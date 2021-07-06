@@ -1,0 +1,64 @@
+{
+  "name": "maidboye",
+  "version": "1.0.1",
+  "buildDate": null,
+  "description": "A cute little maid bot for keep your server nice and tidy.",
+  "main": "index.js",
+  "dependencies": {
+    "@uwu-codes/utils": "^1.0.44",
+    "chunk": "^0.0.3",
+    "discord-command-parser": "^1.5.3",
+    "eris": "github:DonovanDMC/eris#merge",
+    "express": "^4.17.1",
+    "express-session": "^1.17.2",
+    "fs-extra": "^10.0.0",
+    "ioredis": "^4.27.6",
+    "lavalink": "^2.11.0",
+    "mongodb": "^3.6.9",
+    "morgan": "^1.10.0",
+    "node-fetch": "^2.6.1",
+    "source-map-support": "^0.5.19",
+    "tinify": "^1.6.0-beta.2",
+    "tslog": "^3.2.0"
+  },
+  "scripts": {
+    "build": "rm -rf build && tsc && ts-node scripts/build-date.ts && echo Build Finished",
+    "dev": "ts-node src/index.ts",
+    "start": "npm run build && node index.js",
+    "start:nobuild": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DonovanDMC/MaidBoye.git"
+  },
+  "keywords": [
+    "maid",
+    "bot",
+    "discord-bot"
+  ],
+  "author": "Donovan_DMC <hewwo@yiff.rocks>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/DonovanDMC/MaidBoye/issues"
+  },
+  "homepage": "https://github.com/DonovanDMC/MaidBoye#readme",
+  "devDependencies": {
+    "@types/chunk": "*",
+    "@types/express": "^4.17.12",
+    "@types/express-session": "^1.17.3",
+    "@types/fs-extra": "^9.0.11",
+    "@types/ioredis": "^4.26.4",
+    "@types/mongodb": "^3.6.19",
+    "@types/morgan": "^1.9.2",
+    "@types/node": "^16.0.0",
+    "@types/node-fetch": "^2.5.10",
+    "@types/source-map-support": "^0.5.3",
+    "@uwu-codes/types": "^1.0.3",
+    "discord-api-types": "^0.19.0-next.836e8fb.1625574825",
+    "ts-node": "^10.0.0"
+  },
+  "engine": {
+    "node": ">=15.x",
+    "npm": ">=7.x"
+  }
+}
