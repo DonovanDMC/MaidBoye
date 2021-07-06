@@ -30,6 +30,7 @@ export default new Command("eval", "ev")
 	.setRestrictions("developer")
 	.setDescription("Evaluate some code.")
 	.setUsage("<code>")
+	.setParsedFlags("d", "delete", "s", "silent")
 	.setExecutor(async function(msg) {
 		const evalVariables: Record<string, unknown> = {};
 		// eslint-disable-next-line -- typescript messes with variable names so we have to remake them

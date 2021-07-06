@@ -53,8 +53,10 @@ export default class ExtendedMessage extends Message<Eris.GuildTextableChannel> 
 		// if the used prefix was a mention, replace it with the server's first prefix
 		if (this.prefix.replace(/!/g, "") === `<@${this.client.user.id}`) this.prefix = this.gConfig.prefix[0].value;
 		this.cmd = CommandHandler.getCommand(p.command);
-		Array.from(this.args).forEach(arg => {
+		if (this.cmd !== null) Array.from(this.args).forEach(arg => {
 			if (/^(-[a-z]|--[a-z]+(=.+)?)$/.test(arg)) {
+				const [, name] = /^--?([a-z\d]+)(?:=.*)?$/.exec(arg) ?? [];
+				if (!name || !this.cmd!.parsedFlags.includes(name)) return;
 				const indexArg = this.args.indexOf(arg);
 				const indexArgRaw = this.rawArgs.indexOf(arg);
 				// make sure we don't remove the last arg if what we're looking for isn't present

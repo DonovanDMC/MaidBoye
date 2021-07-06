@@ -15,6 +15,7 @@ export default class Command {
 	botPermissions = [] as Array<[perm: Permissions, optional: boolean]>;
 	usage: ((this: MaidBoye, msg: ExtendedMessage, cmd: Command) => Eris.MessageContent | null | Promise<Eris.MessageContent | null>) = () => null;
 	description = "";
+	parsedFlags = [] as Array<string>;
 	cooldown = 0;
 	donatorCooldown = 0;
 	hasSlashVariant = false;
@@ -48,6 +49,11 @@ export default class Command {
 
 	setDescription(data: string) {
 		this.description = data;
+		return this;
+	}
+
+	setParsedFlags(...data: Array<string>) {
+		this.parsedFlags = data;
 		return this;
 	}
 

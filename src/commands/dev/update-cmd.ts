@@ -5,6 +5,7 @@ import { execSync } from "child_process";
 export default new Command("update")
 	.setRestrictions("developer")
 	.setDescription("Pull my code from github")
+	.setParsedFlags("exit")
 	.setExecutor(async function(msg) {
 		try {
 			const out = execSync("git pull");
