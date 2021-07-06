@@ -205,7 +205,7 @@ export default new Command("selfroles")
 					],
 					components: []
 				}); */
-				if (!msg.member.roles.includes(made)) await msg.member.removeRole(made, "SelfRoles[Leave]");
+				if (msg.member.roles.includes(made)) await msg.member.removeRole(made, "SelfRoles[Leave]");
 				await msg.uConfig.mongoEdit({
 					$pull: {
 						selfRolesJoined: msg.uConfig.selfRolesJoined.find(g => g.role === made && g.guild === msg.channel.guild.id)
