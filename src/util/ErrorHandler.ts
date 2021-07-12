@@ -2,7 +2,7 @@ import Logger from "./Logger";
 import ExtendedMessage from "./ExtendedMessage";
 import WebhookStore from "./WebhookStore";
 import EmbedBuilder from "./EmbedBuilder";
-import config from "../config";
+import config from "@config";
 import { dependencies } from "../../package.json";
 import { dependencies as shrinkDependencies } from "../../npm-shrinkwrap.json";
 import * as fs from "fs-extra";
@@ -52,7 +52,8 @@ export default class ErrorHandler {
 			err.stack ?? "[No Stack]"
 		].join("\n"));
 
-		Logger.getLogger("ErrorHandler").error(`Error Code: ${code}, Stack:`, err);
+		Logger.getLogger("ErrorHandler").error(`Error Code: ${code}, Stack:`);
+		console.error("Error", err);
 
 		await WebhookStore.execute("errors", {
 			embeds: [

@@ -1,7 +1,7 @@
-import Command from "../../util/cmd/Command";
-import EmbedBuilder from "../../util/EmbedBuilder";
-import config from "../../config";
-import MessageCollector from "../../util/MessageCollector";
+import config from "@config";
+import Command from "@cmd/Command";
+import EmbedBuilder from "@util/EmbedBuilder";
+import MessageCollector from "@util/MessageCollector";
 import { Strings } from "@uwu-codes/utils";
 import Eris from "eris";
 import chunk from "chunk";
@@ -12,29 +12,31 @@ export default new Command("clean", "clear", "prune", "purge")
 	.setDescription("Clean up some messages")
 	.setUsage(async function (msg, cmd) {
 		return {
-			embed: new EmbedBuilder()
-				.setTitle("Command Help")
-				.setColor("green")
-				.setDescription([
-					`Description: ${cmd.description || "None"}`,
-					`Restrictions: ${cmd.restrictions.length === 0 ? "None" : ""}`,
-					...(cmd.restrictions.length === 0 ? [] : cmd.restrictions.map(r => `- **${Strings.ucwords(r)}**`)),
-					"Usage:",
-					`${config.emojis.default.dot} All: \`${msg.gConfig.getFormattedPrefix()}clean 20\` (2-1000)`,
-					`${config.emojis.default.dot} Specific User: \`${msg.gConfig.getFormattedPrefix()}clean 20 @user\``,
-					`${config.emojis.default.dot} All Bots: \`${msg.gConfig.getFormattedPrefix()}clean 20 bots\``,
-					`${config.emojis.default.dot} Different Channel: \`${msg.gConfig.getFormattedPrefix()}clean 20 #channel\``,
-					`${config.emojis.default.dot} Role: \`${msg.gConfig.getFormattedPrefix()}clean 20 @role\``,
-					`${config.emojis.default.dot} My Commands: \`${msg.gConfig.getFormattedPrefix()}clean 20 commands\``,
-					`${config.emojis.default.dot} Text: \`${msg.gConfig.getFormattedPrefix()}clean 20 text "something here"\``,
-					"",
-					`User Permissions: ${cmd.userPermissions.length === 0 ? "None" : ""}`,
-					...(cmd.userPermissions.length === 0 ? [] : ["```diff\n--- (red = optional)", ...cmd.userPermissions.map(([perm, optional]) => `${optional ? "-" : "+"} ${config.permissions[perm]}`), "\n```"]),
-					`Bot Permissions: ${cmd.botPermissions.length === 0 ? "None" : ""}`,
-					...(cmd.botPermissions.length === 0 ? [] : ["```diff\n--- (red = optional)", ...cmd.botPermissions.map(([perm, optional]) => `${optional ? "-" : "+"} ${config.permissions[perm]}`), "\n```"])
-				].join("\n"))
-				.setAuthor(msg.author.tag, msg.author.avatarURL)
-				.toJSON()
+			embeds: [
+				new EmbedBuilder()
+					.setTitle("Command Help")
+					.setColor("green")
+					.setDescription([
+						`Description: ${cmd.description || "None"}`,
+						`Restrictions: ${cmd.restrictions.length === 0 ? "None" : ""}`,
+						...(cmd.restrictions.length === 0 ? [] : cmd.restrictions.map(r => `- **${Strings.ucwords(r)}**`)),
+						"Usage:",
+						`${config.emojis.default.dot} All: \`${msg.gConfig.getFormattedPrefix()}clean 20\` (2-1000)`,
+						`${config.emojis.default.dot} Specific User: \`${msg.gConfig.getFormattedPrefix()}clean 20 @user\``,
+						`${config.emojis.default.dot} All Bots: \`${msg.gConfig.getFormattedPrefix()}clean 20 bots\``,
+						`${config.emojis.default.dot} Different Channel: \`${msg.gConfig.getFormattedPrefix()}clean 20 #channel\``,
+						`${config.emojis.default.dot} Role: \`${msg.gConfig.getFormattedPrefix()}clean 20 @role\``,
+						`${config.emojis.default.dot} My Commands: \`${msg.gConfig.getFormattedPrefix()}clean 20 commands\``,
+						`${config.emojis.default.dot} Text: \`${msg.gConfig.getFormattedPrefix()}clean 20 text "something here"\``,
+						"",
+						`User Permissions: ${cmd.userPermissions.length === 0 ? "None" : ""}`,
+						...(cmd.userPermissions.length === 0 ? [] : ["```diff\n--- (red = optional)", ...cmd.userPermissions.map(([perm, optional]) => `${optional ? "-" : "+"} ${config.permissions[perm]}`), "\n```"]),
+						`Bot Permissions: ${cmd.botPermissions.length === 0 ? "None" : ""}`,
+						...(cmd.botPermissions.length === 0 ? [] : ["```diff\n--- (red = optional)", ...cmd.botPermissions.map(([perm, optional]) => `${optional ? "-" : "+"} ${config.permissions[perm]}`), "\n```"])
+					].join("\n"))
+					.setAuthor(msg.author.tag, msg.author.avatarURL)
+					.toJSON()
+			]
 		};
 	})
 	.setCooldown(5e3)

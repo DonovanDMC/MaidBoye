@@ -1,4 +1,4 @@
-import config from "../config";
+import config from "@config";
 import { ILogObject, Logger as L } from "tslog";
 import * as fs from "fs-extra";
 

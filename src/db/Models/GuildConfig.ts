@@ -1,6 +1,6 @@
 import db from "..";
-import config from "../../config";
-import BotFunctions from "../../util/BotFunctions";
+import config from "@config";
+import BotFunctions from "@util/BotFunctions";
 import { MatchKeysAndValues, UpdateQuery } from "mongodb";
 import { Utility } from "@uwu-codes/utils";
 import { DataTypes, Writeable } from "@uwu-codes/types";
@@ -55,6 +55,13 @@ export default class GuildConfig {
 		threadsChannel: string | null;
 		threadsExpiry: AutoArchiveDuration;
 		type: "channel" | "threads";
+	};
+	modlog: {
+		enabled: boolean;
+		caseEditingEnabled: boolean;
+		caseDeletingEnabled: boolean;
+		editOthersCasesEnabled: boolean;
+		webhook: Record<"id" | "token" | "channelId", string> | null;
 	};
 	constructor(id: string, data: GuildConfigKV) {
 		this.id = id;

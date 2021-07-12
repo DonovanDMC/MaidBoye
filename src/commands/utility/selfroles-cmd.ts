@@ -1,9 +1,9 @@
-import config from "../../config";
-import Command from "../../util/cmd/Command";
-import EmbedBuilder from "../../util/EmbedBuilder";
-import ComponentHelper from "../../util/ComponentHelper";
-import CommandError from "../../util/cmd/CommandError";
-import ComponentInteractionCollector from "../../util/ComponentInteractionCollector";
+import config from "@config";
+import Command from "@cmd/Command";
+import EmbedBuilder from "@util/EmbedBuilder";
+import ComponentHelper from "@util/ComponentHelper";
+import CommandError from "@cmd/CommandError";
+import ComponentInteractionCollector from "@util/ComponentInteractionCollector";
 import { Strings } from "@uwu-codes/utils";
 import Eris from "eris";
 import { APIMessageSelectMenuInteractionData } from "discord-api-types";
@@ -15,31 +15,33 @@ export default new Command("selfroles")
 	.setCooldown(3e3)
 	.setUsage(async function (msg, cmd) {
 		return {
-			embed: new EmbedBuilder()
-				.setTitle("Command Help")
-				.setColor("green")
-				.setDescription([
-					`Description: ${cmd.description || "None"}`,
-					`Restrictions: ${cmd.restrictions.length === 0 ? "None" : ""}`,
-					...(cmd.restrictions.length === 0 ? [] : cmd.restrictions.map(r => `- **${Strings.ucwords(r)}**`)),
-					"Usage:",
-					`${config.emojis.default.dot} List Roles: \`${msg.gConfig.getFormattedPrefix()}selfroles list\``,
-					`${config.emojis.default.dot} Join Role: \`${msg.gConfig.getFormattedPrefix()}selfroles join <role or similar text>\``,
-					`${config.emojis.default.dot} Leave Role: \`${msg.gConfig.getFormattedPrefix()}selfroles leave\` (no args)`,
-					...(msg.member.permissions.has("manageRoles") ? [
-						"Management Commands:",
-						`${config.emojis.default.dot} Add Role: \`${msg.gConfig.getFormattedPrefix()}selfroles add\``,
-						`${config.emojis.default.dot} Remove Role: \`${msg.gConfig.getFormattedPrefix()}selfroles remove\``,
-						`${config.emojis.default.dot} Remove All: \`${msg.gConfig.getFormattedPrefix()}selfroles clear\``
-					] : []),
-					"",
-					`User Permissions: ${cmd.userPermissions.length === 0 ? "None" : ""}`,
-					...(cmd.userPermissions.length === 0 ? [] : ["```diff\n--- (red = optional)", ...cmd.userPermissions.map(([perm, optional]) => `${optional ? "-" : "+"} ${config.permissions[perm]}`), "\n```"]),
-					`Bot Permissions: ${cmd.botPermissions.length === 0 ? "None" : ""}`,
-					...(cmd.botPermissions.length === 0 ? [] : ["```diff\n--- (red = optional)", ...cmd.botPermissions.map(([perm, optional]) => `${optional ? "-" : "+"} ${config.permissions[perm]}`), "\n```"])
-				].join("\n"))
-				.setAuthor(msg.author.tag, msg.author.avatarURL)
-				.toJSON()
+			embeds: [
+				new EmbedBuilder()
+					.setTitle("Command Help")
+					.setColor("green")
+					.setDescription([
+						`Description: ${cmd.description || "None"}`,
+						`Restrictions: ${cmd.restrictions.length === 0 ? "None" : ""}`,
+						...(cmd.restrictions.length === 0 ? [] : cmd.restrictions.map(r => `- **${Strings.ucwords(r)}**`)),
+						"Usage:",
+						`${config.emojis.default.dot} List Roles: \`${msg.gConfig.getFormattedPrefix()}selfroles list\``,
+						`${config.emojis.default.dot} Join Role: \`${msg.gConfig.getFormattedPrefix()}selfroles join <role or similar text>\``,
+						`${config.emojis.default.dot} Leave Role: \`${msg.gConfig.getFormattedPrefix()}selfroles leave\` (no args)`,
+						...(msg.member.permissions.has("manageRoles") ? [
+							"Management Commands:",
+							`${config.emojis.default.dot} Add Role: \`${msg.gConfig.getFormattedPrefix()}selfroles add\``,
+							`${config.emojis.default.dot} Remove Role: \`${msg.gConfig.getFormattedPrefix()}selfroles remove\``,
+							`${config.emojis.default.dot} Remove All: \`${msg.gConfig.getFormattedPrefix()}selfroles clear\``
+						] : []),
+						"",
+						`User Permissions: ${cmd.userPermissions.length === 0 ? "None" : ""}`,
+						...(cmd.userPermissions.length === 0 ? [] : ["```diff\n--- (red = optional)", ...cmd.userPermissions.map(([perm, optional]) => `${optional ? "-" : "+"} ${config.permissions[perm]}`), "\n```"]),
+						`Bot Permissions: ${cmd.botPermissions.length === 0 ? "None" : ""}`,
+						...(cmd.botPermissions.length === 0 ? [] : ["```diff\n--- (red = optional)", ...cmd.botPermissions.map(([perm, optional]) => `${optional ? "-" : "+"} ${config.permissions[perm]}`), "\n```"])
+					].join("\n"))
+					.setAuthor(msg.author.tag, msg.author.avatarURL)
+					.toJSON()
+			]
 		};
 	})
 	.setExecutor(async function(msg, cmd) {
@@ -50,16 +52,20 @@ export default new Command("selfroles")
 				if (msg.gConfig.selfRoles.length === 0) return msg.reply("Th-this server doesnt't have any self roles..");
 				/* if (selfList.length === 0) return msg.reply("Y-you haven't gained any roles via self roles..");
 				return msg.reply({
-					embed: new EmbedBuilder(true, msg.author)
+					embeds: [
+						new EmbedBuilder(true, msg.author)
 						.setTitle("Self Roles List")
 						.setDescription(selfList.map(r => `- <@&${r.role}>`))
 						.toJSON()
+					]
 				}); */
 				return msg.reply({
-					embed: new EmbedBuilder(true, msg.author)
-						.setTitle("Self Roles List")
-						.setDescription(msg.gConfig.selfRoles.map(r => `- <@&${r.role}>`))
-						.toJSON()
+					embeds: [
+						new EmbedBuilder(true, msg.author)
+							.setTitle("Self Roles List")
+							.setDescription(msg.gConfig.selfRoles.map(r => `- <@&${r.role}>`))
+							.toJSON()
+					]
 				});
 				break;
 			}
@@ -87,10 +93,12 @@ export default new Command("selfroles")
 					}
 				} else {
 					const makeChoice = await msg.reply({
-						embed: new EmbedBuilder(true, msg.author)
-							.setDescription(`Your search "${msg.args.slice(1).join(" ").toLowerCase()}" matched multiple roles. Please select one.`)
-							.setColor("gold")
-							.toJSON(),
+						embeds: [
+							new EmbedBuilder(true, msg.author)
+								.setDescription(`Your search "${msg.args.slice(1).join(" ").toLowerCase()}" matched multiple roles. Please select one.`)
+								.setColor("gold")
+								.toJSON()
+						],
 						components: new ComponentHelper()
 							.addSelectMenu(`select-role.${msg.author.id}`, roles.map(r => ({
 								label: r.name,
@@ -158,10 +166,12 @@ export default new Command("selfroles")
 				if (msg.gConfig.selfRoles.length === 0) return msg.reply("Th-this server doesnt't have any self roles..");
 				if (selfList.length === 0) return msg.reply("Y-you haven't gained any roles via self roles..\n(you cannot remove roles that have been manually added to you via this)");
 				const makeChoice = await msg.reply({
-					embed: new EmbedBuilder(true, msg.author)
-						.setDescription("Please select a role to leave.\nIf a role you're looking for isn't listed here, and you have the role, you did not join it via self roles. You cannot leave roles that were manually assigned to you by server staff.")
-						.setColor("gold")
-						.toJSON(),
+					embeds: [
+						new EmbedBuilder(true, msg.author)
+							.setDescription("Please select a role to leave.\nIf a role you're looking for isn't listed here, and you have the role, you did not join it via self roles. You cannot leave roles that were manually assigned to you by server staff.")
+							.setColor("gold")
+							.toJSON()
+					],
 					components: new ComponentHelper()
 						.addSelectMenu(`select-role.${msg.author.id}`, selfList.map(r => ({
 							label: msg.channel.guild.roles.get(r.role)?.name ?? `Unknown[${r.role}]`,

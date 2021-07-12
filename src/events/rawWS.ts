@@ -2,13 +2,13 @@ import ClientEvent from "../util/ClientEvent";
 import CommandHandler from "../util/cmd/CommandHandler";
 import EmbedBuilder from "../util/EmbedBuilder";
 import ComponentHelper from "../util/ComponentHelper";
-import config from "../config";
+import config from "@config";
 import db from "../db";
 const { r: Redis } = db;
 import { CategoryRestrictions } from "../util/cmd/Category";
 import Logger from "../util/Logger";
 import ComponentInteractionCollector, { Interaction } from "../util/ComponentInteractionCollector";
-import { APIGuildMember, APIMessageComponentInteractionData, GatewayDispatchEvents, GatewayGuildCreateDispatchData, GatewayInteractionCreateDispatchData, GatewayOpcodes, InteractionType } from "discord-api-types";
+import { APIGuildMember,  APIMessageComponentInteractionData, GatewayDispatchEvents, GatewayGuildCreateDispatchData, GatewayInteractionCreateDispatchData, GatewayOpcodes, InteractionType } from "discord-api-types";
 import Eris from "eris";
 import { VoiceServerUpdate, VoiceStateUpdate } from "lavalink";
 
@@ -37,27 +37,17 @@ export default new ClientEvent("rawWS", async function({ op, d, t }) {
 				}
 
 				case "INTERACTION_CREATE": {
-					Logger.getLogger("RawWS Event").info("Interaction Create Event:", d);
+					// Logger.getLogger("RawWS Event").info("Interaction Create Event:", d);
 					const data = d as GatewayInteractionCreateDispatchData;
 					switch (data.type) {
 						case InteractionType.MessageComponent: {
 							const cd = data.data as APIMessageComponentInteractionData;
+							const { member } = (data as { member: APIGuildMember; });
+							Logger.getLogger("BtnInteraction").info(`Recieved interaction from ${!member.user ? "Unknown" : `${member.user.username}#${member.user.discriminator} (${member.user.id})`}, interaction id: "${cd.custom_id}"`);
 							const col = ComponentInteractionCollector.processInteraction(data as Interaction<APIMessageComponentInteractionData>);
 							// skip if interaction was used
 							if (col === true) return;
-							const { member } = (data as { member: APIGuildMember; });
 							const ch = this.getChannel(data.channel_id!) as Eris.GuildTextableChannel;
-							if (cd.custom_id.startsWith("select-role")) {
-								const [, user] = cd.custom_id.split(".");
-								if (user !== (data as { member: APIGuildMember; }).member.user?.id) {
-									await this.createInteractionResponse(data.id, data.token, 6);
-									await this.createFollowupMessage(this.user.id, data.token, {
-										content: "H-hey! This isn't your selection to make! Please run the command yourself to use this..",
-										flags: 64
-									});
-									return;
-								}
-							}
 							if (cd.custom_id.startsWith("help")) {
 								const [, name, user] = cd.custom_id.split(".");
 								if (!user) {
@@ -77,7 +67,7 @@ export default new ClientEvent("rawWS", async function({ op, d, t }) {
 									// @ts-ignore missing types
 									// eslint-disable-next-line
 									const b = await Redis.get(`interactions:${data.message.id}:back`);
-									let eb: { embed: Eris.EmbedOptions; components: Eris.Message["components"]; } | undefined;
+									let eb: { embeds: Array<Eris.EmbedOptions>; components: Eris.Message["components"]; } | undefined;
 									try {
 										eb = JSON.parse(b!) as typeof eb;
 									} catch (err) {
@@ -89,7 +79,7 @@ export default new ClientEvent("rawWS", async function({ op, d, t }) {
 										components: []
 									});
 									await this.editOriginalInteractionResponse(this.user.id, data.token, {
-										embeds: [eb!.embed],
+										embeds: eb!.embeds,
 										components: eb!.components
 									});
 									return;
@@ -121,7 +111,7 @@ export default new ClientEvent("rawWS", async function({ op, d, t }) {
 								} else {
 									// @ts-ignore missing types
 									// eslint-disable-next-line
-									await Redis.set(`interactions:${data.message.id}:back`, JSON.stringify({ embed: data.message.embeds[0], components: data.message.components }));
+									await Redis.set(`interactions:${data.message.id}:back`, JSON.stringify({ embeds: data.message.embeds, components: data.message.components }));
 									const e = new EmbedBuilder()
 										.setDescription(`Description: ${cat.description || "None"}\nTotal Commands: ${cat.commands.length}`)
 										.setAuthor(`${member.user!.username}#${member.user!.discriminator}`, Object.getOwnPropertyDescriptor(Eris.User.prototype, "avatarURL")!.get!.call({ ...member.user, _client: this }));
@@ -138,6 +128,16 @@ export default new ClientEvent("rawWS", async function({ op, d, t }) {
 											.addInteractionButton(2, `help.back.${user}`, false, ComponentHelper.emojiToPartial(config.emojis.default.back, "default"), "Back")
 											.toJSON()
 									});
+								}
+							} else {
+								const [user] = cd.custom_id.split(".").slice(-1);
+								if (/[\d]{15,21/.test(user) && user !== (data as { member: APIGuildMember; }).member.user?.id) {
+									await this.createInteractionResponse(data.id, data.token, 6);
+									await this.createFollowupMessage(this.user.id, data.token, {
+										content: "H-hey! This isn't your selection to make!",
+										flags: 64
+									});
+									return;
 								}
 							}
 

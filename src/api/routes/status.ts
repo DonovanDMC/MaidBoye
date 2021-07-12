@@ -1,4 +1,4 @@
-import config from "../../config";
+import config from "@config";
 import MaidBoye from "../../main";
 import Route from "../Route";
 

@@ -1,5 +1,5 @@
 import Route from "./Route";
-import config from "../config";
+import config from "@config";
 import Logger from "../util/Logger";
 import MaidBoye from "../main";
 import express from "express";

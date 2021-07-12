@@ -1,6 +1,6 @@
 import db from "..";
-import config from "../../config";
-import Logger from "../../util/Logger";
+import config from "@config";
+import Logger from "@util/Logger";
 import { DataTypes, Writeable } from "@uwu-codes/types";
 import { Utility } from "@uwu-codes/utils";
 import { MatchKeysAndValues, UpdateQuery } from "mongodb";

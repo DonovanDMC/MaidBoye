@@ -1,5 +1,5 @@
 import API from "../api";
-import config from "../config";
+import config from "@config";
 import ClientEvent from "../util/ClientEvent";
 import Logger from "../util/Logger";
 import { Utility } from "@uwu-codes/utils";

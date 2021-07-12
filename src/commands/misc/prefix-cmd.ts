@@ -1,7 +1,7 @@
-import config from "../../config";
-import BotFunctions from "../../util/BotFunctions";
-import Command from "../../util/cmd/Command";
-import EmbedBuilder from "../../util/EmbedBuilder";
+import config from "@config";
+import BotFunctions from "@util/BotFunctions";
+import Command from "@cmd/Command";
+import EmbedBuilder from "@util/EmbedBuilder";
 
 export default new Command("prefix")
 	.setPermissions("bot", "embedLinks")
@@ -51,35 +51,39 @@ export default new Command("prefix")
 
 			case "list": {
 				return msg.reply({
-					embed: new EmbedBuilder()
-						.setAuthor(msg.author.tag, msg.author.avatarURL)
-						.setTitle("Prefix List")
-						.setDescription(
-							`<@!${this.user.id}>`,
-							msg.gConfig.prefix.map(({ value, space }) => `\`${value}\` (Space: ${space ? "Yes" : "No"})`)
-						)
-						.toJSON()
+					embeds: [
+						new EmbedBuilder()
+							.setAuthor(msg.author.tag, msg.author.avatarURL)
+							.setTitle("Prefix List")
+							.setDescription(
+								`<@!${this.user.id}>`,
+								msg.gConfig.prefix.map(({ value, space }) => `\`${value}\` (Space: ${space ? "Yes" : "No"})`)
+							)
+							.toJSON()
+					]
 				});
 				break;
 			}
 
 			default: {
 				return msg.reply({
-					embed: new EmbedBuilder()
-						.setAuthor(msg.author.tag, msg.author.avatarURL)
-						.setDescription([
-							"H-hey.. This command is a bit complicated, so here's some extra help!",
-							"",
-							`Add Prefix: \`${BotFunctions.formatPrefix(msg.gConfig)}prefix add <prefix>\`\\*`,
-							`Remove Prefix: \`${BotFunctions.formatPrefix(msg.gConfig)}prefix remove <prefix>\``,
-							`Reset Prefixes: \`${BotFunctions.formatPrefix(msg.gConfig)}prefix reset\``,
-							`List Prefixes: \`${BotFunctions.formatPrefix(msg.gConfig)}prefix list\``,
-							`Note: mentions cannot be added or removed, you can always use <@!${this.user.id}> for commands`,
-							"",
-							"\\* - If you want to use a space with your prefix:",
-							`\`${BotFunctions.formatPrefix(msg.gConfig)}prefix add <prefix> --space\``
-						].join("\n"))
-						.toJSON()
+					embeds: [
+						new EmbedBuilder()
+							.setAuthor(msg.author.tag, msg.author.avatarURL)
+							.setDescription([
+								"H-hey.. This command is a bit complicated, so here's some extra help!",
+								"",
+								`Add Prefix: \`${BotFunctions.formatPrefix(msg.gConfig)}prefix add <prefix>\`\\*`,
+								`Remove Prefix: \`${BotFunctions.formatPrefix(msg.gConfig)}prefix remove <prefix>\``,
+								`Reset Prefixes: \`${BotFunctions.formatPrefix(msg.gConfig)}prefix reset\``,
+								`List Prefixes: \`${BotFunctions.formatPrefix(msg.gConfig)}prefix list\``,
+								`Note: mentions cannot be added or removed, you can always use <@!${this.user.id}> for commands`,
+								"",
+								"\\* - If you want to use a space with your prefix:",
+								`\`${BotFunctions.formatPrefix(msg.gConfig)}prefix add <prefix> --space\``
+							].join("\n"))
+							.toJSON()
+					]
 				});
 				break;
 			}

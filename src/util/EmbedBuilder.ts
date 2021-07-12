@@ -1,10 +1,10 @@
 import { Colors } from "./Constants";
-import config from "../config";
+import config from "@config";
 import { User, EmbedField, EmbedOptions } from "eris";
 
 export default class EmbedBuilder {
 	private json: EmbedOptions;
-	constructor(defaults = true, user?: User) {
+	constructor(defaults = true, user?: User | null) {
 		this.json = {};
 		if (defaults) {
 			this.setColor("bot").setTimestamp("now").setFooter("UwU", config.images.bot);

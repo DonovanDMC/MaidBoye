@@ -1,5 +1,5 @@
-import config from "../../config";
-import Category from "../../util/cmd/Category";
+import config from "@config";
+import Category from "@cmd/Category";
 
 export default new Category("mod", __filename)
 	.setDisplayName("Moderation", config.emojis.default.mod, config.emojis.custom.mod)

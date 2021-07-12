@@ -1,4 +1,4 @@
-import config from "../config";
+import config from "@config";
 import ClientEvent from "../util/ClientEvent";
 import EmbedBuilder from "../util/EmbedBuilder";
 import Logger from "../util/Logger";

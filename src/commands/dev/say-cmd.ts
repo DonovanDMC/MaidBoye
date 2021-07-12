@@ -1,4 +1,4 @@
-import Command from "../../util/cmd/Command";
+import Command from "@cmd/Command";
 
 export default new Command("say")
 	.setRestrictions("developer")

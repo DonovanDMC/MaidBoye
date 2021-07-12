@@ -1,10 +1,10 @@
-import config from "../../config";
-import { CategoryRestrictions } from "../../util/cmd/Category";
-import Command from "../../util/cmd/Command";
-import CommandHandler from "../../util/cmd/CommandHandler";
-import ComponentHelper from "../../util/ComponentHelper";
-import EmbedBuilder from "../../util/EmbedBuilder";
-import BotFunctions from "../../util/BotFunctions";
+import config from "@config";
+import { CategoryRestrictions } from "@cmd/Category";
+import Command from "@cmd/Command";
+import CommandHandler from "@cmd/CommandHandler";
+import ComponentHelper from "@util/ComponentHelper";
+import EmbedBuilder from "@util/EmbedBuilder";
+import BotFunctions from "@util/BotFunctions";
 import Eris from "eris";
 import { Strings } from "@uwu-codes/utils";
 
@@ -31,7 +31,7 @@ export default new Command("help")
 			});
 
 			return msg.reply({
-				embed: e.toJSON(),
+				embeds: [ e.toJSON() ],
 				components: c.toJSON()
 			});
 		} else {
@@ -49,7 +49,7 @@ export default new Command("help")
 				});
 				e.setDescription(`${e.getDescription() ?? ""}\n\n${totalLen > 1900 ? cmdDesc.join(", ") : cmdDesc.join("\n")}`);
 				return msg.reply({
-					embed: e.toJSON(),
+					embeds: [ e.toJSON() ],
 					components: new ComponentHelper()
 						.addInteractionButton(ComponentHelper.BUTTON_SECONDARY, `help.home.${msg.author.id}`, false, ComponentHelper.emojiToPartial(config.emojis.default.home, "default"), "Home")
 						.toJSON()
@@ -76,7 +76,7 @@ export default new Command("help")
 							].join("\n"))
 							.setAuthor(msg.author.tag, msg.author.avatarURL);
 						return msg.reply({
-							embed: e.toJSON(),
+							embeds: [ e.toJSON() ],
 							components: new ComponentHelper()
 								.addInteractionButton(ComponentHelper.BUTTON_SECONDARY, `help.home.${msg.author.id}`, false, ComponentHelper.emojiToPartial(config.emojis.default.home, "default"), "Home")
 								.toJSON()

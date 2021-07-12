@@ -1,6 +1,6 @@
-import Command from "../../util/cmd/Command";
-import EmbedBuilder from "../../util/EmbedBuilder";
-import config from "../../config";
+import config from "@config";
+import Command from "@cmd/Command";
+import EmbedBuilder from "@util/EmbedBuilder";
 import { Time } from "@uwu-codes/utils";
 import Eris from "eris";
 
@@ -31,6 +31,7 @@ export default new Command("sinfo", "serverinfo")
 						`${config.emojis.default.dot} 2FA Requirement: **${msg.channel.guild.mfaLevel === 0 ? "Disabled" : "Enabled"}**`,
 						`${config.emojis.default.dot} Default Notifications: **${msg.channel.guild.defaultNotifications === 0 ? "All Messages" : "Only Mentions"}**`,
 						`${config.emojis.default.dot} Vanity URL: **${msg.channel.guild.features.includes("VANITY_URL") && msg.channel.guild.vanityURL !== null ? `[https://discord.gg/${msg.channel.guild.vanityURL}](https://discord.gg/${msg.channel.guild.vanityURL})` : "None"}**`,
+						`${config.emojis.default.dot} NSFW level: ${["Default", "Explicit", "Safe", "Age Restricted"][msg.channel.guild.nsfwLevel]}`,
 						"",
 						"**Features**:",
 						msg.channel.guild.features.length === 0 ? `${config.emojis.default.dot} NONE` : msg.channel.guild.features.map(f => `${config.emojis.default.dot} ${config.names.serverFeatures[f as keyof typeof config["names"]["serverFeatures"]] ?? f}`),
@@ -134,6 +135,8 @@ export default new Command("sinfo", "serverinfo")
 			}
 		}
 		return msg.channel.createMessage({
-			embed: embed.toJSON()
+			embeds: [
+				embed.toJSON()
+			]
 		});
 	});

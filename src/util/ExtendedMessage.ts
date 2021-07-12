@@ -6,7 +6,7 @@ import GuildConfig from "../db/Models/GuildConfig";
 import UserConfig from "../db/Models/UserConfig";
 import MaidBoye from "../main";
 import db from "../db";
-import config from "../config";
+import config from "@config";
 import Eris, { Member, Message } from "eris";
 import { parse } from "discord-command-parser";
 

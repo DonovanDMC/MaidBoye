@@ -1,9 +1,9 @@
-import Command, { Permissions } from "../../util/cmd/Command";
-/* import MessageCollector from "../../util/MessageCollector";
-import EmbedBuilder from "../../util/EmbedBuilder";
-import ExtendedMessage from "../../util/ExtendedMessage";
+import Command/* , { Permissions } */ from "@cmd/Command";
+/* import MessageCollector from "@util/MessageCollector";
+import EmbedBuilder from "@util/EmbedBuilder";
+import ExtendedMessage from "@util/ExtendedMessage";
 import MaidBoye from "../../main";
-import config from "../../config";
+import config from "@config";
 import Eris from "eris"; */
 
 export default new Command("report")
@@ -118,24 +118,28 @@ export default new Command("report")
 						if (userMsgRaw === null) {
 							await m.edit({
 								content: "",
-								embed: new EmbedBuilder()
-									.setAuthor(msg.author.tag, msg.author.avatarURL)
-									.setTitle("Report Timeout")
-									.setColor("red")
-									.setDescription("Report timed out. This channel will be deleted in 30 seconds.")
-									.toJSON()
+								embeds: [
+									new EmbedBuilder()
+										.setAuthor(msg.author.tag, msg.author.avatarURL)
+										.setTitle("Report Timeout")
+										.setColor("red")
+										.setDescription("Report timed out. This channel will be deleted in 30 seconds.")
+										.toJSON()
+								]
 							});
 							setTimeout(() => ch.delete("Report Timeout").catch(() => ch.createMessage("Failed to delete channel. Please contact a server administrator to clean up this thread.")), 3e4);
 							return null;
 						} else if (userMsgRaw.content.toLowerCase() === "cancel") {
 							await m.edit({
 								content: "",
-								embed: new EmbedBuilder()
-									.setAuthor(msg.author.tag, msg.author.avatarURL)
-									.setTitle("Report Cancelled")
-									.setColor("red")
-									.setDescription("Report cancelled. This channel will be deleted in 30 seconds.")
-									.toJSON()
+								embeds: [
+									new EmbedBuilder()
+										.setAuthor(msg.author.tag, msg.author.avatarURL)
+										.setTitle("Report Cancelled")
+										.setColor("red")
+										.setDescription("Report cancelled. This channel will be deleted in 30 seconds.")
+										.toJSON()
+								]
 							});
 							setTimeout(() => ch.delete("Report Timeout").catch(() => ch.createMessage("Failed to delete channel. Please contact a server administrator to clean up this thread.")), 3e4);
 							return null;
@@ -149,42 +153,48 @@ export default new Command("report")
 						if (user === null) {
 							await m.edit({
 								content: "",
-								embed: new EmbedBuilder()
-									.setTitle("Invalid User")
-									.setColor("red")
-									.setAuthor(msg.author.tag, msg.author.avatarURL)
-									.setDescription("We couldn't find a user with what you provided.. Please try again, or provide `cancel` to cancel.")
-									.toJSON()
+								embeds: [
+									new EmbedBuilder()
+										.setTitle("Invalid User")
+										.setColor("red")
+										.setAuthor(msg.author.tag, msg.author.avatarURL)
+										.setDescription("We couldn't find a user with what you provided.. Please try again, or provide `cancel` to cancel.")
+										.toJSON()
+								]
 							});
 							return getUser.call(this);
 						} else {
 							await m.edit({
 								content: "",
-								embed: new EmbedBuilder()
-									.setAuthor(msg.author.tag, msg.author.avatarURL)
-									.setTitle("User Confirmation")
-									.setColor("gold")
-									.setDescription(
-										"Is this the user you are reporting?",
-										"Answer **yes** or **no**.",
-										"",
-										`User: <@!${user.id}> (\`${user.tag}\`)`,
-										`ID: \`${user.id}\``
-									)
-									.setImage(user.avatarURL)
-									.toJSON()
+								embeds: [
+									new EmbedBuilder()
+										.setAuthor(msg.author.tag, msg.author.avatarURL)
+										.setTitle("User Confirmation")
+										.setColor("gold")
+										.setDescription(
+											"Is this the user you are reporting?",
+											"Answer **yes** or **no**.",
+											"",
+											`User: <@!${user.id}> (\`${user.tag}\`)`,
+											`ID: \`${user.id}\``
+										)
+										.setImage(user.avatarURL)
+										.toJSON()
+								]
 							});
 
 							const confirmMsg = await MessageCollector.awaitMessages(ch.id, 3e4, (mf) => mf.author.id === msg.author.id);
 							if (confirmMsg === null) {
 								await m.edit({
 									content: "",
-									embed: new EmbedBuilder()
-										.setAuthor(msg.author.tag, msg.author.avatarURL)
-										.setTitle("Report Timeout")
-										.setColor("red")
-										.setDescription("Report timed out. This channel will be deleted in 30 seconds.")
-										.toJSON()
+									embeds: [
+										new EmbedBuilder()
+											.setAuthor(msg.author.tag, msg.author.avatarURL)
+											.setTitle("Report Timeout")
+											.setColor("red")
+											.setDescription("Report timed out. This channel will be deleted in 30 seconds.")
+											.toJSON()
+									]
 								});
 								setTimeout(() => ch.delete("Report Timeout").catch(() => ch.createMessage("Failed to delete channel. Please contact a server administrator to clean up this thread.")), 3e4);
 								return null;
@@ -193,12 +203,14 @@ export default new Command("report")
 								if (confirmMsg.content.toLowerCase() !== "yes") {
 									await m.edit({
 										content: "",
-										embed: new EmbedBuilder()
-											.setAuthor(msg.author.tag, msg.author.avatarURL)
-											.setTitle("Report Cancelled")
-											.setColor("red")
-											.setDescription("Report cancelled. This channel will be deleted in 30 seconds.")
-											.toJSON()
+										embeds: [
+											new EmbedBuilder()
+												.setAuthor(msg.author.tag, msg.author.avatarURL)
+												.setTitle("Report Cancelled")
+												.setColor("red")
+												.setDescription("Report cancelled. This channel will be deleted in 30 seconds.")
+												.toJSON()
+										]
 									});
 									setTimeout(() => ch.delete("Report Timeout").catch(() => ch.createMessage("Failed to delete channel. Please contact a server administrator to clean up this thread.")), 3e4);
 									return null;
@@ -212,24 +224,28 @@ export default new Command("report")
 
 					await m.edit({
 						content: "",
-						embed: new EmbedBuilder()
-							.setAuthor(msg.author.tag, msg.author.avatarURL)
-							.setTitle("Report Reason")
-							.setColor("gold")
-							.setDescription("Got it. Please provide a reason for the report.")
-							.setFooter(`Reported User: ${user.tag}`, user.avatarURL)
-							.toJSON()
+						embeds: [
+							new EmbedBuilder()
+								.setAuthor(msg.author.tag, msg.author.avatarURL)
+								.setTitle("Report Reason")
+								.setColor("gold")
+								.setDescription("Got it. Please provide a reason for the report.")
+								.setFooter(`Reported User: ${user.tag}`, user.avatarURL)
+								.toJSON()
+						]
 					});
 					const reasonMsg = await MessageCollector.awaitMessages(ch.id, 3e4, (mf) => mf.author.id === msg.author.id);
 					if (reasonMsg === null) {
 						await m.edit({
 							content: "",
-							embed: new EmbedBuilder()
-								.setAuthor(msg.author.tag, msg.author.avatarURL)
-								.setTitle("Report Timeout")
-								.setColor("red")
-								.setDescription("Report timed out. This channel will be deleted in 30 seconds.")
-								.toJSON()
+							embeds: [
+								new EmbedBuilder()
+									.setAuthor(msg.author.tag, msg.author.avatarURL)
+									.setTitle("Report Timeout")
+									.setColor("red")
+									.setDescription("Report timed out. This channel will be deleted in 30 seconds.")
+									.toJSON()
+							]
 						});
 						setTimeout(() => ch.delete("Report Timeout").catch(() => ch.createMessage("Failed to delete thread. Please contact a server administrator to clean up this thread.")), 3e4);
 						return null;
@@ -239,17 +255,19 @@ export default new Command("report")
 
 						await m.edit({
 							content: "",
-							embed: new EmbedBuilder()
-								.setAuthor(msg.author.tag, msg.author.avatarURL)
-								.setTitle("Report Complete")
-								.setColor("gold")
-								.setDescription(
-									"Your report is finished, and has been sent to this server's staff. If they do not reply within 24 hours, this report will be automatically closed.",
-									"",
-									`Report Id: \`${r}\``,
-									`User Reported: <@!${user.id}> (${user.tag})`
-								)
-								.toJSON()
+							embeds: [
+								new EmbedBuilder()
+									.setAuthor(msg.author.tag, msg.author.avatarURL)
+									.setTitle("Report Complete")
+									.setColor("gold")
+									.setDescription(
+										"Your report is finished, and has been sent to this server's staff. If they do not reply within 24 hours, this report will be automatically closed.",
+										"",
+										`Report Id: \`${r}\``,
+										`User Reported: <@!${user.id}> (${user.tag})`
+									)
+									.toJSON()
+							]
 						});
 						await ch.edit({
 							name: `user-report-${r}`
@@ -288,24 +306,28 @@ export default new Command("report")
 						if (userMsgRaw === null) {
 							await m.edit({
 								content: "",
-								embed: new EmbedBuilder()
-									.setAuthor(msg.author.tag, msg.author.avatarURL)
-									.setTitle("Report Timeout")
-									.setColor("red")
-									.setDescription("Report timed out. This thread will be deleted in 30 seconds.")
-									.toJSON()
+								embeds: [
+									new EmbedBuilder()
+										.setAuthor(msg.author.tag, msg.author.avatarURL)
+										.setTitle("Report Timeout")
+										.setColor("red")
+										.setDescription("Report timed out. This thread will be deleted in 30 seconds.")
+										.toJSON()
+								]
 							});
 							setTimeout(() => t.delete().catch(() => t.createMessage("Failed to delete thread. Please contact a server administrator to clean up this thread.")), 3e4);
 							return null;
 						} else if (userMsgRaw.content.toLowerCase() === "cancel") {
 							await m.edit({
 								content: "",
-								embed: new EmbedBuilder()
-									.setAuthor(msg.author.tag, msg.author.avatarURL)
-									.setTitle("Report Cancelled")
-									.setColor("red")
-									.setDescription("Report cancelled. This thread will be deleted in 30 seconds.")
-									.toJSON()
+								embeds: [
+									new EmbedBuilder()
+										.setAuthor(msg.author.tag, msg.author.avatarURL)
+										.setTitle("Report Cancelled")
+										.setColor("red")
+										.setDescription("Report cancelled. This thread will be deleted in 30 seconds.")
+										.toJSON()
+								]
 							});
 							return null;
 						}
@@ -318,42 +340,48 @@ export default new Command("report")
 						if (user === null) {
 							await m.edit({
 								content: "",
-								embed: new EmbedBuilder()
-									.setTitle("Invalid User")
-									.setColor("red")
-									.setAuthor(msg.author.tag, msg.author.avatarURL)
-									.setDescription("We couldn't find a user with what you provided.. Please try again, or provide `cancel` to cancel.")
-									.toJSON()
+								embeds: [
+									new EmbedBuilder()
+										.setTitle("Invalid User")
+										.setColor("red")
+										.setAuthor(msg.author.tag, msg.author.avatarURL)
+										.setDescription("We couldn't find a user with what you provided.. Please try again, or provide `cancel` to cancel.")
+										.toJSON()
+								]
 							});
 							return getUser.call(this);
 						} else {
 							await m.edit({
 								content: "",
-								embed: new EmbedBuilder()
-									.setAuthor(msg.author.tag, msg.author.avatarURL)
-									.setTitle("User Confirmation")
-									.setColor("gold")
-									.setDescription(
-										"Is this the user you are reporting?",
-										"Answer **yes** or **no**.",
-										"",
-										`User: <@!${user.id}> (\`${user.tag}\`)`,
-										`ID: \`${user.id}\``
-									)
-									.setImage(user.avatarURL)
-									.toJSON()
+								embeds: [
+									new EmbedBuilder()
+										.setAuthor(msg.author.tag, msg.author.avatarURL)
+										.setTitle("User Confirmation")
+										.setColor("gold")
+										.setDescription(
+											"Is this the user you are reporting?",
+											"Answer **yes** or **no**.",
+											"",
+											`User: <@!${user.id}> (\`${user.tag}\`)`,
+											`ID: \`${user.id}\``
+										)
+										.setImage(user.avatarURL)
+										.toJSON()
+								]
 							});
 
 							const confirmMsg = await MessageCollector.awaitMessages(t.id, 3e4, (mf) => mf.author.id === msg.author.id);
 							if (confirmMsg === null) {
 								await m.edit({
 									content: "",
-									embed: new EmbedBuilder()
-										.setAuthor(msg.author.tag, msg.author.avatarURL)
-										.setTitle("Report Timeout")
-										.setColor("red")
-										.setDescription("Report timed out. This thread will be deleted in 30 seconds.")
-										.toJSON()
+									embeds: [
+										new EmbedBuilder()
+											.setAuthor(msg.author.tag, msg.author.avatarURL)
+											.setTitle("Report Timeout")
+											.setColor("red")
+											.setDescription("Report timed out. This thread will be deleted in 30 seconds.")
+											.toJSON()
+									]
 								});
 								setTimeout(() => t.delete().catch(() => t.createMessage("Failed to delete thread. Please contact a server administrator to clean up this thread.")), 3e4);
 								return null;
@@ -362,12 +390,14 @@ export default new Command("report")
 								if (confirmMsg.content.toLowerCase() !== "yes") {
 									await m.edit({
 										content: "",
-										embed: new EmbedBuilder()
-											.setAuthor(msg.author.tag, msg.author.avatarURL)
-											.setTitle("Report Cancelled")
-											.setColor("red")
-											.setDescription("Report cancelled. This thread will be deleted in 30 seconds.")
-											.toJSON()
+										embeds: [
+											new EmbedBuilder()
+												.setAuthor(msg.author.tag, msg.author.avatarURL)
+												.setTitle("Report Cancelled")
+												.setColor("red")
+												.setDescription("Report cancelled. This thread will be deleted in 30 seconds.")
+												.toJSON()
+										]
 									});
 									setTimeout(() => t.delete().catch(() => t.createMessage("Failed to delete thread. Please contact a server administrator to clean up this thread.")), 3e4);
 									return null;
@@ -381,24 +411,28 @@ export default new Command("report")
 
 					await m.edit({
 						content: "",
-						embed: new EmbedBuilder()
-							.setAuthor(msg.author.tag, msg.author.avatarURL)
-							.setTitle("Report Reason")
-							.setColor("gold")
-							.setDescription("Got it. Please provide a reason for the report.")
-							.setFooter(`Reported User: ${user.tag}`, user.avatarURL)
-							.toJSON()
+						embeds: [
+							new EmbedBuilder()
+								.setAuthor(msg.author.tag, msg.author.avatarURL)
+								.setTitle("Report Reason")
+								.setColor("gold")
+								.setDescription("Got it. Please provide a reason for the report.")
+								.setFooter(`Reported User: ${user.tag}`, user.avatarURL)
+								.toJSON()
+						]
 					});
 					const reasonMsg = await MessageCollector.awaitMessages(t.id, 3e4, (mf) => mf.author.id === msg.author.id);
 					if (reasonMsg === null) {
 						await m.edit({
 							content: "",
-							embed: new EmbedBuilder()
-								.setAuthor(msg.author.tag, msg.author.avatarURL)
-								.setTitle("Report Timeout")
-								.setColor("red")
-								.setDescription("Report timed out. This thread will be deleted in 30 seconds.")
-								.toJSON()
+							embeds: [
+								new EmbedBuilder()
+									.setAuthor(msg.author.tag, msg.author.avatarURL)
+									.setTitle("Report Timeout")
+									.setColor("red")
+									.setDescription("Report timed out. This thread will be deleted in 30 seconds.")
+									.toJSON()
+							]
 						});
 						setTimeout(() => t.delete().catch(() => t.createMessage("Failed to delete thread. Please contact a server administrator to clean up this thread.")), 3e4);
 						return null;
@@ -408,17 +442,19 @@ export default new Command("report")
 
 						await m.edit({
 							content: "",
-							embed: new EmbedBuilder()
-								.setAuthor(msg.author.tag, msg.author.avatarURL)
-								.setTitle("Report Complete")
-								.setColor("gold")
-								.setDescription(
-									"Your report is finished, and has been sent to this server's staff. If they do not reply within 24 hours, this will be auto archived.",
-									"",
-									`Report Id: \`${r}\``,
-									`User Reported: <@!${user.id}> (${user.tag})`
-								)
-								.toJSON()
+							embeds: [
+								new EmbedBuilder()
+									.setAuthor(msg.author.tag, msg.author.avatarURL)
+									.setTitle("Report Complete")
+									.setColor("gold")
+									.setDescription(
+										"Your report is finished, and has been sent to this server's staff. If they do not reply within 24 hours, this will be auto archived.",
+										"",
+										`Report Id: \`${r}\``,
+										`User Reported: <@!${user.id}> (${user.tag})`
+									)
+									.toJSON()
+							]
 						});
 						await t.edit({
 							name: `User Report (${r})`

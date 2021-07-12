@@ -1,6 +1,6 @@
-import Command from "../../util/cmd/Command";
-import EmbedBuilder from "../../util/EmbedBuilder";
-import config from "../../config";
+import config from "@config";
+import Command from "@cmd/Command";
+import EmbedBuilder from "@util/EmbedBuilder";
 import { performance } from "perf_hooks";
 
 export default new Command("ping")
@@ -14,11 +14,12 @@ export default new Command("ping")
 		const end = performance.now();
 		await m.delete();
 		return msg.reply({
-			embed: new EmbedBuilder()
+			embeds: [new EmbedBuilder()
 				.setAuthor(msg.author.tag, msg.author.avatarURL)
 				.setTitle("Pong!")
 				.setDescription(`\ud83c\udfd3 Gateway: **${msg.channel.guild.shard.latency}ms** | REST: **${(end - start).toFixed(0)}ms**`)
 				.setFooter(`UwU | Shard: ${msg.channel.guild.shard.id + 1}/${this.shards.size}`, config.images.bot)
 				.toJSON()
+			]
 		});
 	});

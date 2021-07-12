@@ -1,5 +1,7 @@
+import EmbedBuilder from "./EmbedBuilder";
 import GuildConfig from "../db/Models/GuildConfig";
 import Eris from "eris";
+import { Strings } from "@uwu-codes/utils";
 
 export default class BotFunctions {
 	private constructor() {
@@ -123,5 +125,23 @@ export default class BotFunctions {
 								flag === "long-datetime" ? "F" :
 									flag === "relative" ? "R" :
 										"f"}>`;
+	}
+
+	// @FIXME legacy code
+	static genErrorEmbed(user: Eris.User | null, type: "INVALID_USER" | "INVALID_MEMBER" | "INVALID_ROLE" | "INVALID_CHANNEL", json: true): Eris.EmbedOptions;
+	static genErrorEmbed(user: Eris.User | null, type: "INVALID_USER" | "INVALID_MEMBER" | "INVALID_ROLE" | "INVALID_CHANNEL", json?: false): EmbedBuilder;
+	static genErrorEmbed(user: Eris.User | null, type: "INVALID_USER" | "INVALID_MEMBER" | "INVALID_ROLE" | "INVALID_CHANNEL", json?: boolean) {
+		const desc = {
+			INVALID_USER: "The specified user was not found. Please provide either a mention, a username, a full tag, or an id.",
+			INVALID_MEMBER: "The specified member was not found. Please provide either a mention, a username, a full tag, or an id.",
+			INVALID_ROLE: "The specified role was not found. Please provide either a mention, a name, or an id.",
+			INVALID_CHANNEL: "The specified channel was not found. Please provide either a mention, a name, or an id."
+		};
+		const e = new EmbedBuilder(true, user)
+			.setTitle(`${Strings.ucwords(type.split("_")[1].toLowerCase())} Not Found`)
+			.setDescription(desc[type])
+			.setTimestamp(new Date().toISOString())
+			.setColor("red");
+		return json ? e.toJSON() : e;
 	}
 }

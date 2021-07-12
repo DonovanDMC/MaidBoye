@@ -5,7 +5,33 @@
 		"baseUrl": "./src",
 		"strictPropertyInitialization": false,
 		"skipLibCheck": true,
-		"inlineSourceMap": true
+		"inlineSourceMap": true,
+		"paths": {
+			"@src/*": [
+				"*"
+			],
+			"@root/*": [
+				"../*"
+			],
+			"@config": [
+				"config/index.ts"
+			],
+			"@config/*": [
+				"config/*"
+			],
+			"@util/*": [
+				"util/*"
+			],
+			"@cmd/*": [
+				"util/cmd/*"
+			],
+			"@db/*": [
+				"db/*"
+			],
+			"@MaidBoye": [
+				"main.ts"
+			]
+		}
 	},
 	"include": [
 		"**/*"

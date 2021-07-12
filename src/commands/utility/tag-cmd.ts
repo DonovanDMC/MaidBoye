@@ -1,5 +1,5 @@
-import Command from "../../util/cmd/Command";
-import EmbedBuilder from "../../util/EmbedBuilder";
+import Command from "@cmd/Command";
+import EmbedBuilder from "@util/EmbedBuilder";
 import chunk from "chunk";
 import { Time } from "@uwu-codes/utils";
 
@@ -35,10 +35,12 @@ export default new Command("tag", "tags")
 
 				return msg.reply({
 					content: `successfully created the tag **${msg.rawArgs[1].toLowerCase()}**, with the content:`,
-					embed: new EmbedBuilder()
-						.setAuthor(msg.author.tag, msg.author.avatarURL)
-						.setDescription(msg.rawArgs.slice(2).join(" "))
-						.toJSON()
+					embeds: [
+						new EmbedBuilder()
+							.setAuthor(msg.author.tag, msg.author.avatarURL)
+							.setDescription(msg.rawArgs.slice(2).join(" "))
+							.toJSON()
+					]
 				});
 				break;
 			}
@@ -69,11 +71,13 @@ export default new Command("tag", "tags")
 
 				return msg.reply({
 					content: `successfully modified the tag **${msg.rawArgs[1].toLowerCase()}**`,
-					embed: new EmbedBuilder()
-						.setAuthor(msg.author.tag, msg.author.avatarURL)
-						.addField("Old Content", t.content, false)
-						.addField("New Content", msg.rawArgs.slice(2).join(" "), false)
-						.toJSON()
+					embeds: [
+						new EmbedBuilder()
+							.setAuthor(msg.author.tag, msg.author.avatarURL)
+							.addField("Old Content", t.content, false)
+							.addField("New Content", msg.rawArgs.slice(2).join(" "), false)
+							.toJSON()
+					]
 				});
 				break;
 			}
@@ -117,30 +121,34 @@ export default new Command("tag", "tags")
 					]);
 				}
 				return msg.reply({
-					embed: new EmbedBuilder()
-						.setAuthor(msg.author.tag, msg.author.avatarURL)
-						.setFooter(`UwU | Page ${page}/${pages.length}${page !== pages.length ? ` | ${msg.gConfig.getFormattedPrefix(0)}tags list ${page + 1}` : ""}`)
-						.setDescription(tags[0], ...tags.slice(1))
-						.toJSON()
+					embeds: [
+						new EmbedBuilder()
+							.setAuthor(msg.author.tag, msg.author.avatarURL)
+							.setFooter(`UwU | Page ${page}/${pages.length}${page !== pages.length ? ` | ${msg.gConfig.getFormattedPrefix(0)}tags list ${page + 1}` : ""}`)
+							.setDescription(tags[0], ...tags.slice(1))
+							.toJSON()
+					]
 				});
 				break;
 			}
 
 			case "help": {
 				return msg.reply({
-					embed: new EmbedBuilder()
-						.setAuthor(msg.author.tag, msg.author.avatarURL)
-						.setTitle("Tag Help")
-						.setDescription(
-							"(techincal note: **tags** and **tag** refer to the same command)",
-							`**Create**: \`${msg.gConfig.getFormattedPrefix(0)}tags create <name> <content>\``,
-							`**Modify**: \`${msg.gConfig.getFormattedPrefix(0)}tags modify <name> <newcontent>\``,
-							`**Delete**: \`${msg.gConfig.getFormattedPrefix(0)}tags delete <name>\``,
-							`**List**: \`${msg.gConfig.getFormattedPrefix(0)}tags list [page]\``,
-							`**Help**: \`${msg.gConfig.getFormattedPrefix(0)}tags help\``,
-							`**Get**: \`${msg.gConfig.getFormattedPrefix(0)}tag <name>\``
-						)
-						.toJSON()
+					embeds: [
+						new EmbedBuilder()
+							.setAuthor(msg.author.tag, msg.author.avatarURL)
+							.setTitle("Tag Help")
+							.setDescription(
+								"(techincal note: **tags** and **tag** refer to the same command)",
+								`**Create**: \`${msg.gConfig.getFormattedPrefix(0)}tags create <name> <content>\``,
+								`**Modify**: \`${msg.gConfig.getFormattedPrefix(0)}tags modify <name> <newcontent>\``,
+								`**Delete**: \`${msg.gConfig.getFormattedPrefix(0)}tags delete <name>\``,
+								`**List**: \`${msg.gConfig.getFormattedPrefix(0)}tags list [page]\``,
+								`**Help**: \`${msg.gConfig.getFormattedPrefix(0)}tags help\``,
+								`**Get**: \`${msg.gConfig.getFormattedPrefix(0)}tag <name>\``
+							)
+							.toJSON()
+					]
 				});
 				break;
 			}

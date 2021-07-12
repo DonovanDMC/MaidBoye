@@ -1,5 +1,7 @@
 // eslint-disable-next-line @typescript-eslint/triple-slash-reference
 /// <reference path="./@types/Eris.d.ts" />
+import "module-alias/register";
+import MessageCollector from "./MessageCollector";
 import Eris from "eris";
 import sauce from "source-map-support";
 sauce.install({ hookRequire: true });
@@ -23,27 +25,29 @@ Object.defineProperties(Eris.Member.prototype, {
 		get(this: Eris.Member) { return this.roles.map(r => this.guild.roles.get(r)); }
 	},
 	topRole: {
-		get(this: Eris.Member) { return this.realRoles.sort((a,b) => a.position - b.position)[0]?.name ?? null; }
+		get(this: Eris.Member) { return this.realRoles.sort((a,b) => a.position - b.position)[0] ?? null; }
 	},
+	// higher = compared member is higher than current member
 	compareToMember: {
 		value(this: Eris.Member, to: Eris.Member | string) {
 			if (!(to instanceof Eris.Member)) to = this.guild.members.get(to)!;
 			if (!to) return "invalid";
 			const a = this.topRole?.position ?? -1;
 			const b = to.topRole?.position ?? -1;
-			if (a > b) return "higher";
-			else if (a < b) return "lower";
+			if (a > b) return "lower";
+			else if (a < b) return "higher";
 			else if (a === b) return "same";
 			else return "unknown";
 		}
 	},
+	// higher = compared role is higher than current member
 	compareToRole: {
 		value(this: Eris.Member, to: Eris.Role | string) {
 			if (!(to instanceof Eris.Role)) to = this.guild.roles.get(to)!;
 			if (!to) return "invalid";
 			const a = this.topRole?.position ?? -1;
-			if (a > to.position) return "higher";
-			else if (a < to.position) return "lower";
+			if (a > to.position) return "lower";
+			else if (a < to.position) return "higher";
 			else if (a === to.position) return "same";
 			else return "unknown";
 		}
@@ -116,6 +120,8 @@ Object.defineProperties(Eris.Message.prototype, {
 				...content,
 				messageReference: {
 					messageID: this.id,
+					guildID: this.guildID,
+					channelID: this.channel.id,
 					failIfNotExists: false
 				}
 			}, file);
@@ -279,5 +285,22 @@ Object.defineProperties(Eris.Client.prototype, {
 		async value(this: Eris.Client, applicationId: string, token: string, id: string) {
 			await this.requestHandler.request("DELETE", `/webhooks/${applicationId}/${token}/messages/${id}`, true, undefined, undefined, `/webhooks/:applicationId/:token/messages/${id === "@original" ? "@original" : ":id"}`);
 		}
+	}
+});
+
+Object.defineProperty(Eris.GuildChannel, "awaitMessages", {
+	async value<T extends Eris.TextableChannel = Exclude<Eris.GuildTextableChannel, Eris.AnyThreadChannel>>(this: T, timeout: number, filter: (msg: Eris.Message<Eris.TextableChannel>) => boolean = (() => true), limit?: number): Promise<Array<Eris.Message<T>> | Eris.Message<T> | null> {
+		return MessageCollector.awaitMessages(this.id, timeout, filter, limit as 1);
+	}
+});
+
+
+Object.defineProperty(Eris, "InteractionCallbackType", {
+	value: {
+		PONG: 1,
+		CHANNEL_MESSAGE_WITH_SOURCE: 4,
+		DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE: 5,
+		DEFERRED_UPDATE_MESSAGE: 6,
+		UPDATE_MESSAGE: 7
 	}
 });

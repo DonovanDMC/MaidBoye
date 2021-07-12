@@ -1,11 +1,11 @@
 import ClientEvent from "../util/ClientEvent";
 import EmbedBuilder from "../util/EmbedBuilder";
-import config from "../config";
 import Logger from "../util/Logger";
 import ExtendedMessage from "../util/ExtendedMessage";
 import { Permissions } from "../util/cmd/Command";
 import ErrorHandler from "../util/ErrorHandler";
 import CommandError from "../util/cmd/CommandError";
+import config from "@config";
 import { Strings } from "@uwu-codes/utils";
 import Eris from "eris";
 
@@ -17,12 +17,14 @@ export default new ClientEvent("messageCreate", async function (message) {
 	if (message.channel.type === Eris.Constants.ChannelTypes.DM) {
 		Logger.info(`Direct message recieved from ${message.author.tag} (${message.author.id}) | Content: ${message.content || "NONE"}${message.attachments.length !== 0 ? ` | Attachments: ${message.attachments.map((a, i) => `[${i}]: ${a.url}`).join(", ")}` : ""}`);
 		return message.channel.createMessage({
-			embed: EmbedBuilder.new()
-				.setTitle("Hi!")
-				.setDescription(`H-hey... I see you direct messaged me.. If you need some help, y-you can join my support server.. <${config.client.links.supprt}>\nMy default prefix is \`${config.defaults.prefix.trim()}\`, and you can list my commands b-by using \`${config.defaults.prefix}help\` in a server.\n\nI-if you don't want this response, run \`${config.defaults.prefix}toggledmresponse\` in a server..`)
-				.setAuthor(message.author.tag, message.author.avatarURL)
-				.setFooter(">w<")
-				.toJSON()
+			embeds: [
+				new EmbedBuilder()
+					.setTitle("Hi!")
+					.setDescription(`H-hey... I see you direct messaged me.. If you need some help, y-you can join my support server.. <${config.client.links.supprt}>\nMy default prefix is \`${config.defaults.prefix.trim()}\`, and you can list my commands b-by using \`${config.defaults.prefix}help\` in a server.\n\nI-if you don't want this response, run \`${config.defaults.prefix}toggledmresponse\` in a server..`)
+					.setAuthor(message.author.tag, message.author.avatarURL)
+					.setFooter(">w<")
+					.toJSON()
+			]
 		});
 	}
 

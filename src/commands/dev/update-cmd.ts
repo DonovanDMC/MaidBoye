@@ -1,5 +1,5 @@
-import Command from "../../util/cmd/Command";
-import Logger from "../../util/Logger";
+import Command from "@cmd/Command";
+import Logger from "@util/Logger";
 import { execSync } from "child_process";
 
 export default new Command("update")

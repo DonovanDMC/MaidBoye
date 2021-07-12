@@ -1,6 +1,6 @@
 import GuildConfig, { GuildConfigKV, UserReport } from "./Models/GuildConfig";
 import UserConfig, { UserConfigKV } from "./Models/UserConfig";
-import config from "../config";
+import config from "@config";
 import Logger from "../util/Logger";
 import IORedis from "ioredis";
 import { Collection, MongoClient, MongoClientOptions } from "mongodb";

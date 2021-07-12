@@ -1,7 +1,7 @@
-import Command from "../../util/cmd/Command";
-import EmbedBuilder from "../../util/EmbedBuilder";
-import config from "../../config";
-import BotFunctions from "../../util/BotFunctions";
+import config from "@config";
+import Command from "@cmd/Command";
+import EmbedBuilder from "@util/EmbedBuilder";
+import BotFunctions from "@util/BotFunctions";
 import fetch from "node-fetch";
 import { Time } from "@uwu-codes/utils";
 import Eris from "eris";
@@ -51,32 +51,34 @@ export default new Command("uinfo", "userinfo")
 		}
 
 		return msg.reply({
-			embed: new EmbedBuilder()
-				.setAuthor(msg.author.tag, msg.author.avatarURL)
-				.setTitle(`User Info for ${user.tag}`)
-				.setThumbnail(user.dynamicAvatarURL(undefined, 4096))
-				.setDescription(
-					"**General User**:",
-					`${config.emojis.default.dot} Tag: **${user.tag}**`,
-					`${config.emojis.default.dot} ID: **${user.id}**`,
-					`${config.emojis.default.dot} Avatar: [Link](${user.avatarURL})`,
-					`${config.emojis.default.dot} Creation Date: ${Time.formatDateWithPadding(user.createdAt, true, false, true, false)}`,
-					member === undefined ? "" : [
+			embeds: [
+				new EmbedBuilder()
+					.setAuthor(msg.author.tag, msg.author.avatarURL)
+					.setTitle(`User Info for ${user.tag}`)
+					.setThumbnail(user.dynamicAvatarURL(undefined, 4096))
+					.setDescription(
+						"**General User**:",
+						`${config.emojis.default.dot} Tag: **${user.tag}**`,
+						`${config.emojis.default.dot} ID: **${user.id}**`,
+						`${config.emojis.default.dot} Avatar: [Link](${user.avatarURL})`,
+						`${config.emojis.default.dot} Creation Date: ${Time.formatDateWithPadding(user.createdAt, true, false, true, false)}`,
+						member === undefined ? "" : [
+							"",
+							"**Server Member**:",
+							`${config.emojis.default.dot} Join Date: ${member.joinedAt === null ? "Unknown" : Time.formatDateWithPadding(member.joinedAt, true, false, true, false)}`,
+							`${config.emojis.default.dot} Roles: ${member.roles.length === 0 ? "**None**" : member.roles.reduce((a,b) => a + b.length + 4 /* <@&> */, 0) > 1500 ? "**Unable To Display Roles.**" : member.roles.map(r => `<@&${r}>`).join(" ")}`,
+							`${config.emojis.default.dot} Join Info:`,
+							...joins.map(j => `${config.emojis.default.dot} ${j.id === member.id ? `**#${sortedMembers.indexOf(j) + 1} ${j.tag}**` : `#${sortedMembers.indexOf(j) + 1} ${j.tag}`}`)
+						],
 						"",
-						"**Server Member**:",
-						`${config.emojis.default.dot} Join Date: ${member.joinedAt === null ? "Unknown" : Time.formatDateWithPadding(member.joinedAt, true, false, true, false)}`,
-						`${config.emojis.default.dot} Roles: ${member.roles.length === 0 ? "**None**" : member.roles.reduce((a,b) => a + b.length + 4 /* <@&> */, 0) > 1500 ? "**Unable To Display Roles.**" : member.roles.map(r => `<@&${r}>`).join(" ")}`,
-						`${config.emojis.default.dot} Join Info:`,
-						...joins.map(j => `${config.emojis.default.dot} ${j.id === member.id ? `**#${sortedMembers.indexOf(j) + 1} ${j.tag}**` : `#${sortedMembers.indexOf(j) + 1} ${j.tag}`}`)
-					],
-					"",
-					`[**DiscordRep**](https://discordrep.com/u/${user.id}):`,
-					`${config.emojis.default.dot} Rep: ${!dRep? "Unable to fetch data." : `${config.emojis.custom[(dRep.upvotes - dRep.downvotes) > 0 ? "upvote" : (dRep.upvotes - dRep.downvotes) < 0 ? "downvote" : "neutral"]} ${dRep.upvotes - dRep.downvotes}`}`,
-					`${config.emojis.default.dot} Infractions: ${!infr ? "Unable to fetch data." : `${infr.type === "CLEAN" ? "None" : `**${infr.type}**, Reason: ${infr.reason}, Timestamp: ${new Date(infr.date).toISOString()}`}`}`,
-					"",
-					"**Badges**:",
-					badges.map(f => `${config.emojis.default.dot} ${config.names.badges[f]}`)
-				)
-				.toJSON()
+						`[**DiscordRep**](https://discordrep.com/u/${user.id}):`,
+						`${config.emojis.default.dot} Rep: ${!dRep? "Unable to fetch data." : `${config.emojis.custom[(dRep.upvotes - dRep.downvotes) > 0 ? "upvote" : (dRep.upvotes - dRep.downvotes) < 0 ? "downvote" : "neutral"]} ${dRep.upvotes - dRep.downvotes}`}`,
+						`${config.emojis.default.dot} Infractions: ${!infr ? "Unable to fetch data." : `${infr.type === "CLEAN" ? "None" : `**${infr.type}**, Reason: ${infr.reason}, Timestamp: ${new Date(infr.date).toISOString()}`}`}`,
+						"",
+						"**Badges**:",
+						badges.map(f => `${config.emojis.default.dot} ${config.names.badges[f]}`)
+					)
+					.toJSON()
+			]
 		});
 	});

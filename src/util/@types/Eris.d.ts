@@ -12,7 +12,7 @@ declare module "eris" {
 
 	interface User {
 		readonly tag: string;
-		createMessage(content: MessageContent, file: MessageFile | Array<MessageFile>): Message<PrivateChannel>;
+		createMessage(content: MessageContent, file?: MessageFile | Array<MessageFile>): Promise<Message<PrivateChannel>>;
 	}
 
 	interface Guild {
@@ -47,10 +47,18 @@ declare module "eris" {
 	}
 
 	type InteractionPayload = Omit<WebhookPayload, "auth" | "avatarURL" | "username" | "wait"> & { flags?: number; };
-	type InteractionCallbackType = 1 | 4 | 5 | 6 | 7;
+	interface InteractionCallbackType {
+		PONG: 1;
+		CHANNEL_MESSAGE_WITH_SOURCE: 4;
+		DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE: 5;
+		DEFERRED_UPDATE_MESSAGE: 6;
+		UPDATE_MESSAGE: 7;
+	}
+
+	export const InteractionCallbackType: InteractionCallbackType;
 
 	interface Client {
-		createInteractionResponse(id: string, token: string, type: InteractionCallbackType, content?: InteractionPayload): Promise<void>;
+		createInteractionResponse(id: string, token: string, type: InteractionCallbackType[keyof InteractionCallbackType], content?: InteractionPayload): Promise<void>;
 		getOriginalInteractionResponse(applicationId: string, token: string): Promise<Message<GuildTextableChannel>>;
 		editOriginalInteractionResponse(applicationId: string, token: string, content: InteractionPayload): Promise<void>;
 		deleteOriginalInteractionResponse(applicationId: string, token: string): Promise<void>;
@@ -60,5 +68,10 @@ declare module "eris" {
 		deleteFollowupMessage(applicationId: string, token: string, messageId: string): Promise<void>;
 		// just for internal use
 		private _formatAllowedMentions(allowed: AllowedMentions): unknown;
+	}
+
+	interface GuildChannel {
+		async awaitMessages<T extends TextableChannel = Exclude<GuildTextableChannel, AnyThreadChannel>>(timeout: number, filter: (msg: Message<TextableChannel>) => boolean, limit: number): Promise<Array<Message<T>>>;
+		async awaitMessages<T extends TextableChannel = Exclude<GuildTextableChannel, AnyThreadChannel>>(timeout: number, filter?: (msg: Message<TextableChannel>) => boolean, limit?: 1): Promise<Message<T> | null>;
 	}
 }
