@@ -1,6 +1,16 @@
 // eslint-disable-next-line @typescript-eslint/triple-slash-reference
 /// <reference path="./@types/Eris.d.ts" />
-import "module-alias/register";
+// eslint-disable-next-line import/order
+import moduleAlias from "module-alias";
+const d = `../../${__filename.endsWith(".ts") ? "../" : ""}`;
+moduleAlias.addAliases({
+	"@root": `${d}/build`,
+	"@config": `${d}/src/config`,
+	"@util": `${d}/src/util`,
+	"@cmd": `${d}/src/util/cmd`,
+	"@db": `${d}/src/db`,
+	"@MaidBoye": `${d}/src/main`
+});
 import MessageCollector from "./MessageCollector";
 import ComponentInteractionCollector, { InteractionWithData } from "./ComponentInteractionCollector";
 import Eris from "eris";

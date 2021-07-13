@@ -63,13 +63,5 @@
   "engine": {
     "node": ">=15.x",
     "npm": ">=7.x"
-  },
-  "_moduleAliases": {
-    "@root": ".",
-    "@config": "src/config",
-    "@util": "src/util",
-    "@cmd": "src/util/cmd",
-    "@db": "src/db",
-    "@MaidBoye": "src/main"
   }
 }
