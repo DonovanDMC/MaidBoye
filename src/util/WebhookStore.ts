@@ -1,5 +1,5 @@
 import config from "@config";
-import MaidBoye from "../main";
+import MaidBoye from "@MaidBoye";
 import { GuildTextableChannel, Message, WebhookPayload } from "eris";
 
 interface WebhookInfo {

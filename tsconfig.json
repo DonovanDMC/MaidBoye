@@ -22,6 +22,9 @@
 			"@cmd/*": [
 				"util/cmd/*"
 			],
+			"@db": [
+				"db/index.ts"
+			],
 			"@db/*": [
 				"db/*"
 			],

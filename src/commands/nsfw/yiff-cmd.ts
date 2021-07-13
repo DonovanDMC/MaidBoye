@@ -5,7 +5,7 @@ import config from "@config";
 import Logger from "@util/Logger";
 import Yiffy from "@util/req/Yiffy";
 import { Strings } from "@uwu-codes/utils";
-import Eris, { InteractionCallbackType } from "eris";
+import Eris from "eris";
 import ComponentHelper from "@util/ComponentHelper";
 import MaidBoye from "@MaidBoye";
 
@@ -64,7 +64,7 @@ export default new Command("yiff", "thegoodstuff")
 			});
 			else {
 				if (!id || !token) return;
-				await this.createInteractionResponse(id, token, InteractionCallbackType.UPDATE_MESSAGE,{
+				await this.createInteractionResponse(id, token, Eris.InteractionCallbackType.UPDATE_MESSAGE,{
 					embeds: [e],
 					components: c
 				});

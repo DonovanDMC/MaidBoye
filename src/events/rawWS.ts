@@ -1,21 +1,24 @@
-import ClientEvent from "../util/ClientEvent";
-import CommandHandler from "../util/cmd/CommandHandler";
-import EmbedBuilder from "../util/EmbedBuilder";
-import ComponentHelper from "../util/ComponentHelper";
+import ClientEvent from "@util/ClientEvent";
+import CommandHandler from "@cmd/CommandHandler";
+import EmbedBuilder from "@util/EmbedBuilder";
+import ComponentHelper from "@util/ComponentHelper";
 import config from "@config";
-import db from "../db";
-const { r: Redis } = db;
-import { CategoryRestrictions } from "../util/cmd/Category";
-import Logger from "../util/Logger";
-import ComponentInteractionCollector, { Interaction } from "../util/ComponentInteractionCollector";
+import { CategoryRestrictions } from "@cmd/Category";
+import Logger from "@util/Logger";
+import ComponentInteractionCollector, { Interaction } from "@util/ComponentInteractionCollector";
 import { APIGuildMember,  APIMessageComponentInteractionData, GatewayDispatchEvents, GatewayGuildCreateDispatchData, GatewayInteractionCreateDispatchData, GatewayOpcodes, InteractionType } from "discord-api-types";
 import Eris from "eris";
 import { VoiceServerUpdate, VoiceStateUpdate } from "lavalink";
+import StatsHandler from "@util/handlers/StatsHandler";
+import EventsASecondHandler from "@util/handlers/EventsASecondHandler";
 
 export default new ClientEvent("rawWS", async function({ op, d, t }) {
+	EventsASecondHandler.add("general");
 	const type = t as GatewayDispatchEvents | undefined;
 	switch (op) {
 		case GatewayOpcodes.Dispatch: {
+			StatsHandler.trackNoResponse("stats", "events", type!);
+			EventsASecondHandler.add(type!);
 			switch (type) {
 				case "VOICE_STATE_UPDATE": {
 					if (!this.lava) return;
@@ -69,7 +72,7 @@ export default new ClientEvent("rawWS", async function({ op, d, t }) {
 									const b = await Redis.get(`interactions:${data.message.id}:back`);
 									let eb: { embeds: Array<Eris.EmbedOptions>; components: Eris.Message["components"]; } | undefined;
 									try {
-										eb = JSON.parse(b!) as typeof eb;
+										eb = JSON.parse(b) as typeof eb;
 									} catch (err) {
 										// throw away error
 									}

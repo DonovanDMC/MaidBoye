@@ -311,11 +311,25 @@ Object.defineProperties(Eris.GuildChannel.prototype, {
 		async value(this: Eris.GuildTextableChannel, timeout: number, filter: (interaction: InteractionWithData<APIMessageComponentInteractionData>) => boolean = (() => true), limit?: number) {
 			return ComponentInteractionCollector.awaitInteractions(this.id, timeout, filter, limit as 1);
 		}
+	},
+	typeString: {
+		get(this: Eris.GuildTextableChannel) {
+			return Object.entries(Eris.Constants.ChannelTypes).find(([, n]) => this.type === n)![0];
+		}
 	}
 });
 
 
 Object.defineProperty(Eris, "InteractionCallbackType", {
+	value: {
+		PONG: 1,
+		CHANNEL_MESSAGE_WITH_SOURCE: 4,
+		DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE: 5,
+		DEFERRED_UPDATE_MESSAGE: 6,
+		UPDATE_MESSAGE: 7
+	}
+});
+Object.defineProperty(Eris.prototype, "InteractionCallbackType", {
 	value: {
 		PONG: 1,
 		CHANNEL_MESSAGE_WITH_SOURCE: 4,
