@@ -63,6 +63,7 @@ export default class GuildConfig {
 		editOthersCasesEnabled: boolean;
 		webhook: Record<"id" | "token" | "channelId", string> | null;
 	};
+	defaultYiffType: typeof config["yiffTypes"][number] | null;
 	constructor(id: string, data: GuildConfigKV) {
 		this.id = id;
 		this.load(data);

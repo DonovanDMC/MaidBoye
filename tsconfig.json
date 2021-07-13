@@ -7,9 +7,6 @@
 		"skipLibCheck": true,
 		"inlineSourceMap": true,
 		"paths": {
-			"@src/*": [
-				"*"
-			],
 			"@root/*": [
 				"../*"
 			],

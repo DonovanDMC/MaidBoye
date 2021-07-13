@@ -1,3 +1,5 @@
+import { InteractionWithData } from "@util/ComponentInteractionCollector";
+import { APIMessageComponentInteractionData } from "discord-api-types";
 import "eris";
 
 declare module "eris" {
@@ -73,5 +75,8 @@ declare module "eris" {
 	interface GuildChannel {
 		async awaitMessages<T extends TextableChannel = Exclude<GuildTextableChannel, AnyThreadChannel>>(timeout: number, filter: (msg: Message<TextableChannel>) => boolean, limit: number): Promise<Array<Message<T>>>;
 		async awaitMessages<T extends TextableChannel = Exclude<GuildTextableChannel, AnyThreadChannel>>(timeout: number, filter?: (msg: Message<TextableChannel>) => boolean, limit?: 1): Promise<Message<T> | null>;
+
+		async awaitComponentInteractions<T extends APIMessageComponentInteractionData>(timeout: number, filter: (interaction: InteractionWithData<APIMessageComponentInteractionData>) => boolean, limit: number): Promise<Array<InteractionWithData<T>>>;
+		async awaitComponentInteractions<T extends APIMessageComponentInteractionData>(timeout: number, filter?: (interaction: InteractionWithData<APIMessageComponentInteractionData>) => boolean, limit?: 1): Promise<InteractionWithData<T> | null>;
 	}
 }

@@ -63,5 +63,7 @@ export default class EmbedBuilder {
 	setURL(url: string) { this.json.url = url; return this; }
 	getURL() { return this.json.url; }
 
-	toJSON() { return this.json; }
+	toJSON(array: true): Array<EmbedOptions>;
+	toJSON(array?: false): EmbedOptions;
+	toJSON(array = false) { return array ? [this.json] : this.json; }
 }

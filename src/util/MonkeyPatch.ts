@@ -2,8 +2,10 @@
 /// <reference path="./@types/Eris.d.ts" />
 import "module-alias/register";
 import MessageCollector from "./MessageCollector";
+import ComponentInteractionCollector, { InteractionWithData } from "./ComponentInteractionCollector";
 import Eris from "eris";
 import sauce from "source-map-support";
+import { APIMessageComponentInteractionData } from "discord-api-types";
 sauce.install({ hookRequire: true });
 
 Object.defineProperties(Eris.User.prototype, {
@@ -288,9 +290,16 @@ Object.defineProperties(Eris.Client.prototype, {
 	}
 });
 
-Object.defineProperty(Eris.GuildChannel, "awaitMessages", {
-	async value<T extends Eris.TextableChannel = Exclude<Eris.GuildTextableChannel, Eris.AnyThreadChannel>>(this: T, timeout: number, filter: (msg: Eris.Message<Eris.TextableChannel>) => boolean = (() => true), limit?: number): Promise<Array<Eris.Message<T>> | Eris.Message<T> | null> {
-		return MessageCollector.awaitMessages(this.id, timeout, filter, limit as 1);
+Object.defineProperties(Eris.GuildChannel.prototype, {
+	awaitMessages: {
+		async value(this: Eris.GuildTextableChannel, timeout: number, filter: (msg: Eris.Message<Eris.TextableChannel>) => boolean = (() => true), limit?: number) {
+			return MessageCollector.awaitMessages(this.id, timeout, filter, limit as 1);
+		}
+	},
+	awaitComponentInteractions: {
+		async value(this: Eris.GuildTextableChannel, timeout: number, filter: (interaction: InteractionWithData<APIMessageComponentInteractionData>) => boolean = (() => true), limit?: number) {
+			return ComponentInteractionCollector.awaitInteractions(this.id, timeout, filter, limit as 1);
+		}
 	}
 });
 
