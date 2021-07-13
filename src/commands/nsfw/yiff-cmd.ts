@@ -82,6 +82,8 @@ export default new Command("yiff", "thegoodstuff")
 		await refreshImage.call(this);
 		const t = setTimeout(() => {
 			if (m !== undefined) void m.edit({
+				content: m.content,
+				embeds: m.embeds,
 				components:  m.components?.slice(0, 1)
 			});
 		}, 9e5);
