@@ -1,10 +1,11 @@
 // eslint-disable-next-line @typescript-eslint/triple-slash-reference
 /// <reference path="./@types/Eris.d.ts" />
-// eslint-disable-next-line import/order
+/* eslint-disable import/order */
+import path from "path";
 import moduleAlias from "module-alias";
-const d = `../../${__filename.endsWith(".ts") ? "../" : ""}`;
+const d = path.resolve(`${__dirname}/../../`);
 moduleAlias.addAliases({
-	"@root": `${d}/build`,
+	"@root": d,
 	"@config": `${d}/src/config`,
 	"@util": `${d}/src/util`,
 	"@cmd": `${d}/src/util/cmd`,
