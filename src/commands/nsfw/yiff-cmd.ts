@@ -73,7 +73,9 @@ export default new Command("yiff", "thegoodstuff")
 			const wait = await msg.channel.awaitComponentInteractions(3e5, (it) => it.channel_id === msg.channel.id && it.message.id === m!.id && it.data.custom_id.startsWith("new-image") && it.data.custom_id.endsWith(msg.author.id) && !!it.member.user && it.member.user.id === msg.author.id);
 			if (wait === null) {
 				await m.edit({
-					components: m.components?.slice(0, 1)
+					content: m.content,
+					embeds: m.embeds,
+					components:  m.components?.slice(0, 1)
 				});
 				clearTimeout(t);
 			} else return refreshImage.call(this, wait.id, wait.token);
