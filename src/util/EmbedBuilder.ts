@@ -24,6 +24,7 @@ export default class EmbedBuilder {
 		return  this;
 	}
 	getAuthor() { return this.json.author; }
+	removeAuthor() { this.json.author = undefined; return this; }
 
 	setColor(color: number | keyof typeof Colors) {
 		if (typeof color === "string") color = Colors[color];
@@ -31,9 +32,11 @@ export default class EmbedBuilder {
 		return this;
 	}
 	getColor() { return this.json.color; }
+	removeColor() { this.json.color = undefined; return this; }
 
 	setDescription(first: string | Array<string>, ...other: Array<(string | Array<string>)>) { this.json.description = [...(Array.isArray(first) ? first : [first]), ...(other.map(o => [...(Array.isArray(o) ? o : [o])].join("\n")))].join("\n"); return this; }
 	getDescription() { return this.json.description; }
+	removeDescription() { this.json.description = undefined; return this; }
 
 	addField(name: string, value: string, inline?: boolean) { this.json.fields = [...(this.json.fields ?? []), { name, value, inline }]; return this; }
 	addBlankField(inline?: boolean) { return this.addField("\u200b", "\u200b", inline); }
@@ -43,12 +46,15 @@ export default class EmbedBuilder {
 
 	setFooter(text: string, icon_url = config.images.bot) { this.json.footer = { text, icon_url }; return this; }
 	getFooter() { return this.json.footer; }
+	removeFooter() { this.json.footer = undefined; return this; }
 
 	setImage(url: string) { this.json.image = { url }; return this; }
 	getImage() { return this.json.image; }
+	removeImage() { this.json.image = undefined; return this; }
 
 	setThumbnail(url: string) { this.json.thumbnail = { url }; return this; }
 	getThumbnail() { return this.json.thumbnail; }
+	removeThumbnail() { this.json.thumbnail = undefined; return this; }
 
 	setTimestamp(time: string | Date | "now") {
 		if (time === "now") time = new Date().toISOString();
@@ -56,12 +62,15 @@ export default class EmbedBuilder {
 		return this;
 	}
 	getTimestamp() { return this.json.timestamp; }
+	removeTimestamp() { this.json.timestamp = undefined; return this; }
 
 	setTitle(title: string) { this.json.title = title; return this; }
 	getTitle() { return this.json.title; }
+	removeTitle() { this.json.title = undefined; return this; }
 
 	setURL(url: string) { this.json.url = url; return this; }
 	getURL() { return this.json.url; }
+	removeURL() { this.json.url = undefined; return this; }
 
 	toJSON(array: true): Array<EmbedOptions>;
 	toJSON(array?: false): EmbedOptions;
