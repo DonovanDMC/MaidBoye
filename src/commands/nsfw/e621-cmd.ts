@@ -1,5 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/triple-slash-reference
-/// <reference path="../../util/@types/simple-thumbnail.d.ts" />
 import Command from "@cmd/Command";
 import EmbedBuilder from "@util/EmbedBuilder";
 import config from "@config";
