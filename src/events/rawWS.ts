@@ -135,11 +135,14 @@ export default new ClientEvent("rawWS", async function({ op, d, t }) {
 							} else {
 								const [user] = cd.custom_id.split(".").slice(-1);
 								if (/[\d]{15,21/.test(user) && user !== (data as { member: APIGuildMember; }).member.user?.id) {
-									await this.createInteractionResponse(data.id, data.token, 6);
+									await this.createInteractionResponse(data.id, data.token, 6, {
+										content: "H-hey! This isn't your button to click!",
+										flags: 64
+									});/*
 									await this.createFollowupMessage(this.user.id, data.token, {
 										content: "H-hey! This isn't your selection to make!",
 										flags: 64
-									});
+									}); */
 									return;
 								}
 							}

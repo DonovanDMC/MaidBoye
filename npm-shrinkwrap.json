@@ -12,6 +12,7 @@
         "@uwu-codes/utils": "^1.0.44",
         "chunk": "^0.0.3",
         "discord-command-parser": "^1.5.3",
+        "e621": "^1.0.8",
         "eris": "github:DonovanDMC/eris#merge",
         "express": "^4.17.1",
         "express-session": "^1.17.2",
@@ -1167,6 +1168,11 @@
       "bin": {
         "dot-object": "bin/dot-object"
       }
+    },
+    "node_modules/e621": {
+      "version": "1.0.8",
+      "resolved": "https://registry.npmjs.org/e621/-/e621-1.0.8.tgz",
+      "integrity": "sha512-Ng2sCPPMwPDoVdbOhjCR5QTlMWq2z4zsBJUF2O56heDaIE2q7v93AbDY6vF2Oolqbhq9vFG32NMX6xZFoCiBMw=="
     },
     "node_modules/ee-first": {
       "version": "1.1.1",
@@ -5046,6 +5052,11 @@
         "commander": "^4.0.0",
         "glob": "^7.1.5"
       }
+    },
+    "e621": {
+      "version": "1.0.8",
+      "resolved": "https://registry.npmjs.org/e621/-/e621-1.0.8.tgz",
+      "integrity": "sha512-Ng2sCPPMwPDoVdbOhjCR5QTlMWq2z4zsBJUF2O56heDaIE2q7v93AbDY6vF2Oolqbhq9vFG32NMX6xZFoCiBMw=="
     },
     "ee-first": {
       "version": "1.1.1",

@@ -8,6 +8,7 @@
     "@uwu-codes/utils": "^1.0.44",
     "chunk": "^0.0.3",
     "discord-command-parser": "^1.5.3",
+    "e621": "^1.0.8",
     "eris": "github:DonovanDMC/eris#merge",
     "express": "^4.17.1",
     "express-session": "^1.17.2",
