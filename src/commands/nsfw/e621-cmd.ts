@@ -27,12 +27,29 @@ export default new Command("e621", "e6")
 			const e = new EmbedBuilder()
 				.setTitle(`E621 | Tags: ${msg.rawArgs.length === 0 ? "None" : `"${msg.rawArgs.join(" ").slice(0, 500)}"`}`)
 				.setColor(post.rating === "s" ? "green" : post.rating === "q" ? "gold" : post.rating === "e" ? "red" : "bot")
-				.setFooter(`Post #${post.id} | ${i + 1}/${posts.length}`)
+				.setFooter(`Post #${post.id} | ${i + 1}/${posts.length} | ${post.score.up} ${config.emojis.default.up} ${post.score.down} ${config.emojis.default.down} | ${post.fav_count} ${config.emojis.default.heart}`)
 				.removeDescription();
+			if (id && token) await this.createInteractionResponse(id, token, Eris.InteractionCallbackType.DEFERRED_UPDATE_MESSAGE);
+
 			if (post.file.ext === "swf") e.setDescription(`This post is a flash animation. Please view it [directly](https://e621.net/posts/${post.id}) on e621.`);
 			else if (post.file.ext === "webm") {
 				let url = "https://http.cat/500";
 				try {
+					type CreateTimeType = "total" | "upload" | "cut" | "getVTG" | "convert";
+					interface Thumbnail {
+						url: string;
+						startTime: string | null;
+						endTime: string | null;
+						createTime: (Record<CreateTimeType, number> & Record<`${CreateTimeType}Ns`, string>) | null;
+					}
+					if (token && m) await this.editOriginalInteractionResponse(this.user.id, token, {
+						embeds: [
+							new EmbedBuilder(true, undefined, m.embeds[0])
+								.setDescription("Generating post preview..")
+								.toJSON()
+						],
+						components: m.components
+					});
 					const b = await fetch("https://v2.yiff.rest/e621-thumb/create", {
 						method: "POST",
 						headers: {
@@ -41,11 +58,28 @@ export default new Command("e621", "e6")
 							"Content-Type": "application/json"
 						},
 						body: JSON.stringify({
-							type: "image",
-							url: post.file.url
+							type: msg.gConfig.settings.yiffThumbnailType || "image",
+							url: post.file.url,
+							length: 2.5
 						})
-					}).then((v) => v.json() as Promise<{ success: true; data: string; }>);
-					url = b.data;
+					}).then((v) => v.json() as Promise<{
+						success: true;
+						data: Thumbnail;
+					}>);
+					url = b.data.url;
+					if (config.developers.includes(msg.author.id)) {
+						console.log("Start Time:", b.data.startTime || "Cached");
+						console.log("End Time:", b.data.endTime || "Cached");
+						if (b.data.createTime === null) console.log("Create Time: Cached");
+						else {
+							console.log("Create Time:");
+							console.log(`Total Time: ${b.data.createTime.total}ms (${b.data.createTime.totalNs}ns)`);
+							console.log(`Upload Time: ${b.data.createTime.upload}ms (${b.data.createTime.uploadNs}ns)`);
+							console.log(`Cut Time: ${b.data.createTime.cut}ms (${b.data.createTime.cutNs}ns)`);
+							console.log(`Get VTG Time: ${b.data.createTime.getVTG}ms (${b.data.createTime.getVTGNs}ns)`);
+							console.log(`Convert Time: ${b.data.createTime.convert}ms (${b.data.createTime.convertNs}ns)`);
+						}
+					}
 				} catch (err) {
 					Logger.getLogger("E621Command").error(`Error creating webm thumbnail (https://e621.net/posts/${post.id})`);
 					console.error(err);
@@ -59,6 +93,7 @@ export default new Command("e621", "e6")
 			else if (post.tags.artist.length === 1) a = post.tags.artist[0];
 			else a = post.tags.artist.find(v => !["conditional_dnp", "sound_warning"].includes(v)) || "unknown_artist";
 			const c = new ComponentHelper()
+				.addURLButton(`https://e621.net/posts/${post.id}`, false, undefined, "Open Post")
 				.addURLButton(post.file.url, false, undefined, "Full Image")
 				.addURLButton(post.sources[0] || `https://e621.net/${post.id}`, post.sources.length === 0, undefined, "Source")
 				.addURLButton(`https://e621.net/artists/show_or_new?name=${a}`, false, undefined, `Artist: ${a}`)
@@ -80,7 +115,7 @@ export default new Command("e621", "e6")
 			});
 			else {
 				if (!id || !token) return;
-				await this.createInteractionResponse(id, token, Eris.InteractionCallbackType.UPDATE_MESSAGE,{
+				await this.editOriginalInteractionResponse(this.user.id, token,{
 					embeds: [e.toJSON()],
 					components: c
 				});
