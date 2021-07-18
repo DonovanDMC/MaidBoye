@@ -17,17 +17,17 @@ export default new Command("yiff", "thegoodstuff")
 	.setRestrictions("nsfw")
 	.setCooldown(3e3)
 	.setExecutor(async function(msg) {
-		let type: Exclude<GuildConfig["defaultYiffType"], null>;
+		let type: Exclude<GuildConfig["settings"]["defaultYiffType"], null>;
 		if (msg.args.length === 0) {
-			if (msg.gConfig.defaultYiffType === null) type = config.yiffTypes[0];
+			if (msg.gConfig.settings.defaultYiffType === null) type = config.yiffTypes[0];
 			else {
-				if (!config.yiffTypes.includes(msg.gConfig.defaultYiffType)) {
-					Logger.getLogger("YiffCommand").warn(`Unknown Default Yiff Type "${msg.gConfig.defaultYiffType}" on guild ${msg.channel.guild.id}`);
+				if (!config.yiffTypes.includes(msg.gConfig.settings.defaultYiffType)) {
+					Logger.getLogger("YiffCommand").warn(`Unknown Default Yiff Type "${msg.gConfig.settings.defaultYiffType}" on guild ${msg.channel.guild.id}`);
 					await msg.gConfig.edit({
 						defaultYiffType: null
 					});
 					type = config.yiffTypes[0];
-				} else type = msg.gConfig.defaultYiffType;
+				} else type = msg.gConfig.settings.defaultYiffType;
 			}
 		} else {
 			type = msg.args[0].toLowerCase() as typeof type;
