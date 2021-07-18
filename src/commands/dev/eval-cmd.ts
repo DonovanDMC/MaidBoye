@@ -6,6 +6,7 @@ import EmbedBuilder from "@util/EmbedBuilder";
 import ComponentHelper from "@util/ComponentHelper";
 import Eris from "eris";
 import { Internal, Request, Strings, Time, Utility, Redis } from "@uwu-codes/utils";
+import Timer from "@util/Timer";
 import util from "util";
 
 async function format(obj: unknown) {
@@ -53,6 +54,7 @@ export default new Command("eval", "ev")
 		// eslint-disable-next-line -- typescript messes with variable names so we have to remake them
 		for (const k in evalVariables) new Function("value", `${k} = value`)(evalVariables[k]);
 		let res: unknown;
+		const start = Timer.start();
 		try {
 			const ev = msg.rawArgs.join(" ");
 			// eslint-disable-next-line no-eval
@@ -60,6 +62,7 @@ export default new Command("eval", "ev")
 		} catch (err) {
 			res = err;
 		}
+		const end = Timer.end();
 
 		const f = await format(res);
 
@@ -75,10 +78,14 @@ export default new Command("eval", "ev")
 				}
 				out = "see attached file";
 			}
+
+			// @TODO ms/μs/ns
+			const t = Timer.calc(start, end, 3, false);
 			return msg.reply({
 				embeds: [
 					new EmbedBuilder()
 						.setAuthor(msg.author.tag, msg.author.avatarURL)
+						.setTitle(`Time Taken: ${t.val}ms`)
 						.setColor(res instanceof Error ? "red" : "green")
 						.addField(`${config.emojis.default.in} Code`, `\`\`\`js\n${msg.args.join(" ").slice(0, 300)}\`\`\``, false)
 						.addField(`${config.emojis.default.out}`, `\`\`\`js\n${out}\`\`\``, false)

@@ -4,7 +4,7 @@ import Logger from "@util/Logger";
 import config from "@config";
 import IORedis from "ioredis";
 import { Collection, MongoClient, MongoClientOptions } from "mongodb";
-import { performance } from "perf_hooks";
+import Timer from "@util/Timer";
 
 
 export default class db {
@@ -14,18 +14,18 @@ export default class db {
 	static r: IORedis.Redis;
 
 	static async init(mongo = true, redis = true) {
-		const start = performance.now();
+		const start = Timer.start();
 		if (mongo) await this.initMongo();
 		if (redis) await this.initRedis();
-		const end = performance.now();
-		Logger.getLogger("Database[General]").debug(`Initialization complete in ${(end - start).toFixed(3)}ms`);
+		const end = Timer.end();
+		Logger.getLogger("Database[General]").debug(`Initialization complete in ${Timer.calc(start, end)}ms`);
 	}
 
 	static async initMongo() {
 		this.mainDB = config.services.mongo[config.beta ? "dbBeta" : "db"];
 		const uri = `mongodb://${config.services.mongo.host}:${config.services.mongo.port}/${config.services.mongo.authSource}?authSource=${config.services.mongo.authSource}`;
 		Logger.getLogger("Database[MongoDB]").debug(`Connecting to ${uri} (ssl: ${config.services.mongo.options.ssl ? "Yes" : "No"})`);
-		const start = performance.now();
+		const start = Timer.start();
 		try {
 			this.mongo = await MongoClient.connect(uri, {
 				appName: `Maid Boye${config.beta ? " Beta" : ""}`,
@@ -35,14 +35,14 @@ export default class db {
 			Logger.getLogger("Database[MongoDB]").error("Error while connecting:", err);
 			return;
 		}
-		const end = performance.now();
-		Logger.getLogger("Database[MongoDB]").debug(`Successfully connected in ${(end - start).toFixed(3)}ms`);
+		const end = Timer.end();
+		Logger.getLogger("Database[MongoDB]").debug(`Successfully connected in ${end - start}ms`);
 	}
 
 	static async initRedis() {
 		return new Promise<void>(resolve => {
 			this.redisDb = config.services.redis[config.beta ? "dbBeta" : "db"];
-			const start = performance.now();
+			const start = Timer.start();
 			Logger.getLogger("Database[Redis]").debug(`Connecting to redis://${config.services.redis.host}:${config.services.redis.port} using user "${config.services.redis.username ?? "default"}", and db ${this.redisDb}`);
 			this.r = new IORedis(config.services.redis.port, config.services.redis.host, {
 				username: config.services.redis.username,
@@ -52,8 +52,8 @@ export default class db {
 			});
 
 			this.r.on("connect", () => {
-				const end = performance.now();
-				Logger.getLogger("Database[Redis]").debug(`Successfully connected in ${(end - start).toFixed(3)}ms`);
+				const end = Timer.end();
+				Logger.getLogger("Database[Redis]").debug(`Successfully connected in ${Timer.calc(start, end)}ms`);
 				resolve();
 			});
 		});
@@ -71,7 +71,7 @@ export default class db {
 	/* eslint-enable @typescript-eslint/unified-signatures */
 
 	static async getUser(id: string) {
-		const start = performance.now();
+		const start = Timer.start();
 		let res = await this.collection("users").findOne({ id });
 		if (res === undefined) {
 			res = await this.collection("users").insertOne({
@@ -80,18 +80,18 @@ export default class db {
 			}).then(() => new UserConfig(id, { ...config.defaults.user, id }));
 			Logger.getLogger("Database[MongoDB]").debug(`Created the user entry "${id}".`);
 		}
-		const end = performance.now();
+		const end = Timer.end();
 
 		// if we somehow get another undefined
 		if (res === undefined) throw new TypeError("Unexpected undefined user in db#getUser");
 
-		if (config.beta) Logger.getLogger("Database[MongoDB]").debug(`Query for the user "${id}" took ${(end - start).toFixed(3)}ms`);
+		if (config.beta) Logger.getLogger("Database[MongoDB]").debug(`Query for the user "${id}" took ${Timer.calc(start, end)}ms`);
 
 		return new UserConfig(id, res);
 	}
 
 	static async getGuild(id: string) {
-		const start = performance.now();
+		const start = Timer.start();
 		let res = await this.collection("guilds").findOne({ id });
 		if (res === undefined) {
 			// @ts-ignore this errors because defaults has generic numbers, and not exact numbers
@@ -102,12 +102,12 @@ export default class db {
 			}).then(() => new GuildConfig(id, { ...config.defaults.guild, id }));
 			Logger.getLogger("Database[MongoDB]").debug(`Created the guild entry "${id}".`);
 		}
-		const end = performance.now();
+		const end = Timer.end();
 
 		// if we somehow get another null
 		if (res === undefined) throw new TypeError("Unexpected undefined guild in db#getGuild");
 
-		if (config.beta) Logger.getLogger("Database[MongoDB]").debug(`Query for the guild "${id}" took ${(end - start).toFixed(3)}ms`);
+		if (config.beta) Logger.getLogger("Database[MongoDB]").debug(`Query for the guild "${id}" took ${Timer.calc(start, end)}ms`);
 
 		return new GuildConfig(id, res);
 	}
