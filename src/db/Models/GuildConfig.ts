@@ -1,7 +1,7 @@
 import db from "..";
 import config from "@config";
 import BotFunctions from "@util/BotFunctions";
-import { MatchKeysAndValues, UpdateQuery } from "mongodb";
+import { MatchKeysAndValues, UpdateFilter } from "mongodb";
 import { Utility } from "@uwu-codes/utils";
 import { DataTypes, Writeable } from "@uwu-codes/types";
 import { Track } from "lavalink";
@@ -79,7 +79,7 @@ export default class GuildConfig {
 
 	async reload() {
 		const v = await db.collection("guilds").findOne({ id: this.id });
-		if (v === null) throw new Error(`Unexpected null on GuildConfig#reload (id: ${this.id})`);
+		if (v === undefined) throw new Error(`Unexpected undefined on GuildConfig#reload (id: ${this.id})`);
 		this.load(v);
 		return this;
 	}
@@ -88,7 +88,7 @@ export default class GuildConfig {
 		return this.mongoEdit({ $set: data });
 	}
 
-	async mongoEdit(data: UpdateQuery<GuildConfigKV>) {
+	async mongoEdit(data: UpdateFilter<GuildConfigKV>) {
 		await db.collection("guilds").findOneAndUpdate({ id: this.id }, data);
 		await this.reload();
 		return this;

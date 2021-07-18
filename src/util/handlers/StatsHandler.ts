@@ -1,6 +1,7 @@
 import db from "@db";
 const { r: Redis } = db;
 
+// https://api.paw.bot/v1/status
 export default class StatsHandler {
 	static async track(first: string, ...other: Array<string>) {
 		return Redis.incr(other.length === 0 ? first : [first, ...other].join(":"));

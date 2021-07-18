@@ -1,7 +1,7 @@
 import GuildConfig, { GuildConfigKV, UserReport } from "./Models/GuildConfig";
 import UserConfig, { UserConfigKV } from "./Models/UserConfig";
+import Logger from "@util/Logger";
 import config from "@config";
-import Logger from "../util/Logger";
 import IORedis from "ioredis";
 import { Collection, MongoClient, MongoClientOptions } from "mongodb";
 import { performance } from "perf_hooks";
@@ -28,7 +28,7 @@ export default class db {
 		const start = performance.now();
 		try {
 			this.mongo = await MongoClient.connect(uri, {
-				appname: `Maid Boye${config.beta ? " Beta" : ""}`,
+				appName: `Maid Boye${config.beta ? " Beta" : ""}`,
 				...config.services.mongo.options as MongoClientOptions // because json
 			});
 		} catch (err) {
@@ -73,17 +73,17 @@ export default class db {
 	static async getUser(id: string) {
 		const start = performance.now();
 		let res = await this.collection("users").findOne({ id });
-		if (res === null) {
+		if (res === undefined) {
 			res = await this.collection("users").insertOne({
 				...config.defaults.user,
 				id
-			}).then(v => v.ops[0]);
+			}).then(() => new UserConfig(id, { ...config.defaults.user, id }));
 			Logger.getLogger("Database[MongoDB]").debug(`Created the user entry "${id}".`);
 		}
 		const end = performance.now();
 
-		// if we somehow get another null
-		if (res === null) throw new TypeError("Unexpected null user in db#getUser");
+		// if we somehow get another undefined
+		if (res === undefined) throw new TypeError("Unexpected undefined user in db#getUser");
 
 		if (config.beta) Logger.getLogger("Database[MongoDB]").debug(`Query for the user "${id}" took ${(end - start).toFixed(3)}ms`);
 
@@ -93,18 +93,19 @@ export default class db {
 	static async getGuild(id: string) {
 		const start = performance.now();
 		let res = await this.collection("guilds").findOne({ id });
-		if (res === null) {
+		if (res === undefined) {
 			// @ts-ignore this errors because defaults has generic numbers, and not exact numbers
 			res = await this.collection("guilds").insertOne({
 				...config.defaults.guild,
 				id
-			}).then(v => v.ops[0]);
+				// @ts-ignore json doesn't match strictly types properties
+			}).then(() => new GuildConfig(id, { ...config.defaults.guild, id }));
 			Logger.getLogger("Database[MongoDB]").debug(`Created the guild entry "${id}".`);
 		}
 		const end = performance.now();
 
 		// if we somehow get another null
-		if (res === null) throw new TypeError("Unexpected null guild in db#getGuild");
+		if (res === undefined) throw new TypeError("Unexpected undefined guild in db#getGuild");
 
 		if (config.beta) Logger.getLogger("Database[MongoDB]").debug(`Query for the guild "${id}" took ${(end - start).toFixed(3)}ms`);
 

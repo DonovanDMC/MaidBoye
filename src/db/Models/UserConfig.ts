@@ -3,7 +3,7 @@ import config from "@config";
 import Logger from "@util/Logger";
 import { DataTypes, Writeable } from "@uwu-codes/types";
 import { Utility } from "@uwu-codes/utils";
-import { MatchKeysAndValues, UpdateQuery } from "mongodb";
+import { MatchKeysAndValues, UpdateFilter } from "mongodb";
 
 export type UserConfigKV = DataTypes<UserConfig>;
 export default class UserConfig {
@@ -26,7 +26,7 @@ export default class UserConfig {
 
 	async reload() {
 		const v = await db.collection("users").findOne({ id: this.id });
-		if (v === null) throw new Error(`Unexpected null on UserConfig#reload (id: ${this.id})`);
+		if (v === undefined) throw new Error(`Unexpected undefined on UserConfig#reload (id: ${this.id})`);
 		this.load(v);
 		return this;
 	}
@@ -35,7 +35,7 @@ export default class UserConfig {
 		return this.mongoEdit({ $set: data });
 	}
 
-	async mongoEdit(data: UpdateQuery<UserConfigKV>) {
+	async mongoEdit(data: UpdateFilter<UserConfigKV>) {
 		await db.collection("users").findOneAndUpdate({ id: this.id }, data);
 		await this.reload();
 		return this;
