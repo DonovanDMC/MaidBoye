@@ -46,6 +46,7 @@ export default new Command("e621", "e6")
 						embeds: [
 							new EmbedBuilder(true, undefined, m.embeds[0])
 								.setDescription("Generating post preview..")
+								.setImage("https://assets.maid.gay/loading.gif")
 								.toJSON()
 						],
 						components: m.components
