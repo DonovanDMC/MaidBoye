@@ -1,8 +1,8 @@
-import db from "../db";
-import GuildConfig from "../db/Models/GuildConfig";
-import MaidBoye from "../main";
+import db from "../../db";
+import GuildConfig from "../../db/Models/GuildConfig";
+import MaidBoye from "../../main";
 
-export default class ModLogUtil {
+export default class ModLogHandler {
 	static async check(guild: string | GuildConfig, client: MaidBoye) {
 		if (!(guild instanceof GuildConfig)) guild = await db.getGuild(guild);
 		if (guild.modlog.enabled === true) {
