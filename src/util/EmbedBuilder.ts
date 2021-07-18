@@ -4,8 +4,8 @@ import { User, EmbedField, EmbedOptions } from "eris";
 
 export default class EmbedBuilder {
 	private json: EmbedOptions;
-	constructor(defaults = true, user?: User | null) {
-		this.json = {};
+	constructor(defaults = true, user?: User | null, json: EmbedOptions = {}) {
+		this.json = json ?? {};
 		if (defaults) {
 			this.setColor("bot").setTimestamp("now").setFooter("UwU", config.images.bot);
 			if (user) this.setAuthor(user.tag, user.avatarURL);
