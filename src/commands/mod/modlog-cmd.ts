@@ -32,21 +32,38 @@ export default new Command("modlog")
 				.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `modlog-section-get.${msg.author.id}`, false, undefined, "Info")
 				.toJSON()
 		});
-		const section = await msg.channel.awaitComponentInteractions(6e4, (it) => it.channel_id === msg.channel.id && it.message.id === m.id && it.data.custom_id.startsWith("modlog-section") && it.data.custom_id.endsWith(msg.author.id) && !!it.member.user && it.member.user.id === msg.author.id);
-		if (section === null) return m.edit({
-			content: "Selection timed out..",
-			components: []
-		});
-		await this.createInteractionResponse(section.id, section.token, Eris.InteractionCallbackType.UPDATE_MESSAGE, {
-			content: "Successfully selected, processing..",
-			components: []
-		});
-		switch (section.data.custom_id.split(".")[0].split("-")[2]) {
+		let skip = false, sect: string;
+		if (msg.args.length !== 0 && ["setup", "reset", "get", "info"].includes(msg.args[0].toLowerCase())) {
+			sect = msg.args[0].toLowerCase();
+			skip = true;
+			await m.edit({
+				content: "Successfully selected, processing..",
+				components: []
+			});
+		}
+		if (skip === false) {
+			const section = await msg.channel.awaitComponentInteractions(6e4, (it) => it.channel_id === msg.channel.id && it.message.id === m.id && it.data.custom_id.startsWith("modlog-section") && it.data.custom_id.endsWith(msg.author.id) && !!it.member.user && it.member.user.id === msg.author.id);
+			if (section === null) return m.edit({
+				content: "Selection timed out..",
+				components: []
+			});
+			await this.createInteractionResponse(section.id, section.token, Eris.InteractionCallbackType.UPDATE_MESSAGE, {
+				content: "Successfully selected, processing..",
+				components: []
+			});
+			sect = section.data.custom_id.split(".")[0].split("-")[2];
+		}
+		switch (sect!) {
 			case "setup": {
-				const ch = (msg.args.length === 1 ? msg.channel : await msg.getChannelFromArgs(1, 0)) as Exclude<Eris.GuildTextableChannel, Eris.AnyThreadChannel> | null;
-				if (ch === null) return msg.reply("Th-that isn't a valid channel..");
-				const check = await ModLogUtil.check(msg.gConfig, this);
+				const check = await ModLogUtil.check(msg.gConfig);
 				if (check === true) return msg.reply(`Th-this server's modlog has already been set up.. if you want to reset it, run \`${msg.gConfig.getFormattedPrefix()}modlog reset\``);
+
+				await m.edit("Please respond with a channel to use. (default: this channel)");
+				const j = await msg.channel.awaitMessages(3e4, (mg) => mg.author.id === msg.author.id);
+				const ch = (!j ? msg.channel : await j.getChannelFromArgs(undefined, undefined, undefined, undefined, false)) as Exclude<Eris.GuildTextableChannel, Eris.AnyThreadChannel>;
+				if (ch === null) return msg.reply("Th-that wasn't a valid channel!");
+				if (j && msg.channel.permissionsOf(this.user.id).has("manageMessages")) await j.delete().catch(() => null);
+
 				await m.edit({
 					content: `Please select one of the following to proceed.\n1.) Select an existing webhook (on <#${ch.id}>) to use for the modlog\n2.) Provide a direct url to a webhook\n3.) Create a new webhook (with me)`,
 					components: new ComponentHelper()
@@ -129,7 +146,7 @@ export default new Command("modlog")
 					// case editing yes
 					} else if (cnfCaseEditing.data.custom_id.indexOf("yes") !== -1) {
 						await this.createInteractionResponse(cnfCaseEditing.id, cnfCaseEditing.token, Eris.InteractionCallbackType.UPDATE_MESSAGE, {
-							content: `**Case Editing** has been set to enabled.\n\nNext: Do you want to enable **Case Deletion**? (default: **${v.caseDeletingEnabled ? "yes" : "no"}**)**)`,
+							content: `**Case Editing** has been set to enabled.\n\nNext: Do you want to enable **Case Deletion**? (default: **${v.caseDeletingEnabled ? "yes" : "no"}**)`,
 							components: cnfCDComponents
 						});
 						v.caseEditingEnabled = true;
@@ -270,14 +287,22 @@ export default new Command("modlog")
 
 					// create
 					case 3: {
-						if (!msg.channel.permissionsOf(this.user.id).has("manageWebhooks")) return msg.edit("I-I'm missing the **Manage Webhooks** permission..");
+						if (!ch.permissionsOf(this.user.id).has("manageWebhooks")) return m.edit("I-I'm missing the **Manage Webhooks** permission..");
 						const img = await Request.getImageFromURL(config.images.bot);
 						const { mime } = await FileType.fromBuffer(img) ?? { mime: null };
 						if (mime === null) throw new Error("Internal error.");
 						const b64 = Buffer.from(img).toString("base64");
-						hook = await (msg.channel as Exclude<Eris.GuildTextableChannel, Eris.AnyThreadChannel>).createWebhook({
+						hook = await ch.createWebhook({
 							name: "Maid Boye Moderation Log",
 							avatar: `data:${mime};base64,${b64}`
+						});
+						await this.editOriginalInteractionResponse(this.user.id, sel.token, {
+							content: `Successfully created the webhook **${hook.name}** (${hook.id})\nWould you like to configure the more detailed options, or leave them at their defaults?`,
+							components: new ComponentHelper()
+								.addInteractionButton(ComponentHelper.BUTTON_SUCCESS, `modlogconfig-yes.${msg.author.id}`, false, undefined, "Configure")
+								.addInteractionButton(ComponentHelper.BUTTON_DANGER, `modlogconfig-no.${msg.author.id}`, false, undefined, "Defaults")
+								.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `modlogconfig-cancel.${msg.author.id}`, false, undefined, "Cancel")
+								.toJSON()
 						});
 						break;
 					}
@@ -337,10 +362,10 @@ export default new Command("modlog")
 						const delHook = await msg.channel.awaitComponentInteractions(6e4, (it) => it.channel_id === msg.channel.id && it.message.id === m.id && it.data.custom_id.startsWith("delhook") && it.data.custom_id.endsWith(msg.author.id) && !!it.member.user && it.member.user.id === msg.author.id);
 
 						if (delHook === null) return m.edit({
-							content: "Timeout detected, not deleting webhook. Modlog has been reset.",
+							content: "Timeout detected, modlog has not been reset.",
 							components: []
 						});
-						switch (delHook.data.custom_id.split("-")[1]) {
+						switch (delHook.data.custom_id.split("-")[1].split(".")[0]) {
 							case "yes": {
 								await this.deleteWebhook(msg.gConfig.modlog.webhook.id, msg.gConfig.modlog.webhook.token, `Command: ${msg.author.tag}`).catch(() => null);
 								await msg.gConfig.mongoEdit({
@@ -386,6 +411,7 @@ export default new Command("modlog")
 				break;
 			}
 
+			case "info":
 			case "get": {
 				if (msg.gConfig.modlog.enabled === false || msg.gConfig.modlog.webhook === null) return m.edit("This server's modlog is not enabled.");
 				const wh = await this.getWebhook(msg.gConfig.modlog.webhook.id, msg.gConfig.modlog.webhook.token);
