@@ -5,6 +5,8 @@ import config from "@config";
 import IORedis from "ioredis";
 import { Collection, MongoClient, MongoClientOptions } from "mongodb";
 import Timer from "@util/Timer";
+import { GenericEntry } from "@util/@types/ModLog";
+import { TimedEntry } from "@util/handlers/ModLogHandler";
 
 
 export default class db {
@@ -63,6 +65,8 @@ export default class db {
 
 	/* eslint-disable @typescript-eslint/unified-signatures */
 	static collection<T = UserReport>(name: "reports"): Collection<T>;
+	static collection<T = TimedEntry>(name: "timed"): Collection<T>;
+	static collection<T = GenericEntry>(name: "modlog"): Collection<T>;
 	static collection<T = GuildConfigKV>(name: "guilds"): Collection<T>;
 	static collection<T = UserConfigKV>(name: "users"): Collection<T>;
 	static collection<T = unknown>(name: string) {

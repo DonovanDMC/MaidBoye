@@ -10,6 +10,7 @@ import { Strings, Utility } from "@uwu-codes/utils";
 import Eris from "eris";
 import * as fs from "fs-extra";
 import { Node } from "lavalink";
+import ModLogHandler from "@util/handlers/ModLogHandler";
 import { performance } from "perf_hooks";
 
 
@@ -28,6 +29,7 @@ export default class MaidBoye extends Eris.Client {
 		await this.loadEvents();
 		await this.loadCommands();
 		MessageCollector.setClient(this);
+		ModLogHandler.setClient(this);
 		await this.connect();
 	}
 

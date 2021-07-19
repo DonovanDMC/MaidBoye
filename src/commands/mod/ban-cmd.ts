@@ -1,3 +1,4 @@
+import ModLogHandler from "../../util/handlers/ModLogHandler";
 import Command from "@cmd/Command";
 import CommandError from "@cmd/CommandError";
 import EmbedBuilder from "@util/EmbedBuilder";
@@ -48,7 +49,7 @@ export default new Command("ban")
 			const compareMe = msg.channel.guild.me.compareToMember(member);
 			if (["higher","same"].includes(compareMe)) return msg.reply("Th-that user is higher than, or as high as my highest role.. I cannot ban them");
 		}
-		let time = Time.parseTime2(msg.args[msg.args.length - 1]), reason = "No Reason Provided";
+		let time = Time.parseTime2(msg.args[msg.args.length - 1]), reason: string | null = null;
 		if (msg.args.length !== 1) {
 			if (time === 0) {
 				time = Time.parseTime2(msg.args.join(" "));
@@ -60,7 +61,7 @@ export default new Command("ban")
 		let dmError: string | undefined;
 		let dm: Eris.Message<Eris.PrivateChannel> | null = null;
 		if (!nodm && member !== null && !member.bot)
-			dm = await member.user.createMessage(`You were banned from **${msg.channel.guild.name}** by **${msg.author.tag}**\nReason:\n\`\`\`\n${reason}\`\`\`\nTime: **${time === 0 ? "Permanent" : Time.ms(time, true, true, false)}**`)
+			dm = await member.user.createMessage(`You were banned from **${msg.channel.guild.name}** by **${msg.author.tag}**\nReason:\n\`\`\`\n${reason ?? "None Provided"}\`\`\`\nTime: **${time === 0 ? "Permanent" : Time.ms(time, true, true, false)}**`)
 				.catch((err: Error) => ((dmError = `${err.name}: ${err.message}`, null)));
 		await msg.channel.guild.banMember(user.id, delDays)
 			// catch first so we only catch an error from ban
@@ -70,8 +71,7 @@ export default new Command("ban")
 				return msg.channel.createMessage(`I-I failed to ban **${user.tag}**..\n\`${err.name}: ${err.message}\``);
 			})
 			.then(async() => {
-			// @TODO modlog
-			// @TODO timed
-				await msg.channel.createMessage(`**${user.tag}** was banned, ***${reason}***${dmError !== undefined ? `\n\nFailed to send dm:\n\`${dmError}\`` : ""}`);
+				const mdl = await ModLogHandler.createBanEntry(msg.gConfig, user, msg.author, `Ban: ${msg.author.tag} -> ${reason ?? "None Provided"}`, time, delDays);
+				return msg.channel.createMessage(`**${user.tag}** was banned ${time === 0 ? "permanently" : `for \`${Time.ms(time, true, true, false)}\``}, ***${reason ?? "None Provided"}***${dmError !== undefined ? `\n\nFailed to send dm:\n\`${dmError}\`` : ""}${mdl !== false ? `\nFor more info, check <#${msg.gConfig.modlog.webhook!.channelId}> (case: **#${mdl.entryId}**)` : ""}`);
 			});
 	});

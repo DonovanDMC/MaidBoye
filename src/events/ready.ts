@@ -1,9 +1,10 @@
 import API from "../api";
-import config from "@config";
 import ClientEvent from "../util/ClientEvent";
 import Logger from "../util/Logger";
+import config from "@config";
 import { Utility } from "@uwu-codes/utils";
 import { Node } from "lavalink";
+import { TimedModerationHandler } from "@util/handlers/ModLogHandler";
 
 export default new ClientEvent("ready", async function() {
 	if (this.firstReady === true) return Logger.getLogger("Ready").warn("Ready event called after first ready, ignoring.");
@@ -17,9 +18,10 @@ export default new ClientEvent("ready", async function() {
 	}, 500);
 	await API.launch(this);
 	this.cpuUsage = await Utility.getCPUUsage();
-	setInterval(async() => {
-		this.cpuUsage = await Utility.getCPUUsage();
-	}, 1e3);
+	setInterval(async() =>
+		this.cpuUsage = await Utility.getCPUUsage()
+	, 1e3);
+	TimedModerationHandler.init();
 	this.lava = new Node({
 		password: config.services.lavalink.password,
 		userID: config.client.id,
