@@ -65,6 +65,7 @@ export default new Command("eval", "ev")
 		const end = Timer.end();
 
 		const f = await format(res);
+		const t = Timer.calc(start, end, 3, false);
 
 		if (res instanceof Error) Logger.getLogger("Eval").error("Eval Error:", res);
 		if (msg.dashedArgs.value.includes("delete") || msg.dashedArgs.value.includes("d")) await msg.delete().catch(() => null);
@@ -79,13 +80,11 @@ export default new Command("eval", "ev")
 				out = "see attached file";
 			}
 
-			// @TODO ms/μs/ns
-			const t = Timer.calc(start, end, 3, false);
 			return msg.reply({
 				embeds: [
 					new EmbedBuilder()
 						.setAuthor(msg.author.tag, msg.author.avatarURL)
-						.setTitle(`Time Taken: ${t.val}ms`)
+						.setTitle(`Time Taken: ${t}`)
 						.setColor(res instanceof Error ? "red" : "green")
 						.addField(`${config.emojis.default.in} Code`, `\`\`\`js\n${msg.args.join(" ").slice(0, 300)}\`\`\``, false)
 						.addField(`${config.emojis.default.out}`, `\`\`\`js\n${out}\`\`\``, false)
@@ -107,5 +106,6 @@ export default new Command("eval", "ev")
 		} else {
 			Logger.getLogger("Eval").info("Silent Eval Return (formatted):", f);
 			Logger.getLogger("Eval").info("Silent Eval Return (raw):", res);
+			Logger.getLogger("Eval").info("Silent Eval Time:", t);
 		}
 	});

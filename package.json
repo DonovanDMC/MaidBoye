@@ -5,7 +5,7 @@
   "description": "A cute little maid bot for keep your server nice and tidy.",
   "main": "index.js",
   "dependencies": {
-    "@uwu-codes/utils": "^1.0.44",
+    "@uwu-codes/utils": "^1.0.46",
     "chunk": "^0.0.3",
     "discord-command-parser": "^1.5.3",
     "e621": "^1.0.8",

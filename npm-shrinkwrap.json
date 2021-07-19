@@ -9,7 +9,7 @@
       "version": "1.0.2",
       "license": "MIT",
       "dependencies": {
-        "@uwu-codes/utils": "^1.0.44",
+        "@uwu-codes/utils": "^1.0.46",
         "chunk": "^0.0.3",
         "discord-command-parser": "^1.5.3",
         "e621": "^1.0.8",
@@ -583,9 +583,9 @@
       "integrity": "sha512-wF6hazbsnwaW3GhK4jFuw5NaLDQVRQ6pWQUGAUrJzxixFkTaODSiAKMPXuHwPEPkAKQWHAzj6uJ5h+3zU9gQxg=="
     },
     "node_modules/@uwu-codes/utils": {
-      "version": "1.0.44",
-      "resolved": "https://registry.npmjs.org/@uwu-codes/utils/-/utils-1.0.44.tgz",
-      "integrity": "sha512-omw+Thss0svt6wxMdMzfME0JpPWp15Ylue+H0LyHj1jzHs2G+HbClp0PmAy3uA6r1CBQFhChXfcskqzaFKAO+g==",
+      "version": "1.0.46",
+      "resolved": "https://registry.npmjs.org/@uwu-codes/utils/-/utils-1.0.46.tgz",
+      "integrity": "sha512-JmksuxKqsOSWqR+KgpSLzSa5LYZ4S28HTebRz4/70lAhDvGfkMbjwL32lboNX1x15kwSSTsH5grKDsFxcN1JtA==",
       "os": [
         "linux",
         "win32"
@@ -4718,9 +4718,9 @@
       }
     },
     "@uwu-codes/utils": {
-      "version": "1.0.44",
-      "resolved": "https://registry.npmjs.org/@uwu-codes/utils/-/utils-1.0.44.tgz",
-      "integrity": "sha512-omw+Thss0svt6wxMdMzfME0JpPWp15Ylue+H0LyHj1jzHs2G+HbClp0PmAy3uA6r1CBQFhChXfcskqzaFKAO+g==",
+      "version": "1.0.46",
+      "resolved": "https://registry.npmjs.org/@uwu-codes/utils/-/utils-1.0.46.tgz",
+      "integrity": "sha512-JmksuxKqsOSWqR+KgpSLzSa5LYZ4S28HTebRz4/70lAhDvGfkMbjwL32lboNX1x15kwSSTsH5grKDsFxcN1JtA==",
       "requires": {
         "@types/ioredis": "^4.26.4",
         "@uwu-codes/types": "^1.0.3",
