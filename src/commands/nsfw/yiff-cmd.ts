@@ -77,11 +77,11 @@ export default new Command("yiff", "thegoodstuff")
 					embeds: m.embeds,
 					components:  m.components?.slice(0, 1)
 				});
-				clearTimeout(t);
+				if (t) clearTimeout(t);
 			} else return refreshImage.call(this, wait.id, wait.token);
 		}
 
-		await refreshImage.call(this);
+		void refreshImage.call(this);
 		const t = setTimeout(() => {
 			if (m !== undefined) void m.edit({
 				content: m.content,
