@@ -139,7 +139,7 @@ export default new Command("e621", "e6")
 						embeds: m.embeds,
 						components:  m.components?.slice(0, 1)
 					});
-					clearTimeout(t);
+					if (t) clearTimeout(t);
 				}
 				if (wait.data.custom_id.includes("next")) i++;
 				if (wait.data.custom_id.includes("last")) i = posts.length - 1;
