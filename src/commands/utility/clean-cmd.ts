@@ -22,12 +22,12 @@ export default new Command("clean", "clear", "prune", "purge")
 						...(cmd.restrictions.length === 0 ? [] : cmd.restrictions.map(r => `- **${Strings.ucwords(r)}**`)),
 						"Usage:",
 						`${config.emojis.default.dot} All: \`${msg.gConfig.getFormattedPrefix()}clean 20\` (2-1000)`,
-						`${config.emojis.default.dot} Specific User: \`${msg.gConfig.getFormattedPrefix()}clean 20 @user\``,
-						`${config.emojis.default.dot} All Bots: \`${msg.gConfig.getFormattedPrefix()}clean 20 bots\``,
-						`${config.emojis.default.dot} Different Channel: \`${msg.gConfig.getFormattedPrefix()}clean 20 #channel\``,
-						`${config.emojis.default.dot} Role: \`${msg.gConfig.getFormattedPrefix()}clean 20 @role\``,
-						`${config.emojis.default.dot} My Commands: \`${msg.gConfig.getFormattedPrefix()}clean 20 commands\``,
-						`${config.emojis.default.dot} Text: \`${msg.gConfig.getFormattedPrefix()}clean 20 text "something here"\``,
+						`${config.emojis.default.dot} Specific User: \`${msg.gConfig.getFormattedPrefix()}clean @user 20\``,
+						`${config.emojis.default.dot} All Bots: \`${msg.gConfig.getFormattedPrefix()}clean bots 20\``,
+						`${config.emojis.default.dot} Different Channel: \`${msg.gConfig.getFormattedPrefix()}clean #channel 20\``,
+						`${config.emojis.default.dot} Role: \`${msg.gConfig.getFormattedPrefix()}clean @role 20\``,
+						`${config.emojis.default.dot} My Commands: \`${msg.gConfig.getFormattedPrefix()}clean commands 20\``,
+						`${config.emojis.default.dot} Text: \`${msg.gConfig.getFormattedPrefix()}clean text 20 "something here"\``,
 						"",
 						`User Permissions: ${cmd.userPermissions.length === 0 ? "None" : ""}`,
 						...(cmd.userPermissions.length === 0 ? [] : ["```diff\n--- (red = optional)", ...cmd.userPermissions.map(([perm, optional]) => `${optional ? "-" : "+"} ${config.permissions[perm]}`), "\n```"]),
@@ -43,12 +43,12 @@ export default new Command("clean", "clear", "prune", "purge")
 	.setExecutor(async function(msg) {
 		if (msg.args.length === 0) return msg.reply(`H-hey! You have to provide some arguments, silly.. See \`${msg.gConfig.getFormattedPrefix()}clean help\` for help`);
 		// assume they provided the arguments backwards
-		if (isNaN(Number(msg.args[0])) && !isNaN(Number(msg.args[1]))) msg.args = [
+		if (!isNaN(Number(msg.args[0])) && isNaN(Number(msg.args[1]))) msg.args = [
 			msg.args[1],
 			msg.args[0],
 			...msg.args.slice(2)
 		];
-		const amount = Number(msg.args[0]);
+		const amount = Number(msg.args[1]);
 		if (amount < 2) return msg.reply("H-hey! You have to provide a number 2 or higher!");
 		if (amount > 1000) return msg.reply("H-hey! You have to provide a number 1000 or lower!");
 		if (isNaN(amount)) return msg.reply("H-hey! You have to provide a number for the amount!");
@@ -60,6 +60,7 @@ export default new Command("clean", "clear", "prune", "purge")
 		} else {
 			switch (msg.args[1]?.toLowerCase()) {
 				// bot messages
+				case "bot":
 				case "bots": {
 					type = "bots";
 					target = null;
@@ -83,9 +84,9 @@ export default new Command("clean", "clear", "prune", "purge")
 
 				// specific
 				default: {
-					const user = await msg.getUserFromArgs(1, 0);
-					const role = await msg.getRoleFromArgs(1, 0);
-					const channel = await msg.getChannelFromArgs<Eris.GuildTextableChannel>(1, 0, undefined, undefined, true);
+					const user = await msg.getUserFromArgs();
+					const role = await msg.getRoleFromArgs();
+					const channel = await msg.getChannelFromArgs<Eris.GuildTextableChannel>(0, 0, undefined, undefined, true);
 
 					if (user !== null) {
 						type = "user";
@@ -124,7 +125,8 @@ export default new Command("clean", "clear", "prune", "purge")
 			else return [...(old ?? []), ...m];
 		}
 
-		const messages = await getMessages();
+		//                                                                                       fetch extra for filtering
+		const messages = await getMessages(["bots", "commands", "role", "user"].includes(type) ? amount < 100 ? 100 : amount : undefined);
 		let filteredDate = 0;
 		const filtered = messages.filter(m => {
 			if (m.createdAt < (Date.now() - 1.21e+9)) {
@@ -143,8 +145,7 @@ export default new Command("clean", "clear", "prune", "purge")
 			}
 		});
 
-		console.log(messages.length, filteredDate, filtered.length);
-		const count = await msg.reply(`Total Messages Recieved: **${messages.length}**\nOlder Than 2 Weeks: **${filteredDate}**\nProvided Filter: **${((messages.length - filteredDate) - filtered.length)}**\n\nMessages Left Over: **${filtered.length}**`);
+		const count = await msg.reply(`Total Messages Recieved: **${messages.length}**\nOlder Than 2 Weeks: **${filteredDate}**\nFiltered Out: **${((messages.length - filteredDate) - filtered.length)}**\n\nMessages Left Over: **${filtered.length}**\n Excess Removed: **${filtered.length > amount ? filtered.length - amount : 0}**`);
 		if (filtered.length < 2) {
 			clearInterval(typing);
 			clearTimeout(time);
@@ -162,6 +163,9 @@ export default new Command("clean", "clear", "prune", "purge")
 			return msg.reply("Cancelled.");
 		}
 		await sendCancel.edit("Running...");
+		if (filtered.length > amount) filtered.forEach((f, i) =>
+			i > (amount + 1) ? filtered.splice(i, 1) : null
+		);
 
 		const typing2 = setInterval(() => msg.channel.sendTyping(), 7e3);
 		const time2 = setTimeout(() => {
