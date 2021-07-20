@@ -1,0 +1,40 @@
+import ModLogHandler from "../../util/handlers/ModLogHandler";
+import Command from "@cmd/Command";
+import Eris from "eris";
+import db from "@db";
+const Redis = db.r;
+
+export default new Command("lockdown")
+	.setPermissions("bot", "embedLinks", "manageChannels")
+	.setPermissions("user", "kickMembers", "manageGuild")
+	.setDescription("lock all channels in the server")
+	.setUsage("[reason]")
+	.setHasSlashVariant(true)
+	.setCooldown(3e3)
+	.setExecutor(async function(msg) {
+		const old = await Redis.get(`lockdown:${msg.channel.guild.id}`);
+		if (old) return msg.reply("Th-this server has already been locked down..");
+		const channels = msg.channel.guild.channels.filter(c => [Eris.Constants.ChannelTypes.GUILD_TEXT, Eris.Constants.ChannelTypes.GUILD_NEWS].includes(c.type as 0));
+		const ovr = [] as Array<[id: string, allow: string, deny: string]>;
+		const reason = msg.args.join(" ") || null;
+		const m = await msg.reply("Running..");
+		for (const ch of channels) {
+			const p = ch.permissionOverwrites.get(msg.channel.guild.id) ?? {
+				allow: 0n,
+				deny: 0n
+			};
+			// skip if send is already denied
+			if (p.deny & Eris.Constants.Permissions.sendMessages) continue;
+			else {
+				ovr.push([ch.id, p.allow.toString(), p.deny.toString()]);
+				if (p.allow & Eris.Constants.Permissions.sendMessages) p.allow -= Eris.Constants.Permissions.sendMessages;
+				await ch.editPermission(msg.channel.guild.id, p.allow, p.deny | Eris.Constants.Permissions.sendMessages, 0, `Lockdown: ${msg.author.tag} (${msg.author.id}) -> ${reason ?? "None Provided"}`);
+			}
+		}
+		if (ovr.length === 0) return m.edit("No channels were locked.");
+
+		await Redis.set(`lockdown:${msg.channel.guild.id}`, JSON.stringify(ovr));
+		const mdl = await ModLogHandler.createLockDownEntry(msg.gConfig, msg.member, reason);
+		await m.edit(`Locked **${ovr.length}** channels. ${mdl === false ? "" : ` (case #${mdl.entryId})`}`);
+
+	});
