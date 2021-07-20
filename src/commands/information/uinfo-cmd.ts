@@ -3,7 +3,6 @@ import Command from "@cmd/Command";
 import EmbedBuilder from "@util/EmbedBuilder";
 import BotFunctions from "@util/BotFunctions";
 import fetch from "node-fetch";
-import { Time } from "@uwu-codes/utils";
 import Eris from "eris";
 
 export default new Command("uinfo", "userinfo")
