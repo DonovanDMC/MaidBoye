@@ -73,4 +73,20 @@ export default class MaidBoye extends Eris.Client {
 			return u;
 		} else return null;
 	}
+
+	async getMember(guildId: string, userId: string) {
+		if (!this.guilds.has(guildId)) return this.getRESTGuildMember(guildId, userId).catch(() => null);
+		else {
+			const g = this.guilds.get(guildId)!;
+			if (g.members.has(userId)) return g.members.get(userId)!;
+			else {
+				const m = await g.getRESTMember(userId).catch(() => null);
+				if (m === null) return null;
+				else {
+					g.members.add(m, g);
+					return m;
+				}
+			}
+		}
+	}
 }

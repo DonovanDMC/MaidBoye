@@ -63,7 +63,7 @@ export default new Command("ban")
 		if (!nodm && member !== null && !member.bot)
 			dm = await member.user.createMessage(`You were banned from **${msg.channel.guild.name}** by **${msg.author.tag}**\nReason:\n\`\`\`\n${reason ?? "None Provided"}\`\`\`\nTime: **${time === 0 ? "Permanent" : Time.ms(time, true, true, false)}**`)
 				.catch((err: Error) => ((dmError = `${err.name}: ${err.message}`, null)));
-		await msg.channel.guild.banMember(user.id, delDays)
+		await msg.channel.guild.banMember(user.id, delDays, `Command: ${msg.author.tag} -> ${reason ?? "None Provided"}`)
 			// catch first so we only catch an error from ban
 			.catch(async(err: Error) => {
 				// delete the dm if we didn't ban them
@@ -71,7 +71,7 @@ export default new Command("ban")
 				return msg.channel.createMessage(`I-I failed to ban **${user.tag}**..\n\`${err.name}: ${err.message}\``);
 			})
 			.then(async() => {
-				const mdl = await ModLogHandler.createBanEntry(msg.gConfig, user, msg.author, `Ban: ${msg.author.tag} -> ${reason ?? "None Provided"}`, time, delDays);
+				const mdl = await ModLogHandler.createBanEntry(msg.gConfig, user, msg.author, reason, time, delDays);
 				return msg.channel.createMessage(`**${user.tag}** was banned ${time === 0 ? "permanently" : `for \`${Time.ms(time, true, true, false)}\``}, ***${reason ?? "None Provided"}***${dmError !== undefined ? `\n\nFailed to send dm:\n\`${dmError}\`` : ""}${mdl !== false ? `\nFor more info, check <#${msg.gConfig.modlog.webhook!.channelId}> (case: **#${mdl.entryId}**)` : ""}`);
 			});
 	});

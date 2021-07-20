@@ -66,6 +66,7 @@ export default class GuildConfig {
 	settings: {
 		defaultYiffType: typeof config["yiffTypes"][number] | null;
 		yiffThumbnailType: "gif" | "image";
+		muteRole: string | null;
 	};
 	constructor(id: string, data: GuildConfigKV) {
 		this.id = id;
