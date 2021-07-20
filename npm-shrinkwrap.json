@@ -1222,7 +1222,7 @@
     },
     "node_modules/eris": {
       "version": "0.15.2-dev",
-      "resolved": "git+ssh://git@github.com/DonovanDMC/eris.git#59b755992a9fb1ff6e19f2f7bec49699c63efa4a",
+      "resolved": "git+ssh://git@github.com/DonovanDMC/eris.git#6c3cf010beb0d0e5a6b71ea57c1f73bd97109a49",
       "license": "MIT",
       "dependencies": {
         "ws": "^7.4.6"
@@ -5181,8 +5181,8 @@
       }
     },
     "eris": {
-      "version": "git+ssh://git@github.com/DonovanDMC/eris.git#59b755992a9fb1ff6e19f2f7bec49699c63efa4a",
-      "from": "eris@github:DonovanDMC/eris#merge",
+      "version": "git+ssh://git@github.com/DonovanDMC/eris.git#6c3cf010beb0d0e5a6b71ea57c1f73bd97109a49",
+      "from": "eris@DonovanDMC/eris#merge",
       "requires": {
         "opusscript": "^0.0.8",
         "tweetnacl": "^1.0.1",
