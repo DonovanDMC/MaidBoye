@@ -10,7 +10,7 @@ export default new Command("tag", "tags")
 	.setHasSlashVariant(true)
 	.setCooldown(3e3)
 	.setExecutor(async function(msg) {
-		const sub = msg.rawArgs.length === 0 ? null : msg.rawArgs[0].toLowerCase();
+		const sub = msg.rawArgs.length === 0 ? "help" : msg.rawArgs[0].toLowerCase();
 		switch (sub) {
 			case "create": {
 				if (msg.gConfig.tags.length >= 50) return msg.reply("H-hey! This server has hit the tag limit (50).. Either delete some to make more, or contact a developer.");
