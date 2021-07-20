@@ -5,7 +5,7 @@ import Logger from "@util/Logger";
 import EmbedBuilder from "@util/EmbedBuilder";
 import ComponentHelper from "@util/ComponentHelper";
 import Eris from "eris";
-import { Internal, Request, Strings, Time, Utility, Redis } from "@uwu-codes/utils";
+import { Internal, Request, Strings, Time, Utility } from "@uwu-codes/utils";
 import Timer from "@util/Timer";
 import BotFunctions from "@util/BotFunctions";
 import util from "util";
@@ -51,7 +51,7 @@ export default new Command("eval", "ev")
 			Time,
 			Utility,
 			BotFunctions,
-			Redis
+			Redis: db.r
 		};
 		// eslint-disable-next-line -- typescript messes with variable names so we have to remake them
 		for (const k in evalVariables) new Function("value", `${k} = value`)(evalVariables[k]);
