@@ -65,27 +65,30 @@ export default class MaidBoye extends Eris.Client {
 		Logger.getLogger("CommandManager").debug(`Loaded ${CommandHandler.commands.length} commands in ${(end - start).toFixed(3)}ms`);
 	}
 
-	async getUser(id: string) {
-		if (this.users.has(id)) return this.users.get(id)!;
+	async getUser(id: string, force = false) {
+		const cur = this.users.get(id);
+		if (cur && force === false) return cur;
 		const u = await this.getRESTUser(id).catch(() => null);
 		if (u !== null) {
+			if (force && cur) this.users.remove(cur);
 			this.users.add(u);
 			return u;
 		} else return null;
 	}
 
-	async getMember(guildId: string, userId: string) {
+	async getMember(guildId: string, userId: string, force = false) {
 		if (!this.guilds.has(guildId)) return this.getRESTGuildMember(guildId, userId).catch(() => null);
 		else {
 			const g = this.guilds.get(guildId)!;
-			if (g.members.has(userId)) return g.members.get(userId)!;
+			const cur = g.members.get(userId);
+			if (cur && force === false) return cur;
 			else {
 				const m = await g.getRESTMember(userId).catch(() => null);
-				if (m === null) return null;
-				else {
+				if (m !== null) {
+					if (force && cur) g.members.remove(cur);
 					g.members.add(m, g);
 					return m;
-				}
+				} else return null;
 			}
 		}
 	}

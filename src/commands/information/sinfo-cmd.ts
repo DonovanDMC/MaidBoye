@@ -1,10 +1,10 @@
 import config from "@config";
 import Command from "@cmd/Command";
 import EmbedBuilder from "@util/EmbedBuilder";
-import { Time } from "@uwu-codes/utils";
 import Eris from "eris";
 import ComponentHelper from "@util/ComponentHelper";
 import MaidBoye from "@MaidBoye";
+import BotFunctions from "@util/BotFunctions";
 
 export default new Command("sinfo", "serverinfo")
 	.setPermissions("bot", "embedLinks", "attachFiles")
@@ -26,7 +26,7 @@ export default new Command("sinfo", "serverinfo")
 							`${config.emojis.default.dot} Name: **${msg.channel.guild.name}**`,
 							`${config.emojis.default.dot} Id: **${msg.channel.guild.id}**`,
 							`${config.emojis.default.dot} Owner:** ${owner}**`,
-							`${config.emojis.default.dot} Creation Date: **${Time.formatDateWithPadding(msg.channel.guild.createdAt, true)}**`,
+							`${config.emojis.default.dot} Creation Date: **${BotFunctions.formatDiscordTime(msg.channel.guild.createdAt, "long-datetime", true)}**`,
 							`${config.emojis.default.dot} Boosts: **${msg.channel.guild.premiumSubscriptionCount || "None"}**${!msg.channel.guild.premiumSubscriptionCount ? "" : ` (Tier: **${config.names.boostTier[msg.channel.guild.premiumTier]}**)`}`,
 							`${config.emojis.default.dot} Large: **${msg.channel.guild.large ? "Yes" : "No"}**`,
 							`${config.emojis.default.dot} Verification Level: **${config.names.verificationLevel[msg.channel.guild.verificationLevel]}**`,

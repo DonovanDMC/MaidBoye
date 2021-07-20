@@ -12,10 +12,13 @@ export default new Command("uinfo", "userinfo")
 	.setHasSlashVariant(true)
 	.setCooldown(3e3)
 	.setExecutor(async function(msg) {
-		const user = msg.args.length === 0 ? msg.author : await msg.getUserFromArgs();
+		let user = msg.args.length === 0 ? msg.author : await msg.getUserFromArgs();
+		// @FIXME banners don't seem to be sent over gateway yet
+		if (user && (user.banner === undefined || user.bannerColor === undefined)) user = await this.getUser(user.id, true);
 		if (user === null) return msg.reply("Th-that isn't a valid user..");
 		const member = msg.channel.guild.members.get(user.id);
 		const sortedMembers = Array.from(msg.channel.guild.members.values()).sort((a,b) => (a.joinedAt ?? 0) - (b.joinedAt ?? 0));
+
 
 		let dRep: { id: string; upvotes: number; downvotes: number; xp: number; rank: string; staff: boolean; } | undefined, infr: { id: string; } & ({ type: "CLEAN";} | { type: "WARN" | "BAN"; reason: string; moderator: string; date: number; }) | undefined;
 		try {
@@ -55,17 +58,18 @@ export default new Command("uinfo", "userinfo")
 				new EmbedBuilder()
 					.setAuthor(msg.author.tag, msg.author.avatarURL)
 					.setTitle(`User Info for ${user.tag}`)
-					.setThumbnail(user.dynamicAvatarURL(undefined, 4096))
+					.setThumbnail(user.avatarURL)
 					.setDescription(
 						"**General User**:",
 						`${config.emojis.default.dot} Tag: **${user.tag}**`,
 						`${config.emojis.default.dot} ID: **${user.id}**`,
-						`${config.emojis.default.dot} Avatar: [Link](${user.avatarURL})`,
-						`${config.emojis.default.dot} Creation Date: ${Time.formatDateWithPadding(user.createdAt, true, false, true, false)}`,
+						`${config.emojis.default.dot} Avatar: [[Link](${user.avatarURL})]`,
+						`${config.emojis.default.dot} Banner: ${user.banner === null ? "[None]" : `[[Link](${user.bannerURL})] ${user.bannerColor === null ? "" : `(#${user.bannerColor.toString(16)})`}`}`,
+						`${config.emojis.default.dot} Creation Date: ${BotFunctions.formatDiscordTime(user.createdAt, "long-datetime", true)}`,
 						member === undefined ? "" : [
 							"",
 							"**Server Member**:",
-							`${config.emojis.default.dot} Join Date: ${member.joinedAt === null ? "Unknown" : Time.formatDateWithPadding(member.joinedAt, true, false, true, false)}`,
+							`${config.emojis.default.dot} Join Date: ${member.joinedAt === null ? "Unknown" : BotFunctions.formatDiscordTime(member.joinedAt, "long-datetime", true)}`,
 							`${config.emojis.default.dot} Roles: ${member.roles.length === 0 ? "**None**" : member.roles.reduce((a,b) => a + b.length + 4 /* <@&> */, 0) > 1500 ? "**Unable To Display Roles.**" : member.roles.map(r => `<@&${r}>`).join(" ")}`,
 							`${config.emojis.default.dot} Join Info:`,
 							...joins.map(j => `${config.emojis.default.dot} ${j.id === member.id ? `**#${sortedMembers.indexOf(j) + 1} ${j.tag}**` : `#${sortedMembers.indexOf(j) + 1} ${j.tag}`}`)
@@ -78,6 +82,7 @@ export default new Command("uinfo", "userinfo")
 						"**Badges**:",
 						badges.map(f => `${config.emojis.default.dot} ${config.names.badges[f]}`)
 					)
+					.setImage(user.bannerURL ?? "")
 					.toJSON()
 			]
 		});

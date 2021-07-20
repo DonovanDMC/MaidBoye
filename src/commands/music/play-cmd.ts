@@ -46,7 +46,7 @@ export default new Command("play")
 			await msg.gConfig.mongoEdit({
 				$push: {
 					queue: {
-						addedAt: new Date().toISOString(),
+						addedAt: Date.now(),
 						addedBy: msg.author.id,
 						track
 					}

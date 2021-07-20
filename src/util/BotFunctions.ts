@@ -79,6 +79,7 @@ export default class BotFunctions {
 				guild_id: message.messageReference.guildID
 			},
 			flags: message.flags,
+			// eslint-disable-next-line deprecation/deprecation
 			stickers: message.stickers,
 			referenced_message: message.referencedMessage === undefined ? undefined : message.referencedMessage === null ? null : this.messageToOriginal(message.referencedMessage),
 			interaction: null,
@@ -115,7 +116,8 @@ export default class BotFunctions {
 		};
 	}
 
-	static formatDiscordTime(time: number, flag: "short-time" | "long-time" | "short-date" | "long-date" | "short-datetime" | "long-datetime" | "relative" = "short-datetime") {
+	static formatDiscordTime(time: number, flag: "short-time" | "long-time" | "short-date" | "long-date" | "short-datetime" | "long-datetime" | "relative" = "short-datetime", ms = false) {
+		if (ms) time = Math.floor(time / 1000);
 		return `<t:${time}:${
 			flag === "short-time" ? "t" :
 				flag === "long-time" ? "T" :

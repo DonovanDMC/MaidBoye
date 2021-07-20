@@ -246,7 +246,7 @@ export default new Command("selfroles")
 					$push: {
 						selfRoles: {
 							role: role.id,
-							addedAt: new Date().toISOString(),
+							addedAt: Date.now(),
 							addedby: msg.author.id
 						}
 					}

@@ -7,6 +7,7 @@ import ComponentHelper from "@util/ComponentHelper";
 import Eris from "eris";
 import { Internal, Request, Strings, Time, Utility, Redis } from "@uwu-codes/utils";
 import Timer from "@util/Timer";
+import BotFunctions from "@util/BotFunctions";
 import util from "util";
 
 async function format(obj: unknown) {
@@ -49,6 +50,7 @@ export default new Command("eval", "ev")
 			Strings,
 			Time,
 			Utility,
+			BotFunctions,
 			Redis
 		};
 		// eslint-disable-next-line -- typescript messes with variable names so we have to remake them

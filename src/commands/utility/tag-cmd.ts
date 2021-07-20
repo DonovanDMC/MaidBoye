@@ -1,7 +1,7 @@
 import Command from "@cmd/Command";
 import EmbedBuilder from "@util/EmbedBuilder";
 import chunk from "chunk";
-import { Time } from "@uwu-codes/utils";
+import BotFunctions from "@util/BotFunctions";
 
 export default new Command("tag", "tags")
 	.setPermissions("bot", "embedLinks")
@@ -25,7 +25,7 @@ export default new Command("tag", "tags")
 						tags: {
 							name: msg.rawArgs[1].toLowerCase(),
 							content,
-							createdAt: new Date().toISOString(),
+							createdAt: Date.now(),
 							createdBy: msg.author.id,
 							modifiedAt: null,
 							modifiedBy: null
@@ -63,7 +63,7 @@ export default new Command("tag", "tags")
 							content,
 							createdAt: t.createdAt,
 							createdBy: t.createdBy,
-							modifiedAt: new Date().toISOString(),
+							modifiedAt: Date.now(),
 							modifiedBy: msg.author.id
 						}
 					}
@@ -112,10 +112,10 @@ export default new Command("tag", "tags")
 					tags.push([
 						`#${(i + ((page - 1) * 10)) + 1} - \`${tag.name}\``,
 						`Created By: ${creator === null ? tag.createdBy : `**${creator.tag}** (<@!${creator.id}>)`}`,
-						`Created At: ${Time.formatDateWithPadding(new Date(tag.createdAt))}`,
+						`Created At: ${BotFunctions.formatDiscordTime(tag.createdAt, "long-datetime", true)}`,
 						...(!(tag.modifiedAt && tag.modifiedBy) ? [] : [
 							`Modified By: ${modifier === null ? tag.modifiedBy : `**${modifier.tag}** (<@!${modifier.id}>)`}`,
-							`Modified At: ${Time.formatDateWithPadding(new Date(tag.modifiedAt))}`
+							`Modified At: ${BotFunctions.formatDiscordTime(tag.modifiedAt, "long-datetime", true)}`
 						]),
 						""
 					]);

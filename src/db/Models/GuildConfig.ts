@@ -33,19 +33,19 @@ export default class GuildConfig {
 	tags: Array<{
 		name: string;
 		content: string;
-		createdAt: string;
+		createdAt: number;
 		createdBy: string;
-		modifiedAt: string | null;
+		modifiedAt: number | null;
 		modifiedBy: string | null;
 	}>;
 	queue: Array<{
-		addedAt: string;
+		addedAt: number;
 		addedBy: string;
 		track: Track;
 	}>;
 	selfRoles: Array<{
 		role: string;
-		addedAt: string;
+		addedAt: number;
 		addedby: string;
 	}>;
 	reports: {
