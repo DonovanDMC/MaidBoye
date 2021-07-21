@@ -33,9 +33,9 @@ export default new Command("mute")
 		if (msg.gConfig.settings.muteRole === null) return msg.reply(`Th-this server's mute role hasn't been set up.. Try \`${msg.gConfig.getFormattedPrefix()}settings\``);
 		const r = msg.channel.guild.roles.get(msg.gConfig.settings.muteRole);
 		if (!r) {
-			await msg.gConfig.mongoEdit({
-				$set: {
-					"settings.muteRole": null
+			await msg.gConfig.edit({
+				settings: {
+					muteRole: null
 				}
 			});
 			return msg.reply("Th-this server's mute role is invalid..");

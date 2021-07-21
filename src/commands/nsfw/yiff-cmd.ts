@@ -1,4 +1,4 @@
-import GuildConfig from "../../db/Models/GuildConfig";
+import GuildConfig from "../../db/Models/Guild/GuildConfig";
 import Command from "@cmd/Command";
 import EmbedBuilder from "@util/EmbedBuilder";
 import config from "@config";
@@ -24,7 +24,9 @@ export default new Command("yiff", "thegoodstuff")
 				if (!config.yiffTypes.includes(msg.gConfig.settings.defaultYiffType)) {
 					Logger.getLogger("YiffCommand").warn(`Unknown Default Yiff Type "${msg.gConfig.settings.defaultYiffType}" on guild ${msg.channel.guild.id}`);
 					await msg.gConfig.edit({
-						defaultYiffType: null
+						settings: {
+							defaultYiffType: config.yiffTypes[0]
+						}
 					});
 					type = config.yiffTypes[0];
 				} else type = msg.gConfig.settings.defaultYiffType;

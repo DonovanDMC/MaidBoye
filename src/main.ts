@@ -85,7 +85,7 @@ export default class MaidBoye extends Eris.Client {
 			else {
 				const m = await g.getRESTMember(userId).catch(() => null);
 				if (m !== null) {
-					if (force && cur) g.members.remove(cur);
+					// if (force && cur) g.members.remove(cur);
 					g.members.add(m, g);
 					return m;
 				} else return null;

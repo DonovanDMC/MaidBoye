@@ -1,8 +1,8 @@
-import config from "@config";
 import ClientEvent from "../util/ClientEvent";
 import EmbedBuilder from "../util/EmbedBuilder";
 import Logger from "../util/Logger";
 import WebhookStore from "../util/WebhookStore";
+import config from "@config";
 
 export default new ClientEvent("shardReady", async function(id) {
 	Logger.debug(`Shard #${id} is ready.`);

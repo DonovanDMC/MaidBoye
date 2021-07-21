@@ -6,10 +6,10 @@ import CommandError from "@cmd/CommandError";
 import ModLogUtil from "@util/handlers/ModLogHandler";
 import ComponentHelper from "@util/ComponentHelper";
 import ComponentInteractionCollector from "@util/ComponentInteractionCollector";
-import GuildConfig from "@db/Models/GuildConfig";
 import Eris from "eris";
 import { Request } from "@uwu-codes/utils";
 import FileType from "file-type";
+import GuildConfig from "@db/Models/Guild/GuildConfig";
 
 export default new Command("modlog")
 	.setPermissions("bot", "embedLinks", "manageChannels", "manageWebhooks")
@@ -19,10 +19,8 @@ export default new Command("modlog")
 	.setHasSlashVariant(true)
 	.setCooldown(3e3)
 	.setExecutor(async function(msg, cmd) {
-		if (msg.gConfig.modlog.enabled === true && msg.gConfig.modlog.webhook === null) await msg.gConfig.mongoEdit({
-			$set: {
-				modlog: config.defaults.guild.modlog
-			}
+		if (msg.gConfig.modlog.enabled === true && msg.gConfig.modlog.webhook === null) await msg.gConfig.edit({
+			modlog: config.defaults.guild.modlog
 		});
 		const m = await msg.reply({
 			content: "Please select a section from below.\n\nIf you want to change a setting, you must use reset, then run setup again.",
@@ -368,10 +366,8 @@ export default new Command("modlog")
 						switch (delHook.data.custom_id.split("-")[1].split(".")[0]) {
 							case "yes": {
 								await this.deleteWebhook(msg.gConfig.modlog.webhook.id, msg.gConfig.modlog.webhook.token, `Command: ${msg.author.tag}`).catch(() => null);
-								await msg.gConfig.mongoEdit({
-									$set: {
-										modlog: config.defaults.guild.modlog
-									}
+								await msg.gConfig.edit({
+									modlog: config.defaults.guild.modlog
 								});
 								return m.edit({
 									content: "The webhook has been deleted, and the modlog was reset.",
@@ -380,10 +376,8 @@ export default new Command("modlog")
 								break;
 							}
 							case "no": {
-								await msg.gConfig.mongoEdit({
-									$set: {
-										modlog: config.defaults.guild.modlog
-									}
+								await msg.gConfig.edit({
+									modlog: config.defaults.guild.modlog
 								});
 								return m.edit({
 									content: "The webhook was not deleted, and the modlog was reset.",
@@ -399,10 +393,8 @@ export default new Command("modlog")
 					}
 				}
 
-				await msg.gConfig.mongoEdit({
-					$set: {
-						modlog: config.defaults.guild.modlog
-					}
+				await msg.gConfig.edit({
+					modlog: config.defaults.guild.modlog
 				});
 				await m.edit({
 					content: "The modlog has been reset.",

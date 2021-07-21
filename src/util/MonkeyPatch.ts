@@ -17,6 +17,7 @@ import ComponentInteractionCollector, { InteractionWithData } from "./ComponentI
 import Eris from "eris";
 import sauce from "source-map-support";
 import { APIMessageComponentInteractionData } from "discord-api-types";
+import MaidBoye from "@MaidBoye";
 sauce.install({ hookRequire: true });
 
 Object.defineProperties(Eris.User.prototype, {
@@ -38,7 +39,7 @@ Object.defineProperties(Eris.Member.prototype, {
 		get(this: Eris.Member) { return this.roles.map(r => this.guild.roles.get(r)); }
 	},
 	topRole: {
-		get(this: Eris.Member) { return this.realRoles.sort((a,b) => a.position - b.position)[0] ?? null; }
+		get(this: Eris.Member) { return this.realRoles.sort((a,b) => b.position - a.position)[0] ?? null; }
 	},
 	// higher = compared member is higher than current member
 	compareToMember: {
@@ -47,8 +48,8 @@ Object.defineProperties(Eris.Member.prototype, {
 			if (!to) return "invalid";
 			const a = this.topRole?.position ?? -1;
 			const b = to.topRole?.position ?? -1;
-			if (a > b) return "lower";
-			else if (a < b) return "higher";
+			if (a < b) return "higher";
+			else if (a > b) return "lower";
 			else if (a === b) return "same";
 			else return "unknown";
 		}
@@ -59,8 +60,8 @@ Object.defineProperties(Eris.Member.prototype, {
 			if (!(to instanceof Eris.Role)) to = this.guild.roles.get(to)!;
 			if (!to) return "invalid";
 			const a = this.topRole?.position ?? -1;
-			if (a > to.position) return "lower";
-			else if (a < to.position) return "higher";
+			if (a < to.position) return "higher";
+			else if (a > to.position) return "lower";
 			else if (a === to.position) return "same";
 			else return "unknown";
 		}
@@ -170,18 +171,15 @@ Object.defineProperties(Eris.Message.prototype, {
 		}
 	},
 	getMemberFromArgs: {
-		async value(this: Eris.Message, argPosition = 0, mentionPosition = 0, parsed = true, nick = true) {
+		async value(this: Eris.Message & { client: MaidBoye; }, argPosition = 0, mentionPosition = 0, parsed = true, nick = true) {
 			if (!("guild" in this.channel)) throw new Error("Missing 'guild' property on channel in Message#getMemberFromArgs");
 			let arg = (this[parsed ? "args" : "rawArgs"])?.[argPosition];
 			// if args are undefined, we are probably in a normal message
 			if (arg === undefined) arg = this.content.split(" ")?.[argPosition];
 			let m: Eris.Member | null = null;
 			if (idRegex.test(arg)) {
-				m = this.channel.guild.members.get(arg) ?? null;
-				if (m === null) {
-					m = await this.channel.guild.getRESTMember(arg).catch(() => null);
-					if (m !== null) return this.channel.guild.members.add(m, undefined, true);
-				} else return m;
+				m = await this.client.getMember(this.channel.guild.id, arg);
+				if (m) return m;
 			}
 			const byUsername = this.channel.guild.members.find(member => member.username.toLowerCase() === arg.toLowerCase()) ?? null;
 			const byNick = nick ? this.channel.guild.members.find(member => member.nick !== null && member.nick.toLowerCase() === arg.toLowerCase()) ?? null : null;

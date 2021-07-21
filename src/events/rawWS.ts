@@ -72,7 +72,7 @@ export default new ClientEvent("rawWS", async function({ op, d, t }) {
 									const b = await Redis.get(`interactions:${data.message.id}:back`);
 									let eb: { embeds: Array<Eris.EmbedOptions>; components: Eris.Message["components"]; } | undefined;
 									try {
-										eb = JSON.parse(b) as typeof eb;
+										eb = JSON.parse(b);
 									} catch (err) {
 										// throw away error
 									}

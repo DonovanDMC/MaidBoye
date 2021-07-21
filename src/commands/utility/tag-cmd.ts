@@ -13,24 +13,18 @@ export default new Command("tag", "tags")
 		const sub = msg.rawArgs.length === 0 ? "help" : msg.rawArgs[0].toLowerCase();
 		switch (sub) {
 			case "create": {
-				if (msg.gConfig.tags.length >= 50) return msg.reply("H-hey! This server has hit the tag limit (50).. Either delete some to make more, or contact a developer.");
+				if (msg.gConfig.tags.size >= 50) return msg.reply("H-hey! This server has hit the tag limit (50).. Either delete some to make more, or contact a developer.");
 				if (msg.args.length === 1) return msg.reply("H-hey! You have to provide a name for the tag..");
 				if (msg.args.length === 2) return msg.reply("H-hey! You have to provide some content for the tag..");
 				if (["create", "modify", "delete", "list", "help", "get"].includes(msg.rawArgs[1].toLowerCase())) return msg.reply(`H-hey! That name (**${msg.rawArgs[1].toLowerCase()}**) is a blacklisted name, you can't use it..`);
 				if (msg.gConfig.tags.map(t => t.name).includes(msg.rawArgs[1].toLowerCase())) return msg.reply("H-hey! A tag already exists with that name..");
 				const content = msg.rawArgs.slice(2).join(" ");
 				if (content.length > 750) return msg.reply("H-hey! Tags have a hard limit of 750 characters..");
-				await msg.gConfig.mongoEdit({
-					$push: {
-						tags: {
-							name: msg.rawArgs[1].toLowerCase(),
-							content,
-							createdAt: Date.now(),
-							createdBy: msg.author.id,
-							modifiedAt: null,
-							modifiedBy: null
-						}
-					}
+				await msg.gConfig.addTag({
+					name: msg.rawArgs[1].toLowerCase(),
+					content,
+					createdAt: Date.now(),
+					createdBy: msg.author.id
 				});
 
 				return msg.reply({
@@ -46,7 +40,7 @@ export default new Command("tag", "tags")
 			}
 
 			case "modify": {
-				if (msg.gConfig.tags.length === 0) return msg.reply("th-this server doesn't have any tags to modify..");
+				if (msg.gConfig.tags.size === 0) return msg.reply("th-this server doesn't have any tags to modify..");
 				if (msg.args.length === 1) return msg.reply("H-hey! You have to provide a name for the tag..");
 				if (msg.args.length === 2) return msg.reply("H-hey! You have to provide some content for the tag..");
 				if (["create", "modify", "delete", "list", "help", "get"].includes(msg.rawArgs[1].toLowerCase())) return msg.reply(`H-hey! That name (**${msg.rawArgs[1].toLowerCase()}**) is a blacklisted name, you can't use it..`);
@@ -55,19 +49,7 @@ export default new Command("tag", "tags")
 				if (!t) return msg.reply(`I couldn't find a tag with the name "${msg.rawArgs[1].toLowerCase()}"..`);
 				const content = msg.rawArgs.slice(2).join(" ");
 				if (content.length > 750) return msg.reply("H-hey! Tags have a hard limit of 750 characters..");
-				await msg.gConfig.mongoEdit({
-					$push: {
-						$pull: t,
-						tags: {
-							name: msg.rawArgs[1].toLowerCase(),
-							content,
-							createdAt: t.createdAt,
-							createdBy: t.createdBy,
-							modifiedAt: Date.now(),
-							modifiedBy: msg.author.id
-						}
-					}
-				});
+				await msg.gConfig.editTag(t.id, "id", content, msg.author.id);
 
 				return msg.reply({
 					content: `successfully modified the tag **${msg.rawArgs[1].toLowerCase()}**`,
@@ -83,24 +65,20 @@ export default new Command("tag", "tags")
 			}
 
 			case "delete": {
-				if (msg.gConfig.tags.length === 0) return msg.reply("th-this server doesn't have any tags to delete..");
+				if (msg.gConfig.tags.size === 0) return msg.reply("th-this server doesn't have any tags to delete..");
 				if (msg.args.length === 1) return msg.reply("H-hey! You have to provide the name of a tag to delete..");
 				if (["create", "modify", "delete", "list", "help", "get"].includes(msg.rawArgs[1].toLowerCase())) return msg.reply(`H-hey! That name (**${msg.rawArgs[1].toLowerCase()}**) is a blacklisted name, you can't use it..`);
 				const t = msg.gConfig.tags.find(tag => tag.name === msg.rawArgs[1].toLowerCase());
 				if (!t) return msg.reply(`I couldn't find a tag with the name "${msg.rawArgs[1].toLowerCase()}"..`);
-				await msg.gConfig.mongoEdit({
-					$pull: {
-						tags: t
-					}
-				});
+				await msg.gConfig.removeTag(t.id, "id");
 				return msg.reply(`successfully deleted the tag **${t.name}**`);
 				break;
 			}
 
 			case "list": {
-				if (msg.gConfig.tags.length === 0) return msg.reply("th-this server doesn't have any tags to list..");
+				if (msg.gConfig.tags.size === 0) return msg.reply("th-this server doesn't have any tags to list..");
 				const page = Number(msg.rawArgs[1]) ?? 1;
-				const pages = chunk(msg.gConfig.tags, 10);
+				const pages = chunk(msg.gConfig.tags.toArray(), 10);
 				if (isNaN(page)) return msg.reply(`H-hey! You can't need to specify a valid page number between **1** and **${pages.length}**..`);
 				if (page < 1) return msg.reply("H-hey! You can't supply a page less than one!");
 				if (page > pages.length) return msg.reply(`H-hey! You can't supply a page greater than **${pages.length}**!`);

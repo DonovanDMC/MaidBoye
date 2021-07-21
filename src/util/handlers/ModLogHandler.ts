@@ -1,18 +1,15 @@
 import db from "../../db";
-import GuildConfig from "../../db/Models/GuildConfig";
+import GuildConfig from "../../db/Models/Guild/GuildConfig";
 import MaidBoye from "../../main";
 import Eris from "eris";
 import EmbedBuilder from "@util/EmbedBuilder";
 import config from "@config";
 import { Time } from "@uwu-codes/utils";
 import Logger from "@util/Logger";
-import {
-	BanEntry, KickEntry, LockEntry,
-	LockDownEntry, MuteEntry, /* CleanEntry, */
-	SoftBanEntry, UnBanEntry, UnlockEntry,
-	UnLockDownEntry, UnMuteEntry, WarnEntry,
-	DeleteWarningEntry, ClearWarningsEntry
-} from "@util/@types/ModLog";
+import { CountResponse, OkPacket } from "@util/@types/MariaDB";
+import TimedEntry, { RawTimedEntry } from "@db/Models/TimedEntry";
+import { RawBanEntry } from "@db/Models/Guild/ModLog/BanEntry";
+import { RawMuteEntry } from "@db/Models/Guild/ModLog/MuteEntry";
 import crypto from "crypto";
 
 export default class ModLogHandler {
@@ -25,30 +22,32 @@ export default class ModLogHandler {
 	static async check(guild: string | GuildConfig) {
 		if (!(guild instanceof GuildConfig)) guild = await db.getGuild(guild);
 		if (guild.modlog.enabled === true) {
-			if (guild.modlog.webhook === null) await guild.mongoEdit({
-				$set: {
-					"modlog.enabled": false
+			if (guild.modlog.webhook === null) await guild.edit({
+				modlog: {
+					enabled: false
 				}
 			});
 			else {
-				if (!guild.modlog.webhook.id || !guild.modlog.webhook.token) await guild.mongoEdit({
-					$set: {
-						"modlog.enabled": false,
-						"modlog.webhook": null
+				if (!guild.modlog.webhook.id || !guild.modlog.webhook.token) await guild.edit({
+					modlog: {
+						enabled: false,
+						webhook: null
 					}
 				});
 				else {
 					const wh = await this.client.getWebhook(guild.modlog.webhook.id, guild.modlog.webhook.token).catch(() => null);
-					if (wh === null) await guild.mongoEdit({
-						$set: {
-							"modlog.enabled": false,
-							"modlog.webhook": null
+					if (wh === null) await guild.edit({
+						modlog: {
+							enabled: false,
+							webhook: null
 						}
 					});
 					else {
-						if (!guild.modlog.webhook.channelId) await guild.mongoEdit({
-							$set: {
-								"modlog.webhook.channelId": wh.channel_id
+						if (wh.channel_id !== undefined && guild.modlog.webhook.channelId !== wh.channel_id) await guild.edit({
+							modlog: {
+								webhook: {
+									channelId: wh.channel_id!
+								}
 							}
 						});
 					}
@@ -60,7 +59,7 @@ export default class ModLogHandler {
 	}
 
 	static getEntryId(guildId: string) {
-		return db.collection("modlog").find({ guildId }).count().then(v => v + 1);
+		return  db.query("SELECT COUNT(*) FROM modlog WHERE guild_id=?", [guildId]).then((v: CountResponse) => (Number(v[0]["COUNT(*)"] ?? 0) + 1));
 	}
 
 	static async executeWebhook(guild: GuildConfig, payload: Eris.WebhookPayload) {
@@ -80,6 +79,7 @@ export default class ModLogHandler {
 		if (check === false) return false;
 		const entryId = await this.getEntryId(guild.id);
 		const id = crypto.randomBytes(6).toString("hex");
+		await db.createUserIfNotExists(target.id);
 		const timedId = time === 0 ? null : await TimedModerationHandler.add(guild.id, target.id, "ban", time);
 		const m = await this.executeWebhook(guild, {
 			embeds: [
@@ -97,21 +97,19 @@ export default class ModLogHandler {
 					.toJSON()
 			]
 		});
-		await db.collection<BanEntry>("modlog").insertOne({
+		await db.query("INSERT INTO modlog (id, entry_id, guild_id, message_id, target, blame, reason, type, created_at, delete_days, timed_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [
 			id,
 			entryId,
-			guildId: guild.id,
-			messageId: m === null ? null : m.id,
-			target: target.id,
-			blame: blame === null ? "automatic" : blame.id,
+			guild.id,
+			m === null ? null : m.id,
+			target.id,
+			blame === null ? "automatic" : blame.id,
 			reason,
+			"ban",
+			Date.now(),
 			deleteDays,
-			type: "ban",
-			timedId,
-			createdAt: Date.now(),
-			lastEditedAt: null,
-			lastEditedBy: null
-		});
+			timedId
+		]);
 
 		return { id, entryId };
 	}
@@ -121,6 +119,7 @@ export default class ModLogHandler {
 		if (check === false) return false;
 		const entryId = await this.getEntryId(guild.id);
 		const id = crypto.randomBytes(6).toString("hex");
+		await db.createUserIfNotExists(target.id);
 		const m = await this.executeWebhook(guild, {
 			embeds: [
 				new EmbedBuilder()
@@ -135,19 +134,18 @@ export default class ModLogHandler {
 					.toJSON()
 			]
 		});
-		await db.collection<KickEntry>("modlog").insertOne({
+
+		await db.query("INSERT INTO modlog (id, entry_id, guild_id, message_id, target, blame, reason, type, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", [
 			id,
 			entryId,
-			guildId: guild.id,
-			messageId: m === null ? null : m.id,
-			target: target.id,
-			blame: blame === null ? "automatic" : blame.id,
+			guild.id,
+			m === null ? null : m.id,
+			target.id,
+			blame === null ? "automatic" : blame.id,
 			reason,
-			type: "kick",
-			createdAt: Date.now(),
-			lastEditedAt: null,
-			lastEditedBy: null
-		});
+			"kick",
+			Date.now()
+		]);
 
 		return { id, entryId };
 	}
@@ -171,19 +169,18 @@ export default class ModLogHandler {
 					.toJSON()
 			]
 		});
-		await db.collection<LockEntry>("modlog").insertOne({
+
+		await db.query("INSERT INTO modlog (id, entry_id, guild_id, message_id, target, blame, reason, type, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", [
 			id,
 			entryId,
-			guildId: guild.id,
-			messageId: m === null ? null : m.id,
-			target: target.id,
-			blame: blame === null ? "automatic" : blame.id,
+			guild.id,
+			m === null ? null : m.id,
+			target.id,
+			blame === null ? "automatic" : blame.id,
 			reason,
-			type: "lock",
-			createdAt: Date.now(),
-			lastEditedAt: null,
-			lastEditedBy: null
-		});
+			"lock",
+			Date.now()
+		]);
 
 		return { id, entryId };
 	}
@@ -207,19 +204,17 @@ export default class ModLogHandler {
 					.toJSON()
 			]
 		});
-		await db.collection<LockDownEntry>("modlog").insertOne({
+
+		await db.query("INSERT INTO modlog (id, entry_id, guild_id, message_id, blame, reason, type, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", [
 			id,
 			entryId,
-			guildId: guild.id,
-			messageId: m === null ? null : m.id,
-			target: null,
-			blame: blame === null ? "automatic" : blame.id,
+			guild.id,
+			m === null ? null : m.id,
+			blame === null ? "automatic" : blame.id,
 			reason,
-			type: "lockdown",
-			createdAt: Date.now(),
-			lastEditedAt: null,
-			lastEditedBy: null
-		});
+			"lockdown",
+			Date.now()
+		]);
 
 		return { id, entryId };
 	}
@@ -229,6 +224,7 @@ export default class ModLogHandler {
 		if (check === false) return false;
 		const entryId = await this.getEntryId(guild.id);
 		const id = crypto.randomBytes(6).toString("hex");
+		await db.createUserIfNotExists(target.id);
 		const timedId = time === 0 ? null : await TimedModerationHandler.add(guild.id, target.id, "mute", time);
 		const m = await this.executeWebhook(guild, {
 			embeds: [
@@ -245,69 +241,29 @@ export default class ModLogHandler {
 					.toJSON()
 			]
 		});
-		await db.collection<MuteEntry>("modlog").insertOne({
+
+		await db.query("INSERT INTO modlog (id, entry_id, guild_id, message_id, target, blame, reason, type, created_at, timed_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [
 			id,
 			entryId,
-			guildId: guild.id,
-			messageId: m === null ? null : m.id,
-			target: target.id,
-			blame: blame === null ? "automatic" : blame.id,
+			guild.id,
+			m === null ? null : m.id,
+			target.id,
+			blame === null ? "automatic" : blame.id,
 			reason,
-			type: "mute",
-			timedId,
-			createdAt: Date.now(),
-			lastEditedAt: null,
-			lastEditedBy: null
-		});
+			"mute",
+			Date.now(),
+			timedId
+		]);
 
 		return { id, entryId };
 	}
-
-	// @TODO modlog entry for clean command
-	/* static async createCleanEntry(guild: GuildConfig, target: Eris.User | Eris.Member | Exclude<Eris.GuildTextableChannel, Eris.AnyThreadChannel> | Eris.Role | string, blame: Eris.User | Eris.Member | null, reason: string | null, time: number) {
-		const check = await this.check(guild);
-		if (check === false) return false;
-		const entryId = await this.getEntryId(guild.id);
-		const id = crypto.randomBytes(6).toString("hex");
-		const timedId = time === 0 ? null : await TimedModerationHandler.add(guild.id, target.id, "mute", time);
-		const m = await this.executeWebhook(guild, {
-			embeds: [
-				new EmbedBuilder()
-					.setTitle(`User Muted | Case #${entryId}`)
-					.setAuthor(...(typeof target !== "string" && "guild" in target ? [target.guild.name, target.guild.iconURL ?? undefined] : [target.tag, target.avatarURL]) as [name: string, icon_url?: string])
-					.setDescription(
-						target === null ? "" : `Target: ${typeof target === "string" ? `"${target}"` : "tag" in target ? `<@!${target.id}>` : }`,
-						`Reason: **${reason ?? "None Provided"}**`,
-						`Time: **${time === 0 ? "Permanent" : Time.ms(time, true, true, false)}** (id: \`${timedId!}\`)`
-					)
-					.setColor("red")
-					.setFooter(`Action Performed ${blame === null ? "Automatically" : `By ${blame.tag}`}`, blame === null ? config.images.bot : blame.avatarURL)
-					.toJSON()
-			]
-		});
-		await db.collection("modlog").insertOne({
-			id,
-			entryId,
-			guildId: guild.id,
-			messageId: m === null ? null : m.id,
-			target: target.id,
-			blame: blame === null ? "automatic" : blame.id,
-			reason,
-			type: "mute",
-			timedId,
-			createdAt: Date.now(),
-			lastEditedAt: null,
-			lastEditedBy: null
-		});
-
-		return { id, entryId };
-	} */
 
 	static async createSoftBanEntry(guild: GuildConfig, target: Eris.User | Eris.Member, blame: Eris.User | Eris.Member | null, reason: string | null) {
 		const check = await this.check(guild);
 		if (check === false) return false;
 		const entryId = await this.getEntryId(guild.id);
 		const id = crypto.randomBytes(6).toString("hex");
+		await db.createUserIfNotExists(target.id);
 		const m = await this.executeWebhook(guild, {
 			embeds: [
 				new EmbedBuilder()
@@ -322,19 +278,18 @@ export default class ModLogHandler {
 					.toJSON()
 			]
 		});
-		await db.collection<SoftBanEntry>("modlog").insertOne({
+
+		await db.query("INSERT INTO modlog (id, entry_id, guild_id, message_id, target, blame, reason, type, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", [
 			id,
 			entryId,
-			guildId: guild.id,
-			messageId: m === null ? null : m.id,
-			target: target.id,
-			blame: blame === null ? "automatic" : blame.id,
+			guild.id,
+			m === null ? null : m.id,
+			target.id,
+			blame === null ? "automatic" : blame.id,
 			reason,
-			type: "softban",
-			createdAt: Date.now(),
-			lastEditedAt: null,
-			lastEditedBy: null
-		});
+			"softban",
+			Date.now()
+		]);
 
 		return { id, entryId };
 	}
@@ -344,6 +299,7 @@ export default class ModLogHandler {
 		if (check === false) return false;
 		const entryId = await this.getEntryId(guild.id);
 		const id = crypto.randomBytes(6).toString("hex");
+		await db.createUserIfNotExists(target.id);
 		const m = await this.executeWebhook(guild, {
 			embeds: [
 				new EmbedBuilder()
@@ -358,19 +314,18 @@ export default class ModLogHandler {
 					.toJSON()
 			]
 		});
-		await db.collection<UnBanEntry>("modlog").insertOne({
+
+		await db.query("INSERT INTO modlog (id, entry_id, guild_id, message_id, target, blame, reason, type, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", [
 			id,
 			entryId,
-			guildId: guild.id,
-			messageId: m === null ? null : m.id,
-			target: target.id,
-			blame: blame === null ? "automatic" : blame.id,
+			guild.id,
+			m === null ? null : m.id,
+			target.id,
+			blame === null ? "automatic" : blame.id,
 			reason,
-			type: "unban",
-			createdAt: Date.now(),
-			lastEditedAt: null,
-			lastEditedBy: null
-		});
+			"unban",
+			Date.now()
+		]);
 
 		return { id, entryId };
 	}
@@ -380,6 +335,7 @@ export default class ModLogHandler {
 		if (check === false) return false;
 		const entryId = await this.getEntryId(guild.id);
 		const id = crypto.randomBytes(6).toString("hex");
+		await db.createUserIfNotExists(target.id);
 		const m = await this.executeWebhook(guild, {
 			embeds: [
 				new EmbedBuilder()
@@ -394,19 +350,18 @@ export default class ModLogHandler {
 					.toJSON()
 			]
 		});
-		await db.collection<UnlockEntry>("modlog").insertOne({
+
+		await db.query("INSERT INTO modlog (id, entry_id, guild_id, message_id, target, blame, reason, type, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", [
 			id,
 			entryId,
-			guildId: guild.id,
-			messageId: m === null ? null : m.id,
-			target: target.id,
-			blame: blame === null ? "automatic" : blame.id,
+			guild.id,
+			m === null ? null : m.id,
+			target.id,
+			blame === null ? "automatic" : blame.id,
 			reason,
-			type: "unlock",
-			createdAt: Date.now(),
-			lastEditedAt: null,
-			lastEditedBy: null
-		});
+			"unlock",
+			Date.now()
+		]);
 
 		return { id, entryId };
 	}
@@ -430,19 +385,17 @@ export default class ModLogHandler {
 					.toJSON()
 			]
 		});
-		await db.collection<UnLockDownEntry>("modlog").insertOne({
+
+		await db.query("INSERT INTO modlog (id, entry_id, guild_id, message_id, blame, reason, type, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", [
 			id,
 			entryId,
-			guildId: guild.id,
-			messageId: m === null ? null : m.id,
-			target: null,
-			blame: blame === null ? "automatic" : blame.id,
+			guild.id,
+			m === null ? null : m.id,
+			blame === null ? "automatic" : blame.id,
 			reason,
-			type: "unlockdown",
-			createdAt: Date.now(),
-			lastEditedAt: null,
-			lastEditedBy: null
-		});
+			"unlockdown",
+			Date.now()
+		]);
 
 		return { id, entryId };
 	}
@@ -452,10 +405,11 @@ export default class ModLogHandler {
 		if (check === false) return false;
 		const entryId = await this.getEntryId(guild.id);
 		const id = crypto.randomBytes(6).toString("hex");
+		await db.createUserIfNotExists(target.id);
 		const m = await this.executeWebhook(guild, {
 			embeds: [
 				new EmbedBuilder()
-					.setTitle(`User UnMuted | Case #${entryId}`)
+					.setTitle(`User Unmuted | Case #${entryId}`)
 					.setAuthor(...("guild" in target ? [target.guild.name, target.guild.iconURL ?? undefined] : [target.tag, target.avatarURL]) as [name: string, icon_url?: string])
 					.setDescription(
 						`Target: <@${target.id}> (\`${target.tag}\`)`,
@@ -466,19 +420,18 @@ export default class ModLogHandler {
 					.toJSON()
 			]
 		});
-		await db.collection<UnMuteEntry>("modlog").insertOne({
+
+		await db.query("INSERT INTO modlog (id, entry_id, guild_id, message_id, target, blame, reason, type, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", [
 			id,
 			entryId,
-			guildId: guild.id,
-			messageId: m === null ? null : m.id,
-			target: target.id,
-			blame: blame === null ? "automatic" : blame.id,
+			guild.id,
+			m === null ? null : m.id,
+			target.id,
+			blame === null ? "automatic" : blame.id,
 			reason,
-			type: "unmute",
-			createdAt: Date.now(),
-			lastEditedAt: null,
-			lastEditedBy: null
-		});
+			"unmute",
+			Date.now()
+		]);
 
 		return { id, entryId };
 	}
@@ -488,6 +441,7 @@ export default class ModLogHandler {
 		if (check === false) return false;
 		const entryId = await this.getEntryId(guild.id);
 		const id = crypto.randomBytes(6).toString("hex");
+		await db.createUserIfNotExists(target.id);
 		const m = await this.executeWebhook(guild, {
 			embeds: [
 				new EmbedBuilder()
@@ -503,20 +457,19 @@ export default class ModLogHandler {
 					.toJSON()
 			]
 		});
-		await db.collection<WarnEntry>("modlog").insertOne({
+
+		await db.query("INSERT INTO modlog (id, entry_id, guild_id, message_id, target, blame, reason, type, created_at, active) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [
 			id,
 			entryId,
-			guildId: guild.id,
-			messageId: m === null ? null : m.id,
-			target: target.id,
-			blame: blame === null ? "automatic" : blame.id,
+			guild.id,
+			m === null ? null : m.id,
+			target.id,
+			blame === null ? "automatic" : blame.id,
 			reason,
-			type: "warn",
-			createdAt: Date.now(),
-			lastEditedAt: null,
-			lastEditedBy: null,
-			active: true
-		});
+			"kick",
+			Date.now(),
+			true
+		]);
 
 		return { id, entryId };
 	}
@@ -526,6 +479,7 @@ export default class ModLogHandler {
 		if (check === false) return false;
 		const entryId = await this.getEntryId(guild.id);
 		const id = crypto.randomBytes(6).toString("hex");
+		await db.createUserIfNotExists(target.id);
 		const m = await this.executeWebhook(guild, {
 			embeds: [
 				new EmbedBuilder()
@@ -541,20 +495,19 @@ export default class ModLogHandler {
 					.toJSON()
 			]
 		});
-		await db.collection<DeleteWarningEntry>("modlog").insertOne({
+
+		await db.query("INSERT INTO modlog (id, entry_id, guild_id, message_id, target, blame, reason, type, created_at, warning_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [
 			id,
 			entryId,
-			guildId: guild.id,
-			messageId: m === null ? null : m.id,
-			target: target.id,
-			blame: blame === null ? "automatic" : blame.id,
+			guild.id,
+			m === null ? null : m.id,
+			target.id,
+			blame === null ? "automatic" : blame.id,
 			reason,
-			type: "delwarning",
-			warningId,
-			createdAt: Date.now(),
-			lastEditedAt: null,
-			lastEditedBy: null
-		});
+			"deletewarning",
+			Date.now(),
+			warningId
+		]);
 
 		return { id, entryId };
 	}
@@ -564,6 +517,7 @@ export default class ModLogHandler {
 		if (check === false) return false;
 		const entryId = await this.getEntryId(guild.id);
 		const id = crypto.randomBytes(6).toString("hex");
+		await db.createUserIfNotExists(target.id);
 		const m = await this.executeWebhook(guild, {
 			embeds: [
 				new EmbedBuilder()
@@ -579,38 +533,28 @@ export default class ModLogHandler {
 					.toJSON()
 			]
 		});
-		await db.collection<ClearWarningsEntry>("modlog").insertOne({
+
+		await db.query("INSERT INTO modlog (id, entry_id, guild_id, message_id, target, blame, reason, type, created_at, total) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [
 			id,
 			entryId,
-			guildId: guild.id,
-			messageId: m === null ? null : m.id,
-			target: target.id,
-			blame: blame === null ? "automatic" : blame.id,
+			guild.id,
+			m === null ? null : m.id,
+			target.id,
+			blame === null ? "automatic" : blame.id,
 			reason,
-			type: "clearwarnings",
-			total,
-			createdAt: Date.now(),
-			lastEditedAt: null,
-			lastEditedBy: null
-		});
+			"clearwarnings",
+			Date.now(),
+			total
+		]);
 
 		return { id, entryId };
 	}
 }
 
-
-export interface TimedEntry {
-	id: string;
-	type: "ban" | "mute";
-	guildId: string;
-	userId: string;
-	time: number;
-	expiry: number;
-}
-
 export class TimedModerationHandler {
 	private static interval: NodeJS.Timeout | undefined;
 	static get client() { return ModLogHandler.client; }
+	private static processed = [] as Array<string>;
 	static init() {
 		this.interval = setInterval(this.process.bind(this), 1e3);
 		Logger.getLogger("TimedModerationHandler").info("Successfully initialized.");
@@ -623,30 +567,32 @@ export class TimedModerationHandler {
 
 	static async add(guildId: string, userId: string, type: TimedEntry["type"], time: number) {
 		const id = crypto.randomBytes(6).toString("hex");
-		await db.collection("timed").insertOne({
+		await db.createUserIfNotExists(userId);
+		await db.query("INSERT INTO timed (id, type, guild_id, user_id, time, expiry) VALUES (?, ?, ?, ?, ?, ?)", [
 			id,
 			type,
 			guildId,
 			userId,
 			time,
-			expiry: Date.now() + time
-		});
+			Date.now() + time
+		]);
 
 		return id;
 	}
 
 	static async remove(id: string) {
-		return db.collection("timed").findOneAndDelete({ id });
+		return db.query("DELETE FROM timed WHERE id=?", [id]).then((r: OkPacket) => r.affectedRows > 0);
 	}
 
 	static async process() {
-		const d = Date.now();
-		const entries = await db.collection("timed").find({}).toArray();
-		for (const entry of entries) {
-			if (entry.expiry > d) continue;
+		const entries = await db.query("SELECT * FROM timed WHERE expiry <= ROUND(UNIX_TIMESTAMP() * 1000)") as Array<RawTimedEntry>;
+		for (const e of entries) {
+			const entry = new TimedEntry(e);
+			if (this.processed.includes(entry.id)) continue;
+			this.processed.push(entry.id);
 			Logger.getLogger("TimedModerationHandler").debug(`Processing timed entry "${entry.id}" for the guild "${entry.guildId}"`);
 			const g = await db.getGuild(entry.guildId);
-			const m = await db.collection<BanEntry>("modlog").findOne({ timedId: entry.id });
+			const [m] = await db.query("SELECT * FROM modlog WHERE timed_id=?", [entry.id]) as Array<RawBanEntry | RawMuteEntry>;
 			const b = m === undefined ? null : await this.client.getUser(m.blame);
 			const u = await this.client.getUser(entry.userId);
 			if (u === null) {

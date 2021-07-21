@@ -13,7 +13,6 @@ import EventsASecondHandler from "@util/handlers/EventsASecondHandler";
 
 export default new ClientEvent("messageCreate", async function (message) {
 	if (message.author.bot === true || !("type" in message.channel) || message.channel.type === Eris.Constants.ChannelTypes.GROUP_DM) return;
-
 	// @TODO blacklist
 
 	if (message.channel.type === Eris.Constants.ChannelTypes.DM) {

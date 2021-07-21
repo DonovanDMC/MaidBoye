@@ -70,4 +70,4 @@ if (process.env.PTR === "1") {
 process
 	.on("uncaughtException", (err) => Logger.getLogger("Uncaught Exception").error(err))
 	.on("unhandledRejection", (err, p) => Logger.getLogger("Unhandled Rejection").error(err, p))
-	.on("SIGINT", () => process.stdin.write("data\n"));
+	.on("SIGINT", () => process.kill(process.pid));

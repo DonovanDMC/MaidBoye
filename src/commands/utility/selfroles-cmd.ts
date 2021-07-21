@@ -46,10 +46,10 @@ export default new Command("selfroles")
 	})
 	.setExecutor(async function(msg, cmd) {
 		if (msg.args.length === 0) return new CommandError("INVALID_USAGE", cmd);
-		const selfList = msg.uConfig.selfRolesJoined.filter(r => r.guild === msg.channel.guild.id);
+		const selfList = msg.uConfig.selfRolesJoined.filter(r => r.guildId === msg.channel.guild.id);
 		switch (msg.args[0].toLowerCase()) {
 			case "list": {
-				if (msg.gConfig.selfRoles.length === 0) return msg.reply("Th-this server doesnt't have any self roles..");
+				if (msg.gConfig.selfRoles.size === 0) return msg.reply("Th-this server doesnt't have any self roles..");
 				/* if (selfList.length === 0) return msg.reply("Y-you haven't gained any roles via self roles..");
 				return msg.reply({
 					embeds: [
@@ -71,7 +71,7 @@ export default new Command("selfroles")
 			}
 
 			case "join": {
-				if (msg.gConfig.selfRoles.length === 0) return msg.reply("Th-this server doesnt't have any self roles..");
+				if (msg.gConfig.selfRoles.size === 0) return msg.reply("Th-this server doesnt't have any self roles..");
 				const roles = msg.gConfig.selfRoles.map(({ role }) => msg.channel.guild.roles.get(role)!).filter(r => r.name.toLowerCase().includes(msg.args.slice(1).join(" ").toLowerCase()));
 				let role: Eris.Role;
 				if (roles.length === 1) {
@@ -79,14 +79,7 @@ export default new Command("selfroles")
 					if (msg.member.roles.includes(role.id)) return msg.reply("Y-you already have that role!");
 					else {
 						await msg.member.addRole(role.id, "SelfRoles[Join]");
-						await msg.uConfig.mongoEdit({
-							$push: {
-								selfRolesJoined: {
-									role: role.id,
-									guild: msg.channel.guild.id
-								}
-							}
-						});
+						await msg.uConfig.addSelfRoleJoined(role.id, msg.channel.guild.id);
 
 						await msg.uConfig.fix(); // fix removes duplicates
 						return msg.reply(`Congrats, you now have the <@&${role.id}> role!`);
@@ -140,14 +133,7 @@ export default new Command("selfroles")
 						components: []
 					});
 					await msg.member.addRole(made, "SelfRoles[Join]");
-					await msg.uConfig.mongoEdit({
-						$push: {
-							selfRolesJoined: {
-								role: made,
-								guild: msg.channel.guild.id
-							}
-						}
-					});
+					await msg.uConfig.addSelfRoleJoined(made, msg.channel.guild.id);
 					await msg.uConfig.fix();
 					return this.editOriginalInteractionResponse(this.user.id, choice.token, {
 						embeds: [
@@ -163,7 +149,7 @@ export default new Command("selfroles")
 			}
 
 			case "leave": {
-				if (msg.gConfig.selfRoles.length === 0) return msg.reply("Th-this server doesnt't have any self roles..");
+				if (msg.gConfig.selfRoles.size === 0) return msg.reply("Th-this server doesnt't have any self roles..");
 				if (selfList.length === 0) return msg.reply("Y-you haven't gained any roles via self roles..\n(you cannot remove roles that have been manually added to you via this)");
 				const makeChoice = await msg.reply({
 					embeds: [
@@ -216,11 +202,7 @@ export default new Command("selfroles")
 					components: []
 				}); */
 				if (msg.member.roles.includes(made)) await msg.member.removeRole(made, "SelfRoles[Leave]");
-				await msg.uConfig.mongoEdit({
-					$pull: {
-						selfRolesJoined: msg.uConfig.selfRolesJoined.find(g => g.role === made && g.guild === msg.channel.guild.id)
-					}
-				});
+				await msg.uConfig.removeSelfRoleJoined(made, "role");
 				await msg.uConfig.fix();
 				return this.editOriginalInteractionResponse(this.user.id, choice.token, {
 					embeds: [
@@ -242,31 +224,19 @@ export default new Command("selfroles")
 				if (msg.gConfig.selfRoles.map(r => r.role).includes(role.id)) return msg.reply("Th-that role is already self assignable..");
 				const compare = role.compareToMember(msg.channel.guild.me);
 				if (["higher", "same"].includes(compare)) return msg.reply("Th-that role is higher than, or the same as my higest role.. I cannot assign it");
-				await msg.gConfig.mongoEdit({
-					$push: {
-						selfRoles: {
-							role: role.id,
-							addedAt: Date.now(),
-							addedby: msg.author.id
-						}
-					}
-				});
+				await msg.gConfig.addSelfRole(role.id, msg.author.id);
 				return msg.reply(`The role <@&${role.id}> is now self assignable`);
 				break;
 			}
 
 			case "remove": {
 				if (!msg.member.permissions.has("manageRoles")) return msg.reply("Y-you must have the **Manage Roles** permission to use this!");
-				if (msg.gConfig.selfRoles.length === 0) return msg.reply("Th-this server doesnt't have any self roles to remove..");
+				if (msg.gConfig.selfRoles.size === 0) return msg.reply("Th-this server doesnt't have any self roles to remove..");
 				if (msg.args.length === 1) return msg.reply("Y-you have to provide a role to remove..");
 				const role = await msg.getRoleFromArgs(1, 0);
 				if (role === null) return msg.reply("Th-that wasn't a valid role..");
 				if (!msg.gConfig.selfRoles.map(r => r.role).includes(role.id)) return msg.reply("Th-that role isn't self assignable..");
-				await msg.gConfig.mongoEdit({
-					$pull: {
-						selfRoles: msg.gConfig.selfRoles.find(r => r.role === role.id)
-					}
-				});
+				await msg.gConfig.removeSelfRole(role.id, "role");
 				return msg.reply(`The role <@&${role.id}> is no longer self assignable`);
 				break;
 			}

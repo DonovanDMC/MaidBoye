@@ -1,44 +1,47 @@
-import GuildConfig, { GuildConfigKV, UserReport } from "./Models/GuildConfig";
-import UserConfig, { UserConfigKV } from "./Models/UserConfig";
+// eslint-disable-next-line @typescript-eslint/triple-slash-reference
+/// <reference path="../util/@types/Node.d.ts" />
+import GuildConfig, { RawGuildConfig } from "./Models/Guild/GuildConfig";
+import UserConfig, { RawUserConfig } from "./Models/User/UserConfig";
+import { RawSelfRole } from "./Models/Guild/SelfRole";
+import { RawSelfRoleJoined } from "./Models/User/SelfRoleJoined";
+import { RawPrefix } from "./Models/Guild/Prefix";
+import { RawTag } from "./Models/Guild/Tag";
 import Logger from "@util/Logger";
 import config from "@config";
 import IORedis from "ioredis";
-import { Collection, MongoClient, MongoClientOptions } from "mongodb";
 import Timer from "@util/Timer";
-import { AnyEntry } from "@util/@types/ModLog";
-import { TimedEntry } from "@util/handlers/ModLogHandler";
+import mariadb, { Pool } from "mariadb";
+import crypto from "crypto";
 
 
 export default class db {
-	static mainDB: string;
 	static redisDb: number;
-	static mongo: MongoClient;
 	static r: IORedis.Redis;
+	static pool: Pool;
 
-	static async init(mongo = true, redis = true) {
+	static async init(sql = true, redis = true) {
 		const start = Timer.start();
-		if (mongo) await this.initMongo();
+		if (sql) await this.initMariaDb();
 		if (redis) await this.initRedis();
 		const end = Timer.end();
 		Logger.getLogger("Database[General]").debug(`Initialization complete in ${Timer.calc(start, end)}ms`);
 	}
 
-	static async initMongo() {
-		this.mainDB = config.services.mongo[config.beta ? "dbBeta" : "db"];
-		const uri = `mongodb://${config.services.mongo.host}:${config.services.mongo.port}/${config.services.mongo.authSource}?authSource=${config.services.mongo.authSource}`;
-		Logger.getLogger("Database[MongoDB]").debug(`Connecting to ${uri} (ssl: ${config.services.mongo.options.ssl ? "Yes" : "No"})`);
+	static async initMariaDb() {
+		const uri = `mariadb://${config.services.mariadb.host}:${config.services.mariadb.port}`;
+		Logger.getLogger("Database[MariaDB]").debug(`Connecting to ${uri} (ssl: ${config.services.mariadb.ssl ? "Yes" : "No"})`);
 		const start = Timer.start();
 		try {
-			this.mongo = await MongoClient.connect(uri, {
-				appName: `Maid Boye${config.beta ? " Beta" : ""}`,
-				...config.services.mongo.options as MongoClientOptions // because json
+			this.pool = mariadb.createPool({
+				...config.services.mariadb,
+				database: config.services.mariadb.db[config.beta ? "beta" : "prod"]
 			});
 		} catch (err) {
-			Logger.getLogger("Database[MongoDB]").error("Error while connecting:", err);
+			Logger.getLogger("Database[MariaDB]").error("Error while connecting:", err);
 			return;
 		}
 		const end = Timer.end();
-		Logger.getLogger("Database[MongoDB]").debug(`Successfully connected in ${end - start}ms`);
+		Logger.getLogger("Database[MariaDB]").debug(`Successfully connected in ${end - start}ms`);
 	}
 
 	static async initRedis() {
@@ -61,58 +64,76 @@ export default class db {
 		});
 	}
 
-	static get mdb() { return this.mongo.db(this.mainDB); }
+	static get query() { return this.pool.query.bind(this.pool); }
 
-	/* eslint-disable @typescript-eslint/unified-signatures */
-	static collection<T = UserReport>(name: "reports"): Collection<T>;
-	static collection<T = TimedEntry>(name: "timed"): Collection<T>;
-	static collection<T = AnyEntry>(name: "modlog"): Collection<T>;
-	static collection<T = GuildConfigKV>(name: "guilds"): Collection<T>;
-	static collection<T = UserConfigKV>(name: "users"): Collection<T>;
-	static collection<T = unknown>(name: string) {
-		return this.mdb.collection<T>(name);
-	}
-	/* eslint-enable @typescript-eslint/unified-signatures */
-
-	static async getUser(id: string) {
+	// because of foreign key restraints
+	static async createUserIfNotExists(id: string) { await this.query("INSERT IGNORE INTO users (id) VALUES (?)", [id]); }
+	static async getUser(id: string, raw: true): Promise<{ user: RawUserConfig; selfRolesJoined: Array<RawSelfRoleJoined>; }>;
+	static async getUser(id: string, raw?: false): Promise<UserConfig>;
+	static async getUser(id: string, raw = false) {
 		const start = Timer.start();
-		let res = await this.collection("users").findOne({ id });
+		let res = await this.pool.query("SELECT * FROM users WHERE id=? LIMIT 1", [id]).then(v => (v as Array<RawUserConfig>)[0]);
+		const selfRolesJoined = await this.pool.query("SELECT * FROM selfrolesjoined WHERE user_id=?", [id]).then(v => (v as Array<RawSelfRoleJoined>));
 		if (res === undefined) {
-			res = await this.collection("users").insertOne({
-				...config.defaults.user,
-				id
-			}).then(() => new UserConfig(id, { ...config.defaults.user, id }));
-			Logger.getLogger("Database[MongoDB]").debug(`Created the user entry "${id}".`);
+			await this.pool.query("INSERT INTO users (id) VALUES (?)", [id]);
+			Logger.getLogger("Database[MariaDB]").debug(`Created the user entry "${id}".`);
+			res = await this.pool.query("SELECT * FROM users WHERE id=? LIMIT 1", [id]).then(v => (v as Array<RawUserConfig>)[0]);
 		}
 		const end = Timer.end();
 
 		// if we somehow get another undefined
 		if (res === undefined) throw new TypeError("Unexpected undefined user in db#getUser");
 
-		if (config.beta) Logger.getLogger("Database[MongoDB]").debug(`Query for the user "${id}" took ${Timer.calc(start, end)}ms`);
+		if (config.beta) Logger.getLogger("Database[MariaDB]").debug(`Query for the user "${id}" took ${Timer.calc(start, end)}ms`);
 
-		return new UserConfig(id, res);
+		if (raw) return {
+			user: res,
+			selfRolesJoined
+		};
+		else return new UserConfig(id, res, selfRolesJoined);
 	}
 
-	static async getGuild(id: string) {
+	static async createGuildIfNotExists(id: string) { await this.query("INSERT IGNORE INTO guilds (id) VALUES (?)", [id]); }
+	static async getGuild(id: string, raw: true): Promise<{
+		guild: RawGuildConfig;
+		prefix: Array<RawPrefix>;
+		selfRoles: Array<RawSelfRole>;
+		tags: Array<RawTag>;
+	}>;
+	static async getGuild(id: string, raw?: false): Promise<GuildConfig>;
+	static async getGuild(id: string, raw = false) {
 		const start = Timer.start();
-		let res = await this.collection("guilds").findOne({ id });
+		let res = await this.pool.query("SELECT * FROM guilds WHERE id=? LIMIT 1", [id]).then(v => (v as Array<RawGuildConfig>)[0]);
+		let prefix = await this.pool.query("SELECT * FROM prefix WHERE guild_id=?", [id]).then(v => (v as Array<RawPrefix>));
+		const selfRoles = await this.pool.query("SELECT * FROM selfroles WHERE guild_id=?", [id]).then(v => (v as Array<RawSelfRole>));
+		const tags = await this.pool.query("SELECT * FROM tags WHERE guild_id=?", [id]).then(v => (v as Array<RawTag>));
 		if (res === undefined) {
-			// @ts-ignore this errors because defaults has generic numbers, and not exact numbers
-			res = await this.collection("guilds").insertOne({
-				...config.defaults.guild,
-				id
-				// @ts-ignore json doesn't match strictly types properties
-			}).then(() => new GuildConfig(id, { ...config.defaults.guild, id }));
-			Logger.getLogger("Database[MongoDB]").debug(`Created the guild entry "${id}".`);
+			await this.pool.query("INSERT INTO guilds (id) VALUES (?)", [id]);
+			await this.pool.query("INSERT INTO prefix (id, guild_id, value, space) VALUES (?, ?, ?, ?)", [crypto.randomBytes(6).toString("hex"), id, config.defaults.prefix, true]);
+			Logger.getLogger("Database[MariaDB]").debug(`Created the guild entry "${id}".`);
+			res = await this.pool.query("SELECT * FROM guilds WHERE id=? LIMIT 1", [id]).then(v => (v as Array<RawGuildConfig>)[0]);
+			prefix = await this.pool.query("SELECT * FROM prefix WHERE guild_id=?", [id]).then(v => (v as Array<RawPrefix>));
 		}
 		const end = Timer.end();
 
+		if (prefix.length === 0) {
+			Logger.getLogger("Database[MariaDB]").warn(`Found guild "${id}" with zero prefixes, fixing..`);
+			await this.pool.query("INSERT INTO prefix (id, guild_id, value, space) VALUES (?, ?, ?, ?)", [crypto.randomBytes(6).toString("hex"), id, config.defaults.prefix, true]);
+			prefix = await this.pool.query("SELECT * FROM prefix WHERE guild_id=?", [id]).then(v => (v as Array<RawPrefix>));
+		}
+
+		// null yes
 		// if we somehow get another null
 		if (res === undefined) throw new TypeError("Unexpected undefined guild in db#getGuild");
 
-		if (config.beta) Logger.getLogger("Database[MongoDB]").debug(`Query for the guild "${id}" took ${Timer.calc(start, end)}ms`);
+		if (config.beta) Logger.getLogger("Database[MariaDB]").debug(`Query for the guild "${id}" took ${Timer.calc(start, end)}ms`);
 
-		return new GuildConfig(id, res);
+		if (raw) return {
+			guild: res,
+			prefix,
+			selfRoles,
+			tags
+		};
+		else return new GuildConfig(id, res, prefix, selfRoles, tags);
 	}
 }

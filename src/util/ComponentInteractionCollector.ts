@@ -1,12 +1,12 @@
-import { APIMessageComponentInteractionData, APIMessageComponentInteraction, APIGuildMember } from "discord-api-types";
+import { APIMessageComponentInteractionData, APIMessageComponentInteraction, APIInteractionGuildMember } from "discord-api-types";
 
 export interface Interaction<T extends APIMessageComponentInteractionData> extends Omit<APIMessageComponentInteraction, "data"> {
 	data?: T;
-	member: APIGuildMember;
+	member: APIInteractionGuildMember;
 }
 export interface InteractionWithData<T extends APIMessageComponentInteractionData> extends Omit<APIMessageComponentInteraction, "data"> {
 	data: T;
-	member: APIGuildMember;
+	member: APIInteractionGuildMember;
 }
 export default class ComponentInteractionCollector {
 	static collectors = [] as Array<{

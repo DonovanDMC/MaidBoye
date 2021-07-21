@@ -10,20 +10,15 @@ export default new Command("prefix")
 	.setUsage("<add/remove/reset/list>")
 	.setHasSlashVariant(true)
 	.setCooldown(5e3)
+	.setParsedFlags("space")
 	.setExecutor(async function(msg) {
 		switch (msg.args[0]) {
 			case "add": {
 				const space = msg.dashedArgs.value.includes("space") || msg.dashedArgs.keyValue.space === "true";
 				if (msg.gConfig.prefix.length >= 10) return msg.reply("H-hey! This server already has 10 prefixes, please remove some before you add more!");
 				if ([...msg.gConfig.prefix.map(({ value }) => value), `<@${this.user.id}>`, `<@!${this.user.id}>`].includes(msg.args[1].toLowerCase())) return msg.reply("H-hey! This server already has that as a prefix.");
-				await msg.gConfig.mongoEdit({
-					$push: {
-						prefix: {
-							value: msg.args[1].toLowerCase(),
-							space
-						}
-					}
-				});
+				if (msg.args[1].toLowerCase().length > 25) return msg.reply("H-hey! That prefix is too long..");
+				await msg.gConfig.addPrefix(msg.args[1].toLowerCase(), space);
 				return msg.reply(`Successfully added **${msg.args[1].toLowerCase()}** to this server's prefixes.`);
 				break;
 			}
@@ -31,20 +26,14 @@ export default new Command("prefix")
 			case "remove": {
 				if ([`<@${this.user.id}>`, `<@!${this.user.id}>`].includes(msg.args[1])) return msg.reply("H-hey! You can't remove that prefix..");
 				if (!msg.gConfig.prefix.map(({ value }) => value).includes(msg.args[1].toLowerCase())) return msg.reply("H-hey! This server doesn't have that as one of its prefixes..");
-				await msg.gConfig.mongoEdit({
-					$pull: {
-						prefix: msg.gConfig.prefix.find(p => p.value === msg.args[1].toLowerCase())
-					}
-				});
+				await msg.gConfig.removePrefix(msg.args[1].toLowerCase(), "value");
 				return msg.reply(`Successfully removed **${msg.args[1].toLowerCase()}** from this server's prefixes.`);
 				break;
 			}
 
 			case "reset": {
 				if (msg.gConfig.prefix.length === 1 && msg.gConfig.prefix[0].value === "maid") return msg.reply("There isn't anything to reset?");
-				await msg.gConfig.edit({
-					prefix: config.defaults.guild.prefix
-				});
+				await msg.gConfig.resetPrefixes();
 				return msg.reply(`Successfully reset this servers prefixes, you can use \`${config.defaults.prefix}\`.`);
 				break;
 			}

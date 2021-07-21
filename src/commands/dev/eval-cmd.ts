@@ -1,4 +1,4 @@
-import db from "../../db";
+import db from "@db";
 import config from "@config";
 import Command from "@cmd/Command";
 import Logger from "@util/Logger";

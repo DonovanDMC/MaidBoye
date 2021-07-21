@@ -11,20 +11,20 @@ declare namespace ModLog {
 		reason: string | null;
 		type:
 		"ban" | "kick" | "lock" |
-		"lockdown" | "mute" | "clean" |
-		"softban" | "unban" | "unlock" |
-		"unlockdown" | "unmute" | "warn" |
-		"delwarning" | "clearwarnings";
+		"lockdown" | "mute" | "softban" |
+		"unban" | "unlock" | "unlockdown" |
+		"unmute" | "warn" | "delwarning" |
+		"clearwarnings";
 		createdAt: number;
 		lastEditedAt: number | null;
 		lastEditedBy: string | null;
 	}
 
 	type AnyEntry = BanEntry | KickEntry | LockEntry |
-		LockDownEntry | MuteEntry | CleanEntry |
-		SoftBanEntry | UnBanEntry | UnLockEntry |
-		UnLockDownEntry | UnMuteEntry | WarnEntry |
-		DeleteWarningEntry | ClearWarningsEntry;
+		LockDownEntry | MuteEntry | SoftBanEntry |
+		UnBanEntry | UnLockEntry | UnLockDownEntry |
+		UnMuteEntry | WarnEntry | DeleteWarningEntry |
+		ClearWarningsEntry;
 
 	interface BanEntry extends GenericEntry {
 		type: "ban";
@@ -48,13 +48,13 @@ declare namespace ModLog {
 	interface MuteEntry extends GenericEntry {
 		type: "mute";
 		timedId: string | null;
-	}
+	}/* 
 
 	interface CleanEntry extends GenericEntry {
 		type: "clean";
 		type: "all" | "user" | "bots" | "channel" | "role" | "commands" | "text";
 		amount: number;
-	}
+	} */
 
 	interface SoftBanEntry extends GenericEntry {
 		type: "softban";
