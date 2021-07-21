@@ -11,6 +11,8 @@ import Eris from "eris";
 import { VoiceServerUpdate, VoiceStateUpdate } from "lavalink";
 import StatsHandler from "@util/handlers/StatsHandler";
 import EventsASecondHandler from "@util/handlers/EventsASecondHandler";
+import db from "@db";
+const Redis = db.r;
 
 export default new ClientEvent("rawWS", async function({ op, d, t }) {
 	EventsASecondHandler.add("general");
@@ -50,7 +52,7 @@ export default new ClientEvent("rawWS", async function({ op, d, t }) {
 							const col = ComponentInteractionCollector.processInteraction(data as Interaction<APIMessageComponentInteractionData>);
 							// skip if interaction was used
 							if (col === true) return;
-							const ch = this.getChannel(data.channel_id!) as Eris.GuildTextableChannel;
+							const ch = this.getChannel(data.channel_id) as Eris.GuildTextableChannel;
 							if (cd.custom_id.startsWith("help")) {
 								const [, name, user] = cd.custom_id.split(".");
 								if (!user) {
@@ -72,7 +74,7 @@ export default new ClientEvent("rawWS", async function({ op, d, t }) {
 									const b = await Redis.get(`interactions:${data.message.id}:back`);
 									let eb: { embeds: Array<Eris.EmbedOptions>; components: Eris.Message["components"]; } | undefined;
 									try {
-										eb = JSON.parse(b);
+										eb = JSON.parse(b!);
 									} catch (err) {
 										// throw away error
 									}
