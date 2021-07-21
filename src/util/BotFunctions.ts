@@ -1,5 +1,5 @@
 import EmbedBuilder from "./EmbedBuilder";
-import GuildConfig from "../db/Models/GuildConfig";
+import GuildConfig from "../db/Models/Guild/GuildConfig";
 import Eris from "eris";
 import { Strings } from "@uwu-codes/utils";
 
@@ -40,7 +40,7 @@ export default class BotFunctions {
 				// I don't know what this is supposed to have, as the docs don't make
 				// a distinction between normal members and partial members
 				member: {
-					...message.member,
+					...m,
 					user: {
 						...message.author.toJSON(),
 						public_flags: message.author.publicFlags
@@ -145,5 +145,12 @@ export default class BotFunctions {
 			.setTimestamp(new Date().toISOString())
 			.setColor("red");
 		return json ? e.toJSON() : e;
+	}
+
+	static sqlFormat(v: unknown) {
+		if (typeof v === "string") return `'${v}'`;
+		else if (typeof v === "boolean") return v ? "TRUE" : "FALSE";
+		else if (v === null) return "NULL";
+		else return String(v);
 	}
 }
