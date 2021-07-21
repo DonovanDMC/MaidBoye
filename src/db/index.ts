@@ -68,9 +68,16 @@ export default class db {
 
 	// because of foreign key restraints
 	static async createUserIfNotExists(id: string) { await this.query("INSERT IGNORE INTO users (id) VALUES (?)", [id]); }
-	static async getUser(id: string, raw: true): Promise<{ user: RawUserConfig; selfRolesJoined: Array<RawSelfRoleJoined>; }>;
-	static async getUser(id: string, raw?: false): Promise<UserConfig>;
-	static async getUser(id: string, raw = false) {
+	static async getUser(id: string, raw: true, bypassCache?: boolean): Promise<{ user: RawUserConfig; selfRolesJoined: Array<RawSelfRoleJoined>; }>;
+	static async getUser(id: string, raw?: false, bypassCache?: boolean): Promise<UserConfig>;
+	static async getUser(id: string, raw = false, bypassCache = false) {
+		if (bypassCache === true) await this.r.del(`cache:users:${id}`);
+		const cache = await this.r.get(`cache:users:${id}`);
+		if (cache !== null && bypassCache !== true) {
+			const v = JSON.parse<{ user: RawUserConfig; selfRolesJoined: Array<RawSelfRoleJoined>; }>(cache);
+			if (raw) return v;
+			else return new UserConfig(id, v.user, v.selfRolesJoined);
+		}
 		const start = Timer.start();
 		let res = await this.pool.query("SELECT * FROM users WHERE id=? LIMIT 1", [id]).then(v => (v as Array<RawUserConfig>)[0]);
 		const selfRolesJoined = await this.pool.query("SELECT * FROM selfrolesjoined WHERE user_id=?", [id]).then(v => (v as Array<RawSelfRoleJoined>));
@@ -94,14 +101,26 @@ export default class db {
 	}
 
 	static async createGuildIfNotExists(id: string) { await this.query("INSERT IGNORE INTO guilds (id) VALUES (?)", [id]); }
-	static async getGuild(id: string, raw: true): Promise<{
+	static async getGuild(id: string, raw: true, bypassCache?: boolean): Promise<{
 		guild: RawGuildConfig;
 		prefix: Array<RawPrefix>;
 		selfRoles: Array<RawSelfRole>;
 		tags: Array<RawTag>;
 	}>;
-	static async getGuild(id: string, raw?: false): Promise<GuildConfig>;
-	static async getGuild(id: string, raw = false) {
+	static async getGuild(id: string, raw?: false, bypassCache?: boolean): Promise<GuildConfig>;
+	static async getGuild(id: string, raw = false, bypassCache = false) {
+		if (bypassCache === true) await this.r.del(`cache:guilds:${id}`);
+		const cache = await this.r.get(`cache:guilds:${id}`);
+		if (cache !== null && bypassCache !== true) {
+			const v = JSON.parse<{
+				guild: RawGuildConfig;
+				prefix: Array<RawPrefix>;
+				selfRoles: Array<RawSelfRole>;
+				tags: Array<RawTag>;
+			}>(cache);
+			if (raw) return v;
+			else return new GuildConfig(id, v.guild, v.prefix, v.selfRoles, v.tags);
+		}
 		const start = Timer.start();
 		let res = await this.pool.query("SELECT * FROM guilds WHERE id=? LIMIT 1", [id]).then(v => (v as Array<RawGuildConfig>)[0]);
 		let prefix = await this.pool.query("SELECT * FROM prefix WHERE guild_id=?", [id]).then(v => (v as Array<RawPrefix>));

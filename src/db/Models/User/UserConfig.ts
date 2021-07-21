@@ -27,7 +27,7 @@ export default class UserConfig {
 	}
 
 	async reload() {
-		const v = await db.getUser(this.id, true);
+		const v = await db.getUser(this.id, true, true);
 		if (v === undefined) throw new Error(`Unexpected undefined on UserConfig#reload (id: ${this.id})`);
 		this.load(v.user, v.selfRolesJoined);
 		return this;

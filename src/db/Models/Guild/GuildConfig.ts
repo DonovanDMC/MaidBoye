@@ -81,7 +81,7 @@ export default class GuildConfig {
 	}
 
 	async reload() {
-		const v = await db.getGuild(this.id, true);
+		const v = await db.getGuild(this.id, true, true);
 		if (!v) throw new Error(`Unexpected undefined on GuildConfig#reload (id: ${this.id})`);
 		this.load(v.guild, v.prefix, v.selfRoles, v.tags);
 		return this;
