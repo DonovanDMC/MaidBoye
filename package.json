@@ -58,7 +58,7 @@
     "@types/node": "^16.4.0",
     "@types/node-fetch": "^2.5.11",
     "@types/source-map-support": "^0.5.4",
-    "@uwu-codes/types": "^1.0.4",
+    "@uwu-codes/types": "^1.0.5",
     "discord-api-types": "^0.20.2",
     "ts-node": "^10.1.0"
   },

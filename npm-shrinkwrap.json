@@ -41,7 +41,7 @@
         "@types/node": "^16.4.0",
         "@types/node-fetch": "^2.5.11",
         "@types/source-map-support": "^0.5.4",
-        "@uwu-codes/types": "^1.0.4",
+        "@uwu-codes/types": "^1.0.5",
         "discord-api-types": "^0.20.2",
         "ts-node": "^10.1.0"
       }
@@ -577,9 +577,9 @@
       }
     },
     "node_modules/@uwu-codes/types": {
-      "version": "1.0.4",
-      "resolved": "https://registry.npmjs.org/@uwu-codes/types/-/types-1.0.4.tgz",
-      "integrity": "sha512-a8XCcUotNKGbjtKOT9pB+pq+n/1RtRKmo/gv7FDRfPcNXQvt9S5qdLy4cREzDCghiPnmbs3RUPLom4fAEa6nFQ==",
+      "version": "1.0.5",
+      "resolved": "https://registry.npmjs.org/@uwu-codes/types/-/types-1.0.5.tgz",
+      "integrity": "sha512-LphJLN0YYh99KwMrgVgn6XSdnmNRumZt0LtccR2xEFVJ8metGm65eW2uVPJBm8TldRwIRxj4UPYuWirMhCJaUw==",
       "os": [
         "linux",
         "win32"
@@ -4662,9 +4662,9 @@
       "integrity": "sha512-JcVNthILR1ZU+SGh54Z/Gxi0mEQCmPrcQHbtCxg23TZ17z/HiGf/Wc3Tkdg4q/VUs9c/pfYx1B1xS0LCnG24MA=="
     },
     "@uwu-codes/types": {
-      "version": "1.0.4",
-      "resolved": "https://registry.npmjs.org/@uwu-codes/types/-/types-1.0.4.tgz",
-      "integrity": "sha512-a8XCcUotNKGbjtKOT9pB+pq+n/1RtRKmo/gv7FDRfPcNXQvt9S5qdLy4cREzDCghiPnmbs3RUPLom4fAEa6nFQ==",
+      "version": "1.0.5",
+      "resolved": "https://registry.npmjs.org/@uwu-codes/types/-/types-1.0.5.tgz",
+      "integrity": "sha512-LphJLN0YYh99KwMrgVgn6XSdnmNRumZt0LtccR2xEFVJ8metGm65eW2uVPJBm8TldRwIRxj4UPYuWirMhCJaUw==",
       "requires": {
         "@types/node": "^15.12.5",
         "@uwu-codes/eslint-config": "^1.0.18",
