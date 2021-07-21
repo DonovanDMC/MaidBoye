@@ -93,7 +93,7 @@ export default class db {
 
 		if (config.beta) Logger.getLogger("Database[MariaDB]").debug(`Query for the user "${id}" took ${Timer.calc(start, end)}ms`);
 
-		await this.r.set(`cache:users:${id}`, JSON.stringify({ user: res, selfRolesJoined }));
+		await this.r.setex(`cache:users:${id}`, 300, JSON.stringify({ user: res, selfRolesJoined }));
 
 		if (raw) return {
 			user: res,
@@ -149,7 +149,7 @@ export default class db {
 
 		if (config.beta) Logger.getLogger("Database[MariaDB]").debug(`Query for the guild "${id}" took ${Timer.calc(start, end)}ms`);
 
-		await this.r.set(`cache:guilds:${id}`, JSON.stringify({ guild: res, prefix, selfRoles, tags }));
+		await this.r.setex(`cache:guilds:${id}`, 300, JSON.stringify({ guild: res, prefix, selfRoles, tags }));
 
 		if (raw) return {
 			guild: res,
