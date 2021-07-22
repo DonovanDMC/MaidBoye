@@ -93,10 +93,10 @@ export default class GuildConfig {
 		if (data.selfRoles) throw new TypeError("Field 'selfRoles' cannot be used in the generic edit function.");
 
 		const v = {
-			modlog_enabled: Boolean(data.modlog && data.modlog.enabled) === true ? 1 : 0,
-			modlog_case_editing_enabled: Boolean(data.modlog && data.modlog.caseEditingEnabled) === true ? 1 : 0,
-			modlog_case_deleting_enabled: Boolean(data.modlog && data.modlog.caseDeletingEnabled) === true ? 1 : 0,
-			modlog_edit_others_cases_enabled: Boolean(data.modlog && data.modlog.editOthersCasesEnabled) === true ? 1 : 0,
+			modlog_enabled: data.modlog === undefined || data.modlog.enabled === undefined ? undefined : Boolean(data.modlog.enabled) === true ? 1 : 0,
+			modlog_case_editing_enabled: data.modlog === undefined || data.modlog.caseEditingEnabled === undefined ? undefined : Boolean(data.modlog.caseEditingEnabled) === true ? 1 : 0,
+			modlog_case_deleting_enabled: data.modlog === undefined || data.modlog.caseDeletingEnabled === undefined ? undefined : Boolean(data.modlog.caseDeletingEnabled) === true ? 1 : 0,
+			modlog_edit_others_cases_enabled: data.modlog === undefined || data.modlog.editOthersCasesEnabled === undefined ? undefined : Boolean(data.modlog.editOthersCasesEnabled) === true ? 1 : 0,
 			modlog_webhook_id: data.modlog === undefined || data.modlog.webhook === undefined ? undefined : data.modlog.webhook === null ? null : data.modlog.webhook.id ?? undefined,
 			modlog_webhook_token: data.modlog === undefined || data.modlog.webhook === undefined ? undefined : data.modlog.webhook === null ? null : data.modlog.webhook.token ?? undefined,
 			modlog_webhook_channel_id: data.modlog === undefined || data.modlog.webhook === undefined ? undefined : data.modlog.webhook === null ? null : data.modlog.webhook.channelId ?? undefined,
@@ -108,9 +108,10 @@ export default class GuildConfig {
 		const keys = Object.keys(v).filter(k => v[k as keyof typeof v] !== undefined);
 		const values = Object.values(v).filter(k => k !== undefined) as Array<unknown>;
 		// for debug
-		// console.log("obj", v);
-		// console.log("Query:", `UPDATE guilds SET ${keys.map(j => `${j}=?`).join(", ")} WHERE id = ?`);
-		// console.log("Parameters:", [...values, this.id]);
+		/* console.log("data", data);
+		console.log("obj", v);
+		console.log("Query:", `UPDATE guilds SET ${keys.map(j => `${j}=?`).join(", ")} WHERE id = ?`);
+		console.log("Parameters:", [...values, this.id]); */
 		await db.query(`UPDATE guilds SET ${keys.map(j => `${j}=?`).join(", ")} WHERE id = ?`, [...values, this.id]);
 		return this.reload();
 	}
@@ -212,8 +213,8 @@ export default class GuildConfig {
 		return true;
 	}
 
-	async editModlog(reason: string, blame?: string) {
-		const res = await db.query("UPDATE modlog SET reason=?, last_edited_at=?, last_edited_by=? WHERE id=?", [reason, Date.now(), blame ?? null, this.id]).then((r: OkPacket) => r.affectedRows > 0);
+	async editModlog(entryId: number, reason: string, blame?: string) {
+		const res = await db.query("UPDATE modlog SET reason=?, last_edited_at=?, last_edited_by=? WHERE guild_id=? AND entry_id=?", [reason, Date.now(), blame ?? null, this.id, entryId]).then((r: OkPacket) => r.affectedRows > 0);
 		if (res === false) return false;
 		await this.reload();
 		return true;
@@ -226,9 +227,25 @@ export default class GuildConfig {
 		return true;
 	}
 
-	async getModlog() {
-		const res = await db.query("SELECT * FROM modlog WHERE guild_id=?", [this.id]).then(v => (v as Array<AnyRawEntry>));
-		return Promise.all(res.map(async(v) => {
+	async getModlogEntry(id: number) {
+		const [res] = await db.query("SELECT * FROM modlog WHERE guild_id=? AND entry_id=?", [this.id, id]).then(v => (v as Array<AnyRawEntry>));
+		if (res === undefined) return null;
+		switch (res.type) {
+			case "ban": return new BanEntry(res, this);
+			case "clearwarnings": return new ClearWarningsEntry(res, this);
+			case "deletewarning": return new DeleteWarningEntry(res, this);
+			case "kick": return new KickEntry(res, this);
+			case "lockdown": return new LockDownEntry(res, this);
+			case "lock": return new LockEntry(res, this);
+			case "mute": return new MuteEntry(res, this);
+			case "softban": return new SoftBanEntry(res, this);
+			case "unban": return new UnBanEntry(res, this);
+			case "unlockdown": return new UnLockDownEntry(res, this);
+			case "unlock": return new UnLockEntry(res, this);
+			case "unmute": return new UnMuteEntry(res, this);
+			case "warn": return new WarnEntry(res, this);
+		}
+		/* return Promise.all(res.map(async(v) => {
 			switch (v.type) {
 				case "ban": return new BanEntry(v, this);
 				case "clearwarnings": return new ClearWarningsEntry(v, this);
@@ -244,6 +261,6 @@ export default class GuildConfig {
 				case "unmute": return new UnMuteEntry(v, this);
 				case "warn": return new WarnEntry(v, this);
 			}
-		}));
+		})); */
 	}
 }

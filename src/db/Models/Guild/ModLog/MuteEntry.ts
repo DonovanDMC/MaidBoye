@@ -1,6 +1,10 @@
 import GenericEntry, { RawGenericEntry } from "./GenericEntry";
 import GuildConfig from "../GuildConfig";
 import { DataTypes } from "@uwu-codes/types";
+import MaidBoye from "@MaidBoye";
+import Eris from "eris";
+import TimedEntry, { RawTimedEntry } from "@db/Models/TimedEntry";
+import db from "@db";
 
 export interface RawMuteEntry extends RawGenericEntry {
 	type: "mute";
@@ -14,5 +18,19 @@ export default class MuteEntry extends GenericEntry {
 	constructor(data: RawMuteEntry, guild: GuildConfig) {
 		super(data, guild);
 		this.timedId = data.timed_id;
+	}
+
+	async getTarget(client: MaidBoye) {
+		return super.getTarget(client) as Promise<Eris.User>;
+	}
+
+	async getTimedEntry(raw: true): Promise<RawTimedEntry>;
+	async getTimedEntry(raw?: false): Promise<TimedEntry>;
+	async getTimedEntry(raw = false) {
+		if (this.timedId === null) return null;
+		const [res] = await db.query("SELECT * FROM timed WHERE id=?", [this.timedId]) as Array<RawTimedEntry>;
+		if (res === undefined) return null;
+		if (raw) return res;
+		else return new TimedEntry(res);
 	}
 }

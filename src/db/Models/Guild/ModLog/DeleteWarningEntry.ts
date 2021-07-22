@@ -1,6 +1,8 @@
 import GenericEntry, { RawGenericEntry } from "./GenericEntry";
 import GuildConfig from "../GuildConfig";
 import { DataTypes } from "@uwu-codes/types";
+import MaidBoye from "@MaidBoye";
+import Eris from "eris";
 
 export interface RawDeleteWarningEntry extends RawGenericEntry {
 	type: "deletewarning";
@@ -14,5 +16,9 @@ export default class DeleteWarningEntry extends GenericEntry {
 	constructor(data: RawDeleteWarningEntry, guild: GuildConfig) {
 		super(data, guild);
 		this.warningId = data.warning_id;
+	}
+
+	async getTarget(client: MaidBoye) {
+		return super.getTarget.call(this, client) as Promise<Eris.User>;
 	}
 }

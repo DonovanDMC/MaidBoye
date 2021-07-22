@@ -12,4 +12,6 @@ export default class UnLockDownEntry extends GenericEntry {
 	constructor(data: RawUnLockDownEntry, guild: GuildConfig) {
 		super(data, guild);
 	}
+
+	async getTarget() { return null; }
 }

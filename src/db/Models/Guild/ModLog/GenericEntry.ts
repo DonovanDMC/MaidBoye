@@ -1,5 +1,8 @@
 import GuildConfig from "../GuildConfig";
 import { DataTypes } from "@uwu-codes/types";
+import MaidBoye from "@MaidBoye";
+import Eris from "eris";
+import db from "@db";
 
 export interface RawGenericEntry {
 	id: string;
@@ -20,7 +23,7 @@ export interface RawGenericEntry {
 	last_edited_by: string | null;
 }
 export type GenericEntryKV = DataTypes<GenericEntry>;
-export default class GenericEntry {
+export default abstract class GenericEntry {
 	protected guild: GuildConfig;
 	/** internal use only */
 	id: string;
@@ -56,5 +59,27 @@ export default class GenericEntry {
 	}
 
 	get delete() { return this.guild.removeModlog.bind(this.guild, this.id); }
-	get edit() { return this.guild.editModlog.bind(this.guild); }
+	get edit() { return this.guild.editModlog.bind(this.guild, this.entryId); }
+
+	async getTarget(client: MaidBoye) {
+		if (this.target === null) return null;
+		if (["lock", "unlock"].includes(this.type)) return client.getChannel(this.target) as Eris.GuildTextableChannelWithoutThreads;
+		return client.getUser(this.target);
+	}
+
+	async getBlame(client: MaidBoye) {
+		if (this.blame === "automatic") return "automatic";
+		return client.getUser(this.blame);
+	}
+
+	async getGuildConfig() {
+		return db.getGuild(this.guildId);
+	}
+
+	async getMessage(client: MaidBoye) {
+		if (this.messageId === null) return null;
+		const cnf = await this.getGuildConfig();
+		if (cnf.modlog.enabled === false || !cnf.modlog.webhook?.channelId) return null;
+		return (client.getMessage(cnf.modlog.webhook.channelId, this.messageId).catch(() => null)) as Promise<Eris.Message<Eris.GuildTextableChannelWithoutThreads> | null>;
+	}
 }

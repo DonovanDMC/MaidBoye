@@ -12,4 +12,6 @@ export default class LockDownEntry extends GenericEntry {
 	constructor(data: RawLockDownEntry, guild: GuildConfig) {
 		super(data, guild);
 	}
+
+	async getTarget() { return null; }
 }
