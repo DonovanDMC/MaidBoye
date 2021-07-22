@@ -60,13 +60,13 @@ declare module "eris" {
 	export const InteractionCallbackType: InteractionCallbackType;
 
 	interface Client {
-		createInteractionResponse(id: string, token: string, type: InteractionCallbackType[keyof InteractionCallbackType], content?: InteractionPayload): Promise<void>;
-		getOriginalInteractionResponse(applicationId: string, token: string): Promise<Message<GuildTextableChannel>>;
-		editOriginalInteractionResponse(applicationId: string, token: string, content: InteractionPayload): Promise<void>;
+		createInteractionResponse(id: string, token: string, type: InteractionCallbackType[keyof InteractionCallbackType], content?: InteractionPayload): Promise<Message<TextChannel>>;
+		getOriginalInteractionResponse(applicationId: string, token: string): Promise<Message<TextChannel>>;
+		editOriginalInteractionResponse(applicationId: string, token: string, content: InteractionPayload): Promise<Message<TextChannel>>;
 		deleteOriginalInteractionResponse(applicationId: string, token: string): Promise<void>;
 
-		createFollowupMessage(applicationId: string, token: string, content: InteractionPayload): Promise<void>;
-		editFollowupMessage(applicationId: string, token: string, messageId: string, content: InteractionPayload): Promise<void>;
+		createFollowupMessage(applicationId: string, token: string, content: InteractionPayload): Promise<Message<TextChannel>>;
+		editFollowupMessage(applicationId: string, token: string, messageId: string, content: InteractionPayload): Promise<Message<TextChannel>>;
 		deleteFollowupMessage(applicationId: string, token: string, messageId: string): Promise<void>;
 		// just for internal use
 		private _formatAllowedMentions(allowed: AllowedMentions): unknown;

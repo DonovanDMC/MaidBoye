@@ -242,7 +242,7 @@ Object.defineProperties(Eris.Client.prototype, {
 	createInteractionResponse: {
 		async value(this: Eris.Client, id: string, token: string, type: Eris.InteractionCallbackType, content?: Eris.InteractionPayload) {
 			if (content && (!content.content && !content.file && !content.embeds)) return Promise.reject(new Error("No content, file, or embeds"));
-			await this.requestHandler.request("POST", `/interactions/${id}/${token}/callback`, true, {
+			return this.requestHandler.request("POST", `/interactions/${id}/${token}/callback`, true, {
 				type,
 				data: content === undefined ? {} : {
 					content: content.content,
@@ -250,7 +250,8 @@ Object.defineProperties(Eris.Client.prototype, {
 					allowed_mentions: this._formatAllowedMentions(content.allowedMentions ?? {}),
 					components: content.components
 				}
-			}, content && content.file ? Array.isArray(content.file) ? content.file[0] : content.file : undefined, "/interactions/:id/:token/callback");
+			}, content && content.file ? Array.isArray(content.file) ? content.file[0] : content.file : undefined, "/interactions/:id/:token/callback")
+				.then(v => new Eris.Message(v as Eris.BaseData, this));
 		}
 	},
 	getOriginalInteractionResponse: {
@@ -271,30 +272,32 @@ Object.defineProperties(Eris.Client.prototype, {
 	createFollowupMessage: {
 		async value(this: Eris.Client, applicationId: string, token: string, content: Eris.InteractionPayload) {
 			if (content && (!content.content && !content.file && !content.embeds)) return Promise.reject(new Error("No content, file, or embeds"));
-			await this.requestHandler.request("POST", `/webhooks/${applicationId}/${token}`, true, {
+			return this.requestHandler.request("POST", `/webhooks/${applicationId}/${token}`, true, {
 				content: content.content,
 				embeds: content.embeds,
 				allowed_mentions: this._formatAllowedMentions(content.allowedMentions ?? {}),
 				components: content.components,
 				flags: content.flags
-			}, Array.isArray(content.file) ? content.file[0] : content.file, "/webhooks/:applicationId/:token");
+			}, Array.isArray(content.file) ? content.file[0] : content.file, "/webhooks/:applicationId/:token")
+				.then(v => new Eris.Message(v as Eris.BaseData, this));
 		}
 	},
 	editFollowupMessage: {
 		async value(this: Eris.Client, applicationId: string, token: string, messageId: string, content: Eris.InteractionPayload) {
 			if (!content.content && !content.file && !content.embeds) return Promise.reject(new Error("No content, file, or embeds"));
-			await this.requestHandler.request("PATCH", `/webhooks/${applicationId}/${token}/messages/${messageId}`, true, {
+			return this.requestHandler.request("PATCH", `/webhooks/${applicationId}/${token}/messages/${messageId}`, true, {
 				content: content.content,
 				embeds: content.embeds,
 				allowed_mentions: this._formatAllowedMentions(content.allowedMentions ?? {}),
 				components: content.components,
 				flags: content.flags
-			}, Array.isArray(content.file) ? content.file[0] : content.file, `/webhooks/:applicationId/:token/messages/${messageId === "@original" ? "@original" : ":messageId"}`);
+			}, Array.isArray(content.file) ? content.file[0] : content.file, `/webhooks/:applicationId/:token/messages/${messageId === "@original" ? "@original" : ":messageId"}`)
+				.then(v => new Eris.Message(v as Eris.BaseData, this));
 		}
 	},
 	deleteFollowupMessage: {
 		async value(this: Eris.Client, applicationId: string, token: string, id: string) {
-			await this.requestHandler.request("DELETE", `/webhooks/${applicationId}/${token}/messages/${id}`, true, undefined, undefined, `/webhooks/:applicationId/:token/messages/${id === "@original" ? "@original" : ":id"}`);
+			return this.requestHandler.request("DELETE", `/webhooks/${applicationId}/${token}/messages/${id}`, true, undefined, undefined, `/webhooks/:applicationId/:token/messages/${id === "@original" ? "@original" : ":id"}`);
 		}
 	}
 });
