@@ -66,8 +66,8 @@ export default class ExtendedMessage extends Message<Eris.GuildTextableChannel> 
 		if (this.prefix.replace(/!/g, "") === `<@${this.client.user.id}`) this.prefix = this.gConfig.prefix[0].value;
 		this.cmd = CommandHandler.getCommand(p.command);
 		if (this.cmd !== null) Array.from(this.args).forEach(arg => {
-			if (/^(-[a-z]|--[a-z]+(=.+)?)$/.test(arg)) {
-				const [, name] = /^--?([a-z\d]+)(?:=.*)?$/.exec(arg) ?? [];
+			if (/^(-[a-z\d]|--[a-z\d-_]+(=.+)?)$/.test(arg)) {
+				const [, name] = /^--?([a-z\d-]+)(?:=.*)?$/.exec(arg) ?? [];
 				if (!name || !this.cmd!.parsedFlags.includes(name)) return;
 				const indexArg = this.args.indexOf(arg);
 				const indexArgRaw = this.rawArgs.indexOf(arg);
