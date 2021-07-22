@@ -6,11 +6,13 @@ import Eris from "eris";
 
 export interface RawSoftBanEntry extends RawGenericEntry {
 	type: "softban";
+	delete_days: number;
 }
 export type SoftBanEntryKV = DataTypes<SoftBanEntry>;
 export default class SoftBanEntry extends GenericEntry {
 	declare type: "softban";
 	declare target: string;
+	deleteDays: number;
 	constructor(data: RawSoftBanEntry, guild: GuildConfig) {
 		super(data, guild);
 	}

@@ -258,7 +258,7 @@ export default class ModLogHandler {
 		return { id, entryId };
 	}
 
-	static async createSoftBanEntry(guild: GuildConfig, target: Eris.User | Eris.Member, blame: Eris.User | Eris.Member | null, reason: string | null) {
+	static async createSoftBanEntry(guild: GuildConfig, target: Eris.User | Eris.Member, blame: Eris.User | Eris.Member | null, reason: string | null, deleteDays: number) {
 		const check = await this.check(guild);
 		if (check === false) return false;
 		const entryId = await this.getEntryId(guild.id);
@@ -279,7 +279,7 @@ export default class ModLogHandler {
 			]
 		});
 
-		await db.query("INSERT INTO modlog (id, entry_id, guild_id, message_id, target, blame, reason, type, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", [
+		await db.query("INSERT INTO modlog (id, entry_id, guild_id, message_id, target, blame, reason, type, created_at, delete_days) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [
 			id,
 			entryId,
 			guild.id,
@@ -288,7 +288,8 @@ export default class ModLogHandler {
 			blame === null ? "automatic" : blame.id,
 			reason,
 			"softban",
-			Date.now()
+			Date.now(),
+			deleteDays
 		]);
 
 		return { id, entryId };
