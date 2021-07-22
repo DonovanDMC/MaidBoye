@@ -40,7 +40,7 @@ export default new Command("ban")
 		const user =  await msg.getUserFromArgs();
 		if (user === null) return msg.reply("Th-that wasn't a valid user..");
 
-		const member = msg.channel.guild.members.get(user.id) ?? await msg.channel.guild.getRESTMember(user.id).catch(() => null);
+		const member = await this.getMember(msg.channel.guild.id, user.id);
 		if (member !== null) {
 			if (member.id === msg.author.id) return msg.reply("I-I can't let you do that..");
 			if (member.id === msg.channel.guild.ownerID) return msg.reply("Y-you can't ban the server owner!");
