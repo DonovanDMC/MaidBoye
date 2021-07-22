@@ -251,7 +251,7 @@ Object.defineProperties(Eris.Client.prototype, {
 					components: content.components
 				}
 			}, content && content.file ? Array.isArray(content.file) ? content.file[0] : content.file : undefined, "/interactions/:id/:token/callback")
-				.then(v => new Eris.Message(v as Eris.BaseData, this));
+				.then(v => content === undefined ? undefined : new Eris.Message(v as Eris.BaseData, this));
 		}
 	},
 	getOriginalInteractionResponse: {

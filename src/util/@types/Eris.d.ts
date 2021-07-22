@@ -60,7 +60,8 @@ declare module "eris" {
 	export const InteractionCallbackType: InteractionCallbackType;
 
 	interface Client {
-		createInteractionResponse(id: string, token: string, type: InteractionCallbackType[keyof InteractionCallbackType], content?: InteractionPayload): Promise<Message<TextChannel>>;
+		createInteractionResponse(id: string, token: string, type: InteractionCallbackType[keyof InteractionCallbackType]): Promise<void>;
+		createInteractionResponse(id: string, token: string, type: InteractionCallbackType[keyof InteractionCallbackType], content: InteractionPayload): Promise<Message<TextChannel>>;
 		getOriginalInteractionResponse(applicationId: string, token: string): Promise<Message<TextChannel>>;
 		editOriginalInteractionResponse(applicationId: string, token: string, content: InteractionPayload): Promise<Message<TextChannel>>;
 		deleteOriginalInteractionResponse(applicationId: string, token: string): Promise<void>;
