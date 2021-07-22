@@ -50,8 +50,8 @@ export default class ComponentHelper {
 	}
 
 	addSelectMenu(custom_id: string, options: Array<Eris.SelectMenuOptions>, placeholder?: string, min_values?: number, max_values?: number) {
-		//                                                             either up to 5 buttons or a select menu per row
-		if (this.rows.length === 0 || this.rows[this.rows.length - 1].components.length >= 5 || this.rows[this.rows.length - 1].components[0]?.type === 3) this.addRow();
+		// select menus have to be on their own row
+		this.addRow();
 		this.rows[this.rows.length - 1].components.push({
 			type: 3,
 			options,
