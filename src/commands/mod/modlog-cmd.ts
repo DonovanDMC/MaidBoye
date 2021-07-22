@@ -365,7 +365,7 @@ export default new Command("modlog")
 						});
 						switch (delHook.data.custom_id.split("-")[1].split(".")[0]) {
 							case "yes": {
-								await this.deleteWebhook(msg.gConfig.modlog.webhook.id, msg.gConfig.modlog.webhook.token, `Command: ${msg.author.tag}`).catch(() => null);
+								await this.deleteWebhook(msg.gConfig.modlog.webhook.id, msg.gConfig.modlog.webhook.token, `ModLog Reset: ${msg.author.tag} (${msg.author.id})`).catch(() => null);
 								await msg.gConfig.edit({
 									modlog: config.defaults.guild.modlog
 								});

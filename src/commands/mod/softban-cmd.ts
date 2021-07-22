@@ -54,7 +54,7 @@ export default new Command("softban")
 		if (!nodm && member !== null && !member.bot)
 			dm = await member.user.createMessage(`You were softbanned from **${msg.channel.guild.name}** by **${msg.author.tag}**\nReason:\n\`\`\`\n${reason ?? "None Provided"}\`\`\`\nWe are not responsible for inviting you back, contact a server staff member.`)
 				.catch((err: Error) => ((dmError = `${err.name}: ${err.message}`, null)));
-		await member.ban(delDays, `Command: ${msg.author.tag} -> ${reason ?? "None Provided"}`)
+		await member.ban(delDays, `SoftBan: ${msg.author.tag} (${msg.author.id}) -> ${reason ?? "None Provided"}`)
 			// catch first so we only catch an error from ban
 			.catch(async(err: Error) => {
 				// delete the dm if we didn't ban them
@@ -62,7 +62,7 @@ export default new Command("softban")
 				return msg.channel.createMessage(`I-I failed to ban **${member.tag}**..\n\`${err.name}: ${err.message}\``);
 			})
 			.then(async() => {
-				await member.unban(`Command: ${msg.author.tag} -> ${reason ?? "None Provided"}`);
+				await member.unban(`SoftBan: ${msg.author.tag} (${msg.author.id}) -> ${reason ?? "None Provided"}`);
 			})
 			.catch(async(err: Error) =>
 				msg.channel.createMessage(`I-I failed to unban **${member.tag}**..\n\`${err.name}: ${err.message}\``)

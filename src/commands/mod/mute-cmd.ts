@@ -69,7 +69,7 @@ export default new Command("mute")
 		if (!nodm && member !== null && !member.bot)
 			dm = await member.user.createMessage(`You were muted in **${msg.channel.guild.name}** by **${msg.author.tag}**\nReason:\n\`\`\`\n${reason ?? "None Provided"}\`\`\`\nTime: **${time === 0 ? "Permanent" : Time.ms(time, true, true, false)}**`)
 				.catch((err: Error) => ((dmError = `${err.name}: ${err.message}`, null)));
-		await member.addRole(r.id, `Command: ${msg.author.tag} -> ${reason ?? "None Provided"}`)
+		await member.addRole(r.id, `Mute: ${msg.author.tag} (${msg.author.id}) -> ${reason ?? "None Provided"}`)
 			// catch first so we only catch an error from ban
 			.catch(async(err: Error) => {
 				// delete the dm if we didn't ban them
