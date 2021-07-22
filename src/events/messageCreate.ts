@@ -47,6 +47,7 @@ export default new ClientEvent("messageCreate", async function (message) {
 	const msg = new ExtendedMessage(message as Eris.Message<Exclude<Eris.GuildTextableChannel, Eris.AnyThreadChannel>>, this);
 	const load = await msg.load();
 	if (msg.content.split(" ").slice(1).join(" ").replace(/go/, "").trim().toLowerCase().startsWith("make me")) return msg.reply("Th-that's not my purpose..");
+	if (msg.content.split(" ").slice(1).join(" ").trim().toLowerCase().startsWith("fuck me")) return msg.reply("I-I don't even know you..");
 	const { cmd } = msg;
 	StatsHandler.trackNoResponse("stats", "message", msg.channel.typeString);
 	if (load === false || cmd === null || msg.member === null) return;
