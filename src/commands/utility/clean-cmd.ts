@@ -43,12 +43,12 @@ export default new Command("clean", "clear", "prune", "purge")
 	.setExecutor(async function(msg) {
 		if (msg.args.length === 0) return msg.reply(`H-hey! You have to provide some arguments, silly.. See \`${msg.gConfig.getFormattedPrefix()}clean help\` for help`);
 		// assume they provided the arguments backwards
-		if (!isNaN(Number(msg.args[0])) && isNaN(Number(msg.args[1]))) msg.args = [
+		if (msg.args.length > 1 && (!isNaN(Number(msg.args[0])) && isNaN(Number(msg.args[1])))) msg.args = [
 			msg.args[1],
 			msg.args[0],
 			...msg.args.slice(2)
 		];
-		const amount = Number(msg.args[1]);
+		const amount = Number(msg.args.length === 1 ? msg.args[0] : msg.args[1]);
 		if (amount < 2) return msg.reply("H-hey! You have to provide a number 2 or higher!");
 		if (amount > 1000) return msg.reply("H-hey! You have to provide a number 1000 or lower!");
 		if (isNaN(amount)) return msg.reply("H-hey! You have to provide a number for the amount!");
@@ -84,8 +84,8 @@ export default new Command("clean", "clear", "prune", "purge")
 
 				// specific
 				default: {
-					const user = await msg.getUserFromArgs();
-					const role = await msg.getRoleFromArgs();
+					const user = await msg.getUserFromArgs(1, 0);
+					const role = await msg.getRoleFromArgs(1, 0);
 					const channel = await msg.getChannelFromArgs<Eris.GuildTextableChannel>(0, 0, undefined, undefined, true);
 
 					if (user !== null) {
@@ -125,8 +125,8 @@ export default new Command("clean", "clear", "prune", "purge")
 			else return [...(old ?? []), ...m];
 		}
 
-		//                                                                                       fetch extra for filtering
-		const messages = await getMessages(["bots", "commands", "role", "user"].includes(type) ? amount < 100 ? 100 : amount : undefined);
+		//                                 fetch extra for filtering
+		const messages = await getMessages(amount < 100 ? 100 : amount);
 		let filteredDate = 0;
 		const filtered = messages.filter(m => {
 			if (m.createdAt < (Date.now() - 1.21e+9)) {
