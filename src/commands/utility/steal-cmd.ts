@@ -16,6 +16,10 @@ export default new Command("steal")
 	.setCooldown(3e3)
 	.setExecutor(async function(msg, cmd) {
 		if (msg.args.length < 1) return new CommandError("INVALID_USAGE", cmd);
+		if (msg.args[0].toLowerCase() === "attachment") {
+			const [a = null] = msg.attachments.filter(at => at.content_type && at.content_type.startsWith("image/"));
+			if (a !== null) msg.args = [a.url, ...msg.args.slice(1)];
+		}
 		const e = /(?:<a?:(.*):)?([0-9]{15,21})(?:>)?/i.exec(msg.args[0]);
 
 		// https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)
@@ -62,7 +66,7 @@ export default new Command("steal")
 			name,
 			image: `data:${img.headers.get("Content-Type")!};base64,${Buffer.from(b).toString("base64")}`
 		}, encodeURIComponent(`steal command: ${msg.author.tag} (${msg.author.id})`)).then(j =>
-			msg.reply(`Created the emoji <${j.animated ? "a" : ""}:${j.name}:${j.id}> w-with the name *${j.name}**..`)
+			msg.reply(`Created the emoji <${j.animated ? "a" : ""}:${j.name}:${j.id}> w-with the name **${j.name}**..`)
 		).catch(error  => {
 			const err = error as Error & { code: number; };
 			if ("code" in err) switch (err.code) {
