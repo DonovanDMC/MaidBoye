@@ -3,7 +3,7 @@ import ExtendedMessage from "./ExtendedMessage";
 import WebhookStore from "./WebhookStore";
 import EmbedBuilder from "./EmbedBuilder";
 import { dependencies } from "../../package.json";
-import { dependencies as shrinkDependencies } from "../../npm-shrinkwrap.json";
+import { dependencies as shrinkDependencies } from "../../package-lock.json";
 import config from "@config";
 import * as fs from "fs-extra";
 import Eris from "eris";

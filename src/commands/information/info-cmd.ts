@@ -1,5 +1,5 @@
 import config from "@config";
-import { dependencies as shrinkDependencies } from "@root/npm-shrinkwrap.json";
+import { dependencies as shrinkDependencies } from "@root/package-lock.json";
 import pkg from "@root/package.json";
 import Command from "@cmd/Command";
 import EmbedBuilder from "@util/EmbedBuilder";
