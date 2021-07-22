@@ -58,6 +58,8 @@ export default new Command("ban")
 			if (time < 1000) time = 0;
 		}
 
+		if (reason && reason.length > 500) return msg.reply("Th-that reason is too long!");
+
 		let dmError: string | undefined;
 		let dm: Eris.Message<Eris.PrivateChannel> | null = null;
 		if (!nodm && member !== null && !member.bot)

@@ -17,6 +17,7 @@ export default new Command("lockdown")
 		const channels = msg.channel.guild.channels.filter(c => [Eris.Constants.ChannelTypes.GUILD_TEXT, Eris.Constants.ChannelTypes.GUILD_NEWS].includes(c.type as 0));
 		const ovr = [] as Array<[id: string, allow: string, deny: string]>;
 		const reason = msg.args.join(" ") || null;
+		if (reason && reason.length > 500) return msg.reply("Th-that reason is too long!");
 		const m = await msg.reply("Running..");
 		for (const ch of channels) {
 			const p = ch.permissionOverwrites.get(msg.channel.guild.id) ?? {
