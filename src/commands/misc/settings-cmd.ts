@@ -18,31 +18,6 @@ export default new Command("settings")
 	.setExecutor(async function(msg) {
 		let page = 1;
 		const pages = chunk(Settings, 3);
-		/* 	const pages = [
-			{
-				embeds: [
-					new EmbedBuilder()
-						.setTitle("Server Settings")
-						.setDescription(
-							"**Default Yiff Type**",
-							`Current Value: \`${msg.gConfig.settings.defaultYiffType ?? "None"}\``,
-							"",
-							"**Yiff Thumbnail Type**",
-							`Current Value: \`${msg.gConfig.settings.yiffThumbnailType}\``,
-							"",
-							"**Mute Role**",
-							`Current Value: ${msg.gConfig.settings.muteRole === null ? "`None`" : `<@&${msg.gConfig.settings.muteRole}>`}`
-						)
-						.setFooter(`UwU | Page 1/${totalPages}`)
-						.toJSON()
-				],
-				components: new ComponentHelper()
-					.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-back.${msg.author.id}`, true, ComponentHelper.emojiToPartial(config.emojis.default.back, "default"), "Back")
-					.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-configure.${msg.author.id}`, false, ComponentHelper.emojiToPartial(config.emojis.custom.settings, "custom"), "Configure")
-					.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-next.${msg.author.id}`, true, ComponentHelper.emojiToPartial(config.emojis.default.next, "default"), "Next Page")
-					.toJSON()
-			}
-		] as Array<Eris.MessageContent>; */
 		function formatEmbed(v: typeof Settings) {
 			return new EmbedBuilder(true, msg.author)
 				.setTitle("Server Settings")
