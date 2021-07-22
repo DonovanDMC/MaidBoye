@@ -27,7 +27,7 @@ export interface RawGuildConfig {
 	modlog_webhook_token: string | null;
 	modlog_webhook_channel_id: string | null;
 	settings_default_yiff_type: string;
-	settings_yiff_thumbnail_type: string;
+	settings_e621_thumbnail_type: string;
 	settings_mute_role: string | null;
 }
 
@@ -45,8 +45,8 @@ export default class GuildConfig {
 		webhook: Record<"id" | "token" | "channelId", string> | null;
 	};
 	settings: {
-		defaultYiffType: typeof config["yiffTypes"][number] | null;
-		yiffThumbnailType: "gif" | "image";
+		defaultYiffType: typeof config["yiffTypes"][number];
+		e621ThumbnailType: "gif" | "image" | "none";
 		muteRole: string | null;
 	};
 	constructor(id: string, data: RawGuildConfig, prefixData: Array<RawPrefix>, selfRolesData: Array<RawSelfRole>, tagsData: Array<RawTag>) {
@@ -74,7 +74,7 @@ export default class GuildConfig {
 		};
 		this.settings = {
 			defaultYiffType: data.settings_default_yiff_type as GuildConfig["settings"]["defaultYiffType"],
-			yiffThumbnailType: data.settings_yiff_thumbnail_type as GuildConfig["settings"]["yiffThumbnailType"],
+			e621ThumbnailType: data.settings_e621_thumbnail_type as GuildConfig["settings"]["e621ThumbnailType"],
 			muteRole: data.settings_mute_role
 		};
 		return this;
@@ -101,7 +101,7 @@ export default class GuildConfig {
 			modlog_webhook_token: data.modlog === undefined || data.modlog.webhook === undefined ? undefined : data.modlog.webhook === null ? null : data.modlog.webhook.token ?? undefined,
 			modlog_webhook_channel_id: data.modlog === undefined || data.modlog.webhook === undefined ? undefined : data.modlog.webhook === null ? null : data.modlog.webhook.channelId ?? undefined,
 			settings_default_yiff_type: data.settings === undefined ? undefined : data.settings.defaultYiffType ?? undefined,
-			settings_yiff_thumbnail_type: data.settings === undefined ? undefined : data.settings.yiffThumbnailType ?? undefined,
+			settings_e621_thumbnail_type: data.settings === undefined ? undefined : data.settings.e621ThumbnailType ?? undefined,
 			settings_mute_role: data.settings === undefined ? undefined : data.settings.muteRole === null ? null : data.settings.muteRole ?? undefined
 		} as Omit<RawGuildConfig, "id">;
 

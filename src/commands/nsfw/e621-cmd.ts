@@ -33,8 +33,10 @@ export default new Command("e621", "e6")
 
 			if (post.file.ext === "swf") e.setDescription(`This post is a flash animation. Please view it [directly](https://e621.net/posts/${post.id}) on e621.`);
 			else if (post.file.ext === "webm") {
-				let url = "https://http.cat/500";
-				try {
+				e.setDescription(`This post is a video. Please view it [directly](https://e621.net/posts/${post.id}) on e621.`);
+				if (msg.gConfig.settings.e621ThumbnailType !== "none") {
+					let url = "https://http.cat/500";
+					try {
 					type CreateTimeType = "total" | "upload" | "cut" | "getVTG" | "convert";
 					interface Thumbnail {
 						url: string;
@@ -59,7 +61,7 @@ export default new Command("e621", "e6")
 							"Content-Type": "application/json"
 						},
 						body: JSON.stringify({
-							type: msg.gConfig.settings.yiffThumbnailType || "image",
+							type: msg.gConfig.settings.e621ThumbnailType || "image",
 							url: post.file.url,
 							length: 2.5
 						})
@@ -81,13 +83,12 @@ export default new Command("e621", "e6")
 							console.log(`Convert Time: ${b.data.createTime.convert}ms (${b.data.createTime.convertNs}ns)`);
 						}
 					}
-				} catch (err) {
-					Logger.getLogger("E621Command").error(`Error creating webm thumbnail (https://e621.net/posts/${post.id})`);
-					console.error(err);
+					} catch (err) {
+						Logger.getLogger("E621Command").error(`Error creating webm thumbnail (https://e621.net/posts/${post.id})`);
+						console.error(err);
+					}
+					e.setImage(url);
 				}
-				e
-					.setDescription(`This post is a video. Please view it [directly](https://e621.net/posts/${post.id}) on e621.`)
-					.setImage(url);
 			} else e.setImage(post.file.url);
 			let a: string;
 			if (post.tags.artist.length === 0) a = "unknown_artist";
