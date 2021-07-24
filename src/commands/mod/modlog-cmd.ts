@@ -10,6 +10,7 @@ import Eris from "eris";
 import { Request } from "@uwu-codes/utils";
 import FileType from "file-type";
 import GuildConfig from "@db/Models/Guild/GuildConfig";
+import { ApplicationCommandOptionType } from "discord-api-types";
 
 export default new Command("modlog")
 	.setPermissions("bot", "embedLinks", "manageChannels", "manageWebhooks")
@@ -17,6 +18,27 @@ export default new Command("modlog")
 	.setDescription("Manage this server's modlog")
 	.setUsage("(no arguments)")
 	.setHasSlashVariant(true)
+	.setSlashCommandOptions([
+		{
+			type: ApplicationCommandOptionType.String,
+			name: "section",
+			description: "the section of modlog configuration to open",
+			choices:[
+				{
+					name: "Setup",
+					value: "setup"
+				},
+				{
+					name: "Reset",
+					value: "reset"
+				},
+				{
+					name: "Get",
+					value: "get"
+				}
+			]
+		}
+	])
 	.setCooldown(3e3)
 	.setExecutor(async function(msg, cmd) {
 		if (msg.gConfig.modlog.enabled === true && msg.gConfig.modlog.webhook === null) await msg.gConfig.edit({

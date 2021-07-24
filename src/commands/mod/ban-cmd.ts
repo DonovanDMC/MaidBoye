@@ -4,6 +4,7 @@ import CommandError from "@cmd/CommandError";
 import EmbedBuilder from "@util/EmbedBuilder";
 import { Time } from "@uwu-codes/utils";
 import Eris from "eris";
+import { ApplicationCommandOptionType } from "discord-api-types";
 
 export default new Command("ban")
 	.setPermissions("bot", "embedLinks", "banMembers")
@@ -30,6 +31,52 @@ export default new Command("ban")
 		};
 	})
 	.setHasSlashVariant(true)
+	.setSlashCommandOptions([
+		{
+			type: ApplicationCommandOptionType.User,
+			name: "user",
+			description: "The user to ban",
+			required: true
+		},
+		{
+			type: ApplicationCommandOptionType.String,
+			name: "reason",
+			description: "The reason for banning the user",
+			required: false
+		},
+		{
+			type: ApplicationCommandOptionType.String,
+			name: "time",
+			description: "The time until the ban expires (ex: 2 days)",
+			required: false
+		},
+		{
+			type: ApplicationCommandOptionType.String,
+			name: "no-dm",
+			description: "If we should attempt to dm the banned user with some info",
+			required: false,
+			choices: [
+				{
+					name: "Yes",
+					value: ""
+				},
+				{
+					name: "No",
+					value: "--nodm"
+				}
+			]
+		},
+		{
+			type: ApplicationCommandOptionType.String,
+			name: "delete-days",
+			description: "The amount of days of messages that should be deleted",
+			choices: new Array(8).fill(null).map((_, i) => ({
+				name: String(i),
+				value: `--deldays=${i}`
+			})),
+			required: false
+		}
+	])
 	.setCooldown(3e3)
 	.setParsedFlags("nodm", "deldays")
 	.setExecutor(async function(msg, cmd) {

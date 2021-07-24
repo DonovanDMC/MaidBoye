@@ -4,6 +4,7 @@ import CommandError from "@util/cmd/CommandError";
 import EmbedBuilder from "@util/EmbedBuilder";
 import ModLogHandler from "@util/handlers/ModLogHandler";
 import Logger from "@util/Logger";
+import { ApplicationCommandOptionType } from "discord-api-types";
 
 export default new Command("reason")
 	.setPermissions("bot", "embedLinks")
@@ -11,6 +12,20 @@ export default new Command("reason")
 	.setDescription("change a cases reason")
 	.setUsage("<case> <newReason>")
 	.setHasSlashVariant(true)
+	.setSlashCommandOptions([
+		{
+			type: ApplicationCommandOptionType.Integer,
+			name: "case-number",
+			description: "The number of the case to change",
+			required: true
+		},
+		{
+			type: ApplicationCommandOptionType.String,
+			name: "new-reason",
+			description: "The new reason for the case",
+			required: true
+		}
+	])
 	.setCooldown(3e3)
 	.setParsedFlags("force")
 	.setExecutor(async function(msg, cmd) {

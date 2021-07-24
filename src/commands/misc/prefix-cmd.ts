@@ -2,6 +2,7 @@ import config from "@config";
 import BotFunctions from "@util/BotFunctions";
 import Command from "@cmd/Command";
 import EmbedBuilder from "@util/EmbedBuilder";
+import { ApplicationCommandOptionType } from "discord-api-types";
 
 export default new Command("prefix")
 	.setPermissions("bot", "embedLinks")
@@ -9,6 +10,66 @@ export default new Command("prefix")
 	.setDescription("Set the prefix you use me with")
 	.setUsage("<add/remove/reset/list>")
 	.setHasSlashVariant(true)
+	.setSlashCommandOptions([
+		{
+			type: ApplicationCommandOptionType.SubCommand,
+			name: "add",
+			description: "Add additional prefixes",
+			required: true,
+			options: [
+				{
+					type: ApplicationCommandOptionType.String,
+					name: "value",
+					description: "The prefix to add",
+					required: true
+				},
+				{
+					type: ApplicationCommandOptionType.String,
+					name: "space",
+					description: "If this prefix should have a space before the command",
+					required: false,
+					choices: [
+						{
+							name: "Yes",
+							value: "--space"
+						},
+						{
+							name: "No",
+							value: ""
+						}
+					]
+				}
+			]
+		},
+		{
+			type: ApplicationCommandOptionType.SubCommand,
+			name: "remove",
+			description: "remove a prefix",
+			required: true,
+			options: [
+				{
+					type: ApplicationCommandOptionType.String,
+					name: "prefix",
+					description: "The prefix to remove (see list subcommand)",
+					required: true
+				}
+			]
+		},
+		{
+			type: ApplicationCommandOptionType.SubCommand,
+			name: "reset",
+			description: "Reset all prefixes",
+			required: true,
+			options: []
+		},
+		{
+			type: ApplicationCommandOptionType.SubCommand,
+			name: "list",
+			description: "List current prefixes",
+			required: true,
+			options: []
+		}
+	])
 	.setCooldown(5e3)
 	.setParsedFlags("space")
 	.setExecutor(async function(msg) {

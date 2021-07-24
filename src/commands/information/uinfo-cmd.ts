@@ -4,12 +4,21 @@ import EmbedBuilder from "@util/EmbedBuilder";
 import BotFunctions from "@util/BotFunctions";
 import fetch from "node-fetch";
 import Eris from "eris";
+import { ApplicationCommandOptionType } from "discord-api-types";
 
 export default new Command("uinfo", "userinfo")
 	.setPermissions("bot", "embedLinks", "attachFiles")
 	.setDescription("Get info about someone..")
 	.setHasSlashVariant(true)
 	.setCooldown(3e3)
+	.setSlashCommandOptions([
+		{
+			type: ApplicationCommandOptionType.User,
+			name: "user",
+			description: "The user to get info about (none for yourself)",
+			required: false
+		}
+	])
 	.setExecutor(async function(msg) {
 		let user = msg.args.length === 0 ? msg.author : await msg.getUserFromArgs();
 		// @FIXME banners don't seem to be sent over gateway yet

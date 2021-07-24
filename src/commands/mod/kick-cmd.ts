@@ -3,6 +3,7 @@ import Command from "@cmd/Command";
 import CommandError from "@cmd/CommandError";
 import EmbedBuilder from "@util/EmbedBuilder";
 import Eris from "eris";
+import { ApplicationCommandOptionType } from "discord-api-types";
 
 export default new Command("kick")
 	.setPermissions("bot", "embedLinks", "kickMembers")
@@ -24,6 +25,36 @@ export default new Command("kick")
 		};
 	})
 	.setHasSlashVariant(true)
+	.setSlashCommandOptions([
+		{
+			type: ApplicationCommandOptionType.User,
+			name: "user",
+			description: "The user to kick",
+			required: true
+		},
+		{
+			type: ApplicationCommandOptionType.String,
+			name: "reason",
+			description: "The reason for kicking the user",
+			required: false
+		},
+		{
+			type: ApplicationCommandOptionType.String,
+			name: "no-dm",
+			description: "If we should attempt to dm the kicked user with some info",
+			required: false,
+			choices: [
+				{
+					name: "Yes",
+					value: ""
+				},
+				{
+					name: "No",
+					value: "--nodm"
+				}
+			]
+		}
+	])
 	.setCooldown(3e3)
 	.setParsedFlags("nodm")
 	.setExecutor(async function(msg, cmd) {
@@ -55,7 +86,7 @@ export default new Command("kick")
 				return msg.channel.createMessage(`I-I failed to kick **${member.tag}**..\n\`${err.name}: ${err.message}\``);
 			})
 			.then(async() => {
-				const mdl = await ModLogHandler.createKickEntry(msg.gConfig, member, msg.author, `Ban: ${msg.author.tag} -> ${reason ?? "None Provided"}`);
+				const mdl = await ModLogHandler.createKickEntry(msg.gConfig, member, msg.author, `Kick: ${msg.author.tag} -> ${reason ?? "None Provided"}`);
 				return msg.channel.createMessage(`**${member.tag}** was kicked, ***${reason ?? "None Provided"}***${dmError !== undefined ? `\n\nFailed to send dm:\n\`${dmError}\`` : ""}${mdl !== false ? `\nFor more info, check <#${msg.gConfig.modlog.webhook!.channelId}> (case: **#${mdl.entryId}**)` : ""}`);
 			});
 	});

@@ -1,10 +1,19 @@
 import Command from "@cmd/Command";
+import { ApplicationCommandOptionType } from "discord-api-types";
 
 export default new Command("impostor")
 	.setPermissions("bot", "embedLinks")
 	.setDescription("amogus")
 	.setUsage("[@user/text]")
 	.setHasSlashVariant(true)
+	.setSlashCommandOptions([
+		{
+			type: ApplicationCommandOptionType.User,
+			name: "user",
+			description: "The user to sus (none for yourself)",
+			required: false
+		}
+	])
 	.setCooldown(3e3)
 	.setExecutor(async function(msg) {
 		const m = msg.args.length === 0 ? msg.member : await msg.getMemberFromArgs();

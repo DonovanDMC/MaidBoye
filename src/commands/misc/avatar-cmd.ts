@@ -1,6 +1,7 @@
 import config from "@config";
 import Command from "@cmd/Command";
 import EmbedBuilder from "@util/EmbedBuilder";
+import { ApplicationCommandOptionType } from "discord-api-types";
 
 
 export default new Command("avatar")
@@ -9,6 +10,14 @@ export default new Command("avatar")
 	.setUsage("<@user>")
 	.setHasSlashVariant(true)
 	.setCooldown(3e3)
+	.setSlashCommandOptions([
+		{
+			type: ApplicationCommandOptionType.User,
+			name: "user",
+			description: "The user to get the avatar of (none for yourself)",
+			required: false
+		}
+	])
 	.setExecutor(async function(msg) {
 		const user = msg.args.length === 0 ? msg.author : await msg.getUserFromArgs();
 		if (user === null) return msg.reply("Th-that isn't a valid user..");

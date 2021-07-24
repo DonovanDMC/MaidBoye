@@ -3,6 +3,7 @@ import MaidBoye from "../../main";
 import ExtendedMessage from "../ExtendedMessage";
 import { ArrayOneOrMore } from "@uwu-codes/types";
 import Eris from "eris";
+import { APIApplicationCommandOption } from "discord-api-types";
 
 export type CommandRestrictions = "beta" | "developer" | "nsfw";
 export type DeprecatedPermissions = "viewAuditLogs" | "stream" | "readMessages" | "externalEmojis";
@@ -16,6 +17,7 @@ export default class Command {
 	usage: ((this: MaidBoye, msg: ExtendedMessage, cmd: Command) => Eris.MessageContent | null | Promise<Eris.MessageContent | null>) = () => null;
 	description = "";
 	parsedFlags = [] as Array<string>;
+	slashCommandOptions = [] as Array<APIApplicationCommandOption>;
 	cooldown = 0;
 	donatorCooldown = 0;
 	hasSlashVariant = false;
@@ -54,6 +56,11 @@ export default class Command {
 
 	setParsedFlags(...data: Array<string>) {
 		this.parsedFlags = data;
+		return this;
+	}
+
+	setSlashCommandOptions(data: Array<APIApplicationCommandOption>) {
+		this.slashCommandOptions = data;
 		return this;
 	}
 

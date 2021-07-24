@@ -7,6 +7,7 @@ import MaidBoye from "@MaidBoye";
 import E621 from "@util/req/E621";
 import fetch from "node-fetch";
 import Logger from "@util/Logger";
+import { ApplicationCommandOptionType } from "discord-api-types";
 
 // attachment version: https://pastebin.com/D4ZBuLjw
 export default new Command("e621", "e6")
@@ -14,12 +15,57 @@ export default new Command("e621", "e6")
 	.setDescription("Search for posts from e621")
 	.setUsage("[tags]")
 	.setHasSlashVariant(true)
+	.setSlashCommandOptions([
+		{
+			type: ApplicationCommandOptionType.String,
+			name: "tags",
+			description: "The tags to search with (default order: favcount), max 40",
+			required: false
+		},
+		{
+			type: ApplicationCommandOptionType.String,
+			name: "no-video",
+			description: "If we should filter out video files",
+			required: false,
+			choices: [
+				{
+					name: "Yes",
+					value: "--no-video"
+				},
+				{
+					name: "No",
+					value: ""
+				}
+			]
+		},
+		{
+			type: ApplicationCommandOptionType.String,
+			name: "no-flash",
+			description: "If we should filter out flash files",
+			required: false,
+			choices: [
+				{
+					name: "Yes",
+					value: "--no-flash"
+				},
+				{
+					name: "No",
+					value: ""
+				}
+			]
+		}
+	])
 	.setRestrictions("nsfw")
 	.setCooldown(3e3)
+	.setParsedFlags("no-video", "no-flash")
 	.setExecutor(async function(msg) {
 		const tags = Array.from(msg.rawArgs);
 		if (!tags.find(t => t.includes("order:"))) tags.push("order:favcount");
-		const posts = await E621.getPosts(tags, 50);
+		const posts = await E621.getPosts(tags, 100);
+		/* for (const p of posts) {
+			if (msg.dashedArgs.value.includes("no-video") && p.file.ext === "webm") posts.splice(posts.indexOf(p), 1);
+			else if (msg.dashedArgs.value.includes("no-flash") && p.file.ext === "swf") posts.splice(posts.indexOf(p), 1);
+		} */
 
 		let m: Eris.Message<Eris.GuildTextableChannel> | undefined, i = 0;
 		async function changePost(this: MaidBoye, id?: string, token?: string): Promise<void> {
@@ -31,8 +77,17 @@ export default new Command("e621", "e6")
 				.removeDescription();
 			if (id && token) await this.createInteractionResponse(id, token, Eris.InteractionCallbackType.DEFERRED_UPDATE_MESSAGE);
 
-			if (post.file.ext === "swf") e.setDescription(`This post is a flash animation. Please view it [directly](https://e621.net/posts/${post.id}) on e621.`);
-			else if (post.file.ext === "webm") {
+			if (post.file.ext === "swf") {
+				if (msg.dashedArgs.value.includes("no-flash")) {
+					posts.splice(i, 1);
+					return changePost.call(this, undefined, token);
+				}
+				e.setDescription(`This post is a flash animation. Please view it [directly](https://e621.net/posts/${post.id}) on e621.`);
+			} else if (post.file.ext === "webm") {
+				if (msg.dashedArgs.value.includes("no-video")) {
+					posts.splice(i, 1);
+					return changePost.call(this, undefined, token);
+				}
 				e.setDescription(`This post is a video. Please view it [directly](https://e621.net/posts/${post.id}) on e621.`);
 				if (msg.gConfig.settings.e621ThumbnailType !== "none") {
 					let url = "https://http.cat/500";
@@ -90,6 +145,7 @@ export default new Command("e621", "e6")
 					e.setImage(url);
 				}
 			} else e.setImage(post.file.url);
+			e.setDescription(e.getDescription()!, "(post numbers may fluctuate as we filter things)");
 			let a: string;
 			if (post.tags.artist.length === 0) a = "unknown_artist";
 			else if (post.tags.artist.length === 1) a = post.tags.artist[0];
@@ -116,7 +172,7 @@ export default new Command("e621", "e6")
 				components: c
 			});
 			else {
-				if (!id || !token) return;
+				if (!token) return;
 				await this.editOriginalInteractionResponse(this.user.id, token,{
 					embeds: [e.toJSON()],
 					components: c

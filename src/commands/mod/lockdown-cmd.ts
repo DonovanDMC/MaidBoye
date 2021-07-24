@@ -2,6 +2,7 @@ import ModLogHandler from "../../util/handlers/ModLogHandler";
 import Command from "@cmd/Command";
 import Eris from "eris";
 import db from "@db";
+import { ApplicationCommandOptionType } from "discord-api-types";
 const Redis = db.r;
 
 export default new Command("lockdown")
@@ -10,6 +11,14 @@ export default new Command("lockdown")
 	.setDescription("lock all channels in the server")
 	.setUsage("[reason]")
 	.setHasSlashVariant(true)
+	.setSlashCommandOptions([
+		{
+			type: ApplicationCommandOptionType.String,
+			name: "reason",
+			description: "The reason for locking the server",
+			required: false
+		}
+	])
 	.setCooldown(3e3)
 	.setExecutor(async function(msg) {
 		const old = await Redis.get(`lockdown:${msg.channel.guild.id}`);

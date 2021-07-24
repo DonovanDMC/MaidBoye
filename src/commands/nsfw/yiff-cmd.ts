@@ -8,12 +8,25 @@ import { Strings } from "@uwu-codes/utils";
 import Eris from "eris";
 import ComponentHelper from "@util/ComponentHelper";
 import MaidBoye from "@MaidBoye";
+import { ApplicationCommandOptionType } from "discord-api-types";
 
 export default new Command("yiff", "thegoodstuff")
 	.setPermissions("bot", "embedLinks", "attachFiles")
 	.setDescription("Y-you know what this is..")
 	.setUsage(`<${config.yiffTypes.join("/")}>`)
 	.setHasSlashVariant(true)
+	.setSlashCommandOptions([
+		{
+			type: ApplicationCommandOptionType.String,
+			name: "type",
+			description: "The type of yiff to fetch",
+			required: false,
+			choices: config.yiffTypes.map(y => ({
+				name: Strings.ucwords(y),
+				value: y
+			}))
+		}
+	])
 	.setRestrictions("nsfw")
 	.setCooldown(3e3)
 	.setExecutor(async function(msg) {

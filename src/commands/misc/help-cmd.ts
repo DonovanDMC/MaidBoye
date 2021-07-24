@@ -7,6 +7,7 @@ import EmbedBuilder from "@util/EmbedBuilder";
 import BotFunctions from "@util/BotFunctions";
 import Eris from "eris";
 import { Strings } from "@uwu-codes/utils";
+import { APIApplicationCommandOptionChoice, ApplicationCommandOptionType } from "discord-api-types";
 
 export default new Command("help")
 	.setPermissions("bot", "embedLinks")
@@ -14,6 +15,22 @@ export default new Command("help")
 	.setUsage("[command]")
 	.setHasSlashVariant(true)
 	.setCooldown(3e3)
+	.setSlashCommandOptions([
+		{
+			type: ApplicationCommandOptionType.String,
+			name: "category",
+			description: "The category to get help with",
+			required: false,
+			choices: CommandHandler.categories.map(cat => {
+				if (cat.restrictions.includes("disabled")) return;
+				else if ((cat.restrictions.includes("beta") && !config.beta)) return;
+				else return {
+					name: cat.displayName.text,
+					value: cat.name
+				};
+			}).filter(Boolean) as Array<APIApplicationCommandOptionChoice>
+		}
+	])
 	.setExecutor(async function(msg) {
 		if (msg.args.length === 0) {
 			const e = new EmbedBuilder().setAuthor(msg.author.tag, msg.author.avatarURL);

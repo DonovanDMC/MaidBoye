@@ -2,6 +2,7 @@ import ModLogHandler from "../../util/handlers/ModLogHandler";
 import Command from "@cmd/Command";
 import EmbedBuilder from "@util/EmbedBuilder";
 import Eris from "eris";
+import { ApplicationCommandOptionType } from "discord-api-types";
 
 export default new Command("lock")
 	.setPermissions("bot", "embedLinks", "manageChannels")
@@ -9,6 +10,20 @@ export default new Command("lock")
 	.setDescription("keep everyone from speaking in a channel")
 	.setUsage("[<channel> [reason]]")
 	.setHasSlashVariant(true)
+	.setSlashCommandOptions([
+		{
+			type: ApplicationCommandOptionType.Channel,
+			name: "channel",
+			description: "The channel to lock (none for current channel)",
+			required: false
+		},
+		{
+			type: ApplicationCommandOptionType.String,
+			name: "reason",
+			description: "The reason for locking the channel",
+			required: false
+		}
+	])
 	.setCooldown(3e3)
 	.setExecutor(async function(msg) {
 		const ch = (msg.args.length === 0 ? msg.channel : await msg.getChannelFromArgs()) as Exclude<Eris.GuildTextableChannel, Eris.AnyThreadChannel>;

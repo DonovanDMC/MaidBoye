@@ -5,11 +5,46 @@ import Eris from "eris";
 import ComponentHelper from "@util/ComponentHelper";
 import MaidBoye from "@MaidBoye";
 import BotFunctions from "@util/BotFunctions";
+import { ApplicationCommandOptionType } from "discord-api-types";
 
 export default new Command("sinfo", "serverinfo")
 	.setPermissions("bot", "embedLinks", "attachFiles")
 	.setDescription("Get some info about this server")
 	.setHasSlashVariant(true)
+	.setSlashCommandOptions([
+		{
+			type: ApplicationCommandOptionType.String,
+			name: "section",
+			description: "The section of info to get.",
+			required: false,
+			choices: [
+				{
+					name: "Server",
+					value: "server"
+				},
+				{
+					name: "Members",
+					value: "members"
+				},
+				{
+					name: "Channels",
+					value: "channels"
+				},
+				{
+					name: "Icon",
+					value: "icon"
+				},
+				{
+					name: "Splash",
+					value: "splash"
+				},
+				{
+					name: "Banner",
+					value: "banner"
+				}
+			]
+		}
+	])
 	.setCooldown(3e3)
 	.setExecutor(async function(msg) {
 		const o = await this.getUser(msg.channel.guild.ownerID);
@@ -164,59 +199,52 @@ export default new Command("sinfo", "serverinfo")
 			} as Eris.AdvancedMessageContent
 		};
 
+		let initialSection = msg.args.length === 0 ? "server" : msg.args[0].toLowerCase();
+		if (!Object.keys(sections).includes(initialSection)) initialSection = "server";
 		let m: Eris.Message<Eris.GuildTextableChannel> | undefined;
 		async function waitForEdit(this: MaidBoye): Promise<void> {
-			if (m === undefined) m = await msg.reply(sections.server);
+			if (m === undefined) m = await msg.reply(sections[initialSection as keyof typeof sections]);
 			const c = await msg.channel.awaitComponentInteractions(6e4, (it) => it.channel_id === msg.channel.id && it.message.id === m!.id && it.data.custom_id.startsWith("sinfo") && it.data.custom_id.endsWith(msg.author.id) && !!it.member.user && it.member.user.id === msg.author.id);
 			if (c === null) {
 				await m.edit({
 					embeds: m.embeds,
 					components: []
 				});
-				clearTimeout(t);
 			} else {
-				switch (c.data.custom_id.split(".")[0]) {
-					case "sinfo-members": {
+				switch (c.data.custom_id.split(".")[0].split("-")[1]) {
+					case "members": {
 						await this.createInteractionResponse(c.id, c.token, Eris.InteractionCallbackType.UPDATE_MESSAGE, sections.members);
 						break;
 					}
 
-					case "sinfo-channels": {
+					case "channels": {
 						await this.createInteractionResponse(c.id, c.token, Eris.InteractionCallbackType.UPDATE_MESSAGE, sections.channels);
 						break;
 					}
 
-					case "sinfo-icon": {
+					case "icon": {
 						await this.createInteractionResponse(c.id, c.token, Eris.InteractionCallbackType.UPDATE_MESSAGE, sections.icon);
 						break;
 					}
 
-					case "sinfo-splash": {
+					case "splash": {
 						await this.createInteractionResponse(c.id, c.token, Eris.InteractionCallbackType.UPDATE_MESSAGE, sections.splash);
 						break;
 					}
 
-					case "sinfo-banner": {
+					case "banner": {
 						await this.createInteractionResponse(c.id, c.token, Eris.InteractionCallbackType.UPDATE_MESSAGE, sections.banner);
 						break;
 					}
 
-					case "sinfo-back": {
+					case "back": {
 						await this.createInteractionResponse(c.id, c.token, Eris.InteractionCallbackType.UPDATE_MESSAGE, sections.server);
 						break;
 					}
 				}
 
-				return waitForEdit.call(this);
+				return void waitForEdit.call(this);
 			}
 		}
-
-		const t = setTimeout(() => {
-			if (m !== undefined) void m.edit({
-				embeds: m.embeds,
-				components: []
-			});
-		}, 9e5);
-
 		void waitForEdit.call(this);
 	});
