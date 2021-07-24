@@ -17,8 +17,8 @@ export default new Command("links", "support", "invite", "inv")
 						`[Twitter](${config.client.links.twitter})`,
 						`[Website](${config.client.links.website})`,
 						`[Developer](${config.client.links.dev})`,
-						`[Patreon](${config.client.links.patreon})`,
-						"[Invite](https://maid.gay/closed-beta"
+						`[Ko-Fi (Donate)](${config.client.links.kofi})`,
+						"[Invite](https://maid.gay/closed-beta)"
 					)
 					.toJSON()
 			]
