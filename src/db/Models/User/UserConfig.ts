@@ -8,6 +8,9 @@ import crypto from "crypto";
 
 export interface RawUserConfig {
 	id: string;
+	premium_kofi_email: string | null;
+	premium_months: number;
+	premium_subscription: boolean;
 }
 
 export type UserConfigKV = DataTypes<UserConfig>;
@@ -16,6 +19,11 @@ export default class UserConfig {
 	// @TODO remove roles from this array when they are manually removed
 	// so they can't remove manually added roles
 	selfRolesJoined: Array<SelfRoleJoined>;
+	donations: {
+		kofiEmail: string | null;
+		months: number;
+		subscription: boolean;
+	};
 	constructor(id: string, data: RawUserConfig, selfRolesJoinedData: Array<RawSelfRoleJoined>) {
 		this.id = id;
 		this.load(data, selfRolesJoinedData);
@@ -24,6 +32,11 @@ export default class UserConfig {
 	private load(data: RawUserConfig, selfRolesJoinedData: Array<RawSelfRoleJoined>) {
 		this.id = data.id;
 		this.selfRolesJoined = selfRolesJoinedData.map(d => new SelfRoleJoined(d, this));
+		this.donations = {
+			kofiEmail: data.premium_kofi_email,
+			months: data.premium_months,
+			subscription: data.premium_subscription
+		};
 		return this;
 	}
 
@@ -36,7 +49,11 @@ export default class UserConfig {
 
 	async edit(data: DeepPartial<UserConfigKV>) {
 		if (data.selfRolesJoined) throw new TypeError("Field 'selfRolesJoined' cannot be used in the generic edit function.");
-		const v = {} as RawUserConfig;
+		const v = {
+			premium_kofi_email: data.donations?.kofiEmail,
+			premium_months: data.donations?.months,
+			premium_subscription: data.donations?.subscription
+		} as RawUserConfig;
 
 		const keys = Object.keys(v).filter(k => v[k as keyof typeof v] !== undefined);
 		const values = Object.values(v).filter(Boolean) as Array<unknown>;

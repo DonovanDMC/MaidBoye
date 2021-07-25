@@ -10,7 +10,10 @@ process.nextTick(async() => {
 
 	const userProps = {
 		id: "VARCHAR(21) NOT NULL UNIQUE",
-		self_roles_joined: "MEDIUMTEXT NOT NULL DEFAULT '[]'"
+		self_roles_joined: "MEDIUMTEXT NOT NULL DEFAULT '[]'",
+		premium_kofi_email: "TINYTEXT NULL",
+		premium_months: "TINYINT UNSIGNED NOT NULL DEFAULT 0",
+		premium_subscription: "BOOLEAN NOT NULL DEFAULT FALSE"
 	};
 
 	console.log("Creating Users Table");

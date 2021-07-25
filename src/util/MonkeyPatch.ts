@@ -240,7 +240,7 @@ Object.defineProperties(Eris.Message.prototype, {
 
 Object.defineProperties(Eris.Client.prototype, {
 	createInteractionResponse: {
-		async value(this: Eris.Client, id: string, token: string, type: Eris.InteractionCallbackType, content?: Eris.InteractionPayload) {
+		async value(this: Eris.Client, id: string, token: string, type: Eris.InteractionCallbackType[keyof Eris.InteractionCallbackType], content?: Eris.InteractionPayload) {
 			if (content && (!content.content && !content.file && !content.embeds)) return Promise.reject(new Error("No content, file, or embeds"));
 			return this.requestHandler.request("POST", `/interactions/${id}/${token}/callback`, true, {
 				type,
@@ -248,10 +248,11 @@ Object.defineProperties(Eris.Client.prototype, {
 					content: content.content,
 					embeds: content.embeds,
 					allowed_mentions: this._formatAllowedMentions(content.allowedMentions ?? {}),
-					components: content.components
+					components: content.components,
+					flags: content.flags
 				}
 			}, content && content.file ? Array.isArray(content.file) ? content.file[0] : content.file : undefined, "/interactions/:id/:token/callback")
-				.then(v => content === undefined ? undefined : new Eris.Message(v as Eris.BaseData, this));
+				.then(v => content === undefined || type === Eris.InteractionCallbackType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE || type === Eris.InteractionCallbackType.DEFERRED_UPDATE_MESSAGE ? undefined : new Eris.Message(v as Eris.BaseData, this));
 		}
 	},
 	getOriginalInteractionResponse: {

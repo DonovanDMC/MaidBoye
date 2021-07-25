@@ -46,6 +46,13 @@ export default new ClientEvent("rawWS", async function({ op, d, t }) {
 					// Logger.getLogger("RawWS Event").info("Interaction Create Event:", d);
 					const data = d as GatewayInteractionCreateDispatchData;
 					switch (data.type) {
+						case InteractionType.ApplicationCommand: {
+							void this.createInteractionResponse(data.id, data.token, Eris.InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE, {
+								content: "Slash Commands have not been set up yet.",
+								flags: 64
+							});
+							break;
+						}
 						case InteractionType.MessageComponent: {
 							const cd = data.data as APIMessageComponentInteractionData;
 							const { member } = (data as { member: APIGuildMember; });
