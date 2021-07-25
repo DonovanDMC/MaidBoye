@@ -12,7 +12,7 @@ import util from "util";
 
 async function format(obj: unknown) {
 	if (obj instanceof Promise) obj = await obj;
-	if (Array.isArray(obj)) return JSON.stringify(obj);
+	if (Array.isArray(obj)) return JSON.stringify(obj, (k, v: unknown) => typeof v === "bigint" ? `${v.toString()}n` : v);
 	/* if (typeof obj === "object" && obj !== null) {
 		if (obj.constructor && typeof Eris[obj.constructor.name as "Client"] !== "undefined" && !["DiscordRESTError"].includes(obj.constructor.name)) {
 			let str = `<${obj.constructor.name}`;
