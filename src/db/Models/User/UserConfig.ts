@@ -109,8 +109,9 @@ export default class UserConfig {
 	async addStrikes(guildId: string, blame: string, amount: number) {
 		const d = Date.now();
 		const groupId = crypto.randomBytes(6).toString("hex");
+		const ids = [] as Array<string>;
 		await db.pool.batch("INSERT INTO strikes (id, group_id, guild_id, user_id, created_by, created_at) VALUES (?, ?, ?, ?, ?, ?)", new Array(amount).fill(null).map(() => [
-			crypto.randomBytes(6).toString("hex"),
+			ids[ids.push(crypto.randomBytes(6).toString("hex")) - 1],
 			groupId,
 			guildId,
 			this.id,
@@ -118,7 +119,7 @@ export default class UserConfig {
 			d
 		]));
 
-		return this.getStrikeCount(guildId);
+		return ids;
 	}
 
 	async getStrikeCount(guild?: string) {
