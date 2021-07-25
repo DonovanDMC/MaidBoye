@@ -30,7 +30,7 @@ export default new Command("strike")
 		const amount = msg.args.length === 1 ? 1 : Number(msg.args[1]);
 		if (member === null) return msg.reply("Th-that wasn't a valid member..");
 		if (member.id === msg.author.id) return msg.reply("H-hey! You can't strike yourself!");
-		const c = member.compareToMember(msg.member);
+		const c = msg.member.compareToMember(member);
 		if (c !== "lower") return msg.reply("H-hey! You can't strike people higher than you!");
 		if (amount < 1) return msg.reply("Y-you have to add at least one strike..");
 		if (amount > 10 && !config.developers.includes(msg.author.id)) return msg.reply("Y-you cannot add more than 10 strikes at a time..");
