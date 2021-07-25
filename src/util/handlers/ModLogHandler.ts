@@ -60,7 +60,7 @@ export default class ModLogHandler {
 	}
 
 	static getEntryId(guildId: string) {
-		return  db.query("SELECT COUNT(*) FROM modlog WHERE guild_id=?", [guildId]).then((v: CountResponse) => (Number(v[0]["COUNT(*)"] ?? 0) + 1));
+		return db.query("SELECT COUNT(*) FROM modlog WHERE guild_id=?", [guildId]).then((v: CountResponse) => (Number(v[0]["COUNT(*)"] ?? 0) + 1));
 	}
 
 	static async executeWebhook(guild: GuildConfig, payload: Eris.WebhookPayload) {

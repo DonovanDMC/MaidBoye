@@ -1,8 +1,9 @@
 import SelfRoleJoined, { RawSelfRoleJoined } from "./SelfRoleJoined";
+import Strike, { RawStrike } from "../Strike";
 import db from "@db";
 import Logger from "@util/Logger";
 import { DataTypes, DeepPartial, Writeable } from "@uwu-codes/types";
-import { OkPacket } from "@util/@types/MariaDB";
+import { CountResponse, OkPacket } from "@util/@types/MariaDB";
 import crypto from "crypto";
 
 export interface RawUserConfig {
@@ -85,5 +86,26 @@ export default class UserConfig {
 		const res = await db.query("INSERT INTO strikes (id, guild_id, user_id, created_by, created_at) VALUES (?, ?, ?, ?, ?)", [id, guildId, this.id, blame, Date.now()]).then((r: OkPacket) => r.affectedRows > 0);
 		if (res === false) return null;
 		return id;
+	}
+	async addStrikes(guildId: string, blame: string, amount: number) {
+		const d = Date.now();
+		await db.pool.batch("INSERT INTO strikes (id, guild_id, user_id, created_by, created_at) VALUES (?, ?, ?, ?, ?)", new Array(amount).fill(null).map(() => [
+			crypto.randomBytes(6).toString("hex"),
+			guildId,
+			this.id,
+			blame,
+			d
+		]));
+
+		return this.getStrikeCount(guildId);
+	}
+
+	async getStrikeCount(guild?: string) {
+		return db.query(`SELECT COUNT(*) FROM strikes WHERE strikes WHERE user_id="${this.id}"${guild === undefined ? "" : ` AND guild_id=${guild}`}`).then((v: CountResponse) => (Number(v[0]["COUNT(*)"] ?? 0)));
+	}
+
+	async getStrikes(guild?: string) {
+		const res = await db.query(`SELECT * FROM strikes WHERE strikes WHERE user_id="${this.id}"${guild === undefined ? "" : ` AND guild_id="${guild}"`}`) as Array<RawStrike>;
+		return res.map(s => new Strike(s));
 	}
 }
