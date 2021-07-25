@@ -2,6 +2,7 @@ import Command from "@cmd/Command";
 import { ApplicationCommandOptionType } from "discord-api-types";
 import UserConfig from "@db/Models/User/UserConfig";
 import db from "@db";
+import config from "@config";
 
 export default new Command("strike")
 	.setPermissions("bot", "embedLinks")
@@ -32,7 +33,7 @@ export default new Command("strike")
 		const c = member.compareToMember(msg.member);
 		if (c !== "lower") return msg.reply("H-hey! You can't strike people higher than you!");
 		if (amount < 1) return msg.reply("Y-you have to add at least one strike..");
-		if (amount > 10) return msg.reply("Y-you cannot add more than 10 strikes at a time..");
+		if (amount > 10 && !config.developers.includes(msg.author.id)) return msg.reply("Y-you cannot add more than 10 strikes at a time..");
 		await db.createUserIfNotExists(member.id);
 		const v = await UserConfig.prototype.addStrikes.call({
 			id: member.id,
