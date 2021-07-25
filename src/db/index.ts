@@ -66,7 +66,9 @@ export default class db {
 
 	static get query() { return this.pool.query.bind(this.pool); }
 	static async insert(table: string, data: Record<string, unknown>) {
-		await this.query(`INSERT INTO ${table} (${Object.keys(data).join(", ")}) VALUES (${Object.values(data).map(() => "?").join(", ")})`, [Object.values(data)]);
+		const keys = Object.keys(data);
+		const values = Object.values(data);
+		await this.query(`INSERT INTO ${table} (${keys.join(", ")}) VALUES (${values.map(() => "?").join(", ")})`, values);
 	}
 
 	// because of foreign key restraints
