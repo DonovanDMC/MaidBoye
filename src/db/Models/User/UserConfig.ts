@@ -85,7 +85,7 @@ export default class UserConfig {
 		const id = crypto.randomBytes(6).toString("hex");
 		const res = await db.query("INSERT INTO strikes (id, guild_id, user_id, created_by, created_at) VALUES (?, ?, ?, ?, ?)", [id, guildId, this.id, blame, Date.now()]).then((r: OkPacket) => r.affectedRows > 0);
 		if (res === false) return null;
-		return id;
+		return this.getStrikeCount(guildId);
 	}
 	async addStrikes(guildId: string, blame: string, amount: number) {
 		const d = Date.now();
@@ -101,7 +101,7 @@ export default class UserConfig {
 	}
 
 	async getStrikeCount(guild?: string) {
-		return db.query(`SELECT COUNT(*) FROM strikes WHERE strikes WHERE user_id="${this.id}"${guild === undefined ? "" : ` AND guild_id=${guild}`}`).then((v: CountResponse) => (Number(v[0]["COUNT(*)"] ?? 0)));
+		return db.query(`SELECT COUNT(*) FROM strikes WHERE user_id="${this.id}"${guild === undefined ? "" : ` AND guild_id="${guild}"`}`).then((v: CountResponse) => (Number(v[0]["COUNT(*)"] ?? 0)));
 	}
 
 	async getStrikes(guild?: string) {
