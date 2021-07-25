@@ -5,7 +5,7 @@ import db from "@db";
 
 export default new Command("strike")
 	.setPermissions("bot", "embedLinks")
-	.setPermissions("user", "kickMembers")
+	.setPermissions("user", "manageMessages")
 	.setDescription("Add a strike or several to a user")
 	.setUsage("<user> [amount]")
 	.setHasSlashVariant(true)
@@ -29,6 +29,8 @@ export default new Command("strike")
 		const amount = msg.args.length === 1 ? 1 : Number(msg.args[1]);
 		if (member === null) return msg.reply("Th-that wasn't a valid member..");
 		if (member.id === msg.author.id) return msg.reply("H-hey! You can't strike yourself!");
+		const c = member.compareToMember(msg.member);
+		if (c !== "lower") return msg.reply("H-hey! You can't strike people higher than you!");
 		if (amount < 1) return msg.reply("Y-you have to add at least one strike..");
 		if (amount > 10) return msg.reply("Y-you cannot add more than 10 strikes at a time..");
 		await db.createUserIfNotExists(member.id);
