@@ -35,12 +35,14 @@ export default new Command("strike")
 		if (amount < 1) return msg.reply("Y-you have to add at least one strike..");
 		if (amount > 10 && !config.developers.includes(msg.author.id)) return msg.reply("Y-you cannot add more than 10 strikes at a time..");
 		await db.createUserIfNotExists(member.id);
-		const v = await UserConfig.prototype.addStrikes.call({
-			id: member.id,
-			getStrikeCount: UserConfig.prototype.getStrikeCount.bind({ id: member.id })
+		await UserConfig.prototype.addStrikes.call({
+			id: member.id
 		}, msg.channel.guild.id, msg.author.id, amount);
+		const count = await UserConfig.prototype.getStrikeCount.call({
+			id: member.id
+		}, msg.channel.guild.id);
 		return msg.reply({
-			content: `Successfully added **${amount}** strike${amount !== 1 ? "s" : ""} to <@!${member.id}>, they now have **${v}** strike${v !== 1 ? "s" : ""}`,
+			content: `Successfully added **${amount}** strike${amount !== 1 ? "s" : ""} to <@!${member.id}>, they now have **${count}** strike${count !== 1 ? "s" : ""}`,
 			allowedMentions: {
 				users: false
 			}
