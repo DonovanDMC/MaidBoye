@@ -77,7 +77,6 @@ export default class ModLogHandler {
 
 	static async createBanEntry(guild: GuildConfig, target: Eris.User | Eris.Member, blame: Eris.User | Eris.Member | null, reason: string | null, time: number, deleteDays: number) {
 		const check = await this.check(guild);
-		if (check === false) return false;
 		const entryId = await this.getEntryId(guild.id);
 		const id = crypto.randomBytes(6).toString("hex");
 		await db.createUserIfNotExists(target.id);
@@ -99,7 +98,7 @@ export default class ModLogHandler {
 			]
 		});
 		// I prefer doing this over the db call required for getting the full user
-		const strikeId = await UserConfig.prototype.addStrike.call({ id: target.id }, guild.id, blame === null ? "automatic" : blame.id);
+		const [strikeId] = await UserConfig.prototype.addStrike.call({ id: target.id }, guild.id, blame === null ? "automatic" : blame.id);
 
 		await db.insert("modlog", {
 			id,
@@ -116,12 +115,11 @@ export default class ModLogHandler {
 			timed_id: timedId
 		});
 
-		return { id, entryId, strikeId, timedId };
+		return { id, entryId, check, strikeId, timedId };
 	}
 
 	static async createKickEntry(guild: GuildConfig, target: Eris.User | Eris.Member, blame: Eris.User | Eris.Member | null, reason: string | null) {
 		const check = await this.check(guild);
-		if (check === false) return false;
 		const entryId = await this.getEntryId(guild.id);
 		const id = crypto.randomBytes(6).toString("hex");
 		await db.createUserIfNotExists(target.id);
@@ -140,7 +138,7 @@ export default class ModLogHandler {
 			]
 		});
 
-		const strikeId = await UserConfig.prototype.addStrike.call({ id: target.id }, guild.id, blame === null ? "automatic" : blame.id);
+		const [strikeId] = await UserConfig.prototype.addStrike.call({ id: target.id }, guild.id, blame === null ? "automatic" : blame.id);
 
 		await db.insert("modlog", {
 			id,
@@ -155,12 +153,11 @@ export default class ModLogHandler {
 			created_at: Date.now()
 		});
 
-		return { id, entryId, strikeId };
+		return { id, entryId, check, strikeId };
 	}
 
 	static async createLockEntry(guild: GuildConfig, target: Exclude<Eris.GuildTextableChannel, Eris.AnyThreadChannel>, blame: Eris.User | Eris.Member | null, reason: string | null) {
 		const check = await this.check(guild);
-		if (check === false) return false;
 		const entryId = await this.getEntryId(guild.id);
 		const id = crypto.randomBytes(6).toString("hex");
 		const m = await this.executeWebhook(guild, {
@@ -190,12 +187,11 @@ export default class ModLogHandler {
 			created_at: Date.now()
 		});
 
-		return { id, entryId };
+		return { id, entryId, check };
 	}
 
 	static async createLockDownEntry(guild: GuildConfig, blame: Eris.User | Eris.Member | null, reason: string | null) {
 		const check = await this.check(guild);
-		if (check === false) return false;
 		const entryId = await this.getEntryId(guild.id);
 		const id = crypto.randomBytes(6).toString("hex");
 		const g = this.client.guilds.get(guild.id);
@@ -224,12 +220,11 @@ export default class ModLogHandler {
 			created_at: Date.now()
 		});
 
-		return { id, entryId };
+		return { id, entryId, check };
 	}
 
 	static async createMuteEntry(guild: GuildConfig, target: Eris.User | Eris.Member, blame: Eris.User | Eris.Member | null, reason: string | null, time: number) {
 		const check = await this.check(guild);
-		if (check === false) return false;
 		const entryId = await this.getEntryId(guild.id);
 		const id = crypto.randomBytes(6).toString("hex");
 		await db.createUserIfNotExists(target.id);
@@ -250,7 +245,7 @@ export default class ModLogHandler {
 			]
 		});
 
-		const strikeId = await UserConfig.prototype.addStrike.call({ id: target.id }, guild.id, blame === null ? "automatic" : blame.id);
+		const [strikeId] = await UserConfig.prototype.addStrike.call({ id: target.id }, guild.id, blame === null ? "automatic" : blame.id);
 
 		await db.insert("modlog", {
 			id,
@@ -266,12 +261,11 @@ export default class ModLogHandler {
 			timed_id: timedId
 		});
 
-		return { id, entryId, strikeId };
+		return { id, entryId, check, strikeId };
 	}
 
 	static async createSoftBanEntry(guild: GuildConfig, target: Eris.User | Eris.Member, blame: Eris.User | Eris.Member | null, reason: string | null, deleteDays: number) {
 		const check = await this.check(guild);
-		if (check === false) return false;
 		const entryId = await this.getEntryId(guild.id);
 		const id = crypto.randomBytes(6).toString("hex");
 		await db.createUserIfNotExists(target.id);
@@ -290,7 +284,7 @@ export default class ModLogHandler {
 			]
 		});
 
-		const strikeId = await UserConfig.prototype.addStrike.call({ id: target.id }, guild.id, blame === null ? "automatic" : blame.id);
+		const [strikeId] = await UserConfig.prototype.addStrike.call({ id: target.id }, guild.id, blame === null ? "automatic" : blame.id);
 
 		await db.insert("modlog", {
 			id,
@@ -306,12 +300,11 @@ export default class ModLogHandler {
 			delete_days: deleteDays
 		});
 
-		return { id, entryId, strikeId };
+		return { id, entryId, check, strikeId };
 	}
 
 	static async createUnBanEntry(guild: GuildConfig, target: Eris.User | Eris.Member, blame: Eris.User | Eris.Member | null, reason: string | null) {
 		const check = await this.check(guild);
-		if (check === false) return false;
 		const entryId = await this.getEntryId(guild.id);
 		const id = crypto.randomBytes(6).toString("hex");
 		await db.createUserIfNotExists(target.id);
@@ -343,12 +336,11 @@ export default class ModLogHandler {
 			created_at: Date.now()
 		});
 
-		return { id, entryId };
+		return { id, entryId, check };
 	}
 
 	static async createUnLockEntry(guild: GuildConfig, target: Exclude<Eris.GuildTextableChannel, Eris.AnyThreadChannel>, blame: Eris.User | Eris.Member | null, reason: string | null) {
 		const check = await this.check(guild);
-		if (check === false) return false;
 		const entryId = await this.getEntryId(guild.id);
 		const id = crypto.randomBytes(6).toString("hex");
 		await db.createUserIfNotExists(target.id);
@@ -379,12 +371,11 @@ export default class ModLogHandler {
 			created_at: Date.now()
 		});
 
-		return { id, entryId };
+		return { id, entryId, check };
 	}
 
 	static async createUnLockDownEntry(guild: GuildConfig, blame: Eris.User | Eris.Member | null, reason: string | null) {
 		const check = await this.check(guild);
-		if (check === false) return false;
 		const entryId = await this.getEntryId(guild.id);
 		const id = crypto.randomBytes(6).toString("hex");
 		const g = this.client.guilds.get(guild.id);
@@ -413,12 +404,11 @@ export default class ModLogHandler {
 			created_at: Date.now()
 		});
 
-		return { id, entryId };
+		return { id, entryId, check };
 	}
 
 	static async createUnMuteEntry(guild: GuildConfig, target: Eris.User | Eris.Member, blame: Eris.User | Eris.Member | null, reason: string | null) {
 		const check = await this.check(guild);
-		if (check === false) return false;
 		const entryId = await this.getEntryId(guild.id);
 		const id = crypto.randomBytes(6).toString("hex");
 		await db.createUserIfNotExists(target.id);
@@ -449,12 +439,11 @@ export default class ModLogHandler {
 			created_at: Date.now()
 		});
 
-		return { id, entryId };
+		return { id, entryId, check };
 	}
 
 	static async createWarnEntry(guild: GuildConfig, target: Eris.User | Eris.Member, blame: Eris.User | Eris.Member | null, reason: string | null) {
 		const check = await this.check(guild);
-		if (check === false) return false;
 		const entryId = await this.getEntryId(guild.id);
 		const id = crypto.randomBytes(6).toString("hex");
 		await db.createUserIfNotExists(target.id);
@@ -474,7 +463,7 @@ export default class ModLogHandler {
 			]
 		});
 
-		const strikeId = await UserConfig.prototype.addStrike.call({ id: target.id }, guild.id, blame === null ? "automatic" : blame.id);
+		const [strikeId] = await UserConfig.prototype.addStrike.call({ id: target.id }, guild.id, blame === null ? "automatic" : blame.id);
 
 		await db.insert("modlog", {
 			id,
@@ -490,12 +479,11 @@ export default class ModLogHandler {
 			active: true
 		});
 
-		return { id, entryId };
+		return { id, entryId, check };
 	}
 
 	static async createDeleteWarnEntry(guild: GuildConfig, target: Eris.User | Eris.Member, blame: Eris.User | Eris.Member | null, reason: string | null, warningId: string) {
 		const check = await this.check(guild);
-		if (check === false) return false;
 		const entryId = await this.getEntryId(guild.id);
 		const id = crypto.randomBytes(6).toString("hex");
 		await db.createUserIfNotExists(target.id);
@@ -528,12 +516,11 @@ export default class ModLogHandler {
 			warning_id: warningId
 		});
 
-		return { id, entryId };
+		return { id, entryId, check };
 	}
 
 	static async createClearWarningsEntry(guild: GuildConfig, target: Eris.User | Eris.Member, blame: Eris.User | Eris.Member | null, reason: string | null, total: number) {
 		const check = await this.check(guild);
-		if (check === false) return false;
 		const entryId = await this.getEntryId(guild.id);
 		const id = crypto.randomBytes(6).toString("hex");
 		await db.createUserIfNotExists(target.id);
@@ -566,7 +553,7 @@ export default class ModLogHandler {
 			total
 		});
 
-		return { id, entryId };
+		return { id, entryId, check };
 	}
 }
 

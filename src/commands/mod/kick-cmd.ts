@@ -87,6 +87,6 @@ export default new Command("kick")
 			})
 			.then(async() => {
 				const mdl = await ModLogHandler.createKickEntry(msg.gConfig, member, msg.author, `Kick: ${msg.author.tag} -> ${reason ?? "None Provided"}`);
-				return msg.channel.createMessage(`**${member.tag}** was kicked, ***${reason ?? "None Provided"}***${dmError !== undefined ? `\n\nFailed to send dm:\n\`${dmError}\`` : ""}${mdl !== false ? `\nFor more info, check <#${msg.gConfig.modlog.webhook!.channelId}> (case: **#${mdl.entryId}**)` : ""}`);
+				return msg.channel.createMessage(`**${member.tag}** was kicked, ***${reason ?? "None Provided"}***${dmError !== undefined ? `\n\nFailed to send dm:\n\`${dmError}\`` : ""}${mdl.check !== false ? `\nFor more info, check <#${msg.gConfig.modlog.webhook!.channelId}> (case: **#${mdl.entryId}**)` : ""}`);
 			});
 	});

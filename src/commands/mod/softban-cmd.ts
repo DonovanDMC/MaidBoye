@@ -110,6 +110,6 @@ export default new Command("softban")
 			)
 			.then(async() => {
 				const mdl = await ModLogHandler.createSoftBanEntry(msg.gConfig, member, msg.author, reason, delDays);
-				return msg.channel.createMessage(`**${member.tag}** was softbanned, ***${reason ?? "None Provided"}***${dmError !== undefined ? `\n\nFailed to send dm:\n\`${dmError}\`` : ""}${mdl !== false ? `\nFor more info, check <#${msg.gConfig.modlog.webhook!.channelId}> (case: **#${mdl.entryId}**)` : ""}`);
+				return msg.channel.createMessage(`**${member.tag}** was softbanned, ***${reason ?? "None Provided"}***${dmError !== undefined ? `\n\nFailed to send dm:\n\`${dmError}\`` : ""}${mdl.check !== false ? `\nFor more info, check <#${msg.gConfig.modlog.webhook!.channelId}> (case: **#${mdl.entryId}**)` : ""}`);
 			});
 	});

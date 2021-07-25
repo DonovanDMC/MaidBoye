@@ -45,6 +45,6 @@ export default new Command("lockdown")
 
 		await Redis.set(`lockdown:${msg.channel.guild.id}`, JSON.stringify(ovr));
 		const mdl = await ModLogHandler.createLockDownEntry(msg.gConfig, msg.member, reason);
-		await m.edit(`Locked **${ovr.length}** channels. ${mdl === false ? "" : ` (case #${mdl.entryId})`}`);
+		await m.edit(`Locked **${ovr.length}** channels. ${mdl.check === false ? "" : ` (case #${mdl.entryId})`}`);
 
 	});

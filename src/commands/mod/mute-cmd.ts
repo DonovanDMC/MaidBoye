@@ -90,7 +90,7 @@ export default new Command("mute")
 		if (["higher","same"].includes(compareMe)) return msg.reply("Th-that user is higher than, or as high as my highest role.. I cannot mute them");
 		if (member.roles.includes(r.id)) return msg.reply("Th-that member is already muted..");
 
-		let time = Time.parseTime2(msg.args[msg.args.length - 1]), reason: string | null = null;
+		let time = Time.parseTime2(msg.args.slice(1)[msg.args.length - 1]), reason: string | null = null;
 		if (msg.args.length !== 1) {
 			if (time === 0) {
 				time = Time.parseTime2(msg.args.join(" "));
@@ -99,6 +99,7 @@ export default new Command("mute")
 			if (time < 1000) time = 0;
 		}
 
+		if (time > 1.5768e11) return msg.reply("H-hey! The maximum time is 5 years!");
 		if (reason && reason.length > 500) return msg.reply("Th-that reason is too long!");
 
 		let dmError: string | undefined;
@@ -115,6 +116,6 @@ export default new Command("mute")
 			})
 			.then(async() => {
 				const mdl = await ModLogHandler.createMuteEntry(msg.gConfig, member, msg.author, reason, time);
-				return msg.channel.createMessage(`**${member.tag}** was muted ${time === 0 ? "permanently" : `for \`${Time.ms(time, true, true, false)}\``}, ***${reason ?? "None Provided"}***${dmError !== undefined ? `\n\nFailed to send dm:\n\`${dmError}\`` : ""}${mdl !== false ? `\nFor more info, check <#${msg.gConfig.modlog.webhook!.channelId}> (case: **#${mdl.entryId}**)` : ""}`);
+				return msg.channel.createMessage(`**${member.tag}** was muted ${time === 0 ? "permanently" : `for \`${Time.ms(time, true, true, false)}\``}, ***${reason ?? "None Provided"}***${dmError !== undefined ? `\n\nFailed to send dm:\n\`${dmError}\`` : ""}${mdl.check !== false ? `\nFor more info, check <#${msg.gConfig.modlog.webhook!.channelId}> (case: **#${mdl.entryId}**)` : ""}`);
 			});
 	});
