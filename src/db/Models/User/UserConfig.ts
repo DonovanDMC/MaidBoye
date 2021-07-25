@@ -11,6 +11,7 @@ export interface RawUserConfig {
 	premium_kofi_email: string | null;
 	premium_months: number;
 	premium_subscription: boolean;
+	premium_total: number;
 }
 
 export type UserConfigKV = DataTypes<UserConfig>;
@@ -23,6 +24,7 @@ export default class UserConfig {
 		kofiEmail: string | null;
 		months: number;
 		subscription: boolean;
+		total: number;
 	};
 	constructor(id: string, data: RawUserConfig, selfRolesJoinedData: Array<RawSelfRoleJoined>) {
 		this.id = id;
@@ -35,7 +37,8 @@ export default class UserConfig {
 		this.donations = {
 			kofiEmail: data.premium_kofi_email,
 			months: data.premium_months,
-			subscription: data.premium_subscription
+			subscription: data.premium_subscription,
+			total: data.premium_total
 		};
 		return this;
 	}
@@ -52,7 +55,8 @@ export default class UserConfig {
 		const v = {
 			premium_kofi_email: data.donations?.kofiEmail,
 			premium_months: data.donations?.months,
-			premium_subscription: data.donations?.subscription
+			premium_subscription: data.donations?.subscription,
+			premium_total: data.donations?.total
 		} as RawUserConfig;
 
 		const keys = Object.keys(v).filter(k => v[k as keyof typeof v] !== undefined);

@@ -35,7 +35,8 @@ export default class DonateRoute extends Route {
 						donations: {
 							months: user.premium_months + 1,
 							// only change it to true
-							subscription: user.premium_subscription === false ? d.is_subscription_payment : undefined
+							subscription: user.premium_subscription === false ? d.is_subscription_payment : undefined,
+							total: user.premium_total + Number(d.amount)
 						}
 					});
 					const dm = await client.getDMChannel(user.id);
@@ -52,7 +53,7 @@ export default class DonateRoute extends Route {
 				void WebhookStore.execute("donations", {
 					embeds: [
 						new EmbedBuilder()
-							.setTitle(d.type === "Donation" ? "One Time Donation" : d.is_first_payment ? `New Subscription ${config.emojis.default.tada}` : "Renewed Subscription")
+							.setTitle(`${d.type === "Donation" ? "One Time Donation" : d.is_first_payment ? `New Subscription ${config.emojis.default.tada}` : "Renewed Subscription"} | Amount: ${Number(d.amount)} ${d.currency}`)
 							.setDescription(d.is_public ? d.message : "User Has Chosen To Keep Their Donation Private.")
 							.setFooter(`Name: ${d.is_public ? d.from_name : "[Private]"}${user === null ? " | This Donation Is Unclaimed" : ""}`, config.images.bot)
 							.toJSON()

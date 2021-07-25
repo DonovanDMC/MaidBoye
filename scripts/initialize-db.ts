@@ -13,7 +13,8 @@ process.nextTick(async() => {
 		self_roles_joined: "MEDIUMTEXT NOT NULL DEFAULT '[]'",
 		premium_kofi_email: "TINYTEXT NULL",
 		premium_months: "TINYINT UNSIGNED NOT NULL DEFAULT 0",
-		premium_subscription: "BOOLEAN NOT NULL DEFAULT FALSE"
+		premium_subscription: "BOOLEAN NOT NULL DEFAULT FALSE",
+		premium_total_amount: "SMALLINT UNSIGNED NOT NULL DEFAULT 0"
 	};
 
 	console.log("Creating Users Table");
