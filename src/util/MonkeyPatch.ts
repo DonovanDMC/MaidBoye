@@ -252,7 +252,13 @@ Object.defineProperties(Eris.Client.prototype, {
 					flags: content.flags
 				}
 			}, content && content.file ? Array.isArray(content.file) ? content.file[0] : content.file : undefined, "/interactions/:id/:token/callback")
-				.then(v => content === undefined || type === Eris.InteractionCallbackType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE || type === Eris.InteractionCallbackType.DEFERRED_UPDATE_MESSAGE ? undefined : new Eris.Message(v as Eris.BaseData, this));
+				.then(v => {
+					try {
+						return new Eris.Message(v as Eris.BaseData, this);
+					} catch (e) {
+						return;
+					}
+				});
 		}
 	},
 	getOriginalInteractionResponse: {
