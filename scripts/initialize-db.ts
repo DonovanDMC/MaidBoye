@@ -115,6 +115,7 @@ process.nextTick(async() => {
 
 	const strikeProps = {
 		id: "CHAR(12) NOT NULL UNIQUE",
+		group_id: "CHAR(12) NOT NULL",
 		guild_id: "VARCHAR(21) NOT NULL REFERENCES guilds(id)",
 		user_id: "VARCHAR(21) NOT NULL REFERENCES users(id)",
 		created_by: "VARCHAR(21) NOT NULL REFERENCES users(id)",
@@ -127,6 +128,7 @@ process.nextTick(async() => {
 	await pool.query("CREATE INDEX guild_id ON strikes (guild_id)");
 	await pool.query("CREATE INDEX user_id ON strikes (user_id)");
 	await pool.query("CREATE INDEX created_by ON strikes (created_by)");
+	await pool.query("CREATE INDEX group_id ON strikes (group_id)");
 	console.log("Created Strikes Table");
 
 	console.log("----------");

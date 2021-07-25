@@ -81,16 +81,12 @@ export default class UserConfig {
 		return true;
 	}
 
-	async addStrike(guildId: string, blame: string) {
-		const id = crypto.randomBytes(6).toString("hex");
-		const res = await db.query("INSERT INTO strikes (id, guild_id, user_id, created_by, created_at) VALUES (?, ?, ?, ?, ?)", [id, guildId, this.id, blame, Date.now()]).then((r: OkPacket) => r.affectedRows > 0);
-		if (res === false) return null;
-		return this.getStrikeCount(guildId);
-	}
 	async addStrikes(guildId: string, blame: string, amount: number) {
 		const d = Date.now();
-		await db.pool.batch("INSERT INTO strikes (id, guild_id, user_id, created_by, created_at) VALUES (?, ?, ?, ?, ?)", new Array(amount).fill(null).map(() => [
+		const groupId = crypto.randomBytes(6).toString("hex");
+		await db.pool.batch("INSERT INTO strikes (id, group_id, guild_id, user_id, created_by, created_at) VALUES (?, ?, ?, ?, ?)", new Array(amount).fill(null).map(() => [
 			crypto.randomBytes(6).toString("hex"),
+			groupId,
 			guildId,
 			this.id,
 			blame,

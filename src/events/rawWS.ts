@@ -19,6 +19,7 @@ export default new ClientEvent("rawWS", async function({ op, d, t }) {
 	const type = t as GatewayDispatchEvents | undefined;
 	switch (op) {
 		case GatewayOpcodes.Dispatch: {
+			if (typeof t !== "string") Logger.getLogger("RawWS").info("Non string event type,", type);
 			StatsHandler.trackNoResponse("stats", "events", type!);
 			EventsASecondHandler.add(type!);
 			switch (type) {

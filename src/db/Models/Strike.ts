@@ -2,6 +2,7 @@ import { DataTypes } from "@uwu-codes/types";
 
 export interface RawStrike {
 	id: string;
+	group_id: string;
 	guild_id: string;
 	user_id: string;
 	created_by: bigint;
@@ -10,12 +11,14 @@ export interface RawStrike {
 export type StrikeKV = DataTypes<Strike>;
 export default class Strike {
 	id: string;
+	groupId: string;
 	guildId: string;
 	userId: string;
 	createdBy: number;
 	createdAt: number;
 	constructor(data: RawStrike) {
 		this.id = data.id;
+		this.groupId = data.group_id;
 		this.guildId = data.guild_id;
 		this.userId = data.user_id;
 		this.createdBy = Number(data.created_by);
