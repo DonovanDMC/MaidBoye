@@ -81,6 +81,10 @@ export default class UserConfig {
 		return true;
 	}
 
+	async addStrike(guildId: string, blame: string) {
+		return UserConfig.prototype.addStrikes.call(this, guildId, blame, 1);
+	}
+
 	async addStrikes(guildId: string, blame: string, amount: number) {
 		const d = Date.now();
 		const groupId = crypto.randomBytes(6).toString("hex");
