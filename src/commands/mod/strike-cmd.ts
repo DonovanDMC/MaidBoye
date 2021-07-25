@@ -28,6 +28,7 @@ export default new Command("strike")
 		const member = await msg.getMemberFromArgs();
 		const amount = msg.args.length === 1 ? 1 : Number(msg.args[1]);
 		if (member === null) return msg.reply("Th-that wasn't a valid member..");
+		if (member.id === msg.author.id) return msg.reply("H-hey! You can't strike yourself!");
 		if (amount < 1) return msg.reply("Y-you have to add at least one strike..");
 		if (amount > 10) return msg.reply("Y-you cannot add more than 10 strikes at a time..");
 		await db.createUserIfNotExists(member.id);
