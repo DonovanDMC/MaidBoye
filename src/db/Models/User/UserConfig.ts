@@ -79,4 +79,11 @@ export default class UserConfig {
 		await this.reload();
 		return true;
 	}
+
+	async addStrike(guildId: string, blame: string) {
+		const id = crypto.randomBytes(6).toString("hex");
+		const res = await db.query("INSERT INTO strikes (id, guild_id, user_id, created_by, created_at) VALUES (?, ?, ?, ?, ?)", [id, guildId, this.id, blame, Date.now()]).then((r: OkPacket) => r.affectedRows > 0);
+		if (res === false) return null;
+		return id;
+	}
 }

@@ -10,6 +10,7 @@ import { CountResponse, OkPacket } from "@util/@types/MariaDB";
 import TimedEntry, { RawTimedEntry } from "@db/Models/TimedEntry";
 import { RawBanEntry } from "@db/Models/Guild/ModLog/BanEntry";
 import { RawMuteEntry } from "@db/Models/Guild/ModLog/MuteEntry";
+import UserConfig from "@db/Models/User/UserConfig";
 import crypto from "crypto";
 
 export default class ModLogHandler {
@@ -97,21 +98,25 @@ export default class ModLogHandler {
 					.toJSON()
 			]
 		});
-		await db.query("INSERT INTO modlog (id, entry_id, guild_id, message_id, target, blame, reason, type, created_at, delete_days, timed_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [
-			id,
-			entryId,
-			guild.id,
-			m === null ? null : m.id,
-			target.id,
-			blame === null ? "automatic" : blame.id,
-			reason,
-			"ban",
-			Date.now(),
-			deleteDays,
-			timedId
-		]);
+		// I prefer doing this over the db call required for getting the full user
+		const strikeId = await UserConfig.prototype.addStrike.call({ id: target.id }, guild.id, blame === null ? "automatic" : blame.id);
 
-		return { id, entryId };
+		await db.insert("modlog", {
+			id,
+			entry_id: entryId,
+			guild_id: guild.id,
+			message_id: m === null ? null : m.id,
+			strike_id: strikeId,
+			target: target.id,
+			blame: blame === null ? "automatic" : blame.id,
+			reason,
+			type: "ban",
+			created_at: Date.now(),
+			delete_days: deleteDays,
+			timed_id: timedId
+		});
+
+		return { id, entryId, strikeId, timedId };
 	}
 
 	static async createKickEntry(guild: GuildConfig, target: Eris.User | Eris.Member, blame: Eris.User | Eris.Member | null, reason: string | null) {
@@ -135,19 +140,22 @@ export default class ModLogHandler {
 			]
 		});
 
-		await db.query("INSERT INTO modlog (id, entry_id, guild_id, message_id, target, blame, reason, type, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", [
-			id,
-			entryId,
-			guild.id,
-			m === null ? null : m.id,
-			target.id,
-			blame === null ? "automatic" : blame.id,
-			reason,
-			"kick",
-			Date.now()
-		]);
+		const strikeId = await UserConfig.prototype.addStrike.call({ id: target.id }, guild.id, blame === null ? "automatic" : blame.id);
 
-		return { id, entryId };
+		await db.insert("modlog", {
+			id,
+			entry_id: entryId,
+			guild_id: guild.id,
+			message_id: m === null ? null : m.id,
+			strike_id: strikeId,
+			target: target.id,
+			blame: blame === null ? "automatic" : blame.id,
+			reason,
+			type: "kick",
+			created_at: Date.now()
+		});
+
+		return { id, entryId, strikeId };
 	}
 
 	static async createLockEntry(guild: GuildConfig, target: Exclude<Eris.GuildTextableChannel, Eris.AnyThreadChannel>, blame: Eris.User | Eris.Member | null, reason: string | null) {
@@ -170,17 +178,17 @@ export default class ModLogHandler {
 			]
 		});
 
-		await db.query("INSERT INTO modlog (id, entry_id, guild_id, message_id, target, blame, reason, type, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", [
+		await db.insert("modlog", {
 			id,
-			entryId,
-			guild.id,
-			m === null ? null : m.id,
-			target.id,
-			blame === null ? "automatic" : blame.id,
+			entry_id: entryId,
+			guild_id: guild.id,
+			message_id: m === null ? null : m.id,
+			target: target.id,
+			blame: blame === null ? "automatic" : blame.id,
 			reason,
-			"lock",
-			Date.now()
-		]);
+			type: "lock",
+			created_at: Date.now()
+		});
 
 		return { id, entryId };
 	}
@@ -205,16 +213,16 @@ export default class ModLogHandler {
 			]
 		});
 
-		await db.query("INSERT INTO modlog (id, entry_id, guild_id, message_id, blame, reason, type, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", [
+		await db.insert("modlog", {
 			id,
-			entryId,
-			guild.id,
-			m === null ? null : m.id,
-			blame === null ? "automatic" : blame.id,
+			entry_id: entryId,
+			guild_id: guild.id,
+			message_id: m === null ? null : m.id,
+			blame: blame === null ? "automatic" : blame.id,
 			reason,
-			"lockdown",
-			Date.now()
-		]);
+			type: "lockdown",
+			created_at: Date.now()
+		});
 
 		return { id, entryId };
 	}
@@ -242,20 +250,23 @@ export default class ModLogHandler {
 			]
 		});
 
-		await db.query("INSERT INTO modlog (id, entry_id, guild_id, message_id, target, blame, reason, type, created_at, timed_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [
-			id,
-			entryId,
-			guild.id,
-			m === null ? null : m.id,
-			target.id,
-			blame === null ? "automatic" : blame.id,
-			reason,
-			"mute",
-			Date.now(),
-			timedId
-		]);
+		const strikeId = await UserConfig.prototype.addStrike.call({ id: target.id }, guild.id, blame === null ? "automatic" : blame.id);
 
-		return { id, entryId };
+		await db.insert("modlog", {
+			id,
+			entry_id: entryId,
+			guild_id: guild.id,
+			message_id: m === null ? null : m.id,
+			strike_id: strikeId,
+			target: target.id,
+			blame: blame === null ? "automatic" : blame.id,
+			reason,
+			type: "mute",
+			created_at: Date.now(),
+			timed_id: timedId
+		});
+
+		return { id, entryId, strikeId };
 	}
 
 	static async createSoftBanEntry(guild: GuildConfig, target: Eris.User | Eris.Member, blame: Eris.User | Eris.Member | null, reason: string | null, deleteDays: number) {
@@ -279,20 +290,23 @@ export default class ModLogHandler {
 			]
 		});
 
-		await db.query("INSERT INTO modlog (id, entry_id, guild_id, message_id, target, blame, reason, type, created_at, delete_days) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [
-			id,
-			entryId,
-			guild.id,
-			m === null ? null : m.id,
-			target.id,
-			blame === null ? "automatic" : blame.id,
-			reason,
-			"softban",
-			Date.now(),
-			deleteDays
-		]);
+		const strikeId = await UserConfig.prototype.addStrike.call({ id: target.id }, guild.id, blame === null ? "automatic" : blame.id);
 
-		return { id, entryId };
+		await db.insert("modlog", {
+			id,
+			entry_id: entryId,
+			guild_id: guild.id,
+			message_id: m === null ? null : m.id,
+			strike_id: strikeId,
+			target: target.id,
+			blame: blame === null ? "automatic" : blame.id,
+			reason,
+			type: "softban",
+			created_at: Date.now(),
+			delete_days: deleteDays
+		});
+
+		return { id, entryId, strikeId };
 	}
 
 	static async createUnBanEntry(guild: GuildConfig, target: Eris.User | Eris.Member, blame: Eris.User | Eris.Member | null, reason: string | null) {
@@ -316,17 +330,18 @@ export default class ModLogHandler {
 			]
 		});
 
-		await db.query("INSERT INTO modlog (id, entry_id, guild_id, message_id, target, blame, reason, type, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", [
+		// no strike
+		await db.insert("modlog", {
 			id,
-			entryId,
-			guild.id,
-			m === null ? null : m.id,
-			target.id,
-			blame === null ? "automatic" : blame.id,
+			entry_id: entryId,
+			guild_id: guild.id,
+			message_id: m === null ? null : m.id,
+			target: target.id,
+			blame: blame === null ? "automatic" : blame.id,
 			reason,
-			"unban",
-			Date.now()
-		]);
+			type: "unban",
+			created_at: Date.now()
+		});
 
 		return { id, entryId };
 	}
@@ -352,17 +367,17 @@ export default class ModLogHandler {
 			]
 		});
 
-		await db.query("INSERT INTO modlog (id, entry_id, guild_id, message_id, target, blame, reason, type, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", [
+		await db.insert("modlog", {
 			id,
-			entryId,
-			guild.id,
-			m === null ? null : m.id,
-			target.id,
-			blame === null ? "automatic" : blame.id,
+			entry_id: entryId,
+			guild_id: guild.id,
+			message_id: m === null ? null : m.id,
+			target: target.id,
+			blame: blame === null ? "automatic" : blame.id,
 			reason,
-			"unlock",
-			Date.now()
-		]);
+			type: "unlock",
+			created_at: Date.now()
+		});
 
 		return { id, entryId };
 	}
@@ -387,16 +402,16 @@ export default class ModLogHandler {
 			]
 		});
 
-		await db.query("INSERT INTO modlog (id, entry_id, guild_id, message_id, blame, reason, type, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", [
+		await db.insert("modlog", {
 			id,
-			entryId,
-			guild.id,
-			m === null ? null : m.id,
-			blame === null ? "automatic" : blame.id,
+			entry_id: entryId,
+			guild_id: guild.id,
+			message_id: m === null ? null : m.id,
+			blame: blame === null ? "automatic" : blame.id,
 			reason,
-			"unlockdown",
-			Date.now()
-		]);
+			type: "unlockdown",
+			created_at: Date.now()
+		});
 
 		return { id, entryId };
 	}
@@ -422,17 +437,17 @@ export default class ModLogHandler {
 			]
 		});
 
-		await db.query("INSERT INTO modlog (id, entry_id, guild_id, message_id, target, blame, reason, type, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", [
+		await db.insert("modlog", {
 			id,
-			entryId,
-			guild.id,
-			m === null ? null : m.id,
-			target.id,
-			blame === null ? "automatic" : blame.id,
+			entry_id: entryId,
+			guild_id: guild.id,
+			message_id: m === null ? null : m.id,
+			target: target.id,
+			blame: blame === null ? "automatic" : blame.id,
 			reason,
-			"unmute",
-			Date.now()
-		]);
+			type: "unban",
+			created_at: Date.now()
+		});
 
 		return { id, entryId };
 	}
@@ -459,18 +474,21 @@ export default class ModLogHandler {
 			]
 		});
 
-		await db.query("INSERT INTO modlog (id, entry_id, guild_id, message_id, target, blame, reason, type, created_at, active) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [
+		const strikeId = await UserConfig.prototype.addStrike.call({ id: target.id }, guild.id, blame === null ? "automatic" : blame.id);
+
+		await db.insert("modlog", {
 			id,
-			entryId,
-			guild.id,
-			m === null ? null : m.id,
-			target.id,
-			blame === null ? "automatic" : blame.id,
+			entry_id: entryId,
+			guild_id: guild.id,
+			message_id: m === null ? null : m.id,
+			strike_id: strikeId,
+			target: target.id,
+			blame: blame === null ? "automatic" : blame.id,
 			reason,
-			"kick",
-			Date.now(),
-			true
-		]);
+			type: "warn",
+			created_at: Date.now(),
+			active: true
+		});
 
 		return { id, entryId };
 	}
@@ -497,18 +515,18 @@ export default class ModLogHandler {
 			]
 		});
 
-		await db.query("INSERT INTO modlog (id, entry_id, guild_id, message_id, target, blame, reason, type, created_at, warning_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [
+		await db.insert("modlog", {
 			id,
-			entryId,
-			guild.id,
-			m === null ? null : m.id,
-			target.id,
-			blame === null ? "automatic" : blame.id,
+			entry_id: entryId,
+			guild_id: guild.id,
+			message_id: m === null ? null : m.id,
+			target: target.id,
+			blame: blame === null ? "automatic" : blame.id,
 			reason,
-			"deletewarning",
-			Date.now(),
-			warningId
-		]);
+			type: "deletewarning",
+			created_at: Date.now(),
+			warning_id: warningId
+		});
 
 		return { id, entryId };
 	}
@@ -535,18 +553,18 @@ export default class ModLogHandler {
 			]
 		});
 
-		await db.query("INSERT INTO modlog (id, entry_id, guild_id, message_id, target, blame, reason, type, created_at, total) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [
+		await db.insert("modlog", {
 			id,
-			entryId,
-			guild.id,
-			m === null ? null : m.id,
-			target.id,
-			blame === null ? "automatic" : blame.id,
+			entry_id: entryId,
+			guild_id: guild.id,
+			message_id: m === null ? null : m.id,
+			target: target.id,
+			blame: blame === null ? "automatic" : blame.id,
 			reason,
-			"clearwarnings",
-			Date.now(),
+			type: "clearwarnings",
+			created_at: Date.now(),
 			total
-		]);
+		});
 
 		return { id, entryId };
 	}

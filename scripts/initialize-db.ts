@@ -113,11 +113,31 @@ process.nextTick(async() => {
 
 	console.log("----------");
 
+	const strikeProps = {
+		id: "CHAR(12) NOT NULL UNIQUE",
+		guild_id: "VARCHAR(21) NOT NULL REFERENCES guilds(id)",
+		user_id: "VARCHAR(21) NOT NULL REFERENCES users(id)",
+		created_by: "VARCHAR(21) NOT NULL REFERENCES users(id)",
+		created_at: "BIGINT UNSIGNED NOT NULL"
+	};
+
+	console.log("Creating Strikes Table");
+	await pool.query("SET FOREIGN_KEY_CHECKS=0; DROP TABLE IF EXISTS strikes");
+	await pool.query(`CREATE TABLE strikes (${Object.entries(strikeProps).map(([a, b]) => `${a} ${b}`).join(", ")}, PRIMARY KEY (id))`);
+	await pool.query("CREATE INDEX guild_id ON strikes (guild_id)");
+	await pool.query("CREATE INDEX user_id ON strikes (user_id)");
+	await pool.query("CREATE INDEX created_by ON strikes (created_by)");
+	console.log("Created Strikes Table");
+
+	console.log("----------");
+
+
 	const modlogProps = {
 		id: "CHAR(12) NOT NULL UNIQUE",
 		entry_id: "SMALLINT UNSIGNED NOT NULL",
 		guild_id: "VARCHAR(21) NOT NULL REFERENCES guilds(id)",
 		message_id: "VARCHAR(21) NULL UNIQUE",
+		strike_id: "CHAR(12) NULL UNIQUE REFERENCES strikes(id)",
 		target: "VARCHAR(21) NOT NULL",
 		blame: "VARCHAR(21) NOT NULL",
 		reason: "TINYTEXT NULL",
@@ -143,7 +163,6 @@ process.nextTick(async() => {
 	console.log("Created ModLog Table");
 
 	console.log("----------");
-
 	const timedProps = {
 		id: "CHAR(12) NOT NULL UNIQUE",
 		type: "TINYTEXT NOT NULL",

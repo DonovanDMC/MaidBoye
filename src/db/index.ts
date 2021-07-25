@@ -65,6 +65,9 @@ export default class db {
 	}
 
 	static get query() { return this.pool.query.bind(this.pool); }
+	static async insert(table: string, data: Record<string, unknown>) {
+		await this.query(`INSERT INTO ${table} (${Object.keys(data).join(", ")}) VALUES (${Object.values(data).map(() => "?").join(", ")})`, [Object.values(data)]);
+	}
 
 	// because of foreign key restraints
 	static async createUserIfNotExists(id: string) { await this.query("INSERT IGNORE INTO users (id) VALUES (?)", [id]); }

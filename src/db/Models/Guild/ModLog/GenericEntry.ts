@@ -3,12 +3,14 @@ import { DataTypes } from "@uwu-codes/types";
 import MaidBoye from "@MaidBoye";
 import Eris from "eris";
 import db from "@db";
+import Strike, { RawStrike } from "@db/Models/Strike";
 
 export interface RawGenericEntry {
 	id: string;
 	entry_id: number;
 	guild_id: string;
 	message_id: string | null;
+	strike_id: string;
 	target: string | null;
 	blame: string;
 	reason: string | null;
@@ -30,6 +32,7 @@ export default abstract class GenericEntry {
 	entryId: number;
 	guildId: string;
 	messageId: string | null;
+	strikeId: string;
 	target: string | null;
 	/** id or "automatic" */
 	blame: string;
@@ -48,6 +51,7 @@ export default abstract class GenericEntry {
 		this.entryId = data.entry_id;
 		this.guildId = data.guild_id;
 		this.messageId = data.message_id;
+		this.strikeId = data.strike_id;
 		this.target = data.target;
 		this.blame = data.blame;
 		this.reason = data.reason;
@@ -81,5 +85,11 @@ export default abstract class GenericEntry {
 		const cnf = await this.getGuildConfig();
 		if (cnf.modlog.enabled === false || !cnf.modlog.webhook?.channelId) return null;
 		return (client.getMessage(cnf.modlog.webhook.channelId, this.messageId).catch(() => null)) as Promise<Eris.Message<Eris.GuildTextableChannelWithoutThreads> | null>;
+	}
+
+	async getStrike() {
+		const [res] = await db.query("SELECT * FROM strikes WHERE id=?", [this.strikeId]) as Array<RawStrike>;
+		if (res === undefined) return null;
+		return new Strike(res);
 	}
 }
