@@ -587,7 +587,7 @@ export class TimedModerationHandler {
 	}
 
 	static async remove(id: string) {
-		return db.query("DELETE FROM timed WHERE id=?", [id]).then((r: OkPacket) => r.affectedRows > 0);
+		return db.query("DELETE FROM timed WHERE id=?; UPDATE modlog SET timed_id = NULL WHERE timed_id = ?", [id, id]).then((r: OkPacket) => r.affectedRows > 0);
 	}
 
 	static async process() {
