@@ -25,3 +25,14 @@ export default class Strike {
 		this.createdAt = Number(data.created_at);
 	}
 }
+
+export class StrikeGroup {
+	id: string;
+	strikes: Array<Strike>;
+	constructor(id: string, strikes: Array<Strike>) {
+		this.id = id;
+		this.strikes = strikes;
+	}
+
+	get total() { return this.strikes.length; }
+}

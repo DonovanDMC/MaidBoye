@@ -1,5 +1,7 @@
 import SelfRoleJoined, { RawSelfRoleJoined } from "./SelfRoleJoined";
-import Strike, { RawStrike } from "../Strike";
+import Strike, { RawStrike, StrikeGroup } from "../Strike";
+import { AnyRawEntry, BanEntry, ClearWarningsEntry, DeleteWarningEntry, KickEntry, LockDownEntry, LockEntry, MuteEntry, SoftBanEntry, UnBanEntry, UnLockDownEntry, UnLockEntry, UnMuteEntry, WarnEntry } from "../Guild/ModLog/All";
+import GuildConfig from "../Guild/GuildConfig";
 import db from "@db";
 import Logger from "@util/Logger";
 import { DataTypes, DeepPartial, Writeable } from "@uwu-codes/types";
@@ -126,8 +128,40 @@ export default class UserConfig {
 		return db.query(`SELECT COUNT(*) FROM strikes WHERE user_id="${this.id}"${guild === undefined ? "" : ` AND guild_id="${guild}"`}`).then((v: CountResponse) => (Number(v[0]["COUNT(*)"] ?? 0)));
 	}
 
-	async getStrikes(guild?: string) {
-		const res = await db.query(`SELECT * FROM strikes WHERE strikes WHERE user_id="${this.id}"${guild === undefined ? "" : ` AND guild_id="${guild}"`}`) as Array<RawStrike>;
-		return res.map(s => new Strike(s));
+	async getStrikes(guild: string | undefined, group: true): Promise<Array<StrikeGroup>>;
+	async getStrikes(guild?: string, group?: false): Promise<Array<Strike>>;
+	async getStrikes(guild?: string, group = false) {
+		const res = await db.query(`SELECT * FROM strikes WHERE user_id=?${guild === undefined ? "" : " AND guild_id=?"}`, [this.id, guild]) as Array<RawStrike>;
+		if (group === true) {
+			const val = new Map<string, Array<Strike>>();
+			for (const rawStrike of res) {
+				const strike = new Strike(rawStrike);
+				if (val.has(strike.groupId)) val.set(strike.groupId, [...val.get(strike.groupId)!, strike]);
+				else val.set(strike.groupId, [strike]);
+			}
+
+			return Array.from(val.entries()).map(([k, v]) => new StrikeGroup(k, v));
+		} else return res.map(s => new Strike(s));
+	}
+
+	async getModlogEntries(guild: GuildConfig) {
+		const res = await db.query("SELECT * FROM modlog WHERE guild_id=? AND target=?", [guild.id, this.id]).then(v => (v as Array<AnyRawEntry>));
+		return res.map(v => {
+			switch (v.type) {
+				case "ban": return new BanEntry(v, guild);
+				case "clearwarnings": return new ClearWarningsEntry(v, guild);
+				case "deletewarning": return new DeleteWarningEntry(v, guild);
+				case "kick": return new KickEntry(v, guild);
+				case "lockdown": return new LockDownEntry(v, guild);
+				case "lock": return new LockEntry(v, guild);
+				case "mute": return new MuteEntry(v, guild);
+				case "softban": return new SoftBanEntry(v, guild);
+				case "unban": return new UnBanEntry(v, guild);
+				case "unlockdown": return new UnLockDownEntry(v, guild);
+				case "unlock": return new UnLockEntry(v, guild);
+				case "unmute": return new UnMuteEntry(v, guild);
+				case "warn": return new WarnEntry(v, guild);
+			}
+		});
 	}
 }
