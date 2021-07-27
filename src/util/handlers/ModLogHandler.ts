@@ -441,7 +441,7 @@ export default class ModLogHandler {
 		return { id, entryId, check };
 	}
 
-	static async createWarnEntry(guild: GuildConfig, target: Eris.User | Eris.Member, blame: Eris.User | Eris.Member | null, reason: string | null) {
+	static async createWarnEntry(guild: GuildConfig, target: Eris.User | Eris.Member, blame: Eris.User | Eris.Member | null, reason: string | null, warningId: number) {
 		const check = await this.check(guild);
 		const entryId = await this.getEntryId(guild.id);
 		const id = crypto.randomBytes(6).toString("hex");
@@ -454,7 +454,7 @@ export default class ModLogHandler {
 					.setDescription(
 						`Target: <@${target.id}> (\`${target.tag}\`)`,
 						`Reason: **${reason ?? "None Provided"}**`,
-						`Warning Id: **${id}**`
+						`Warning Id: **${warningId}**`
 					)
 					.setColor("gold")
 					.setFooter(`Action Performed ${blame === null ? "Automatically" : `By ${blame.tag}`}`, blame === null ? config.images.bot : blame.avatarURL)
@@ -475,7 +475,8 @@ export default class ModLogHandler {
 			reason,
 			type: "warn",
 			created_at: Date.now(),
-			active: true
+			active: true,
+			warning_id: warningId
 		});
 
 		return { id, entryId, check };

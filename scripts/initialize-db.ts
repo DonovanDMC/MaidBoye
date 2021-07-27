@@ -137,38 +137,6 @@ process.nextTick(async() => {
 
 	console.log("----------");
 
-
-	const modlogProps = {
-		id: "CHAR(12) NOT NULL UNIQUE",
-		entry_id: "SMALLINT UNSIGNED NOT NULL",
-		guild_id: "VARCHAR(21) NOT NULL REFERENCES guilds(id)",
-		message_id: "VARCHAR(21) NULL UNIQUE",
-		strike_id: "CHAR(12) NULL UNIQUE REFERENCES strikes(id)",
-		target: "VARCHAR(21) NOT NULL",
-		blame: "VARCHAR(21) NOT NULL",
-		reason: "TINYTEXT NULL",
-		type: "TINYTEXT NOT NULL",
-		created_at: "BIGINT UNSIGNED NOT NULL",
-		last_edited_at: "BIGINT UNSIGNED NULL",
-		last_edited_by: "VARCHAR(21) NULL",
-		// fields for certain types
-		delete_days: "INT UNSIGNED NULL",
-		timed_id: "VARCHAR(12) NULL",
-		total: "INT UNSIGNED NULL",
-		active: "BOOLEAN NULL"
-	};
-
-	console.log("Creating ModLog Table");
-	await pool.query("SET FOREIGN_KEY_CHECKS=0; DROP TABLE IF EXISTS modlog");
-	await pool.query(`CREATE TABLE modlog (${Object.entries(modlogProps).map(([a, b]) => `${a} ${b}`).join(", ")}, PRIMARY KEY (id))`);
-	await pool.query("ALTER TABLE modlog ADD UNIQUE entryid_guild (entry_id, guild_id)");
-	await pool.query("CREATE INDEX entry_id ON modlog (entry_id)");
-	await pool.query("CREATE INDEX guild_id ON modlog (guild_id)");
-	await pool.query("CREATE INDEX target ON modlog (target)");
-	await pool.query("CREATE INDEX blame ON modlog (blame)");
-	console.log("Created ModLog Table");
-
-	console.log("----------");
 	const timedProps = {
 		id: "CHAR(12) NOT NULL UNIQUE",
 		type: "TINYTEXT NOT NULL",
@@ -186,6 +154,61 @@ process.nextTick(async() => {
 	await pool.query("CREATE INDEX user_id ON timed (user_id)");
 	await pool.query("CREATE INDEX expiry ON timed (expiry)");
 	console.log("Created Timed Table");
+
+	console.log("----------");
+
+	const modlogProps = {
+		id: "CHAR(12) NOT NULL UNIQUE",
+		entry_id: "MEDIUMINT UNSIGNED NOT NULL",
+		guild_id: "VARCHAR(21) NOT NULL REFERENCES guilds(id)",
+		message_id: "VARCHAR(21) NULL UNIQUE",
+		strike_id: "CHAR(12) NULL UNIQUE REFERENCES strikes(id)",
+		target: "VARCHAR(21) NOT NULL",
+		blame: "VARCHAR(21) NOT NULL",
+		reason: "TINYTEXT NULL",
+		type: "TINYTEXT NOT NULL",
+		created_at: "BIGINT UNSIGNED NOT NULL",
+		last_edited_at: "BIGINT UNSIGNED NULL",
+		last_edited_by: "VARCHAR(21) NULL",
+		// fields for certain types
+		delete_days: "INT UNSIGNED NULL",
+		timed_id: "VARCHAR(12) NULL REFERENCES timed(id)",
+		warning_id: "TINYINT UNSIGNED NULL",
+		total: "INT UNSIGNED NULL",
+		active: "BOOLEAN NULL"
+	};
+
+	console.log("Creating ModLog Table");
+	await pool.query("SET FOREIGN_KEY_CHECKS=0; DROP TABLE IF EXISTS modlog");
+	await pool.query(`CREATE TABLE modlog (${Object.entries(modlogProps).map(([a, b]) => `${a} ${b}`).join(", ")}, PRIMARY KEY (id))`);
+	await pool.query("ALTER TABLE modlog ADD UNIQUE entryid_guild (entry_id, guild_id)");
+	await pool.query("CREATE INDEX entry_id ON modlog (entry_id)");
+	await pool.query("CREATE INDEX guild_id ON modlog (guild_id)");
+	await pool.query("CREATE INDEX target ON modlog (target)");
+	await pool.query("CREATE INDEX blame ON modlog (blame)");
+	console.log("Created ModLog Table");
+
+	console.log("----------");
+
+	const warningProps = {
+		id: "CHAR(12) NOT NULL UNIQUE",
+		guild_id: "VARCHAR(21) NOT NULL REFERENCES guilds(id)",
+		user_id: "VARCHAR(21) NOT NULL REFERENCES users(id)",
+		blame_id: "VARCHAR(21) NOT NULL REFERENCES users(id)",
+		warning_id: "TINYINT UNSIGNED NOT NULL",
+		created_at: "BIGINT NOT NULL",
+		reason: "TINYTEXT NULL"
+	};
+
+	console.log("Creating Warnings Table");
+	await pool.query("SET FOREIGN_KEY_CHECKS=0; DROP TABLE IF EXISTS warnings");
+	await pool.query(`CREATE TABLE warnings (${Object.entries(warningProps).map(([a, b]) => `${a} ${b}`).join(", ")}, PRIMARY KEY (id))`);
+	await pool.query("CREATE INDEX guild_id ON warnings (guild_id)");
+	await pool.query("CREATE INDEX user_id ON warnings (user_id)");
+	await pool.query("CREATE INDEX blame_id ON warnings (blame_id)");
+	await pool.query("CREATE INDEX warning_id ON warnings (warning_id)");
+	await pool.query("ALTER TABLE warnings ADD UNIQUE guild_user_wid (guild_id, user_id, warning_id)");
+	console.log("Created Warnings Table");
 
 	console.log("----------");
 

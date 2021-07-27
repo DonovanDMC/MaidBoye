@@ -2,6 +2,7 @@ import SelfRoleJoined, { RawSelfRoleJoined } from "./SelfRoleJoined";
 import Strike, { RawStrike, StrikeGroup } from "../Strike";
 import { AnyRawEntry, BanEntry, ClearWarningsEntry, DeleteWarningEntry, KickEntry, LockDownEntry, LockEntry, MuteEntry, SoftBanEntry, UnBanEntry, UnLockDownEntry, UnLockEntry, UnMuteEntry, WarnEntry } from "../Guild/ModLog/All";
 import GuildConfig from "../Guild/GuildConfig";
+import Warning, { RawWarning } from "../Warning";
 import db from "@db";
 import Logger from "@util/Logger";
 import { DataTypes, DeepPartial, Writeable } from "@uwu-codes/types";
@@ -163,5 +164,29 @@ export default class UserConfig {
 				case "warn": return new WarnEntry(v, guild);
 			}
 		});
+	}
+
+	async getWarnings(guild?: string) {
+		return  db.query(`SELECT * FROM warnings WHERE user_id=?${guild === undefined ? "" : " AND guild_id=?"}`, [this.id, guild]).then((res: Array<RawWarning>) => res.map(w => new Warning(w)));
+	}
+
+	async getWarningCount(guild?: string) {
+		return db.query(`SELECT COUNT(*) FROM warnings WHERE user_id=?${guild === undefined ? "" : " AND guild_id=?"}`, [this.id, guild]).then((v: CountResponse) => Number(v[0]["COUNT(*)"] ?? 0));
+	}
+
+	async addWarning(guild: string, blame: string, reason: string | null) {
+		const id = crypto.randomBytes(6).toString("hex");
+		const warningId = await UserConfig.prototype.getWarningCount.call(this, guild);
+		await db.pool.query("INSERT INTO warnings (id, guild_id, user_id, blame_id, warning_id, created_at, reason) VALUES (?, ?, ?, ?, ?, ?, ?)", [
+			id,
+			guild,
+			this.id,
+			blame,
+			warningId + 1,
+			Date.now(),
+			reason
+		]);
+
+		return warningId + 1;
 	}
 }
