@@ -5,17 +5,17 @@ import db from "@db";
 import { ApplicationCommandOptionType } from "discord-api-types";
 const Redis = db.r;
 
-export default new Command("lockdown")
+export default new Command("unlockdown")
 	.setPermissions("bot", "embedLinks", "manageChannels")
 	.setPermissions("user", "kickMembers", "manageGuild")
-	.setDescription("lock all channels in the server")
+	.setDescription("unlock all channels in the server")
 	.setUsage("[reason]")
 	.setHasSlashVariant(true)
 	.setSlashCommandOptions([
 		{
 			type: ApplicationCommandOptionType.String,
 			name: "reason",
-			description: "The reason for locking the server",
+			description: "The reason for unlocking the server",
 			required: false
 		}
 	])
