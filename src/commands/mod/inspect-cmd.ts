@@ -17,7 +17,7 @@ export default new Command("inspect")
 	.setPermissions("bot", "embedLinks")
 	.setPermissions("user", "manageMessages")
 	.setDescription("Get the moderation info of a user")
-	.setUsage("<user>")
+	.setUsage("<user> [section]")
 	.setHasSlashVariant(true)
 	.setSlashCommandOptions([
 		{
@@ -25,6 +25,26 @@ export default new Command("inspect")
 			name: "user",
 			description: "The user to inspect",
 			required: true
+		},
+		{
+			type: ApplicationCommandOptionType.String,
+			name: "section",
+			description: "The section to open",
+			required: false,
+			choices: [
+				{
+					name: "Strike History",
+					value: "strikes"
+				},
+				{
+					name: "Moderation History",
+					value: "moderation"
+				},
+				{
+					name: "Warning History",
+					value: "warnings"
+				}
+			]
 		}
 	])
 	.setCooldown(3e3)
@@ -237,7 +257,10 @@ export default new Command("inspect")
 				} else return;
 			}
 		}
-
-		void main.call(this);
-
+		switch (msg.args[1]?.toLowerCase()) {
+			case "strike": case "strikes": return void strikeHistory.call(this);
+			case "mod": case "moderation": return void moderationHistory.call(this);
+			case "warning": case "warnings": return void warningHistory.call(this);
+			default: return void main.call(this);
+		}
 	});
