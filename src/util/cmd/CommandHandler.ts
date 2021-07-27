@@ -6,6 +6,9 @@ import * as fs from "fs-extra";
 import { Strings } from "@uwu-codes/utils";
 
 export default class CommandHandler {
+	// optimization, traversing an array is slow
+	private static commandMap = new Map<string, Command>();
+	private static categoryMap = new Map<string, Category>();
 	static categories = [] as Array<Category>;
 	static get commands() { return this.categories.reduce<Array<Command>>((a,b) => a.concat(b.commands), []); }
 	static get triggers() { return this.commands.reduce<Array<string>>((a,b) => a.concat(b.triggers), []); }
@@ -15,13 +18,15 @@ export default class CommandHandler {
 		if (dup) throw new Error(`Duplicate category name "${d.name.toLowerCase()}" (${dup.dir})`);
 		Logger.getLogger("CommandHandler").info(`Registered the category "${d.name}" (${d.dir})`);
 		this.categories.push(d);
+		this.categoryMap.set(d.name, d);
 		return d;
 	}
-	static getCategory(name: string) { return this.categories.find(c => c.name.toLowerCase() === name.toLowerCase()) ?? null; }
+	static getCategory(name: string) { return this.categoryMap.get(name.toLowerCase()) ?? null; }
 	static removeCategory(name: string) {
 		const cat = this.getCategory(name);
 		if (!cat) throw new Error(`Invalid category "${name}" provided in CommandHandler#removeCategory`);
-		this.categories.splice(this.categories.indexOf(cat));
+		this.categories.splice(this.categories.indexOf(cat), 1);
+		this.categoryMap.delete(name);
 		delete require.cache[require.resolve(cat.file)];
 		Logger.getLogger("CommandHandler").info(`Removed the category "${name}" (${cat.dir})`);
 		return cat;
@@ -60,14 +65,16 @@ export default class CommandHandler {
 		if (log) Logger.getLogger("CommandHandler").info(`Registered the command "${d.triggers[0]}" (${d.file})`);
 		ctg.commands.push(d);
 		d.category = cat;
+		d.triggers.forEach(t => this.commandMap.set(t, d));
 		return d;
 	}
-	static getCommand(cmd: string) { return this.commands.find(c => c.triggers.includes(cmd)) ?? null; }
+	static getCommand(cmd: string) { return this.commandMap.get(cmd) ?? null; }
 	static removeCommand(d: string, log = true) {
 		const cmd = this.getCommand(d);
 		if (!cmd) throw new Error(`Invalid command "${d}" provided in CommandHandler#removeCommand`);
-		this.commands.splice(this.commands.indexOf(cmd));
+		this.commands.splice(this.commands.indexOf(cmd), 1);
 		delete require.cache[require.resolve(cmd.file)];
+		cmd.triggers.forEach(t => this.commandMap.delete(t));
 		if (log) Logger.getLogger("CommandHandler").info(`Removed the command "${d}" (${cmd.file})`);
 		return cmd;
 	}
