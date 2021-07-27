@@ -8,9 +8,8 @@ import { Time } from "@uwu-codes/utils";
 import Logger from "@util/Logger";
 import { CountResponse, OkPacket } from "@util/@types/MariaDB";
 import TimedEntry, { RawTimedEntry } from "@db/Models/TimedEntry";
-import { RawBanEntry } from "@db/Models/Guild/ModLog/BanEntry";
-import { RawMuteEntry } from "@db/Models/Guild/ModLog/MuteEntry";
 import UserConfig from "@db/Models/User/UserConfig";
+import { AnyEntry, RawBanEntry, RawMuteEntry, UnBanEntry, UnLockDownEntry, UnLockEntry, UnMuteEntry } from "@db/Models/Guild/ModLog/All";
 import crypto from "crypto";
 
 export default class ModLogHandler {
@@ -435,7 +434,7 @@ export default class ModLogHandler {
 			target: target.id,
 			blame: blame === null ? "automatic" : blame.id,
 			reason,
-			type: "unban",
+			type: "unmute",
 			created_at: Date.now()
 		});
 
@@ -555,6 +554,16 @@ export default class ModLogHandler {
 
 		return { id, entryId, check };
 	}
+
+	static entryToString(e: AnyEntry) {
+		switch (e.constructor) {
+			case UnBanEntry: return "unban";
+			case UnLockDownEntry: return "unlockdown";
+			case UnLockEntry: return "unlock";
+			case UnMuteEntry: return "unmute";
+			default: return e.constructor.name.replace(/([A-Z])/g, " $1").trim().replace(/ Entry/i, "").toLowerCase();
+		}
+	}
 }
 
 export class TimedModerationHandler {
@@ -587,7 +596,8 @@ export class TimedModerationHandler {
 	}
 
 	static async remove(id: string) {
-		return db.query("DELETE FROM timed WHERE id=?; UPDATE modlog SET timed_id = NULL WHERE timed_id = ?", [id, id]).then((r: OkPacket) => r.affectedRows > 0);
+		await db.query("UPDATE modlog SET timed_id = NULL WHERE timed_id = ?", [id]);
+		return db.query("DELETE FROM timed WHERE id=?", [id]).then((r: OkPacket) => r.affectedRows > 0);
 	}
 
 	static async process() {
