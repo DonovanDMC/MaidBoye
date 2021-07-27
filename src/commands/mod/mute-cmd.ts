@@ -7,7 +7,7 @@ import Eris from "eris";
 import { ApplicationCommandOptionType } from "discord-api-types";
 
 export default new Command("mute")
-	.setPermissions("bot", "embedLinks", "manageRoles")
+	.setPermissions("bot", "embedLinks", "manageRoles", "voiceMuteMembers")
 	.setPermissions("user", "voiceMuteMembers")
 	.setDescription("keep someone from talking")
 	.setUsage(async function(msg) {
@@ -108,13 +108,18 @@ export default new Command("mute")
 			dm = await member.user.createMessage(`You were muted in **${msg.channel.guild.name}** by **${msg.author.tag}**\nReason:\n\`\`\`\n${reason ?? "None Provided"}\`\`\`\nTime: **${time === 0 ? "Permanent" : Time.ms(time, true, true, false)}**`)
 				.catch((err: Error) => ((dmError = `${err.name}: ${err.message}`, null)));
 		await member.addRole(r.id, `Mute: ${msg.author.tag} (${msg.author.id}) -> ${reason ?? "None Provided"}`)
-			// catch first so we only catch an error from ban
 			.catch(async(err: Error) => {
-				// delete the dm if we didn't ban them
 				if (dm !== null) await dm.delete().catch(() => null);
 				return msg.channel.createMessage(`I-I failed to mute **${member.tag}**..\n\`${err.name}: ${err.message}\``);
 			})
 			.then(async() => {
+				if (member.voiceState.channelID !== null) {
+					try {
+						await member.edit({ mute: true }, `Mute: ${msg.author.tag} (${msg.author.id}) -> ${reason ?? "None Provided"}`);
+					} catch {
+						// they need to be in a voice channel for this to work
+					}
+				}
 				const mdl = await ModLogHandler.createMuteEntry(msg.gConfig, member, msg.author, reason, time);
 				return msg.channel.createMessage(`**${member.tag}** was muted ${time === 0 ? "permanently" : `for \`${Time.ms(time, true, true, false)}\``}, ***${reason ?? "None Provided"}***${dmError !== undefined ? `\n\nFailed to send dm:\n\`${dmError}\`` : ""}${mdl.check !== false ? `\nFor more info, check <#${msg.gConfig.modlog.webhook!.channelId}> (case: **#${mdl.entryId}**)` : ""}`);
 			});
