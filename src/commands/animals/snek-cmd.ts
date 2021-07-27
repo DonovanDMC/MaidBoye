@@ -2,7 +2,7 @@ import Command from "@cmd/Command";
 import EmbedBuilder from "@util/EmbedBuilder";
 import CheweyAPI from "@util/req/CheweyAPI";
 
-export default new Command("snake", "snek", "noodle")
+export default new Command("snek", "snake", "noodle")
 	.setPermissions("bot", "embedLinks")
 	.setDescription("Get an image of a snake!")
 	.setHasSlashVariant(true)
