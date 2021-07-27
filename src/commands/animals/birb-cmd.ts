@@ -1,5 +1,6 @@
 import Command from "@cmd/Command";
 import EmbedBuilder from "@util/EmbedBuilder";
+import CheweyAPI from "@util/req/CheweyAPI";
 import Yiffy from "@util/req/Yiffy";
 
 export default new Command("birb")
@@ -8,13 +9,13 @@ export default new Command("birb")
 	.setHasSlashVariant(true)
 	.setCooldown(3e3)
 	.setExecutor(async function(msg) {
-		const img = await Yiffy.animals.birb("json", 1);
+		const img = await (Math.random() > .5 ? Yiffy.animals.birb("json", 1).then(y => y.url) : CheweyAPI.birb());
 		if (!img) return msg.reply("The image api returned an error..");
 		return msg.reply({
 			embeds: [
 				new EmbedBuilder(true, msg.author)
 					.setTitle("Birb!")
-					.setImage(img.url)
+					.setImage(img)
 					.toJSON()
 			]
 		});

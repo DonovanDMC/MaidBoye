@@ -11,6 +11,7 @@ import Eris from "eris";
 import * as fs from "fs-extra";
 import { Node } from "lavalink";
 import ModLogHandler from "@util/handlers/ModLogHandler";
+import CheweyAPI from "@util/req/CheweyAPI";
 import { performance } from "perf_hooks";
 
 
@@ -30,6 +31,7 @@ export default class MaidBoye extends Eris.Client {
 		await this.loadCommands();
 		MessageCollector.setClient(this);
 		ModLogHandler.setClient(this);
+		// CheweyAPI.analytics.initAutoPosting(this);
 		await this.connect();
 	}
 
