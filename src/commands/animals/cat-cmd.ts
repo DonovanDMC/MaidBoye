@@ -13,7 +13,7 @@ export default new Command("cat", "kitty", "kitten")
 		return msg.reply({
 			embeds: [
 				new EmbedBuilder(true, msg.author)
-					.setTitle("Cat!")
+					.setTitle("Kitty!")
 					.setImage(img)
 					.toJSON()
 			]

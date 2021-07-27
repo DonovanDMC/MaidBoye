@@ -1,7 +1,7 @@
-import ClientEvent from "../util/ClientEvent";
-import EmbedBuilder from "../util/EmbedBuilder";
-import Logger from "../util/Logger";
-import WebhookStore from "../util/WebhookStore";
+import ClientEvent from "@util/ClientEvent";
+import EmbedBuilder from "@util/EmbedBuilder";
+import Logger from "@util/Logger";
+import WebhookStore from "@util/WebhookStore";
 import config from "@config";
 
 export default new ClientEvent("shardReady", async function(id) {

@@ -1,6 +1,6 @@
-import ClientEvent from "../util/ClientEvent";
-import ErrorHandler from "../util/ErrorHandler";
-import Logger from "../util/Logger";
+import ClientEvent from "@util/ClientEvent";
+import Logger from "@util/Logger";
+import ErrorHandler from "@util/handlers/ErrorHandler";
 
 export default new ClientEvent("error", async function(info, id) {
 	Logger.getLogger(id === undefined ? undefined : `Shard #${id}`).error(info);

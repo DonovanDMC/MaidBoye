@@ -1,10 +1,10 @@
-import ClientEvent from "../util/ClientEvent";
-import EmbedBuilder from "../util/EmbedBuilder";
-import Logger from "../util/Logger";
-import ExtendedMessage from "../util/ExtendedMessage";
-import { Permissions } from "../util/cmd/Command";
-import ErrorHandler from "../util/ErrorHandler";
-import CommandError from "../util/cmd/CommandError";
+import ClientEvent from "@util/ClientEvent";
+import EmbedBuilder from "@util/EmbedBuilder";
+import Logger from "@util/Logger";
+import ExtendedMessage from "@util/ExtendedMessage";
+import { Permissions } from "@cmd/Command";
+import ErrorHandler from "@util/handlers/ErrorHandler";
+import CommandError from "@cmd/CommandError";
 import config from "@config";
 import { Strings } from "@uwu-codes/utils";
 import Eris from "eris";
