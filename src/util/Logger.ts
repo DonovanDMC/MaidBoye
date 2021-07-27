@@ -7,7 +7,7 @@ export default class Logger {
 	private static saveToFile(obj: ILogObject) {
 		fs.mkdirpSync(config.dir.logs.client);
 		const d = new Date();
-		const current = `${d.getMonth()}-${d.getDate() + 1}-${d.getFullYear()}`;
+		const current = `${d.getMonth() + 1}-${d.getDate()}-${d.getFullYear()}`;
 		fs.appendFileSync(`${config.dir.logs.client}/${current}.log`, `${JSON.stringify(obj)}\n`);
 	}
 	static initFileLogging() {
