@@ -8,6 +8,9 @@ import Eris from "eris";
 import { Internal, Request, Strings, Time, Utility } from "@uwu-codes/utils";
 import Timer from "@util/Timer";
 import BotFunctions from "@util/BotFunctions";
+import CommandHandler from "@util/cmd/CommandHandler";
+import UserConfig from "@db/Models/User/UserConfig";
+import GuildConfig from "@db/Models/Guild/GuildConfig";
 import util from "util";
 
 async function format(obj: unknown) {
@@ -35,7 +38,6 @@ async function format(obj: unknown) {
 	} else */ return util.inspect(obj, { depth: 1, colors: false, showHidden: false });
 }
 
-// @TODO >2000 characters to text
 export default new Command("eval", "ev")
 	.setRestrictions("developer")
 	.setDescription("Evaluate some code.")
@@ -51,7 +53,11 @@ export default new Command("eval", "ev")
 			Time,
 			Utility,
 			BotFunctions,
-			Redis: db.r
+			Redis: db.r,
+			CommandHandler,
+			UserConfig,
+			GuildConfig,
+			currentUser: this.user.tag
 		};
 		// eslint-disable-next-line -- typescript messes with variable names so we have to remake them
 		for (const k in evalVariables) new Function("value", `${k} = value`)(evalVariables[k]);
