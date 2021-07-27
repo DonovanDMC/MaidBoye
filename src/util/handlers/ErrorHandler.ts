@@ -1,9 +1,9 @@
-import Logger from "./Logger";
-import ExtendedMessage from "./ExtendedMessage";
-import WebhookStore from "./WebhookStore";
-import EmbedBuilder from "./EmbedBuilder";
-import { dependencies } from "../../package.json";
-import { dependencies as shrinkDependencies } from "../../package-lock.json";
+import Logger from "../Logger";
+import WebhookStore from "../WebhookStore";
+import EmbedBuilder from "../EmbedBuilder";
+import ExtendedMessage from "../ExtendedMessage";
+import { dependencies } from "@root/package.json";
+import { dependencies as shrinkDependencies } from "@root/package-lock.json";
 import config from "@config";
 import * as fs from "fs-extra";
 import Eris from "eris";
@@ -74,7 +74,7 @@ export default class ErrorHandler {
 						"",
 						`Code: \`${code}\``,
 						`ID: \`${id}\``,
-						`Report: [http${config.api.listener.secure ? "s" : ""}://${config.api.host}${[80, 443].includes(config.api.listener.port) ? "" : `:${config.api.listener.port}`}/errors/${id}](http${config.api.listener.secure ? "s" : ""}://${config.api.host}${[80, 443].includes(config.api.listener.port) ? `:${config.api.listener.port}` : ""}/errors/${id})`
+						`Report: [${config.api.url}/errors/${id}](${config.api.url}/errors/${id})`
 					].join("\n"))
 					.setColor("red")
 					.toJSON()
