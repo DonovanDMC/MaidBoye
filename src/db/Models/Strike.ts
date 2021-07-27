@@ -5,7 +5,7 @@ export interface RawStrike {
 	group_id: string;
 	guild_id: string;
 	user_id: string;
-	created_by: bigint;
+	created_by: string;
 	created_at: bigint;
 }
 export type StrikeKV = DataTypes<Strike>;
@@ -14,14 +14,14 @@ export default class Strike {
 	groupId: string;
 	guildId: string;
 	userId: string;
-	createdBy: number;
+	createdBy: string;
 	createdAt: number;
 	constructor(data: RawStrike) {
 		this.id = data.id;
 		this.groupId = data.group_id;
 		this.guildId = data.guild_id;
 		this.userId = data.user_id;
-		this.createdBy = Number(data.created_by);
+		this.createdBy = data.created_by;
 		this.createdAt = Number(data.created_at);
 	}
 }
