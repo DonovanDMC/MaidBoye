@@ -5,6 +5,12 @@ import Logger from "./util/Logger";
 import { Time } from "@uwu-codes/utils";
 import { execSync } from "child_process";
 
+
+process
+	.on("uncaughtException", (err) => Logger.getLogger("Uncaught Exception").error(err))
+	.on("unhandledRejection", (err, p) => Logger.getLogger("Unhandled Rejection").error(err, p))
+	.on("SIGINT", () => process.kill(process.pid));
+
 const bot = new MaidBoye(config.client.token, config.client.options);
 void bot.getBotGateway().then(function preLaunchInfo({ session_start_limit: { remaining, total, reset_after }, shards }) {
 	Logger.getLogger("Launch").info(`Mode: ${config.beta ? "BETA" : "PROD"} | CWD: ${process.cwd()} | PID: ${process.pid}`);
@@ -66,8 +72,3 @@ if (process.env.PTR === "1") {
 		}
 	});
 }
-
-process
-	.on("uncaughtException", (err) => Logger.getLogger("Uncaught Exception").error(err))
-	.on("unhandledRejection", (err, p) => Logger.getLogger("Unhandled Rejection").error(err, p))
-	.on("SIGINT", () => process.kill(process.pid));
