@@ -1,7 +1,88 @@
 import EmbedBuilder from "./EmbedBuilder";
+import Command from "./cmd/Command";
+import ExtendedMessage from "./ExtendedMessage";
+import Yiffy from "./req/Yiffy";
+import CommandError from "./cmd/CommandError";
 import GuildConfig from "../db/Models/Guild/GuildConfig";
 import Eris from "eris";
 import { Strings } from "@uwu-codes/utils";
+import MaidBoye from "@MaidBoye";
+import config from "@config";
+
+// since a lot of the fun commands are generic, we have to do this
+const funCommandResponses = (msg: ExtendedMessage) => ({
+	bap: [
+		`<@!${msg.author.id}> smacks ${BotFunctions.extraArgParsing(msg)} hard on the snoot with a rolled up news paper!`,
+		`<@!${msg.author.id}> goes to smack ${BotFunctions.extraArgParsing(msg)} on the snoot with a news paper, but missed and hit themself!`
+	],
+	bellyrub: [
+		`<@!${msg.author.id}> rubs the belly of ${BotFunctions.extraArgParsing(msg)}!`
+	],
+	blep: [
+		`<@!${msg.author.id}> did a little blep!`,
+		`<@!${msg.author.id}> stuck their tongue out cutely!`
+	],
+	boop: [
+		`<@!${msg.author.id}> has booped ${BotFunctions.extraArgParsing(msg)}!\nOwO`,
+		`<@!${msg.author.id}> lightly pokes the nose of ${BotFunctions.extraArgParsing(msg)}\nOwO`
+	],
+	cuddle: [
+		`<@!${msg.author.id}> has cuddled ${BotFunctions.extraArgParsing(msg)}!\nAren't they cute?`,
+		`<@!${msg.author.id}> sneaks up behind ${BotFunctions.extraArgParsing(msg)}, and cuddles them\nIsn't that sweet?`
+	],
+	dictionary: [
+		`<@!${msg.author.id}> throws a dictionary at ${BotFunctions.extraArgParsing(msg)} screaming "KNOWLEDGE"!`,
+		`<@!${msg.author.id}> drops some knowledge on ${BotFunctions.extraArgParsing(msg)}, with their dictionary!`,
+		`<@!${msg.author.id}> drops their entire English folder onto ${BotFunctions.extraArgParsing(msg)}, it seems to have flattened them!`
+	],
+	flop: [
+		`<@!${msg.author.id}> flops over onto ${BotFunctions.extraArgParsing(msg)}\nuwu`,
+		`<@!${msg.author.id}> lays on ${BotFunctions.extraArgParsing(msg)}.. owo`
+	],
+	glomp: [
+		`<@!${msg.author.id}> pounces on ${BotFunctions.extraArgParsing(msg)}, tackling them to the floor in a giant hug!`
+	],
+	hug: [
+		`<@!${msg.author.id}> sneaks up being ${BotFunctions.extraArgParsing(msg)}, and when they aren't looking, tackles them from behind in the biggest hug ever!`,
+		`<@!${msg.author.id}> gently wraps their arms around ${BotFunctions.extraArgParsing(msg)}, giving them a big warm hug!`
+	],
+	kiss: [
+		`<@!${msg.author.id}> kisses ${BotFunctions.extraArgParsing(msg)}, how cute!`
+	],
+	lick: [
+		`<@!${msg.author.id}> licks ${BotFunctions.extraArgParsing(msg)}\nUwU`,
+		`<@!${msg.author.id}> decides to make ${BotFunctions.extraArgParsing(msg)}'s fur a little slimy...`
+	],
+	nap: [
+		`<@!${msg.author.id}> decided to take a nap on ${BotFunctions.extraArgParsing(msg)}.. ${BotFunctions.extraArgParsing(msg)} might need a forklift for this one!`
+	],
+	nuzzle: [
+		`<@!${msg.author.id}> nuzzles ${BotFunctions.extraArgParsing(msg)} gently`
+	],
+	pat: [
+		`<@!${msg.author.id}> pats ${BotFunctions.extraArgParsing(msg)} on the head for being a good boi`,
+		`<@!${msg.author.id}> gently pats ${BotFunctions.extraArgParsing(msg)}`
+	],
+	poke: [
+		`<@!${msg.author.id}> pokes ${BotFunctions.extraArgParsing(msg)}\nDon't make them mad..`
+	],
+	pounce: [
+		`<@!${msg.author.id}> pounces onto ${BotFunctions.extraArgParsing(msg)} uwu`
+	],
+	slap: [
+		// rip siff
+		`<@!${msg.author.id}> sniffs ${BotFunctions.extraArgParsing(msg)}\nMaybe they smell good..?`
+	],
+	snowball: [
+		`<@!${msg.author.id}> throws a snowball at ${BotFunctions.extraArgParsing(msg)}!`
+	],
+	spray: [
+		`<@!${msg.author.id}> sprays ${BotFunctions.extraArgParsing(msg)} with a bottle of water, while yelling "bad fur"!`
+	],
+	wag: [
+		`<@!${msg.author.id}> wags their little tail, aren't they cute ^w^`
+	]
+});
 
 export default class BotFunctions {
 	private constructor() {
@@ -152,5 +233,79 @@ export default class BotFunctions {
 		else if (typeof v === "boolean") return v ? "TRUE" : "FALSE";
 		else if (v === null) return "NULL";
 		else return String(v);
+	}
+
+	static async genericFunCommand(this: MaidBoye, msg: ExtendedMessage, cmd: Command) {
+		if (!["wag"].some(v => cmd.triggers.includes(v)) && msg.args.length < 1) return new CommandError("INVALID_USAGE", cmd);
+
+		const embed = new EmbedBuilder(true, msg.author)
+			.setAuthor(msg.author.tag, msg.author.avatarURL)
+			.setDescription(funCommandResponses(msg)[cmd.triggers[0] as "hug"])
+			.setTimestamp(new Date().toISOString());
+
+		if (cmd.triggers.includes("bap")) embed.setImage("https://assets.maid.gay/bap.gif");
+		if (cmd.triggers.includes("bellyrub")) embed.setImage("https://assets.maid.gay/bellyrub.gif");
+		if (cmd.triggers.includes("spray")) embed.setDescription(`${embed.getDescription()!}\n${`<:${config.emojis.custom.spray}>`.repeat(Math.floor(Math.random() * 3) + 2)}`);
+
+		return msg.channel.createMessage({
+			embeds: [
+				embed.toJSON()
+			]
+		});
+	}
+
+	static async genericFunCommandWithImage(this: MaidBoye, msg: ExtendedMessage, cmd: Command, type: keyof typeof Yiffy["furry"] | "blep") {
+		if (![].some(v => cmd.triggers.includes(v)) && msg.args.length < 1)  return new CommandError("INVALID_USAGE", cmd);
+
+		const embed = new EmbedBuilder(true, msg.author)
+			.setAuthor(msg.author.tag, msg.author.avatarURL)
+			.setDescription(funCommandResponses(msg)[cmd.triggers[0] as "hug"])
+			.setTimestamp(new Date().toISOString());
+
+		if (msg.gConfig.settings.commandImages) {
+			if (!msg.channel.permissionsOf(this.user.id).has("attachFiles")) return msg.reply("H-hey! this server has **Command Images** enabled, but I am missing the `attachFiles` permission..");
+			// eslint-disable-next-line
+			const img = await (type === "blep" ? Yiffy.animals.blep : Yiffy.furry[type as "boop"])("json", 1);
+			embed.setImage(img.url);
+		}
+		return msg.channel.createMessage({
+			embeds: [
+				embed.toJSON()
+			]
+		});
+	}
+
+	/**
+	 * Extra argument parsing for some commands.
+	 *
+	 * @static
+	 * @param {ExtendedMessage} msg - The message instance.
+	 * @returns {string}
+	 * @memberof BotFunctions
+	 * @example BotFunctions.extraArgParsing(<ExtendedMessage>);
+	 */
+	static extraArgParsing(msg: ExtendedMessage, str = msg.args.join(" ")) {
+		(str
+			.split(" ")
+			// throw away mentions
+			.filter(k => !/(?:<@!?)([0-9]{15,21})>/i.exec(k))
+			.map(k => /([0-9]{15,21})/i.exec(k))
+			.filter(v => v !== null) as Array<RegExpExecArray>)
+			.map(([k, id]) => [k, `<@!${id}>`])
+			.map(([k, u]) => str = str.replace(k, u));
+
+		str
+			.split(" ")
+			// throw away mentions & ids
+			.filter(k => !/(?:<@!?)?([0-9]{15,21})>?/i.exec(k))
+			.map(v => [v, msg.channel.guild.members.find(m => Boolean(
+				m.username.toLowerCase() === v.toLowerCase() ||
+				m.tag.toLowerCase() === v.toLowerCase() ||
+				(m.nick && m.nick.toLowerCase() === v.toLowerCase())
+			))] as const)
+			.filter(([, v]) => v !== undefined)
+			.map(([k, u]) => str = str.replace(k, `<@!${u!.id}>`));
+
+		return str;
 	}
 }

@@ -137,7 +137,8 @@ export default new Command("settings")
 					return [false, false];
 				}
 				await this.createInteractionResponse(wait.id, wait.token, Eris.InteractionCallbackType.DEFERRED_UPDATE_MESSAGE);
-				const { values: v } = (wait.data as APIMessageSelectMenuInteractionData);
+				const { values: v = [] } = (wait.data as APIMessageSelectMenuInteractionData);
+				if (wait.data.custom_id.includes("back")) return [true, false];
 				const n = Settings.find(s => s.name.replace(/\s/g, "-").toLowerCase() === v[0]);
 				if (n === undefined) {
 					await m.edit({

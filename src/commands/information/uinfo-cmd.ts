@@ -47,7 +47,7 @@ export default new Command("uinfo", "userinfo")
 		}
 
 		const badges: Array<keyof typeof config["names"]["badges"]> = BotFunctions.getUserFlagsArray(user);
-		if (config.developers.includes(msg.author.id)) badges.push("DEVELOPER");
+		if (config.developers.includes(user.id)) badges.push("DEVELOPER");
 		if (badges.length === 0) badges.push("NONE");
 
 		const joinPosition = member && (sortedMembers.indexOf(member) + 1);

@@ -35,7 +35,8 @@ process.nextTick(async() => {
 		modlog_webhook_channel_id: "VARCHAR(21) NULL",
 		settings_default_yiff_type: "TINYTEXT NOT NULL DEFAULT 'gay'",
 		settings_yiff_thumbnail_type: "TINYTEXT NOT NULL DEFAULT 'image'",
-		settings_mute_role: "VARCHAR(21) NULL"
+		settings_mute_role: "VARCHAR(21) NULL",
+		settings_command_images: "BOOLEAN NOT NULL DEFAULT FALSE"
 	};
 
 	console.log("Creating Guilds Table");

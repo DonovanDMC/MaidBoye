@@ -22,8 +22,7 @@ export default new Command("impostor")
 				"。　　　　•　    　ﾟ　　。",
 				" 　　.　　　.　　　  　　.　　　　　。　　   。　.",
 				" 　.　　      。　        ඞ   。　    .    •",
-				// eslint-disable-next-line no-irregular-whitespace
-				`    •                ${!m ? msg.args.join(" ") : `<@!${m.id}>`} was ${Math.random() > .5 ? "not" : ""} An Impostor.　 。　.`,
+				`    •                ${!m ? msg.args.join(" ") : `<@!${m.id}>`} was ${Math.random() > .5 ? "not" : ""} An Impostor.   。  .`,
 				"　 　　。　　 　　　　ﾟ　　　.　    　　　."
 			].join("\n"),
 			allowedMentions: {

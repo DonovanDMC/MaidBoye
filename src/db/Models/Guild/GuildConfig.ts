@@ -29,6 +29,7 @@ export interface RawGuildConfig {
 	settings_default_yiff_type: string;
 	settings_e621_thumbnail_type: string;
 	settings_mute_role: string | null;
+	settings_command_images: boolean;
 }
 
 export type GuildConfigKV = DataTypes<GuildConfig>;
@@ -48,6 +49,7 @@ export default class GuildConfig {
 		defaultYiffType: typeof config["yiffTypes"][number];
 		e621ThumbnailType: "gif" | "image" | "none";
 		muteRole: string | null;
+		commandImages: boolean;
 	};
 	constructor(id: string, data: RawGuildConfig, prefixData: Array<RawPrefix>, selfRolesData: Array<RawSelfRole>, tagsData: Array<RawTag>) {
 		this.id = id;
@@ -75,7 +77,8 @@ export default class GuildConfig {
 		this.settings = {
 			defaultYiffType: data.settings_default_yiff_type as GuildConfig["settings"]["defaultYiffType"],
 			e621ThumbnailType: data.settings_e621_thumbnail_type as GuildConfig["settings"]["e621ThumbnailType"],
-			muteRole: data.settings_mute_role
+			muteRole: data.settings_mute_role,
+			commandImages: data.settings_command_images
 		};
 		return this;
 	}
@@ -102,7 +105,8 @@ export default class GuildConfig {
 			modlog_webhook_channel_id: data.modlog === undefined || data.modlog.webhook === undefined ? undefined : data.modlog.webhook === null ? null : data.modlog.webhook.channelId ?? undefined,
 			settings_default_yiff_type: data.settings === undefined ? undefined : data.settings.defaultYiffType ?? undefined,
 			settings_e621_thumbnail_type: data.settings === undefined ? undefined : data.settings.e621ThumbnailType ?? undefined,
-			settings_mute_role: data.settings === undefined ? undefined : data.settings.muteRole === null ? null : data.settings.muteRole ?? undefined
+			settings_mute_role: data.settings === undefined ? undefined : data.settings.muteRole === null ? null : data.settings.muteRole ?? undefined,
+			settings_command_images: data.settings === undefined ? undefined : data.settings.commandImages
 		} as Omit<RawGuildConfig, "id">;
 
 		const keys = Object.keys(v).filter(k => v[k as keyof typeof v] !== undefined);
