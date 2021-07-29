@@ -59,7 +59,7 @@
     "@types/ioredis": "^4.26.6",
     "@types/module-alias": "^2.0.1",
     "@types/morgan": "^1.9.3",
-    "@types/node": "^16.4.3",
+    "@types/node": "^16.4.6",
     "@types/node-fetch": "^2.5.12",
     "@types/source-map-support": "^0.5.4",
     "@uwu-codes/types": "^1.0.5",
