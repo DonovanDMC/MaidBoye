@@ -1,12 +1,20 @@
 import Command from "@cmd/Command";
 import config from "@config";
 import db from "@db";
+import { ApplicationCommandOptionType } from "discord-api-types";
 const Redis = db.r;
 
 export default new Command("conga")
 	.setPermissions("bot", "embedLinks", "useExternalEmojis")
 	.setDescription("Start a conga, or join one")
-	.setHasSlashVariant(true)
+	.setSlashOptions(true, [
+		{
+			type: ApplicationCommandOptionType.User,
+			name: "user",
+			description: "The user to start a conga with (none to join an conga howl)",
+			required: false
+		}
+	])
 	.setCooldown(3e3)
 	.setExecutor(async function(msg) {
 		const k = `cmd:multiUser:conga:${msg.channel.id}`;

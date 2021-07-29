@@ -6,7 +6,7 @@ const Redis = db.r;
 export default new Command("awoo", "howl")
 	.setPermissions("bot", "embedLinks", "useExternalEmojis")
 	.setDescription("Start a howl, or join one")
-	.setHasSlashVariant(true)
+	.setSlashOptions(true, [])
 	.setCooldown(3e3)
 	.setExecutor(async function(msg) {
 		const k = `cmd:multiUser:awoo:${msg.channel.id}`;

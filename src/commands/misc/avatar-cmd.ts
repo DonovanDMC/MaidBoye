@@ -8,9 +8,7 @@ export default new Command("avatar")
 	.setPermissions("bot", "embedLinks", "attachFiles")
 	.setDescription("Get someone's avatar..")
 	.setUsage("<@user>")
-	.setHasSlashVariant(true)
-	.setCooldown(3e3)
-	.setSlashCommandOptions([
+	.setSlashOptions(true, [
 		{
 			type: ApplicationCommandOptionType.User,
 			name: "user",
@@ -18,6 +16,7 @@ export default new Command("avatar")
 			required: false
 		}
 	])
+	.setCooldown(3e3)
 	.setExecutor(async function(msg) {
 		const user = msg.args.length === 0 ? msg.author : await msg.getUserFromArgs();
 		if (user === null) return msg.reply("Th-that isn't a valid user..");

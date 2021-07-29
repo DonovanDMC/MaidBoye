@@ -9,7 +9,6 @@ export default new Command("giphy")
 	.setPermissions("bot", "embedLinks")
 	.setDescription("Search for a gif on giphy")
 	.setUsage("<query>")
-	.setHasSlashVariant(true)
 	.setCooldown(3e3)
 	.setExecutor(async function(msg) {
 		if (msg.args.length < 1) return msg.reply("H-hey! You have to provide something to search..");

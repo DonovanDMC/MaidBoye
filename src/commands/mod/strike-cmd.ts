@@ -9,8 +9,7 @@ export default new Command("strike")
 	.setPermissions("user", "manageMessages")
 	.setDescription("Add a strike or several to a user")
 	.setUsage("<user> [amount]")
-	.setHasSlashVariant(true)
-	.setSlashCommandOptions([
+	.setSlashOptions(true, [
 		{
 			type: ApplicationCommandOptionType.User,
 			name: "user",

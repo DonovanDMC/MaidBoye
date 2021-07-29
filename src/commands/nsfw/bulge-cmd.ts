@@ -8,7 +8,7 @@ import MaidBoye from "@MaidBoye";
 export default new Command("bulge")
 	.setPermissions("bot", "embedLinks", "attachFiles")
 	.setDescription("Bolgy wolgy uwu")
-	.setHasSlashVariant(true)
+	.setSlashOptions(true, [])
 	.setRestrictions("nsfw")
 	.setCooldown(3e3)
 	.setExecutor(async function(msg) {

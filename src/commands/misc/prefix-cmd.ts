@@ -9,8 +9,7 @@ export default new Command("prefix")
 	.setPermissions("user", "manageGuild")
 	.setDescription("Set the prefix you use me with")
 	.setUsage("<add/remove/reset/list>")
-	.setHasSlashVariant(true)
-	.setSlashCommandOptions([
+	.setSlashOptions(true, [
 		{
 			type: ApplicationCommandOptionType.SubCommand,
 			name: "add",

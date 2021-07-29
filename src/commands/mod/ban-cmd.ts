@@ -30,8 +30,7 @@ export default new Command("ban")
 			]
 		};
 	})
-	.setHasSlashVariant(true)
-	.setSlashCommandOptions([
+	.setSlashOptions(true, [
 		{
 			type: ApplicationCommandOptionType.User,
 			name: "user",

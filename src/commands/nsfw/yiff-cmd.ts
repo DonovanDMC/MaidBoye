@@ -14,8 +14,7 @@ export default new Command("yiff", "thegoodstuff")
 	.setPermissions("bot", "embedLinks", "attachFiles")
 	.setDescription("Y-you know what this is..")
 	.setUsage(`<${config.yiffTypes.join("/")}>`)
-	.setHasSlashVariant(true)
-	.setSlashCommandOptions([
+	.setSlashOptions(true, [
 		{
 			type: ApplicationCommandOptionType.String,
 			name: "type",

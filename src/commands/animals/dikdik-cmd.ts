@@ -5,7 +5,7 @@ import Yiffy from "@util/req/Yiffy";
 export default new Command("dikdik")
 	.setPermissions("bot", "embedLinks")
 	.setDescription("Get an image of a dikdik!")
-	.setHasSlashVariant(true)
+	.setSlashOptions(true, [])
 	.setCooldown(3e3)
 	.setExecutor(async function(msg) {
 		const img = await Yiffy.animals.dikdik("json", 1);

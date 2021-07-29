@@ -13,9 +13,7 @@ export default new Command("help")
 	.setPermissions("bot", "embedLinks")
 	.setDescription("Find out how to use me..")
 	.setUsage("[command]")
-	.setHasSlashVariant(true)
-	.setCooldown(3e3)
-	.setSlashCommandOptions([
+	.setSlashOptions(true, [
 		{
 			type: ApplicationCommandOptionType.String,
 			name: "category",
@@ -31,6 +29,7 @@ export default new Command("help")
 			}).filter(Boolean) as Array<APIApplicationCommandOptionChoice>
 		}
 	])
+	.setCooldown(3e3)
 	.setExecutor(async function(msg) {
 		if (msg.args.length === 0) {
 			const e = new EmbedBuilder().setAuthor(msg.author.tag, msg.author.avatarURL);

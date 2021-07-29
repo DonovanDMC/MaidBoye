@@ -10,8 +10,7 @@ import { ApplicationCommandOptionType } from "discord-api-types";
 export default new Command("sinfo", "serverinfo")
 	.setPermissions("bot", "embedLinks", "attachFiles")
 	.setDescription("Get some info about this server")
-	.setHasSlashVariant(true)
-	.setSlashCommandOptions([
+	.setSlashOptions(true, [
 		{
 			type: ApplicationCommandOptionType.String,
 			name: "section",

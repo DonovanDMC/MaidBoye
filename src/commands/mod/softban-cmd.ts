@@ -28,8 +28,7 @@ export default new Command("softban")
 			]
 		};
 	})
-	.setHasSlashVariant(true)
-	.setSlashCommandOptions([
+	.setSlashOptions(true, [
 		{
 			type: ApplicationCommandOptionType.User,
 			name: "user",

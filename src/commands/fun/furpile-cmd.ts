@@ -1,11 +1,19 @@
 import Command from "@cmd/Command";
 import db from "@db";
+import { ApplicationCommandOptionType } from "discord-api-types";
 const Redis = db.r;
 
 export default new Command("furpile")
 	.setPermissions("bot", "embedLinks")
 	.setDescription("Start a furpile, or join one")
-	.setHasSlashVariant(true)
+	.setSlashOptions(true, [
+		{
+			type: ApplicationCommandOptionType.User,
+			name: "user",
+			description: "The user to start a furpile on (none to join an existing furpile)",
+			required: false
+		}
+	])
 	.setCooldown(3e3)
 	.setExecutor(async function(msg) {
 		const k = `cmd:multiUser:furpile:${msg.channel.id}`;

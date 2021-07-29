@@ -6,7 +6,7 @@ import Yiffy from "@util/req/Yiffy";
 export default new Command("fursuit")
 	.setPermissions("bot", "embedLinks")
 	.setDescription("Get an image of a fursuit")
-	.setHasSlashVariant(true)
+	.setSlashOptions(true, [])
 	.setCooldown(3e3)
 	.setExecutor(async function(msg) {
 		const butt = msg.args[0] === "butt";

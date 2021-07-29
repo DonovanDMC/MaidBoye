@@ -17,8 +17,7 @@ export default new Command("modlog")
 	.setPermissions("user", "manageGuild")
 	.setDescription("Manage this server's modlog")
 	.setUsage("(no arguments)")
-	.setHasSlashVariant(true)
-	.setSlashCommandOptions([
+	.setSlashOptions(true, [
 		{
 			type: ApplicationCommandOptionType.String,
 			name: "section",

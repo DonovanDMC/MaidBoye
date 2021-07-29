@@ -8,7 +8,6 @@ export default new Command("whosagoodboi", "whosagoodboy", "goodboi", "goodboy")
 	.setPermissions("bot", "embedLinks")
 	.setDescription("Who's a good boye?!?")
 	.setUsage("[@user/text]")
-	.setHasSlashVariant(false)
 	.setCooldown(3e3)
 	.setExecutor(async function(msg) {
 		return msg.reply({

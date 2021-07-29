@@ -9,8 +9,7 @@ export default new Command("unban")
 	.setPermissions("user", "banMembers")
 	.setDescription("Remove the ban for someone..")
 	.setUsage("<@user> [reason]")
-	.setHasSlashVariant(true)
-	.setSlashCommandOptions([
+	.setSlashOptions(true, [
 		{
 			type: ApplicationCommandOptionType.User,
 			name: "user",

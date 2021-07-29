@@ -9,8 +9,7 @@ export default new Command("warn")
 	.setPermissions("user", "kickMembers")
 	.setDescription("warn a user for something they're doing")
 	.setUsage("<user> [reason]")
-	.setHasSlashVariant(true)
-	.setSlashCommandOptions([
+	.setSlashOptions(true, [
 		{
 			type: ApplicationCommandOptionType.User,
 			name: "user",

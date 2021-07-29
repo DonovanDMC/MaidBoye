@@ -11,8 +11,7 @@ export default new Command("reason")
 	.setPermissions("user", "manageMessages")
 	.setDescription("change a cases reason")
 	.setUsage("<case> <newReason>")
-	.setHasSlashVariant(true)
-	.setSlashCommandOptions([
+	.setSlashOptions(true, [
 		{
 			type: ApplicationCommandOptionType.Integer,
 			name: "case-number",

@@ -11,7 +11,6 @@ export default new Command("report")
 	.setDescription("Report a user")
 	.setUsage("(run with no arguments)")
 	.setRestrictions("developer")
-	.setHasSlashVariant(true)
 	.setCooldown(3e3)
 	.setExecutor(async function(msg) {
 		return msg.reply("This feature is currently in development.");

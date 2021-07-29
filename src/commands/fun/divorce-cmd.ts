@@ -6,7 +6,6 @@ import EmbedBuilder from "@util/EmbedBuilder";
 export default new Command("divorce")
 	.setPermissions("bot", "embedLinks")
 	.setDescription("Leave your spouse")
-	.setHasSlashVariant(false)
 	.setCooldown(3e3)
 	.setExecutor(async function(msg) {
 		if (msg.uConfig.marriage === null) return msg.reply("H-hey! You aren't married..");

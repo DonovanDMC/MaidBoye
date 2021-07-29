@@ -6,7 +6,6 @@ import Yiffy from "@util/req/Yiffy";
 export default new Command("fursuitbutt")
 	.setPermissions("bot", "embedLinks")
 	.setDescription("Get an image of a fursuit butt")
-	.setHasSlashVariant(true)
 	.setRestrictions("nsfw")
 	.setCooldown(3e3)
 	.setExecutor(async function(msg) {

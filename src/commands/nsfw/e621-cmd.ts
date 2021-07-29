@@ -14,8 +14,7 @@ export default new Command("e621", "e6")
 	.setPermissions("bot", "embedLinks", "attachFiles")
 	.setDescription("Search for posts from e621")
 	.setUsage("[tags]")
-	.setHasSlashVariant(true)
-	.setSlashCommandOptions([
+	.setSlashOptions(true, [
 		{
 			type: ApplicationCommandOptionType.String,
 			name: "tags",

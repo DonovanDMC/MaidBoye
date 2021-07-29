@@ -13,7 +13,7 @@ export default new Command("settings")
 	.setPermissions("bot", "embedLinks")
 	.setPermissions("user", "manageGuild")
 	.setDescription("manage this server's settings")
-	.setHasSlashVariant(true)
+	.setSlashOptions(true, [])
 	.setCooldown(3e3)
 	.setExecutor(async function(msg) {
 		let page = 1;

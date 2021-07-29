@@ -5,7 +5,7 @@ import CheweyAPI from "@util/req/CheweyAPI";
 export default new Command("koala")
 	.setPermissions("bot", "embedLinks")
 	.setDescription("Get an image of a koala!")
-	.setHasSlashVariant(true)
+	.setSlashOptions(true, [])
 	.setCooldown(3e3)
 	.setExecutor(async function(msg) {
 		const img = await CheweyAPI.koala();

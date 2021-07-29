@@ -11,7 +11,7 @@ import * as os from "os";
 export default new Command("info")
 	.setPermissions("bot", "embedLinks")
 	.setDescription("Get some information about me..")
-	.setHasSlashVariant(true)
+	.setSlashOptions(true, [])
 	.setCooldown(3e3)
 	.setExecutor(async function(msg) {
 		return msg.reply({

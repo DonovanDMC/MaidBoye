@@ -1,11 +1,19 @@
 import Command from "@cmd/Command";
 import EmbedBuilder from "@util/EmbedBuilder";
+import { ApplicationCommandOptionType } from "discord-api-types";
 
 
 export default new Command("gayrate")
 	.setPermissions("bot", "embedLinks")
 	.setDescription("Rate someone's gayness")
-	.setHasSlashVariant(true)
+	.setSlashOptions(true, [
+		{
+			type: ApplicationCommandOptionType.User,
+			name: "user",
+			description: "The user to rate (none for yourself)",
+			required: false
+		}
+	])
 	.setCooldown(3e3)
 	.setExecutor(async function(msg) {
 		const member = msg.args.length === 0 ? msg.member : await msg.getMemberFromArgs();

@@ -8,8 +8,7 @@ export default new Command("unmute")
 	.setPermissions("user", "voiceMuteMembers")
 	.setDescription("undo a mute")
 	.setUsage("<user> [reason]")
-	.setHasSlashVariant(true)
-	.setSlashCommandOptions([
+	.setSlashOptions(true, [
 		{
 			type: ApplicationCommandOptionType.User,
 			name: "user",

@@ -8,8 +8,7 @@ export default new Command("unlock")
 	.setPermissions("user", "kickMembers")
 	.setDescription("undo a lock")
 	.setUsage("[<channel> [reason]]")
-	.setHasSlashVariant(true)
-	.setSlashCommandOptions([
+	.setSlashOptions(true, [
 		{
 			type: ApplicationCommandOptionType.Channel,
 			name: "channel",

@@ -27,8 +27,7 @@ export default new Command("mute")
 			]
 		};
 	})
-	.setHasSlashVariant(true)
-	.setSlashCommandOptions([
+	.setSlashOptions(true, [
 		{
 			type: ApplicationCommandOptionType.User,
 			name: "user",

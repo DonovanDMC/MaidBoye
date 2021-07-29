@@ -5,8 +5,7 @@ export default new Command("impostor")
 	.setPermissions("bot", "embedLinks")
 	.setDescription("amogus")
 	.setUsage("[@user/text]")
-	.setHasSlashVariant(true)
-	.setSlashCommandOptions([
+	.setSlashOptions(true, [
 		{
 			type: ApplicationCommandOptionType.User,
 			name: "user",

@@ -3,13 +3,27 @@ import config from "@config";
 import EmbedBuilder from "@util/EmbedBuilder";
 import Logger from "@util/Logger";
 import FluxPoint from "@util/req/FluxPoint";
+import { ApplicationCommandOptionType } from "discord-api-types";
 import Eris from "eris";
 
 export default new Command("ship")
 	.setPermissions("bot", "embedLinks", "attachFiles")
 	.setDescription("Ship two people")
 	.setUsage("[@member1] [@member2]")
-	.setHasSlashVariant(true)
+	.setSlashOptions(true, [
+		{
+			type: ApplicationCommandOptionType.User,
+			name: "user1",
+			description: "The first user to ship (none for random)",
+			required: false
+		},
+		{
+			type: ApplicationCommandOptionType.User,
+			name: "user2",
+			description: "The second user to ship (none for you)",
+			required: false
+		}
+	])
 	.setCooldown(3e3)
 	.setParsedFlags("percent", "random")
 	.setExecutor(async function(msg) {

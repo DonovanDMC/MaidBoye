@@ -6,12 +6,62 @@ import CommandError from "@cmd/CommandError";
 import ComponentInteractionCollector from "@util/ComponentInteractionCollector";
 import { Strings } from "@uwu-codes/utils";
 import Eris from "eris";
-import { APIMessageSelectMenuInteractionData } from "discord-api-types";
+import { APIMessageSelectMenuInteractionData, ApplicationCommandOptionType } from "discord-api-types";
 
 export default new Command("selfroles")
 	.setPermissions("bot", "embedLinks", "manageRoles")
 	.setDescription("Manage self roles")
-	.setHasSlashVariant(true)
+	.setSlashOptions(true, [
+		{
+			type: ApplicationCommandOptionType.SubCommand,
+			name: "list",
+			description: "List this server's self assignable roles"
+		},
+		{
+			type: ApplicationCommandOptionType.SubCommand,
+			name: "join",
+			description: "Join a self assignable role",
+			options: [
+				{
+					type: ApplicationCommandOptionType.String,
+					name: "role",
+					description: "The name of the role you want to join (see list)",
+					required: true
+				}
+			]
+		},
+		{
+			type: ApplicationCommandOptionType.SubCommand,
+			name: "leave",
+			description: "Leave a self assignable role"
+		},
+		{
+			type: ApplicationCommandOptionType.SubCommand,
+			name: "add",
+			description: "[Management] Add a self assignable role",
+			options: [
+				{
+					type: ApplicationCommandOptionType.Role,
+					name: "role",
+					description: "The role to make self assignable",
+					required: true
+				}
+			]
+		},
+		{
+			type: ApplicationCommandOptionType.SubCommand,
+			name: "remove",
+			description: "[Management] Remove a self assignable role",
+			options: [
+				{
+					type: ApplicationCommandOptionType.Role,
+					name: "role",
+					description: "The role to make not self assignable",
+					required: true
+				}
+			]
+		}
+	])
 	.setCooldown(3e3)
 	.setUsage(async function (msg, cmd) {
 		return {

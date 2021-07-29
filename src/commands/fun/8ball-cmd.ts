@@ -3,6 +3,7 @@ import config from "@config";
 import MaidBoye from "@MaidBoye";
 import ComponentHelper from "@util/ComponentHelper";
 import EmbedBuilder from "@util/EmbedBuilder";
+import { ApplicationCommandOptionType } from "discord-api-types";
 import Eris from "eris";
 
 const answers = [
@@ -32,7 +33,14 @@ export default new Command("8ball")
 	.setPermissions("bot", "embedLinks")
 	.setDescription("Ask the magic 8 ball")
 	.setUsage("<question>")
-	.setHasSlashVariant(true)
+	.setSlashOptions(true, [
+		{
+			type: ApplicationCommandOptionType.String,
+			name: "question",
+			description: "The question to ask the magic 8ball.",
+			required: false
+		}
+	])
 	.setCooldown(3e3)
 	.setExecutor(async function(msg) {
 		if (msg.args.length === 0) return msg.reply("H-hey! You have to provide a question to ask..");

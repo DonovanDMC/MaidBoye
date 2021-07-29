@@ -5,7 +5,7 @@ import CheweyAPI from "@util/req/CheweyAPI";
 export default new Command("dog", "puppy")
 	.setPermissions("bot", "embedLinks")
 	.setDescription("Get an image of a dog!")
-	.setHasSlashVariant(true)
+	.setSlashOptions(true, [])
 	.setCooldown(3e3)
 	.setExecutor(async function(msg) {
 		const img = await CheweyAPI.dog();

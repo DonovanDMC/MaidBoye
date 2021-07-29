@@ -59,8 +59,9 @@ export default class Command {
 		return this;
 	}
 
-	setSlashCommandOptions(data: Array<APIApplicationCommandOption>) {
-		this.slashCommandOptions = data;
+	setSlashOptions(hasSlash: boolean, options: Array<APIApplicationCommandOption>) {
+		this.hasSlashVariant = hasSlash;
+		this.slashCommandOptions = options;
 		return this;
 	}
 
@@ -72,11 +73,6 @@ export default class Command {
 	setCooldown(normal: number, donator = normal) {
 		this.cooldown = normal;
 		this.donatorCooldown = donator;
-		return this;
-	}
-
-	setHasSlashVariant(data: boolean) {
-		this.hasSlashVariant = data;
 		return this;
 	}
 

@@ -6,7 +6,7 @@ import Yiffy from "@util/req/Yiffy";
 export default new Command("birb")
 	.setPermissions("bot", "embedLinks")
 	.setDescription("Get an image of a birb!")
-	.setHasSlashVariant(true)
+	.setSlashOptions(true, [])
 	.setCooldown(3e3)
 	.setExecutor(async function(msg) {
 		const img = await (Math.random() > .5 ? Yiffy.animals.birb("json", 1).then(y => y.url) : CheweyAPI.birb());

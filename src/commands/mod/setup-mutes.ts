@@ -8,7 +8,6 @@ export default new Command("setup-mutes")
 	.setPermissions("bot", "embedLinks", "manageChannels")
 	.setPermissions("user", "manageChannels")
 	.setDescription("setup the proper mute permissions")
-	.setHasSlashVariant(true)
 	.setCooldown(3e3)
 	.setParsedFlags("undo")
 	.setExecutor(async function(msg) {

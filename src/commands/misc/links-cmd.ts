@@ -5,7 +5,7 @@ import EmbedBuilder from "@util/EmbedBuilder";
 export default new Command("links", "support", "invite", "inv")
 	.setPermissions("bot", "embedLinks")
 	.setDescription("Get some of my important links")
-	.setHasSlashVariant(true)
+	.setSlashOptions(true, [])
 	.setCooldown(3e3)
 	.setExecutor(async function(msg) {
 		return msg.reply({

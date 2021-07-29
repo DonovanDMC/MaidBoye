@@ -18,8 +18,7 @@ export default new Command("inspect")
 	.setPermissions("user", "manageMessages")
 	.setDescription("Get the moderation info of a user")
 	.setUsage("<user> [section]")
-	.setHasSlashVariant(true)
-	.setSlashCommandOptions([
+	.setSlashOptions(true, [
 		{
 			type: ApplicationCommandOptionType.User,
 			name: "user",

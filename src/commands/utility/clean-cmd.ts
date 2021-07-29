@@ -5,11 +5,129 @@ import MessageCollector from "@util/MessageCollector";
 import { Strings } from "@uwu-codes/utils";
 import Eris from "eris";
 import chunk from "chunk";
+import { ApplicationCommandOptionType } from "discord-api-types";
 
 export default new Command("clean", "clear", "prune", "purge")
 	.setPermissions("bot", "embedLinks", "manageMessages")
 	.setPermissions("user", "manageMessages")
 	.setDescription("Clean up some messages")
+	.setSlashOptions(true, [
+		{
+			type: ApplicationCommandOptionType.SubCommand,
+			name: "all",
+			description: "Clean up all types of messages",
+			options: [
+				{
+					type: ApplicationCommandOptionType.Integer,
+					name: "amount",
+					description: "Amount of messages to delete, between 2 and 1000",
+					required: true
+				}
+			]
+		},
+		{
+			type: ApplicationCommandOptionType.SubCommand,
+			name: "user",
+			description: "Clean up all messages from a specific user",
+			options: [
+				{
+					type: ApplicationCommandOptionType.User,
+					name: "user",
+					description: "The user to clean up messages from",
+					required: true
+				},
+				{
+					type: ApplicationCommandOptionType.Integer,
+					name: "amount",
+					description: "Amount of messages to delete, between 2 and 1000",
+					required: true
+				}
+			]
+		},
+		{
+			type: ApplicationCommandOptionType.SubCommand,
+			name: "bots",
+			description: "Clean up messages from any bots",
+			options: [
+				{
+					type: ApplicationCommandOptionType.Integer,
+					name: "amount",
+					description: "Amount of messages to delete, between 2 and 1000",
+					required: true
+				}
+			]
+		},
+		{
+			type: ApplicationCommandOptionType.SubCommand,
+			name: "channel",
+			description: "Clean up messages in a channel",
+			options: [
+				{
+					type: ApplicationCommandOptionType.Channel,
+					name: "channel",
+					description: "The channel to clean up messages in",
+					required: true
+				},
+				{
+					type: ApplicationCommandOptionType.Integer,
+					name: "amount",
+					description: "Amount of messages to delete, between 2 and 1000",
+					required: true
+				}
+			]
+		},
+		{
+			type: ApplicationCommandOptionType.SubCommand,
+			name: "role",
+			description: "Clean up messages from members that have a role",
+			options: [
+				{
+					type: ApplicationCommandOptionType.Role,
+					name: "role",
+					description: "The role to delete messages from",
+					required: true
+				},
+				{
+					type: ApplicationCommandOptionType.Integer,
+					name: "amount",
+					description: "Amount of messages to delete, between 2 and 1000",
+					required: true
+				}
+			]
+		},
+		{
+			type: ApplicationCommandOptionType.SubCommand,
+			name: "commands",
+			description: "Clean up command messages for me",
+			options: [
+				{
+					type: ApplicationCommandOptionType.Integer,
+					name: "amount",
+					description: "Amount of messages to delete, between 2 and 1000",
+					required: true
+				}
+			]
+		},
+		{
+			type: ApplicationCommandOptionType.SubCommand,
+			name: "text",
+			description: "Clean up messages containing a specific string",
+			options: [
+				{
+					type: ApplicationCommandOptionType.String,
+					name: "string",
+					description: "The string to match to message content",
+					required: true
+				},
+				{
+					type: ApplicationCommandOptionType.Integer,
+					name: "amount",
+					description: "Amount of messages to delete, between 2 and 1000",
+					required: true
+				}
+			]
+		}
+	])
 	.setUsage(async function (msg, cmd) {
 		return {
 			embeds: [

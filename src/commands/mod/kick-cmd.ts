@@ -24,8 +24,7 @@ export default new Command("kick")
 			]
 		};
 	})
-	.setHasSlashVariant(true)
-	.setSlashCommandOptions([
+	.setSlashOptions(true, [
 		{
 			type: ApplicationCommandOptionType.User,
 			name: "user",

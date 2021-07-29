@@ -10,8 +10,7 @@ export default new Command("lockdown")
 	.setPermissions("user", "kickMembers", "manageGuild")
 	.setDescription("lock all channels in the server")
 	.setUsage("[reason]")
-	.setHasSlashVariant(true)
-	.setSlashCommandOptions([
+	.setSlashOptions(true, [
 		{
 			type: ApplicationCommandOptionType.String,
 			name: "reason",

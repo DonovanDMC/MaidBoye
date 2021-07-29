@@ -17,6 +17,6 @@ export default new Command("say")
 			allowedMentions: {
 				repliedUser: !!msg.dashedArgs.keyValue.reply && msg.dashedArgs.value.includes("mention")
 			},
-			stickerIDS: msg.dashedArgs.keyValue.sticker ? [msg.dashedArgs.keyValue.sticker] : []
+			stickerIDs: msg.dashedArgs.keyValue.sticker ? [msg.dashedArgs.keyValue.sticker] : []
 		});
 	});

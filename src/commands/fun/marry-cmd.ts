@@ -9,7 +9,6 @@ export default new Command("marry")
 	.setPermissions("bot", "embedLinks")
 	.setDescription("Marry someone..")
 	.setUsage("<@user>")
-	.setHasSlashVariant(false)
 	.setCooldown(3e3)
 	.setExecutor(async function(msg) {
 		if (msg.args.length < 1) return msg.reply("H-hey! You have to provide someone to marry..");

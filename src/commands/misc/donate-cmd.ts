@@ -5,7 +5,6 @@ import EmbedBuilder from "@util/EmbedBuilder";
 export default new Command("donate")
 	.setPermissions("bot", "embedLinks")
 	.setDescription("support us, if you feel like it..")
-	.setHasSlashVariant(true)
 	.setCooldown(3e3)
 	.setExecutor(async function(msg) {
 		return msg.reply({

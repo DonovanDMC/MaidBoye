@@ -9,9 +9,7 @@ import { ApplicationCommandOptionType } from "discord-api-types";
 export default new Command("uinfo", "userinfo")
 	.setPermissions("bot", "embedLinks", "attachFiles")
 	.setDescription("Get info about someone..")
-	.setHasSlashVariant(true)
-	.setCooldown(3e3)
-	.setSlashCommandOptions([
+	.setSlashOptions(true, [
 		{
 			type: ApplicationCommandOptionType.User,
 			name: "user",
@@ -19,6 +17,7 @@ export default new Command("uinfo", "userinfo")
 			required: false
 		}
 	])
+	.setCooldown(3e3)
 	.setExecutor(async function(msg) {
 		let user = msg.args.length === 0 ? msg.author : await msg.getUserFromArgs();
 		// @FIXME banners don't seem to be sent over gateway yet

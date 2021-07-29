@@ -2,12 +2,88 @@ import Command from "@cmd/Command";
 import EmbedBuilder from "@util/EmbedBuilder";
 import chunk from "chunk";
 import BotFunctions from "@util/BotFunctions";
+import { ApplicationCommandOptionType } from "discord-api-types";
 
 export default new Command("tag", "tags")
 	.setPermissions("bot", "embedLinks")
 	.setDescription("Manage this server's tags")
 	.setUsage("<create/modify/list/help/tagname>")
-	.setHasSlashVariant(true)
+	.setSlashOptions(true, [
+		{
+			type: ApplicationCommandOptionType.SubCommand,
+			name: "create",
+			description: "[Management] create a tag",
+			options: [
+				{
+					type: ApplicationCommandOptionType.String,
+					name: "name",
+					description: "The name of the tag",
+					required: true
+				},
+				{
+					type: ApplicationCommandOptionType.String,
+					name: "content",
+					description: "The content of the tag",
+					required: true
+				}
+			]
+		},
+		{
+			type: ApplicationCommandOptionType.SubCommand,
+			name: "modify",
+			description: "[Management] modify a tag",
+			options: [
+				{
+					type: ApplicationCommandOptionType.String,
+					name: "name",
+					description: "The name of the tag to modify",
+					required: true
+				},
+				{
+					type: ApplicationCommandOptionType.String,
+					name: "content",
+					description: "The new content of the tag",
+					required: true
+				}
+			]
+		},
+		{
+			type: ApplicationCommandOptionType.SubCommand,
+			name: "delete",
+			description: "[Management] Delete a tag",
+			options: [
+				{
+					type: ApplicationCommandOptionType.String,
+					name: "name",
+					description: "The name of the tag to delete",
+					required: true
+				}
+			]
+		},
+		{
+			type: ApplicationCommandOptionType.SubCommand,
+			name: "list",
+			description: "List the servers tags"
+		},
+		{
+			type: ApplicationCommandOptionType.SubCommand,
+			name: "help",
+			description: "Get help with using tags"
+		},
+		{
+			type: ApplicationCommandOptionType.SubCommand,
+			name: "get",
+			description: "Get a tag",
+			options: [
+				{
+					type: ApplicationCommandOptionType.String,
+					name: "name",
+					description: "The name of the tag to get",
+					required: true
+				}
+			]
+		}
+	])
 	.setCooldown(3e3)
 	.setExecutor(async function(msg) {
 		const sub = msg.rawArgs.length === 0 ? "help" : msg.rawArgs[0].toLowerCase();

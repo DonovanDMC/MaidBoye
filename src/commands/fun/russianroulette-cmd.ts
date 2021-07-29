@@ -4,7 +4,6 @@ export default new Command("russianroulette", "rr")
 	.setPermissions("bot", "embedLinks")
 	.setDescription("Play russianroulette")
 	.setUsage("[bullets]")
-	.setHasSlashVariant(false)
 	.setCooldown(3e3)
 	.setExecutor(async function(msg) {
 		const val = Math.floor(Math.random() * 6);

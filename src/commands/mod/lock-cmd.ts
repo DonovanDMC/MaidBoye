@@ -9,8 +9,7 @@ export default new Command("lock")
 	.setPermissions("user", "kickMembers")
 	.setDescription("keep everyone from speaking in a channel")
 	.setUsage("[<channel> [reason]]")
-	.setHasSlashVariant(true)
-	.setSlashCommandOptions([
+	.setSlashOptions(true, [
 		{
 			type: ApplicationCommandOptionType.Channel,
 			name: "channel",

@@ -6,7 +6,7 @@ import fetch from "node-fetch";
 export default new Command("dadjoke", "joke")
 	.setPermissions("bot", "embedLinks")
 	.setDescription("Get a dadjoke")
-	.setHasSlashVariant(true)
+	.setSlashOptions(true, [])
 	.setCooldown(3e3)
 	.setExecutor(async function(msg) {
 		const { joke } = await fetch("https://icanhazdadjoke.com", {
