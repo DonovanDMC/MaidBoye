@@ -59,7 +59,7 @@ export default class CommandHandler {
 		const ctg = this.getCategory(cat);
 		if (!ctg) throw new Error(`Invalid category "${cat}" specified when registering the command ${d.triggers[0]} (${d.file})`);
 		if (!fs.existsSync(d.file)) throw new Error(`Failed to determine the file location for the command "${d.triggers[0]}" (cat: ${cat}, dir: ${ctg.dir})`);
-		const dup = this.triggers.find(t => d.triggers.some(tr => t.includes(tr)));
+		const dup = this.triggers.find(t => d.triggers.some(tr => t === tr));
 		const dupCmd = (dup && this.commands.find(c => c.triggers.includes(dup))) || undefined;
 		if (dup && dupCmd) throw new Error(`Duplicate commands trigger "${dup}" for command ${d.triggers[0]} (${d.file}) on command ${dupCmd.triggers[0]} (${dupCmd.file})`);
 		if (log) Logger.getLogger("CommandHandler").info(`Registered the command "${d.triggers[0]}" (${d.file})`);

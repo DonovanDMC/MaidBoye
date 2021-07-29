@@ -14,7 +14,8 @@ process.nextTick(async() => {
 		premium_kofi_email: "TINYTEXT NULL",
 		premium_months: "TINYINT UNSIGNED NOT NULL DEFAULT 0",
 		premium_subscription: "BOOLEAN NOT NULL DEFAULT FALSE",
-		premium_total_amount: "SMALLINT UNSIGNED NOT NULL DEFAULT 0"
+		premium_total_amount: "SMALLINT UNSIGNED NOT NULL DEFAULT 0",
+		marriage: "VARCHAR(21) NULL REFERENCES users(id)"
 	};
 
 	console.log("Creating Users Table");

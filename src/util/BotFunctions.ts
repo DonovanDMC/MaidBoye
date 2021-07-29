@@ -42,6 +42,9 @@ const funCommandResponses = (msg: ExtendedMessage) => ({
 	glomp: [
 		`<@!${msg.author.id}> pounces on ${BotFunctions.extraArgParsing(msg)}, tackling them to the floor in a giant hug!`
 	],
+	huff: [
+		`<@!${msg.author.id}> huffed, and puffed, and blew ${BotFunctions.extraArgParsing(msg)}'s house down!`
+	],
 	hug: [
 		`<@!${msg.author.id}> sneaks up being ${BotFunctions.extraArgParsing(msg)}, and when they aren't looking, tackles them from behind in the biggest hug ever!`,
 		`<@!${msg.author.id}> gently wraps their arms around ${BotFunctions.extraArgParsing(msg)}, giving them a big warm hug!`

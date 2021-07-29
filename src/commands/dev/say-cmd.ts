@@ -4,7 +4,7 @@ export default new Command("say")
 	.setRestrictions("developer")
 	.setDescription("M-make me say something..")
 	.setUsage("<text>")
-	.setParsedFlags("d", "delete", "reply", "mention")
+	.setParsedFlags("d", "delete", "reply", "mention", "sticker")
 	.setExecutor(async function(msg) {
 		if (msg.dashedArgs.value.includes("d") || msg.dashedArgs.value.includes("delete")) await msg.delete();
 		return msg.channel.createMessage({
@@ -16,6 +16,7 @@ export default new Command("say")
 			},
 			allowedMentions: {
 				repliedUser: !!msg.dashedArgs.keyValue.reply && msg.dashedArgs.value.includes("mention")
-			}
+			},
+			stickerIDS: msg.dashedArgs.keyValue.sticker ? [msg.dashedArgs.keyValue.sticker] : []
 		});
 	});

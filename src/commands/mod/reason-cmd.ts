@@ -53,7 +53,7 @@ export default new Command("reason")
 				}),
 				e.getDescription()!.includes("Last Edit") ? "" : `Last Edit: by **${msg.author.tag}** on ${BotFunctions.formatDiscordTime(Date.now(), "short-datetime", true)}`
 			);
-			await this.editWebhookMessage(msg.gConfig.modlog.webhook!.id, msg.gConfig.modlog.webhook!.token, m.id, {
+			await m.editWebhook(msg.gConfig.modlog.webhook!.token, {
 				embeds: [
 					e.toJSON()
 				]

@@ -16,6 +16,7 @@
     "express": "^4.17.1",
     "express-session": "^1.17.2",
     "file-type": "^16.5.2",
+    "fluxpointapi": "^1.0.0",
     "fs-extra": "^10.0.0",
     "ioredis": "^4.27.6",
     "lavalink": "^2.11.0",

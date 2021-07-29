@@ -17,7 +17,7 @@ export default new Command("conga")
 			await Redis.sadd(k, msg.author.id);
 			await Redis.pexpire(k, 18e5);
 			return msg.channel.createMessage({
-				content: `<@!${msg.author.id}> joined a howl with ${h.length}!\nJoin in with \`${msg.gConfig.getFormattedPrefix()}conga\` ${config.emojis.custom.furdancing}${config.emojis.custom.furdancing}${config.emojis.custom.furdancing}`,
+				content: `<@!${msg.author.id}> joined a conga with ${h.length}!\nJoin in with \`${msg.gConfig.getFormattedPrefix()}conga\` ${config.emojis.custom.furdancing}${config.emojis.custom.furdancing}${config.emojis.custom.furdancing}`,
 				allowedMentions: {
 					users: false
 				}

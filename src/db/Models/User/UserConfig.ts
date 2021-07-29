@@ -15,6 +15,7 @@ export interface RawUserConfig {
 	premium_months: number;
 	premium_subscription: boolean;
 	premium_total: number;
+	marriage: string | null;
 }
 
 export type UserConfigKV = DataTypes<UserConfig>;
@@ -29,6 +30,8 @@ export default class UserConfig {
 		subscription: boolean;
 		total: number;
 	};
+	// no plan for polyamorous relationships
+	marriage: string | null;
 	constructor(id: string, data: RawUserConfig, selfRolesJoinedData: Array<RawSelfRoleJoined>) {
 		this.id = id;
 		this.load(data, selfRolesJoinedData);
@@ -43,6 +46,7 @@ export default class UserConfig {
 			subscription: data.premium_subscription,
 			total: data.premium_total
 		};
+		this.marriage = data.marriage;
 		return this;
 	}
 
@@ -59,7 +63,8 @@ export default class UserConfig {
 			premium_kofi_email: data.donations?.kofiEmail,
 			premium_months: data.donations?.months,
 			premium_subscription: data.donations?.subscription,
-			premium_total: data.donations?.total
+			premium_total: data.donations?.total,
+			marriage: data.marriage
 		} as RawUserConfig;
 
 		const keys = Object.keys(v).filter(k => v[k as keyof typeof v] !== undefined);
