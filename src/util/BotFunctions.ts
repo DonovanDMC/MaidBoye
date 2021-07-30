@@ -240,15 +240,16 @@ export default class BotFunctions {
 
 	static async genericFunCommand(this: MaidBoye, msg: ExtendedMessage, cmd: Command) {
 		if (!["wag"].some(v => cmd.triggers.includes(v)) && msg.args.length < 1) return new CommandError("INVALID_USAGE", cmd);
+		const r = funCommandResponses(msg)[cmd.triggers[0] as "hug"];
 
 		const embed = new EmbedBuilder(true, msg.author)
 			.setAuthor(msg.author.tag, msg.author.avatarURL)
-			.setDescription(funCommandResponses(msg)[cmd.triggers[0] as "hug"])
+			.setDescription(r[Math.floor(Math.random() * r.length)])
 			.setTimestamp(new Date().toISOString());
 
 		if (cmd.triggers.includes("bap")) embed.setImage("https://assets.maid.gay/bap.gif");
 		if (cmd.triggers.includes("bellyrub")) embed.setImage("https://assets.maid.gay/bellyrub.gif");
-		if (cmd.triggers.includes("spray")) embed.setDescription(`${embed.getDescription()!}\n${`<:${config.emojis.custom.spray}>`.repeat(Math.floor(Math.random() * 3) + 2)}`);
+		if (cmd.triggers.includes("spray")) embed.setDescription(`${embed.getDescription()!}\n${config.emojis.custom.spray.repeat(Math.floor(Math.random() * 3) + 2)}`);
 
 		return msg.channel.createMessage({
 			embeds: [
@@ -259,10 +260,11 @@ export default class BotFunctions {
 
 	static async genericFunCommandWithImage(this: MaidBoye, msg: ExtendedMessage, cmd: Command, type: keyof typeof Yiffy["furry"] | "blep") {
 		if (![].some(v => cmd.triggers.includes(v)) && msg.args.length < 1)  return new CommandError("INVALID_USAGE", cmd);
+		const r = funCommandResponses(msg)[cmd.triggers[0] as "hug"];
 
 		const embed = new EmbedBuilder(true, msg.author)
 			.setAuthor(msg.author.tag, msg.author.avatarURL)
-			.setDescription(funCommandResponses(msg)[cmd.triggers[0] as "hug"])
+			.setDescription(r[Math.floor(Math.random() * r.length)])
 			.setTimestamp(new Date().toISOString());
 
 		if (msg.gConfig.settings.commandImages) {
