@@ -109,7 +109,7 @@ export default new Command("ship")
 		return msg.channel.createMessage({
 			embed: new EmbedBuilder(true, msg.author)
 				.setTitle("Shipping")
-				.setDescription(`Shipping <@!${member1.id}> and <@!${member2.id}>\n**${ship.amount}** - ${ship.name}`)
+				.setDescription(`Shipping <@!${member1.id}> and <@!${member2.id}>\n**${ship.amount}%** - ${ship.name}`)
 				.setFooter(config.emojis.default.blueHeart)
 				.setImage("attachment://ship.png")
 				.toJSON()
