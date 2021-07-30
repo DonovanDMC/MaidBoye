@@ -6,6 +6,7 @@ import { RawSelfRole } from "./Models/Guild/SelfRole";
 import { RawSelfRoleJoined } from "./Models/User/SelfRoleJoined";
 import { RawPrefix } from "./Models/Guild/Prefix";
 import { RawTag } from "./Models/Guild/Tag";
+import { RawLogEvent } from "./Models/Guild/LogEvent";
 import Logger from "@util/Logger";
 import config from "@config";
 import IORedis from "ioredis";
@@ -80,6 +81,7 @@ export default class db {
 		const cache = await this.r.get(`cache:users:${id}`);
 		if (cache !== null && bypassCache !== true) {
 			const v = JSON.parse<{ user: RawUserConfig; selfRolesJoined: Array<RawSelfRoleJoined>; }>(cache);
+			if (v === undefined || v.user === undefined || v.selfRolesJoined === undefined) return this.getUser(id, raw as true);
 			if (raw) return v;
 			else return new UserConfig(id, v.user, v.selfRolesJoined);
 		}
@@ -113,6 +115,7 @@ export default class db {
 		prefix: Array<RawPrefix>;
 		selfRoles: Array<RawSelfRole>;
 		tags: Array<RawTag>;
+		logEvents: Array<RawLogEvent>;
 	}>;
 	static async getGuild(id: string, raw?: false, bypassCache?: boolean): Promise<GuildConfig>;
 	static async getGuild(id: string, raw = false, bypassCache = false) {
@@ -124,15 +127,18 @@ export default class db {
 				prefix: Array<RawPrefix>;
 				selfRoles: Array<RawSelfRole>;
 				tags: Array<RawTag>;
+				logEvents: Array<RawLogEvent>;
 			}>(cache);
+			if (v === undefined || v.guild === undefined || v.prefix === undefined || v.selfRoles === undefined || v.tags === undefined || v.logEvents === undefined) return this.getGuild(id, raw as true);
 			if (raw) return v;
-			else return new GuildConfig(id, v.guild, v.prefix, v.selfRoles, v.tags);
+			else return new GuildConfig(id, v.guild, v.prefix, v.selfRoles, v.tags, v.logEvents);
 		}
 		const start = Timer.start();
 		let res = await this.pool.query("SELECT * FROM guilds WHERE id=? LIMIT 1", [id]).then(v => (v as Array<RawGuildConfig>)[0]);
 		let prefix = await this.pool.query("SELECT * FROM prefix WHERE guild_id=?", [id]).then(v => (v as Array<RawPrefix>));
 		const selfRoles = await this.pool.query("SELECT * FROM selfroles WHERE guild_id=?", [id]).then(v => (v as Array<RawSelfRole>));
 		const tags = await this.pool.query("SELECT * FROM tags WHERE guild_id=?", [id]).then(v => (v as Array<RawTag>));
+		const logEvents = await this.pool.query("SELECT * FROM logevents WHERE guild_id=?", [id]).then(v => (v as Array<RawLogEvent>));
 		if (res === undefined) {
 			await this.pool.query("INSERT INTO guilds (id) VALUES (?)", [id]);
 			await this.pool.query("INSERT INTO prefix (id, guild_id, value, space) VALUES (?, ?, ?, ?)", [crypto.randomBytes(6).toString("hex"), id, config.defaults.prefix, true]);
@@ -160,8 +166,9 @@ export default class db {
 			guild: res,
 			prefix,
 			selfRoles,
-			tags
+			tags,
+			logEvents
 		};
-		else return new GuildConfig(id, res, prefix, selfRoles, tags);
+		else return new GuildConfig(id, res, prefix, selfRoles, tags, logEvents);
 	}
 }

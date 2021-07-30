@@ -9,6 +9,7 @@ import {
 	UnLockDownEntry, UnLockEntry, UnMuteEntry,
 	WarnEntry
 } from "./ModLog/All";
+import LogEvent, { RawLogEvent } from "./LogEvent";
 import { OkPacket } from "@util/@types/MariaDB";
 import { DataTypes, DeepPartial, SomePartial, Writeable } from "@uwu-codes/types";
 import BotFunctions from "@util/BotFunctions";
@@ -38,6 +39,7 @@ export default class GuildConfig {
 	prefix: Array<Prefix>;
 	tags = new Collection<string, Tag>();
 	selfRoles = new Collection<string, SelfRole>();
+	logEvents: Array<LogEvent>;
 	modlog: {
 		enabled: boolean;
 		caseEditingEnabled: boolean;
@@ -51,18 +53,19 @@ export default class GuildConfig {
 		muteRole: string | null;
 		commandImages: boolean;
 	};
-	constructor(id: string, data: RawGuildConfig, prefixData: Array<RawPrefix>, selfRolesData: Array<RawSelfRole>, tagsData: Array<RawTag>) {
+	constructor(id: string, data: RawGuildConfig, prefixData: Array<RawPrefix>, selfRolesData: Array<RawSelfRole>, tagsData: Array<RawTag>, logEventsData: Array<RawLogEvent>) {
 		this.id = id;
-		this.load(data, prefixData, selfRolesData, tagsData);
+		this.load(data, prefixData, selfRolesData, tagsData, logEventsData);
 	}
 
-	private load(data: RawGuildConfig, prefixData: Array<RawPrefix>, selfRolesData: Array<RawSelfRole>, tagsData: Array<RawTag>) {
+	private load(data: RawGuildConfig, prefixData: Array<RawPrefix>, selfRolesData: Array<RawSelfRole>, tagsData: Array<RawTag>, logEventsData: Array<RawLogEvent>) {
 		this.id = data.id;
 		this.prefix = prefixData.map(d => new Prefix(d, this));
 		this.tags.clear();
 		tagsData.forEach(d => this.tags.set(d.name, new Tag(d, this)));
 		this.selfRoles.clear();
 		selfRolesData.forEach(d => this.selfRoles.set(d.role, new SelfRole(d, this)));
+		this.logEvents = logEventsData.map(l => new LogEvent(l, this));
 		this.modlog = {
 			enabled: Boolean(data.modlog_enabled),
 			caseEditingEnabled: Boolean(data.modlog_case_editing_enabled),
@@ -86,7 +89,7 @@ export default class GuildConfig {
 	async reload() {
 		const v = await db.getGuild(this.id, true, true);
 		if (!v) throw new Error(`Unexpected undefined on GuildConfig#reload (id: ${this.id})`);
-		this.load(v.guild, v.prefix, v.selfRoles, v.tags);
+		this.load(v.guild, v.prefix, v.selfRoles, v.tags, v.logEvents);
 		return this;
 	}
 
@@ -184,8 +187,34 @@ export default class GuildConfig {
 	}
 
 	async resetPrefixes() {
-		const res = await db.query("DELETE FROM prefix guild_id=?", [this.id]).then((r: OkPacket) => r.affectedRows > 0);
+		const res = await db.query("DELETE FROM prefix WHERE guild_id=?", [this.id]).then((r: OkPacket) => r.affectedRows > 0);
 		await this.addPrefix(config.defaults.prefix, true);
+		if (res === false) return false;
+		await this.reload();
+		return true;
+	}
+
+	async addLogEvent(event: string, channel: string) {
+		const id = crypto.randomBytes(6).toString("hex");
+		await db.query("INSERT INTO logevents (id, guild_id, event, channel) VALUES (?, ?, ?, ?)", [
+			id,
+			this.id,
+			event,
+			channel
+		]);
+		await this.reload();
+		return id;
+	}
+
+	async removeLogEvent(event: string, channel: string) {
+		const res = await db.query("DELETE FROM logevents WHERE event=? AND channel=? AND guild_id=?", [event, channel, this.id]).then((r: OkPacket) => r.affectedRows > 0);
+		if (res === false) return false;
+		await this.reload();
+		return true;
+	}
+
+	async resetLogEvents() {
+		const res = await db.query("DELETE FROM logevents WHERE guild_id=?", [this.id]).then((r: OkPacket) => r.affectedRows > 0);
 		if (res === false) return false;
 		await this.reload();
 		return true;

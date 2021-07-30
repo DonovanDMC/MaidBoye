@@ -214,5 +214,23 @@ process.nextTick(async() => {
 
 	console.log("----------");
 
+	const logEventsProps = {
+		id: "CHAR(12) NOT NULL UNIQUE",
+		guild_id: "VARCHAR(21) NOT NULL REFERENCES guilds(id)",
+		event: "VARCHAR(20) NOT NULL",
+		channel: "VARCHAR(21) NOT NULL"
+	};
+
+	console.log("Creating Warnings Table");
+	await pool.query("SET FOREIGN_KEY_CHECKS=0; DROP TABLE IF EXISTS warnings");
+	await pool.query(`CREATE TABLE logevents (${Object.entries(logEventsProps).map(([a, b]) => `${a} ${b}`).join(", ")}, PRIMARY KEY (id))`);
+	await pool.query("CREATE INDEX guild_id ON logevents (guild_id)");
+	await pool.query("CREATE INDEX user_id ON logevents (event)");
+	await pool.query("CREATE INDEX blame_id ON logevents (channel)");
+	await pool.query("ALTER TABLE logevents ADD UNIQUE guild_event_channel (guild_id, event, channel)");
+	console.log("Created Warnings Table");
+
+	console.log("----------");
+
 	process.exit(0);
 });
