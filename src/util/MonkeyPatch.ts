@@ -240,7 +240,7 @@ Object.defineProperties(Eris.Message.prototype, {
 
 Object.defineProperties(Eris.Client.prototype, {
 	createInteractionResponse: {
-		async value(this: Eris.Client, id: string, token: string, type: Eris.InteractionCallbackType[keyof Eris.InteractionCallbackType], content?: Eris.InteractionPayload) {
+		async value(this: Eris.Client, id: string, token: string, type: typeof Eris["Constants"]["InteractionResponseTypes"][keyof typeof Eris["Constants"]["InteractionResponseTypes"]], content?: Eris.InteractionPayload) {
 			if (content && (!content.content && !content.file && !content.embeds) && !content.components) return Promise.reject(new Error("No content, file, embeds, or components"));
 			return this.requestHandler.request("POST", `/interactions/${id}/${token}/callback`, true, {
 				type,

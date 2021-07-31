@@ -21,7 +21,7 @@ export default new Command("uinfo", "userinfo")
 	.setExecutor(async function(msg) {
 		let user = msg.args.length === 0 ? msg.author : await msg.getUserFromArgs();
 		// @FIXME banners don't seem to be sent over gateway yet
-		if (user && (user.banner === undefined || user.bannerColor === undefined)) user = await this.getUser(user.id, true);
+		if (user && (user.banner === undefined || user.accentColor === undefined)) user = await this.getUser(user.id, true);
 		if (user === null) return msg.reply("Th-that isn't a valid user..");
 		const member = msg.channel.guild.members.get(user.id);
 		const sortedMembers = Array.from(msg.channel.guild.members.values()).sort((a,b) => (a.joinedAt ?? 0) - (b.joinedAt ?? 0));
@@ -71,7 +71,7 @@ export default new Command("uinfo", "userinfo")
 						`${config.emojis.default.dot} Tag: **${user.tag}**`,
 						`${config.emojis.default.dot} ID: **${user.id}**`,
 						`${config.emojis.default.dot} Avatar: [[Link](${user.avatarURL})]`,
-						`${config.emojis.default.dot} Banner: ${user.banner === null ? "[None]" : `[[Link](${user.bannerURL!})] ${user.bannerColor === null ? "" : `(#${user.bannerColor.toString(16)})`}`}`,
+						`${config.emojis.default.dot} Banner: ${user.banner === null ? "[None]" : `[[Link](${user.bannerURL!})] ${user.accentColor === null ? "" : `(#${user.accentColor.toString(16)})`}`}`,
 						`${config.emojis.default.dot} Creation Date: ${BotFunctions.formatDiscordTime(user.createdAt, "long-datetime", true)}`,
 						member === undefined ? "" : [
 							"",

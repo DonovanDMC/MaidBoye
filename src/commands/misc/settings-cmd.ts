@@ -50,7 +50,7 @@ export default new Command("settings")
 					.toJSON()
 				// string (MessageContent) isn't assignable to InteractionPayload
 			} as Eris.AdvancedMessageContent;
-			if (id && token) await this.createInteractionResponse(id, token, Eris.InteractionCallbackType.UPDATE_MESSAGE, body);
+			if (id && token) await this.createInteractionResponse(id, token, Eris.Constants.InteractionResponseTypes.UPDATE_MESSAGE, body);
 			else await m.edit(body);
 			const wait = await msg.channel.awaitComponentInteractions(6e4, (it) => it.data.custom_id.startsWith("settings-") && it.member.user.id === msg.author.id && it.message.id === m.id);
 			if (wait === null) return void m.edit({
@@ -78,7 +78,7 @@ export default new Command("settings")
 						if (e[1] === true) await new Promise(a => setTimeout(a, 3e3, undefined));
 						return void changePage.call(this);
 					}
-				} else return void this.createInteractionResponse(wait.id, wait.token, Eris.InteractionCallbackType.UPDATE_MESSAGE, {
+				} else return void this.createInteractionResponse(wait.id, wait.token, Eris.Constants.InteractionResponseTypes.UPDATE_MESSAGE, {
 					content: "",
 					embeds: [
 						new EmbedBuilder(true, msg.author)
@@ -92,7 +92,7 @@ export default new Command("settings")
 		}
 
 		async function configure(this: MaidBoye, id: string, token: string): Promise<ExecReturn> {
-			await this.createInteractionResponse(id, token, Eris.InteractionCallbackType.UPDATE_MESSAGE, {
+			await this.createInteractionResponse(id, token, Eris.Constants.InteractionResponseTypes.UPDATE_MESSAGE, {
 				content: "",
 				embeds: [
 					formatEmbed(pages[page - 1])
@@ -124,7 +124,7 @@ export default new Command("settings")
 				return [false, false];
 			} else {
 				if (wait.data.custom_id.includes("exit")) {
-					await this.createInteractionResponse(wait.id, wait.token, Eris.InteractionCallbackType.UPDATE_MESSAGE, {
+					await this.createInteractionResponse(wait.id, wait.token, Eris.Constants.InteractionResponseTypes.UPDATE_MESSAGE, {
 						content: "",
 						embeds: [
 							new EmbedBuilder(true, msg.author)
@@ -136,7 +136,7 @@ export default new Command("settings")
 					});
 					return [false, false];
 				}
-				await this.createInteractionResponse(wait.id, wait.token, Eris.InteractionCallbackType.DEFERRED_UPDATE_MESSAGE);
+				await this.createInteractionResponse(wait.id, wait.token, Eris.Constants.InteractionResponseTypes.DEFERRED_UPDATE_MESSAGE);
 				const { values: v = [] } = (wait.data as APIMessageSelectMenuInteractionData);
 				if (wait.data.custom_id.includes("back")) return [true, false];
 				const n = Settings.find(s => s.name.replace(/\s/g, "-").toLowerCase() === v[0]);

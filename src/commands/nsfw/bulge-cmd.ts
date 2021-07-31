@@ -39,7 +39,7 @@ export default new Command("bulge")
 			});
 			else {
 				if (!id || !token) return;
-				await this.createInteractionResponse(id, token, Eris.InteractionCallbackType.UPDATE_MESSAGE,{
+				await this.createInteractionResponse(id, token, Eris.Constants.InteractionResponseTypes.UPDATE_MESSAGE,{
 					embeds: [e],
 					components: c
 				});

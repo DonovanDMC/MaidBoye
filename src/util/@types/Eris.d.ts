@@ -49,19 +49,10 @@ declare module "eris" {
 	}
 
 	type InteractionPayload = Omit<WebhookPayload, "auth" | "avatarURL" | "username" | "wait"> & { flags?: number; };
-	interface InteractionCallbackType {
-		PONG: 1;
-		CHANNEL_MESSAGE_WITH_SOURCE: 4;
-		DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE: 5;
-		DEFERRED_UPDATE_MESSAGE: 6;
-		UPDATE_MESSAGE: 7;
-	}
-
-	export const InteractionCallbackType: InteractionCallbackType;
 
 	interface Client {
-		createInteractionResponse(id: string, token: string, type: InteractionCallbackType[keyof InteractionCallbackType]): Promise<void>;
-		createInteractionResponse(id: string, token: string, type: InteractionCallbackType[keyof InteractionCallbackType], content: InteractionPayload): Promise<Message<TextChannel>>;
+		createInteractionResponse(id: string, token: string, type: Constants["InteractionResponseTypes"][keyof Constants["InteractionResponseTypes"]]): Promise<void>;
+		createInteractionResponse(id: string, token: string, type: Constants["InteractionResponseTypes"][keyof Constants["InteractionResponseTypes"]], content: InteractionPayload): Promise<Message<TextChannel>>;
 		getOriginalInteractionResponse(applicationId: string, token: string): Promise<Message<TextChannel>>;
 		editOriginalInteractionResponse(applicationId: string, token: string, content: InteractionPayload): Promise<Message<TextChannel>>;
 		deleteOriginalInteractionResponse(applicationId: string, token: string): Promise<void>;

@@ -32,7 +32,7 @@ async function duplicate(originalMessage: ExtendedMessage, botMessage: Eris.Mess
 		});
 		return false;
 	} else {
-		await originalMessage.client.createInteractionResponse(wait.id, wait.token, Eris.InteractionCallbackType.DEFERRED_UPDATE_MESSAGE);
+		await originalMessage.client.createInteractionResponse(wait.id, wait.token, Eris.Constants.InteractionResponseTypes.DEFERRED_UPDATE_MESSAGE);
 		if (wait.data.custom_id.includes("back")) return true;
 		else return false;
 	}
@@ -89,7 +89,7 @@ const Settings = [
 				return [false, false];
 			} else {
 				const { values: [ v = null ] } = wait.data as APIMessageSelectMenuInteractionData ?? { values: [] };
-				await originalMessage.client.createInteractionResponse(wait.id, wait.token, Eris.InteractionCallbackType.DEFERRED_UPDATE_MESSAGE);
+				await originalMessage.client.createInteractionResponse(wait.id, wait.token, Eris.Constants.InteractionResponseTypes.DEFERRED_UPDATE_MESSAGE);
 				if (v === null) {
 					if (wait.data.custom_id.includes("back")) {
 						await botMessage.edit(b);
@@ -189,7 +189,7 @@ const Settings = [
 				return [false, false];
 			} else {
 				const { values: [ v = null ] } = wait.data as APIMessageSelectMenuInteractionData ?? { values: [] };
-				await originalMessage.client.createInteractionResponse(wait.id, wait.token, Eris.InteractionCallbackType.DEFERRED_UPDATE_MESSAGE);
+				await originalMessage.client.createInteractionResponse(wait.id, wait.token, Eris.Constants.InteractionResponseTypes.DEFERRED_UPDATE_MESSAGE);
 				if (v === null) {
 					if (wait.data.custom_id.includes("back")) {
 						await botMessage.edit(b);
@@ -269,7 +269,7 @@ const Settings = [
 					.then(async(wait) => {
 						if (resolved === true) return;
 						if (wait !== null) {
-							await originalMessage.client.createInteractionResponse(wait.id, wait.token, Eris.InteractionCallbackType.DEFERRED_UPDATE_MESSAGE);
+							await originalMessage.client.createInteractionResponse(wait.id, wait.token, Eris.Constants.InteractionResponseTypes.DEFERRED_UPDATE_MESSAGE);
 							resolved = true;
 							if (wait.data.custom_id.includes("reset")) {
 								await botMessage.edit({
@@ -413,7 +413,7 @@ const Settings = [
 				return [false, false];
 			} else {
 				const v = wait.data.custom_id.split("-")[1].split(".")[0];
-				await originalMessage.client.createInteractionResponse(wait.id, wait.token, Eris.InteractionCallbackType.DEFERRED_UPDATE_MESSAGE);
+				await originalMessage.client.createInteractionResponse(wait.id, wait.token, Eris.Constants.InteractionResponseTypes.DEFERRED_UPDATE_MESSAGE);
 				if (v === null) {
 					if (wait.data.custom_id.includes("back")) {
 						await botMessage.edit(b);

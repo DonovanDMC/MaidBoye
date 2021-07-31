@@ -74,7 +74,7 @@ export default new Command("e621", "e6")
 				.setColor(post.rating === "s" ? "green" : post.rating === "q" ? "gold" : post.rating === "e" ? "red" : "bot")
 				.setFooter(`Post #${post.id} | ${i + 1}/${posts.length} | ${post.score.up} ${config.emojis.default.up} ${post.score.down} ${config.emojis.default.down} | ${post.fav_count} ${config.emojis.default.heart}`)
 				.removeDescription();
-			if (id && token) await this.createInteractionResponse(id, token, Eris.InteractionCallbackType.DEFERRED_UPDATE_MESSAGE);
+			if (id && token) await this.createInteractionResponse(id, token, Eris.Constants.InteractionResponseTypes.DEFERRED_UPDATE_MESSAGE);
 
 			if (post.file.ext === "swf") {
 				if (msg.dashedArgs.value.includes("no-flash")) {

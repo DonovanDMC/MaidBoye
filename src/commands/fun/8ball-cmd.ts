@@ -68,7 +68,7 @@ export default new Command("8ball")
 				});
 				return;
 			} else {
-				await this.createInteractionResponse(wait.id, wait.token, Eris.InteractionCallbackType.DEFERRED_UPDATE_MESSAGE);
+				await this.createInteractionResponse(wait.id, wait.token, Eris.Constants.InteractionResponseTypes.DEFERRED_UPDATE_MESSAGE);
 				if (wait.data.custom_id.includes("new")) void main.call(this);
 				else {
 					await m.edit({

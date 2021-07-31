@@ -72,7 +72,7 @@ export default new Command("setup-mutes")
 			],
 			components: []
 		});
-		if (w.data.custom_id.includes("no")) return this.createInteractionResponse(w.id, w.token, Eris.InteractionCallbackType.UPDATE_MESSAGE, {
+		if (w.data.custom_id.includes("no")) return this.createInteractionResponse(w.id, w.token, Eris.Constants.InteractionResponseTypes.UPDATE_MESSAGE, {
 			embeds: [
 				new EmbedBuilder(true, msg.author)
 					.setTitle("Edits Cancelled")
@@ -82,7 +82,7 @@ export default new Command("setup-mutes")
 			],
 			components: []
 		});
-		await  this.createInteractionResponse(w.id, w.token, Eris.InteractionCallbackType.UPDATE_MESSAGE, {
+		await  this.createInteractionResponse(w.id, w.token, Eris.Constants.InteractionResponseTypes.UPDATE_MESSAGE, {
 			content: "Processing..",
 			embeds: [],
 			components: []

@@ -78,7 +78,7 @@ export default new Command("yiff", "thegoodstuff")
 			});
 			else {
 				if (!id || !token) return;
-				await this.createInteractionResponse(id, token, Eris.InteractionCallbackType.UPDATE_MESSAGE,{
+				await this.createInteractionResponse(id, token, Eris.Constants.InteractionResponseTypes.UPDATE_MESSAGE,{
 					embeds: [e],
 					components: c
 				});

@@ -212,32 +212,32 @@ export default new Command("sinfo", "serverinfo")
 			} else {
 				switch (c.data.custom_id.split(".")[0].split("-")[1]) {
 					case "members": {
-						await this.createInteractionResponse(c.id, c.token, Eris.InteractionCallbackType.UPDATE_MESSAGE, sections.members);
+						await this.createInteractionResponse(c.id, c.token, Eris.Constants.InteractionResponseTypes.UPDATE_MESSAGE, sections.members);
 						break;
 					}
 
 					case "channels": {
-						await this.createInteractionResponse(c.id, c.token, Eris.InteractionCallbackType.UPDATE_MESSAGE, sections.channels);
+						await this.createInteractionResponse(c.id, c.token, Eris.Constants.InteractionResponseTypes.UPDATE_MESSAGE, sections.channels);
 						break;
 					}
 
 					case "icon": {
-						await this.createInteractionResponse(c.id, c.token, Eris.InteractionCallbackType.UPDATE_MESSAGE, sections.icon);
+						await this.createInteractionResponse(c.id, c.token, Eris.Constants.InteractionResponseTypes.UPDATE_MESSAGE, sections.icon);
 						break;
 					}
 
 					case "splash": {
-						await this.createInteractionResponse(c.id, c.token, Eris.InteractionCallbackType.UPDATE_MESSAGE, sections.splash);
+						await this.createInteractionResponse(c.id, c.token, Eris.Constants.InteractionResponseTypes.UPDATE_MESSAGE, sections.splash);
 						break;
 					}
 
 					case "banner": {
-						await this.createInteractionResponse(c.id, c.token, Eris.InteractionCallbackType.UPDATE_MESSAGE, sections.banner);
+						await this.createInteractionResponse(c.id, c.token, Eris.Constants.InteractionResponseTypes.UPDATE_MESSAGE, sections.banner);
 						break;
 					}
 
 					case "back": {
-						await this.createInteractionResponse(c.id, c.token, Eris.InteractionCallbackType.UPDATE_MESSAGE, sections.server);
+						await this.createInteractionResponse(c.id, c.token, Eris.Constants.InteractionResponseTypes.UPDATE_MESSAGE, sections.server);
 						break;
 					}
 				}

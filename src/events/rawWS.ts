@@ -47,7 +47,7 @@ export default new ClientEvent("rawWS", async function({ op, d, t }) {
 					const data = d as GatewayInteractionCreateDispatchData;
 					switch (data.type) {
 						case InteractionType.ApplicationCommand: {
-							void this.createInteractionResponse(data.id, data.token, Eris.InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE, {
+							void this.createInteractionResponse(data.id, data.token, Eris.Constants.InteractionResponseTypes.CHANNEL_MESSAGE_WITH_SOURCE, {
 								content: "Slash Commands have not been set up yet.",
 								flags: 64
 							});

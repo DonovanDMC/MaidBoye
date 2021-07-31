@@ -103,7 +103,7 @@ export default new Command("inspect")
 				});
 				return;
 			} else {
-				await this.createInteractionResponse(wait.id, wait.token, Eris.InteractionCallbackType.DEFERRED_UPDATE_MESSAGE);
+				await this.createInteractionResponse(wait.id, wait.token, Eris.Constants.InteractionResponseTypes.DEFERRED_UPDATE_MESSAGE);
 				if (wait.data.custom_id.includes("strikes")) void strikeHistory.call(this);
 				else if (wait.data.custom_id.includes("moderation")) void moderationHistory.call(this);
 				else if (wait.data.custom_id.includes("warnings")) void warningHistory.call(this);
@@ -146,7 +146,7 @@ export default new Command("inspect")
 				});
 				return;
 			} else {
-				await this.createInteractionResponse(wait.id, wait.token, Eris.InteractionCallbackType.DEFERRED_UPDATE_MESSAGE);
+				await this.createInteractionResponse(wait.id, wait.token, Eris.Constants.InteractionResponseTypes.DEFERRED_UPDATE_MESSAGE);
 				if (wait.data.custom_id.includes("prev")){
 					page--;
 					void strikeHistory.call(this);
@@ -194,7 +194,7 @@ export default new Command("inspect")
 				});
 				return;
 			} else {
-				await this.createInteractionResponse(wait.id, wait.token, Eris.InteractionCallbackType.DEFERRED_UPDATE_MESSAGE);
+				await this.createInteractionResponse(wait.id, wait.token, Eris.Constants.InteractionResponseTypes.DEFERRED_UPDATE_MESSAGE);
 				if (wait.data.custom_id.includes("prev")){
 					page--;
 					void moderationHistory.call(this);
@@ -243,7 +243,7 @@ export default new Command("inspect")
 				});
 				return;
 			} else {
-				await this.createInteractionResponse(wait.id, wait.token, Eris.InteractionCallbackType.DEFERRED_UPDATE_MESSAGE);
+				await this.createInteractionResponse(wait.id, wait.token, Eris.Constants.InteractionResponseTypes.DEFERRED_UPDATE_MESSAGE);
 				if (wait.data.custom_id.includes("prev")){
 					page--;
 					void warningHistory.call(this);
