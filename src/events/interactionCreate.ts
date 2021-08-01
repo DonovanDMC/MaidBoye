@@ -18,8 +18,7 @@ export default new ClientEvent("interactionCreate", async function(interaction) 
 		}
 
 		case Eris.Constants.InteractionTypes.MESSAGE_COMPONENT: {
-			Logger.getLogger("MessageInteraction").info(`Recieved interaction from ${!interaction.member ? "Unknown" : `${interaction.member.tag} (${interaction.member.id})`}, interaction id: "${interaction.data!.custom_id!}"`);
-			if(interaction.data.custom_id.startsWith("help"))
+			Logger.getLogger("MessageInteraction").info(`Recieved interaction from ${!interaction.member ? "Unknown" : `${interaction.member.tag} (${interaction.member.id})`}, interaction id: "${interaction.data.custom_id}"`);
 			break;
 		}
 	}

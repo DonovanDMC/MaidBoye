@@ -4,7 +4,6 @@ import MaidBoye from "@MaidBoye";
 import ComponentHelper from "@util/ComponentHelper";
 import EmbedBuilder from "@util/EmbedBuilder";
 import { ApplicationCommandOptionType } from "discord-api-types";
-import Eris from "eris";
 
 const answers = [
 	["Outlook Good", "https://indra.com/8ball/images/1.gif"],
