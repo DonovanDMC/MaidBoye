@@ -18,7 +18,7 @@ export default new Command("shorten")
 					embeds: [
 						new EmbedBuilder(true, msg.author)
 							.setTitle("URL Shortened")
-							.setDescription(`Code: \`${short.code}\``)
+							.setDescription(`Code: \`${short.code}\`\nShort URL: [${short.fullURL}](${short.fullURL})`)
 							.toJSON()
 					],
 					components: new ComponentHelper()
