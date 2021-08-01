@@ -6,15 +6,17 @@ import { Permissions } from "@cmd/Command";
 import ErrorHandler from "@util/handlers/ErrorHandler";
 import CommandError from "@cmd/CommandError";
 import config from "@config";
-import { Strings } from "@uwu-codes/utils";
+import { Strings, Timers } from "@uwu-codes/utils";
 import Eris from "eris";
 import StatsHandler from "@util/handlers/StatsHandler";
 import EventsASecondHandler from "@util/handlers/EventsASecondHandler";
 
 export default new ClientEvent("messageCreate", async function (message) {
+	const t = new Timers((config.developers.includes(message.author.id) || config.beta) === true ? (label, info) => Logger.getLogger(label).debug(info) : false);
 	if (message.author.bot === true || !("type" in message.channel) || message.channel.type === Eris.Constants.ChannelTypes.GROUP_DM) return;
 	// @TODO blacklist
 
+	t.start("dm");
 	if (message.channel.type === Eris.Constants.ChannelTypes.DM) {
 		StatsHandler.trackBulkNoResponse(
 			"stats:directMessage",
@@ -32,6 +34,7 @@ export default new ClientEvent("messageCreate", async function (message) {
 			]
 		});
 	}
+	t.end("dm");
 
 	// ignore if we can't send messages
 	// (we need to check channel and guild to remove Uncached and PrivateChannel)
@@ -44,8 +47,12 @@ export default new ClientEvent("messageCreate", async function (message) {
 		Eris.Constants.ChannelTypes.GUILD_PRIVATE_THREAD
 	].includes(message.channel.type as 10)) return;
 
+	t.start("extend");
 	const msg = new ExtendedMessage(message as Eris.Message<Exclude<Eris.GuildTextableChannel, Eris.AnyThreadChannel>>, this);
+	t.end("extend");
+	t.start("process");
 	const load = await msg.load();
+	t.end("process");
 	if (msg.content.split(" ").slice(1).join(" ").replace(/go/, "").trim().toLowerCase().startsWith("make me")) return msg.reply("Th-that's not my purpose..");
 	if (msg.content.split(" ").slice(1).join(" ").trim().toLowerCase().startsWith("fuck me")) return msg.reply("I-I don't even know you..");
 	const { cmd } = msg;
@@ -72,6 +79,7 @@ export default new ClientEvent("messageCreate", async function (message) {
 	// ignore commands in report channels
 	if (/^user-report-([a-z\d]+)$/i.exec(msg.channel.name) && !cmd.triggers.includes("report")) return;
 
+	t.start("restrictions");
 	if (!config.developers.includes(msg.author.id)) {
 		if (cmd.restrictions.includes("developer")) {
 			StatsHandler.trackBulkNoResponse(
@@ -138,6 +146,7 @@ export default new ClientEvent("messageCreate", async function (message) {
 		);
 		return msg.reply(`H-hey! I'm missing the ${Strings.plural("permission", missingBot)} **${Strings.joinAnd(missingBot.map(p => config.permissions[p] || p), "**, **")}**.. I must have these for this command to function!`);
 	}
+	t.end("restrictions");
 
 	StatsHandler.trackBulkNoResponse(
 		`stats:commands:${cmd.triggers[0]}`,
@@ -147,8 +156,10 @@ export default new ClientEvent("messageCreate", async function (message) {
 	EventsASecondHandler.add(`COMMANDS.${cmd.triggers[0].toUpperCase()}`);
 	Logger.getLogger("CommandHandler").info(`Command ${cmd.triggers[0]} ran with ${msg.args.length === 0 ? "no arguments" : `the arguments "${msg.rawArgs.join(" ")}" by ${msg.author.tag} (${msg.author.id}) in the guild ${msg.channel.guild.name} (${msg.channel.guild.id})`}`);
 
+	t.start("run");
 	void cmd.run.call(this, msg, cmd)
 		.then(res => {
+			t.end("run");
 			if (res instanceof Error) throw res;
 		})
 		.catch(async(err: Error) => {

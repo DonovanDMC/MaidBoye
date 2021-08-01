@@ -2,7 +2,6 @@ import ModLogHandler from "../../util/handlers/ModLogHandler";
 import Command from "@cmd/Command";
 import Eris from "eris";
 import db from "@db";
-import { ApplicationCommandOptionType } from "discord-api-types";
 const Redis = db.r;
 
 export default new Command("lockdown")
@@ -12,7 +11,7 @@ export default new Command("lockdown")
 	.setUsage("[reason]")
 	.setSlashOptions(true, [
 		{
-			type: ApplicationCommandOptionType.String,
+			type: Eris.Constants.CommandOptionTypes.STRING,
 			name: "reason",
 			description: "The reason for locking the server",
 			required: false

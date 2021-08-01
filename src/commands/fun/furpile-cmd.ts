@@ -1,6 +1,6 @@
 import Command from "@cmd/Command";
+import Eris from "eris";
 import db from "@db";
-import { ApplicationCommandOptionType } from "discord-api-types";
 const Redis = db.r;
 
 export default new Command("furpile")
@@ -8,7 +8,7 @@ export default new Command("furpile")
 	.setDescription("Start a furpile, or join one")
 	.setSlashOptions(true, [
 		{
-			type: ApplicationCommandOptionType.User,
+			type: Eris.Constants.CommandOptionTypes.USER,
 			name: "user",
 			description: "The user to start a furpile on (none to join an existing furpile)",
 			required: false

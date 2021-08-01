@@ -3,7 +3,6 @@ import config from "@config";
 import EmbedBuilder from "@util/EmbedBuilder";
 import Logger from "@util/Logger";
 import FluxPoint from "@util/req/FluxPoint";
-import { ApplicationCommandOptionType } from "discord-api-types";
 import Eris from "eris";
 
 export default new Command("ship")
@@ -12,13 +11,13 @@ export default new Command("ship")
 	.setUsage("[@member1] [@member2]")
 	.setSlashOptions(true, [
 		{
-			type: ApplicationCommandOptionType.User,
+			type: Eris.Constants.CommandOptionTypes.USER,
 			name: "user1",
 			description: "The first user to ship (none for random)",
 			required: false
 		},
 		{
-			type: ApplicationCommandOptionType.User,
+			type: Eris.Constants.CommandOptionTypes.USER,
 			name: "user2",
 			description: "The second user to ship (none for you)",
 			required: false

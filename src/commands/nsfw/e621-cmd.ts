@@ -7,7 +7,6 @@ import MaidBoye from "@MaidBoye";
 import E621 from "@util/req/E621";
 import fetch from "node-fetch";
 import Logger from "@util/Logger";
-import { ApplicationCommandOptionType } from "discord-api-types";
 
 // attachment version: https://pastebin.com/D4ZBuLjw
 export default new Command("e621", "e6")
@@ -16,13 +15,13 @@ export default new Command("e621", "e6")
 	.setUsage("[tags]")
 	.setSlashOptions(true, [
 		{
-			type: ApplicationCommandOptionType.String,
+			type: Eris.Constants.CommandOptionTypes.STRING,
 			name: "tags",
 			description: "The tags to search with (default order: favcount), max 40",
 			required: false
 		},
 		{
-			type: ApplicationCommandOptionType.String,
+			type: Eris.Constants.CommandOptionTypes.STRING,
 			name: "no-video",
 			description: "If we should filter out video files",
 			required: false,
@@ -38,7 +37,7 @@ export default new Command("e621", "e6")
 			]
 		},
 		{
-			type: ApplicationCommandOptionType.String,
+			type: Eris.Constants.CommandOptionTypes.STRING,
 			name: "no-flash",
 			description: "If we should filter out flash files",
 			required: false,

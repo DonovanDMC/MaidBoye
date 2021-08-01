@@ -1,6 +1,6 @@
 import Command from "@cmd/Command";
 import BotFunctions from "@util/BotFunctions";
-import { ApplicationCommandOptionType } from "discord-api-types";
+import Eris from "eris";
 
 export default new Command("bellyrub")
 	.setPermissions("bot", "embedLinks", "attachFiles")
@@ -8,7 +8,7 @@ export default new Command("bellyrub")
 	.setUsage("<@user/text>")
 	.setSlashOptions(true, [
 		{
-			type: ApplicationCommandOptionType.User,
+			type: Eris.Constants.CommandOptionTypes.USER,
 			name: "user",
 			description: "The user to give a belly rub to",
 			required: true

@@ -10,7 +10,6 @@ import Eris from "eris";
 import { Request } from "@uwu-codes/utils";
 import FileType from "file-type";
 import GuildConfig from "@db/Models/Guild/GuildConfig";
-import { ApplicationCommandOptionType } from "discord-api-types";
 
 export default new Command("modlog")
 	.setPermissions("bot", "embedLinks", "manageChannels", "manageWebhooks")
@@ -19,7 +18,7 @@ export default new Command("modlog")
 	.setUsage("(no arguments)")
 	.setSlashOptions(true, [
 		{
-			type: ApplicationCommandOptionType.String,
+			type: Eris.Constants.CommandOptionTypes.STRING,
 			name: "section",
 			description: "the section of modlog configuration to open",
 			choices:[

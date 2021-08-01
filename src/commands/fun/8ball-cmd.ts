@@ -3,7 +3,7 @@ import config from "@config";
 import MaidBoye from "@MaidBoye";
 import ComponentHelper from "@util/ComponentHelper";
 import EmbedBuilder from "@util/EmbedBuilder";
-import { ApplicationCommandOptionType } from "discord-api-types";
+import Eris from "eris";
 
 const answers = [
 	["Outlook Good", "https://indra.com/8ball/images/1.gif"],
@@ -34,7 +34,7 @@ export default new Command("8ball")
 	.setUsage("<question>")
 	.setSlashOptions(true, [
 		{
-			type: ApplicationCommandOptionType.String,
+			type: Eris.Constants.CommandOptionTypes.STRING,
 			name: "question",
 			description: "The question to ask the magic 8ball.",
 			required: false

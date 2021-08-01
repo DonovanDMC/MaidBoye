@@ -1,6 +1,6 @@
 import Command from "@cmd/Command";
 import EmbedBuilder from "@util/EmbedBuilder";
-import { ApplicationCommandOptionType } from "discord-api-types";
+import Eris from "eris";
 
 
 export default new Command("gayrate")
@@ -8,7 +8,7 @@ export default new Command("gayrate")
 	.setDescription("Rate someone's gayness")
 	.setSlashOptions(true, [
 		{
-			type: ApplicationCommandOptionType.User,
+			type: Eris.Constants.CommandOptionTypes.USER,
 			name: "user",
 			description: "The user to rate (none for yourself)",
 			required: false

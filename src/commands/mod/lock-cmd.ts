@@ -2,7 +2,6 @@ import ModLogHandler from "../../util/handlers/ModLogHandler";
 import Command from "@cmd/Command";
 import EmbedBuilder from "@util/EmbedBuilder";
 import Eris from "eris";
-import { ApplicationCommandOptionType } from "discord-api-types";
 
 export default new Command("lock")
 	.setPermissions("bot", "embedLinks", "manageChannels")
@@ -11,13 +10,13 @@ export default new Command("lock")
 	.setUsage("[<channel> [reason]]")
 	.setSlashOptions(true, [
 		{
-			type: ApplicationCommandOptionType.Channel,
+			type: Eris.Constants.CommandOptionTypes.CHANNEL,
 			name: "channel",
 			description: "The channel to lock (none for current channel)",
 			required: false
 		},
 		{
-			type: ApplicationCommandOptionType.String,
+			type: Eris.Constants.CommandOptionTypes.STRING,
 			name: "reason",
 			description: "The reason for locking the channel",
 			required: false

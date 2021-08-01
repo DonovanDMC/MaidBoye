@@ -3,7 +3,6 @@ import Command from "@cmd/Command";
 import CommandError from "@cmd/CommandError";
 import EmbedBuilder from "@util/EmbedBuilder";
 import Eris from "eris";
-import { ApplicationCommandOptionType } from "discord-api-types";
 
 export default new Command("kick")
 	.setPermissions("bot", "embedLinks", "kickMembers")
@@ -26,19 +25,19 @@ export default new Command("kick")
 	})
 	.setSlashOptions(true, [
 		{
-			type: ApplicationCommandOptionType.User,
+			type: Eris.Constants.CommandOptionTypes.USER,
 			name: "user",
 			description: "The user to kick",
 			required: true
 		},
 		{
-			type: ApplicationCommandOptionType.String,
+			type: Eris.Constants.CommandOptionTypes.STRING,
 			name: "reason",
 			description: "The reason for kicking the user",
 			required: false
 		},
 		{
-			type: ApplicationCommandOptionType.String,
+			type: Eris.Constants.CommandOptionTypes.STRING,
 			name: "no-dm",
 			description: "If we should attempt to dm the kicked user with some info",
 			required: false,

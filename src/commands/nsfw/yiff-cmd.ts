@@ -8,7 +8,6 @@ import { Strings } from "@uwu-codes/utils";
 import Eris from "eris";
 import ComponentHelper from "@util/ComponentHelper";
 import MaidBoye from "@MaidBoye";
-import { ApplicationCommandOptionType } from "discord-api-types";
 
 export default new Command("yiff", "thegoodstuff")
 	.setPermissions("bot", "embedLinks", "attachFiles")
@@ -16,7 +15,7 @@ export default new Command("yiff", "thegoodstuff")
 	.setUsage(`<${config.yiffTypes.join("/")}>`)
 	.setSlashOptions(true, [
 		{
-			type: ApplicationCommandOptionType.String,
+			type: Eris.Constants.CommandOptionTypes.STRING,
 			name: "type",
 			description: "The type of yiff to fetch",
 			required: false,

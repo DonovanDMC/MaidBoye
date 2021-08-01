@@ -5,14 +5,13 @@ import Eris from "eris";
 import ComponentHelper from "@util/ComponentHelper";
 import MaidBoye from "@MaidBoye";
 import BotFunctions from "@util/BotFunctions";
-import { ApplicationCommandOptionType } from "discord-api-types";
 
 export default new Command("sinfo", "serverinfo")
 	.setPermissions("bot", "embedLinks", "attachFiles")
 	.setDescription("Get some info about this server")
 	.setSlashOptions(true, [
 		{
-			type: ApplicationCommandOptionType.String,
+			type: Eris.Constants.CommandOptionTypes.STRING,
 			name: "section",
 			description: "The section of info to get.",
 			required: false,

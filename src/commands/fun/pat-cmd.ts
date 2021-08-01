@@ -1,6 +1,6 @@
 import Command from "@cmd/Command";
 import BotFunctions from "@util/BotFunctions";
-import { ApplicationCommandOptionType } from "discord-api-types";
+import Eris from "eris";
 
 export default new Command("pat", "pet")
 	.setPermissions("bot", "embedLinks")
@@ -8,7 +8,7 @@ export default new Command("pat", "pet")
 	.setUsage("<@user/text>")
 	.setSlashOptions(true, [
 		{
-			type: ApplicationCommandOptionType.User,
+			type: Eris.Constants.CommandOptionTypes.USER,
 			name: "user",
 			description: "The user to pat",
 			required: true

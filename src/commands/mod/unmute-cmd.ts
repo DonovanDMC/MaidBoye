@@ -1,7 +1,7 @@
 import ModLogHandler from "../../util/handlers/ModLogHandler";
 import Command from "@cmd/Command";
 import CommandError from "@cmd/CommandError";
-import { ApplicationCommandOptionType } from "discord-api-types";
+import Eris from "eris";
 
 export default new Command("unmute")
 	.setPermissions("bot", "embedLinks", "manageRoles", "voiceMuteMembers")
@@ -10,13 +10,13 @@ export default new Command("unmute")
 	.setUsage("<user> [reason]")
 	.setSlashOptions(true, [
 		{
-			type: ApplicationCommandOptionType.User,
+			type: Eris.Constants.CommandOptionTypes.USER,
 			name: "user",
 			description: "The user to unmute",
 			required: true
 		},
 		{
-			type: ApplicationCommandOptionType.String,
+			type: Eris.Constants.CommandOptionTypes.STRING,
 			name: "reason",
 			description: "The reason for unmuting the user",
 			required: false

@@ -1,7 +1,7 @@
 import Command from "@cmd/Command";
 import config from "@config";
+import Eris from "eris";
 import db from "@db";
-import { ApplicationCommandOptionType } from "discord-api-types";
 const Redis = db.r;
 
 export default new Command("conga")
@@ -9,7 +9,7 @@ export default new Command("conga")
 	.setDescription("Start a conga, or join one")
 	.setSlashOptions(true, [
 		{
-			type: ApplicationCommandOptionType.User,
+			type: Eris.Constants.CommandOptionTypes.USER,
 			name: "user",
 			description: "The user to start a conga with (none to join an conga howl)",
 			required: false

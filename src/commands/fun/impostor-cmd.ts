@@ -1,5 +1,5 @@
 import Command from "@cmd/Command";
-import { ApplicationCommandOptionType } from "discord-api-types";
+import Eris from "eris";
 
 export default new Command("impostor")
 	.setPermissions("bot", "embedLinks")
@@ -7,7 +7,7 @@ export default new Command("impostor")
 	.setUsage("[@user/text]")
 	.setSlashOptions(true, [
 		{
-			type: ApplicationCommandOptionType.User,
+			type: Eris.Constants.CommandOptionTypes.USER,
 			name: "user",
 			description: "The user to sus (none for yourself)",
 			required: false

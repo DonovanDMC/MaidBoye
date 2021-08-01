@@ -1,8 +1,7 @@
 import config from "@config";
 import Command from "@cmd/Command";
 import EmbedBuilder from "@util/EmbedBuilder";
-import { ApplicationCommandOptionType } from "discord-api-types";
-
+import Eris from "eris";
 
 export default new Command("avatar")
 	.setPermissions("bot", "embedLinks", "attachFiles")
@@ -10,7 +9,7 @@ export default new Command("avatar")
 	.setUsage("<@user>")
 	.setSlashOptions(true, [
 		{
-			type: ApplicationCommandOptionType.User,
+			type: Eris.Constants.CommandOptionTypes.USER,
 			name: "user",
 			description: "The user to get the avatar of (none for yourself)",
 			required: false

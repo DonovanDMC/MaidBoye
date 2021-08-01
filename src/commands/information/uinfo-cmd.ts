@@ -4,14 +4,13 @@ import EmbedBuilder from "@util/EmbedBuilder";
 import BotFunctions from "@util/BotFunctions";
 import fetch from "node-fetch";
 import Eris from "eris";
-import { ApplicationCommandOptionType } from "discord-api-types";
 
 export default new Command("uinfo", "userinfo")
 	.setPermissions("bot", "embedLinks", "attachFiles")
 	.setDescription("Get info about someone..")
 	.setSlashOptions(true, [
 		{
-			type: ApplicationCommandOptionType.User,
+			type: Eris.Constants.CommandOptionTypes.USER,
 			name: "user",
 			description: "The user to get info about (none for yourself)",
 			required: false

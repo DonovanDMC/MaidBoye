@@ -4,7 +4,7 @@ import CommandError from "@util/cmd/CommandError";
 import EmbedBuilder from "@util/EmbedBuilder";
 import ModLogHandler from "@util/handlers/ModLogHandler";
 import Logger from "@util/Logger";
-import { ApplicationCommandOptionType } from "discord-api-types";
+import Eris from "eris";
 
 export default new Command("reason")
 	.setPermissions("bot", "embedLinks")
@@ -13,13 +13,13 @@ export default new Command("reason")
 	.setUsage("<case> <newReason>")
 	.setSlashOptions(true, [
 		{
-			type: ApplicationCommandOptionType.Integer,
+			type: Eris.Constants.CommandOptionTypes.INTEGER,
 			name: "case-number",
 			description: "The number of the case to change",
 			required: true
 		},
 		{
-			type: ApplicationCommandOptionType.String,
+			type: Eris.Constants.CommandOptionTypes.STRING,
 			name: "new-reason",
 			description: "The new reason for the case",
 			required: true

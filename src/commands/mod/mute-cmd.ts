@@ -4,7 +4,6 @@ import CommandError from "@cmd/CommandError";
 import EmbedBuilder from "@util/EmbedBuilder";
 import { Time } from "@uwu-codes/utils";
 import Eris from "eris";
-import { ApplicationCommandOptionType } from "discord-api-types";
 
 export default new Command("mute")
 	.setPermissions("bot", "embedLinks", "manageRoles", "voiceMuteMembers")
@@ -29,25 +28,25 @@ export default new Command("mute")
 	})
 	.setSlashOptions(true, [
 		{
-			type: ApplicationCommandOptionType.User,
+			type: Eris.Constants.CommandOptionTypes.USER,
 			name: "user",
 			description: "The user to mute",
 			required: true
 		},
 		{
-			type: ApplicationCommandOptionType.String,
+			type: Eris.Constants.CommandOptionTypes.STRING,
 			name: "reason",
 			description: "The reason for muting the user",
 			required: false
 		},
 		{
-			type: ApplicationCommandOptionType.String,
+			type: Eris.Constants.CommandOptionTypes.STRING,
 			name: "time",
 			description: "The time until the mute expires (ex: 2 days)",
 			required: false
 		},
 		{
-			type: ApplicationCommandOptionType.String,
+			type: Eris.Constants.CommandOptionTypes.STRING,
 			name: "no-dm",
 			description: "If we should attempt to dm the muted user with some info",
 			required: false,

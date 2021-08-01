@@ -2,7 +2,7 @@ import config from "@config";
 import BotFunctions from "@util/BotFunctions";
 import Command from "@cmd/Command";
 import EmbedBuilder from "@util/EmbedBuilder";
-import { ApplicationCommandOptionType } from "discord-api-types";
+import Eris from "eris";
 
 export default new Command("prefix")
 	.setPermissions("bot", "embedLinks")
@@ -11,19 +11,19 @@ export default new Command("prefix")
 	.setUsage("<add/remove/reset/list>")
 	.setSlashOptions(true, [
 		{
-			type: ApplicationCommandOptionType.SubCommand,
+			type: Eris.Constants.CommandOptionTypes.SUB_COMMAND,
 			name: "add",
 			description: "Add additional prefixes",
 			required: true,
 			options: [
 				{
-					type: ApplicationCommandOptionType.String,
+					type: Eris.Constants.CommandOptionTypes.STRING,
 					name: "value",
 					description: "The prefix to add",
 					required: true
 				},
 				{
-					type: ApplicationCommandOptionType.String,
+					type: Eris.Constants.CommandOptionTypes.STRING,
 					name: "space",
 					description: "If this prefix should have a space before the command",
 					required: false,
@@ -41,28 +41,28 @@ export default new Command("prefix")
 			]
 		},
 		{
-			type: ApplicationCommandOptionType.SubCommand,
+			type: Eris.Constants.CommandOptionTypes.SUB_COMMAND,
 			name: "remove",
 			description: "remove a prefix",
 			required: true,
 			options: [
 				{
-					type: ApplicationCommandOptionType.String,
+					type: Eris.Constants.CommandOptionTypes.STRING,
 					name: "prefix",
-					description: "The prefix to remove (see list subcommand)",
+					description: "The prefix to remove (see list Subcommand)",
 					required: true
 				}
 			]
 		},
 		{
-			type: ApplicationCommandOptionType.SubCommand,
+			type: Eris.Constants.CommandOptionTypes.SUB_COMMAND,
 			name: "reset",
 			description: "Reset all prefixes",
 			required: true,
 			options: []
 		},
 		{
-			type: ApplicationCommandOptionType.SubCommand,
+			type: Eris.Constants.CommandOptionTypes.SUB_COMMAND,
 			name: "list",
 			description: "List current prefixes",
 			required: true,

@@ -2,7 +2,6 @@ import ModLogHandler from "../../util/handlers/ModLogHandler";
 import Command from "@cmd/Command";
 import CommandError from "@cmd/CommandError";
 import Eris from "eris";
-import { ApplicationCommandOptionType } from "discord-api-types";
 
 export default new Command("unban")
 	.setPermissions("bot", "embedLinks", "banMembers")
@@ -11,13 +10,13 @@ export default new Command("unban")
 	.setUsage("<@user> [reason]")
 	.setSlashOptions(true, [
 		{
-			type: ApplicationCommandOptionType.User,
+			type: Eris.Constants.CommandOptionTypes.USER,
 			name: "user",
 			description: "The user to unban",
 			required: true
 		},
 		{
-			type: ApplicationCommandOptionType.String,
+			type: Eris.Constants.CommandOptionTypes.STRING,
 			name: "reason",
 			description: "The reason for unbanning the user",
 			required: false

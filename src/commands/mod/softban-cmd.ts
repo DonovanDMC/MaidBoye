@@ -3,7 +3,6 @@ import Command from "@cmd/Command";
 import CommandError from "@cmd/CommandError";
 import EmbedBuilder from "@util/EmbedBuilder";
 import Eris from "eris";
-import { ApplicationCommandOptionType } from "discord-api-types";
 
 export default new Command("softban")
 	.setPermissions("bot", "embedLinks", "banMembers")
@@ -30,19 +29,19 @@ export default new Command("softban")
 	})
 	.setSlashOptions(true, [
 		{
-			type: ApplicationCommandOptionType.User,
+			type: Eris.Constants.CommandOptionTypes.USER,
 			name: "user",
 			description: "The user to softban",
 			required: true
 		},
 		{
-			type: ApplicationCommandOptionType.String,
+			type: Eris.Constants.CommandOptionTypes.STRING,
 			name: "reason",
 			description: "The reason for softbanning the user",
 			required: false
 		},
 		{
-			type: ApplicationCommandOptionType.String,
+			type: Eris.Constants.CommandOptionTypes.STRING,
 			name: "no-dm",
 			description: "If we should attempt to dm the softbanned user with some info",
 			required: false,
@@ -58,7 +57,7 @@ export default new Command("softban")
 			]
 		},
 		{
-			type: ApplicationCommandOptionType.String,
+			type: Eris.Constants.CommandOptionTypes.STRING,
 			name: "delete-days",
 			description: "The amount of days of messages that should be deleted",
 			choices: new Array(8).fill(null).map((_, i) => ({

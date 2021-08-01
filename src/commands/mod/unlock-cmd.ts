@@ -1,7 +1,6 @@
 import ModLogHandler from "../../util/handlers/ModLogHandler";
 import Command from "@cmd/Command";
 import Eris from "eris";
-import { ApplicationCommandOptionType } from "discord-api-types";
 
 export default new Command("unlock")
 	.setPermissions("bot", "embedLinks", "manageChannels")
@@ -10,13 +9,13 @@ export default new Command("unlock")
 	.setUsage("[<channel> [reason]]")
 	.setSlashOptions(true, [
 		{
-			type: ApplicationCommandOptionType.Channel,
+			type: Eris.Constants.CommandOptionTypes.CHANNEL,
 			name: "channel",
 			description: "The channel to unlock (none for current channel)",
 			required: false
 		},
 		{
-			type: ApplicationCommandOptionType.String,
+			type: Eris.Constants.CommandOptionTypes.STRING,
 			name: "reason",
 			description: "The reason for unlocking the channel",
 			required: false

@@ -1,8 +1,8 @@
 import ModLogHandler from "../../util/handlers/ModLogHandler";
 import Command from "@cmd/Command";
 import CommandError from "@cmd/CommandError";
-import { ApplicationCommandOptionType } from "discord-api-types";
 import UserConfig from "@db/Models/User/UserConfig";
+import Eris from "eris";
 
 export default new Command("warn")
 	.setPermissions("bot", "embedLinks")
@@ -11,13 +11,13 @@ export default new Command("warn")
 	.setUsage("<user> [reason]")
 	.setSlashOptions(true, [
 		{
-			type: ApplicationCommandOptionType.User,
+			type: Eris.Constants.CommandOptionTypes.USER,
 			name: "user",
 			description: "The user to warn",
 			required: true
 		},
 		{
-			type: ApplicationCommandOptionType.String,
+			type: Eris.Constants.CommandOptionTypes.STRING,
 			name: "reason",
 			description: "The reason for warning the user",
 			required: false

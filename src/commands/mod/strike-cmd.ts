@@ -1,8 +1,8 @@
 import Command from "@cmd/Command";
-import { ApplicationCommandOptionType } from "discord-api-types";
 import UserConfig from "@db/Models/User/UserConfig";
 import db from "@db";
 import config from "@config";
+import Eris from "eris";
 
 export default new Command("strike")
 	.setPermissions("bot", "embedLinks")
@@ -11,13 +11,13 @@ export default new Command("strike")
 	.setUsage("<user> [amount]")
 	.setSlashOptions(true, [
 		{
-			type: ApplicationCommandOptionType.User,
+			type: Eris.Constants.CommandOptionTypes.USER,
 			name: "user",
 			description: "The user to strike",
 			required: true
 		},
 		{
-			type: ApplicationCommandOptionType.Integer,
+			type: Eris.Constants.CommandOptionTypes.INTEGER,
 			name: "amount",
 			description: "The amount of strikes to give the user",
 			required: false

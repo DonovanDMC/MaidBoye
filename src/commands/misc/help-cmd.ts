@@ -7,7 +7,7 @@ import EmbedBuilder from "@util/EmbedBuilder";
 import BotFunctions from "@util/BotFunctions";
 import Eris from "eris";
 import { Strings } from "@uwu-codes/utils";
-import { APIApplicationCommandOptionChoice, ApplicationCommandOptionType } from "discord-api-types";
+import { APIApplicationCommandOptionChoice } from "discord-api-types";
 
 export default new Command("help")
 	.setPermissions("bot", "embedLinks")
@@ -15,7 +15,7 @@ export default new Command("help")
 	.setUsage("[command]")
 	.setSlashOptions(true, [
 		{
-			type: ApplicationCommandOptionType.String,
+			type: Eris.Constants.CommandOptionTypes.STRING,
 			name: "category",
 			description: "The category to get help with",
 			required: false,

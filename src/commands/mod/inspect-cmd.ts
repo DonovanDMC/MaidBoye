@@ -1,5 +1,4 @@
 import Command from "@cmd/Command";
-import { ApplicationCommandOptionType } from "discord-api-types";
 import db from "@db";
 import EmbedBuilder from "@util/EmbedBuilder";
 import ComponentHelper from "@util/ComponentHelper";
@@ -20,13 +19,13 @@ export default new Command("inspect")
 	.setUsage("<user> [section]")
 	.setSlashOptions(true, [
 		{
-			type: ApplicationCommandOptionType.User,
+			type: Eris.Constants.CommandOptionTypes.USER,
 			name: "user",
 			description: "The user to inspect",
 			required: true
 		},
 		{
-			type: ApplicationCommandOptionType.String,
+			type: Eris.Constants.CommandOptionTypes.STRING,
 			name: "section",
 			description: "The section to open",
 			required: false,

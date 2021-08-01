@@ -5,7 +5,6 @@ import CommandError from "@cmd/CommandError";
 import Eris from "eris";
 import fetch from "node-fetch";
 import Tinify from "tinify";
-import { ApplicationCommandOptionType } from "discord-api-types";
 import { URL } from "url";
 
 export default new Command("steal")
@@ -15,13 +14,13 @@ export default new Command("steal")
 	.setUsage("<emoji/url>")
 	.setSlashOptions(true, [
 		{
-			type: ApplicationCommandOptionType.String,
+			type: Eris.Constants.CommandOptionTypes.STRING,
 			name: "input",
 			description: "The emoji or url you want to steal",
 			required: true
 		},
 		{
-			type: ApplicationCommandOptionType.String,
+			type: Eris.Constants.CommandOptionTypes.STRING,
 			name: "name",
 			description: "What to name the emoji (default original name, or filename)",
 			required: false
