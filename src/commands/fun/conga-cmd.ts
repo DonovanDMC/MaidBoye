@@ -1,8 +1,9 @@
 import Command from "@cmd/Command";
 import config from "@config";
 import Eris from "eris";
-import db from "@db";
-const Redis = db.r;
+import EmbedBuilder from "@util/EmbedBuilder";
+import ComponentHelper from "@util/ComponentHelper";
+import MaidBoye from "@MaidBoye";
 
 export default new Command("conga")
 	.setPermissions("bot", "embedLinks", "useExternalEmojis")
@@ -11,36 +12,63 @@ export default new Command("conga")
 		{
 			type: Eris.Constants.CommandOptionTypes.USER,
 			name: "user",
-			description: "The user to start a conga with (none to join an conga howl)",
-			required: false
+			description: "The user to start a conga with",
+			required: true
 		}
 	])
 	.setCooldown(3e3)
 	.setExecutor(async function(msg) {
-		const k = `cmd:multiUser:conga:${msg.channel.id}`;
-		const h = await Redis.smembers(k);
+		if (msg.args.length === 0) return msg.reply("H-hey! A user is required to start a conga..");
+		const member = await msg.getMemberFromArgs();
+		if (member === null) return msg.reply("H-hey! That wasn't a valid member..");
+		if (member.id === msg.author.id) return msg.reply("H-hey! You can't start a conga with yourself..");
 
-		if (h.length !== 0) {
-			if (h.includes(msg.author.id)) return msg.reply("H-hey! You're already in this conga!");
-			await Redis.sadd(k, msg.author.id);
-			await Redis.pexpire(k, 18e5);
-			return msg.channel.createMessage({
-				content: `<@!${msg.author.id}> joined a conga with ${h.length}!\nJoin in with \`${msg.gConfig.getFormattedPrefix()}conga\` ${config.emojis.custom.furdancing}${config.emojis.custom.furdancing}${config.emojis.custom.furdancing}`,
-				allowedMentions: {
-					users: false
+		const e = new EmbedBuilder(true, msg.author)
+			.setTitle("Active Conga")
+			.setDescription(`Conga Started By: <@!${msg.author.id}> with <@!${member.id}>\n${config.emojis.custom.furdancing}\nCurrent Furs: **2**`);
+		const m = await msg.reply({
+			embeds: [
+				e.toJSON()
+			],
+			components: new ComponentHelper()
+				.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, "conga-join", false, ComponentHelper.emojiToPartial(config.emojis.custom.furdancing, "custom"), "Join Conga")
+				.toJSON()
+		});
+
+		const current = [member.id];
+		async function awaitJoin(this: MaidBoye) {
+			const wait = await msg.channel.awaitComponentInteractions(3e5, (it) => it.message.id === m.id && it.data.custom_id === "conga-join");
+			if (wait === null) {
+				await m.edit({
+					embeds: [
+						e
+							.setTitle("Conga Ended")
+							.toJSON()
+					],
+					components: []
+				});
+				return;
+			} else {
+				if (current.includes(wait.member!.id) || wait.member!.id === msg.author.id) {
+					void wait.createMessage({
+						content: "You are already in this conga!",
+						flags: 64
+					});
+				} else {
+					current.push(wait.member!.id);
+					await wait.acknowledge();
+					void m.edit({
+						embeds: [
+							e
+								.setDescription(`Conga Started By: <@!${msg.author.id}> with <@!${member!.id}>\nCurrent Furs: **${current.length + 1}**\n${config.emojis.custom.furdancing.repeat(current.length + 1)}\n${current.slice(1).map((c, i) => `<@!${c}> joined a conga with **${i + 2}** furs`).join("\n")}`)
+								.toJSON()
+						]
+					});
+
 				}
-			});
-		} else {
-			if (msg.args.length === 0) return msg.reply("H-hey! A user is required to start a conga..");
-			const member = await msg.getMemberFromArgs();
-			if (member === null) return msg.reply("H-hey! That wasn't a valid member..");
-			await Redis.sadd(k, msg.author.id, member.id);
-			await Redis.pexpire(k, 18e5);
-			await msg.channel.createMessage({
-				content: `<@!${msg.author.id}> started a conga with <@!${member.id}>!\nJoin in with \`${msg.gConfig.getFormattedPrefix()}conga\` ${config.emojis.custom.furdancing}${config.emojis.custom.furdancing}${config.emojis.custom.furdancing}`,
-				allowedMentions: {
-					users: false
-				}
-			});
+				void awaitJoin.call(this);
+			}
 		}
+
+		void awaitJoin.call(this);
 	});
