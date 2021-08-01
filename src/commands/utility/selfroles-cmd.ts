@@ -6,7 +6,7 @@ import CommandError from "@cmd/CommandError";
 import ComponentInteractionCollector from "@util/ComponentInteractionCollector";
 import { Strings } from "@uwu-codes/utils";
 import Eris from "eris";
-import { APIMessageSelectMenuInteractionData, ApplicationCommandOptionType } from "discord-api-types";
+import { ApplicationCommandOptionType } from "discord-api-types";
 
 export default new Command("selfroles")
 	.setPermissions("bot", "embedLinks", "manageRoles")
@@ -150,10 +150,10 @@ export default new Command("selfroles")
 							.addInteractionButton(ComponentHelper.BUTTON_DANGER, `select-role.${msg.author.id}.cancel`, false, ComponentHelper.emojiToPartial(config.emojis.default.x, "default"), "Cancel")
 							.toJSON()
 					});
-					const choice = await ComponentInteractionCollector.awaitInteractions<APIMessageSelectMenuInteractionData>(msg.channel.id, 3e4, (i) => i.data.custom_id.startsWith(`select-role.${msg.author.id}`) && i.message.id === makeChoice.id && !!i.member?.user && i.member.user.id === msg.author.id);
+					const choice = await ComponentInteractionCollector.awaitInteractions(msg.channel.id, 3e4, (i) => i.data.custom_id.startsWith(`select-role.${msg.author.id}`) && i.message.id === makeChoice.id && !!i.member?.user && i.member.user.id === msg.author.id);
 					if (choice === null) return msg.reply("Th-this either timed out, or you made an invalid selection..");
-					await this.createInteractionResponse(choice.id, choice.token, 6);
-					if (choice.data.custom_id.endsWith("cancel")) return this.editOriginalInteractionResponse(this.user.id, choice.token, {
+					await choice.acknowledge();
+					if (choice.data.custom_id.endsWith("cancel")) return choice.editOriginalMessage({
 						embeds: [
 							new EmbedBuilder(true, msg.author)
 								.setDescription("Cancelled.")
@@ -162,8 +162,8 @@ export default new Command("selfroles")
 						],
 						components: []
 					});
-					const [made] = choice.data.values;
-					if (!roles.map(r => r.id).includes(made)) return this.editOriginalInteractionResponse(this.user.id, choice.token, {
+					const [made] = choice.data.values!;
+					if (!roles.map(r => r.id).includes(made)) return choice.editOriginalMessage({
 						embeds: [
 							new EmbedBuilder(true, msg.author)
 								.setDescription("You made an invalid choice..")
@@ -173,7 +173,7 @@ export default new Command("selfroles")
 						components: []
 					});
 
-					if (msg.member.roles.includes(made)) return this.editOriginalInteractionResponse(this.user.id, choice.token, {
+					if (msg.member.roles.includes(made)) return choice.editOriginalMessage({
 						embeds: [
 							new EmbedBuilder(true, msg.author)
 								.setDescription("Y-you already have that role!")
@@ -185,7 +185,7 @@ export default new Command("selfroles")
 					await msg.member.addRole(made, "SelfRoles[Join]");
 					await msg.uConfig.addSelfRoleJoined(made, msg.channel.guild.id);
 					await msg.uConfig.fix();
-					return this.editOriginalInteractionResponse(this.user.id, choice.token, {
+					return choice.editOriginalMessage({
 						embeds: [
 							new EmbedBuilder(true, msg.author)
 								.setDescription(`Congrats, you now have the <@&${made}> role!`)
@@ -216,10 +216,10 @@ export default new Command("selfroles")
 						.addInteractionButton(ComponentHelper.BUTTON_DANGER, `select-role.${msg.author.id}.cancel`, false, ComponentHelper.emojiToPartial(config.emojis.default.x, "default"), "Cancel")
 						.toJSON()
 				});
-				const choice = await ComponentInteractionCollector.awaitInteractions<APIMessageSelectMenuInteractionData>(msg.channel.id, 3e4, (i) => i.data.custom_id.startsWith(`select-role.${msg.author.id}`) && i.message.id === makeChoice.id && !!i.member?.user && i.member.user.id === msg.author.id);
+				const choice = await ComponentInteractionCollector.awaitInteractions(msg.channel.id, 3e4, (i) => i.data.custom_id.startsWith(`select-role.${msg.author.id}`) && i.message.id === makeChoice.id && !!i.member?.user && i.member.user.id === msg.author.id);
 				if (choice === null) return msg.reply("Th-this either timed out, or you made an invalid selection..");
-				await this.createInteractionResponse(choice.id, choice.token, 6);
-				if (choice.data.custom_id.endsWith("cancel")) return this.editOriginalInteractionResponse(this.user.id, choice.token, {
+				await choice.acknowledge();
+				if (choice.data.custom_id.endsWith("cancel")) return choice.editOriginalMessage({
 					embeds: [
 						new EmbedBuilder(true, msg.author)
 							.setDescription("Cancelled.")
@@ -228,8 +228,8 @@ export default new Command("selfroles")
 					],
 					components: []
 				});
-				const [made] = choice.data.values;
-				if (!selfList.map(r => r.role).includes(made)) return this.editOriginalInteractionResponse(this.user.id, choice.token, {
+				const [made] = choice.data.values!;
+				if (!selfList.map(r => r.role).includes(made)) return choice.editOriginalMessage({
 					embeds: [
 						new EmbedBuilder(true, msg.author)
 							.setDescription("You made an invalid choice..")
@@ -254,7 +254,7 @@ export default new Command("selfroles")
 				if (msg.member.roles.includes(made)) await msg.member.removeRole(made, "SelfRoles[Leave]");
 				await msg.uConfig.removeSelfRoleJoined(made, "role");
 				await msg.uConfig.fix();
-				return this.editOriginalInteractionResponse(this.user.id, choice.token, {
+				return choice.editOriginalMessage({
 					embeds: [
 						new EmbedBuilder(true, msg.author)
 							.setDescription(`Congrats, you no longer have the <@&${made}> role.`)

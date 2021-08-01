@@ -30,14 +30,8 @@ export default class ExtendedMessage extends Message<Eris.GuildTextableChannel> 
 		// for interactions
 		const self = this;
 		this.channel.createMessage = async function createMessage(content: Eris.MessageContent, file?: Eris.MessageFile | Array<Eris.MessageFile> | undefined) {
-			if (typeof content === "string") content = { content };
-			if (self.isInteraction === true && (self.interactionId !== null && self.interactionToken !== null)) {
-				if (self.firstReply === true) return this.client.createFollowupMessage(this.client.user.id, self.interactionToken, content);
-				else {
-					self.firstReply = true;
-					return this.client.createInteractionResponse(self.interactionId, self.interactionToken, 5, content);
-				}
-			} else return self.client.createMessage.call(self.client, this.id, content, file) as Promise<Eris.Message<Eris.TextChannel>>;
+			if (self.cmdInteracton !== null) return self.cmdInteracton.createFollowup(content) as Promise<Eris.Message<Eris.TextChannel>>;
+			else return self.client.createMessage.call(self.client, this.id, content, file) as Promise<Eris.Message<Eris.TextChannel>>;
 		};
 	}
 

@@ -34,7 +34,7 @@ export default new Command("marry")
 				.addInteractionButton(ComponentHelper.BUTTON_DANGER, `marry-no.${member.id}`, false, undefined, "No")
 				.toJSON()
 		});
-		const wait = await msg.channel.awaitComponentInteractions(3e5, (it) => it.message.id === m.id && it.member.user.id === member.id && it.data.custom_id.startsWith("marry-"));
+		const wait = await msg.channel.awaitComponentInteractions(3e5, (it) => it.message.id === m.id && it.member!.user.id === member.id && it.data.custom_id.startsWith("marry-"));
 		if (wait === null || wait.data.custom_id.includes("no")) return m.edit({
 			content: "Better luck next time..",
 			embeds: [],

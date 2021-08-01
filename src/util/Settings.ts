@@ -23,7 +23,7 @@ async function duplicate(originalMessage: ExtendedMessage, botMessage: Eris.Mess
 			.addInteractionButton(ComponentHelper.BUTTON_DANGER, `settings-exit.${originalMessage.author.id}`, false, ComponentHelper.emojiToPartial(config.emojis.default.x, "default"), "Exit")
 			.toJSON()
 	});
-	const wait = await originalMessage.channel.awaitComponentInteractions(6e4, (it) => it.data.custom_id.startsWith("settings-") && it.member.user.id === originalMessage.author.id && it.message.id === botMessage.id);
+	const wait = await originalMessage.channel.awaitComponentInteractions(6e4, (it) => it.data.custom_id.startsWith("settings-") && it.member!.user.id === originalMessage.author.id && it.message.id === botMessage.id);
 	if (wait === null) {
 		await  botMessage.edit({
 			content: "Timeout detected, menu closed.",
@@ -32,7 +32,7 @@ async function duplicate(originalMessage: ExtendedMessage, botMessage: Eris.Mess
 		});
 		return false;
 	} else {
-		await originalMessage.client.createInteractionResponse(wait.id, wait.token, Eris.Constants.InteractionResponseTypes.DEFERRED_UPDATE_MESSAGE);
+		await wait.acknowledge();
 		if (wait.data.custom_id.includes("back")) return true;
 		else return false;
 	}
@@ -74,7 +74,7 @@ const Settings = [
 					.toJSON()
 			});
 
-			const wait = await originalMessage.channel.awaitComponentInteractions(6e4, (it) => it.data.custom_id.startsWith("settings-") && it.member.user.id === originalMessage.author.id && it.message.id === botMessage.id);
+			const wait = await originalMessage.channel.awaitComponentInteractions(6e4, (it) => it.data.custom_id.startsWith("settings-") && it.member!.user.id === originalMessage.author.id && it.message.id === botMessage.id);
 			if (wait === null) {
 				await botMessage.edit({
 					content: "",
@@ -88,8 +88,8 @@ const Settings = [
 				});
 				return [false, false];
 			} else {
-				const { values: [ v = null ] } = wait.data as APIMessageSelectMenuInteractionData ?? { values: [] };
-				await originalMessage.client.createInteractionResponse(wait.id, wait.token, Eris.Constants.InteractionResponseTypes.DEFERRED_UPDATE_MESSAGE);
+				const v = !wait.data || !("values" in wait.data) ? null : wait.data.values![0];
+				await wait.acknowledge();
 				if (v === null) {
 					if (wait.data.custom_id.includes("back")) {
 						await botMessage.edit(b);
@@ -174,7 +174,7 @@ const Settings = [
 					], "Select An Option", 1, 1)
 					.toJSON()
 			});
-			const wait = await originalMessage.channel.awaitComponentInteractions(6e4, (it) => it.data.custom_id.startsWith("settings-") && it.member.user.id === originalMessage.author.id && it.message.id === botMessage.id);
+			const wait = await originalMessage.channel.awaitComponentInteractions(6e4, (it) => it.data.custom_id.startsWith("settings-") && it.member!.user.id === originalMessage.author.id && it.message.id === botMessage.id);
 			if (wait === null) {
 				await botMessage.edit({
 					content: "",
@@ -188,8 +188,8 @@ const Settings = [
 				});
 				return [false, false];
 			} else {
-				const { values: [ v = null ] } = wait.data as APIMessageSelectMenuInteractionData ?? { values: [] };
-				await originalMessage.client.createInteractionResponse(wait.id, wait.token, Eris.Constants.InteractionResponseTypes.DEFERRED_UPDATE_MESSAGE);
+				const v = !wait.data || !("values" in wait.data) ? null : wait.data.values![0];
+				await wait.acknowledge();
 				if (v === null) {
 					if (wait.data.custom_id.includes("back")) {
 						await botMessage.edit(b);
@@ -265,11 +265,11 @@ const Settings = [
 
 			const role = await new Promise<ExecReturn | Eris.Role>(resolve => {
 				let resolved = false;
-				void originalMessage.channel.awaitComponentInteractions(6e4, (it) => it.data.custom_id.startsWith("settings-") && it.member.user.id === originalMessage.author.id && it.message.id === botMessage.id)
+				void originalMessage.channel.awaitComponentInteractions(6e4, (it) => it.data.custom_id.startsWith("settings-") && it.member!.user.id === originalMessage.author.id && it.message.id === botMessage.id)
 					.then(async(wait) => {
 						if (resolved === true) return;
 						if (wait !== null) {
-							await originalMessage.client.createInteractionResponse(wait.id, wait.token, Eris.Constants.InteractionResponseTypes.DEFERRED_UPDATE_MESSAGE);
+							await wait.acknowledge();
 							resolved = true;
 							if (wait.data.custom_id.includes("reset")) {
 								await botMessage.edit({
@@ -398,7 +398,7 @@ const Settings = [
 					.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-disabled.${originalMessage.author.id}`, false, ComponentHelper.emojiToPartial(config.emojis.custom.redTick, "custom"), "Disabled")
 					.toJSON()
 			});
-			const wait = await originalMessage.channel.awaitComponentInteractions(6e4, (it) => it.data.custom_id.startsWith("settings-") && it.member.user.id === originalMessage.author.id && it.message.id === botMessage.id);
+			const wait = await originalMessage.channel.awaitComponentInteractions(6e4, (it) => it.data.custom_id.startsWith("settings-") && it.member!.user.id === originalMessage.author.id && it.message.id === botMessage.id);
 			if (wait === null) {
 				await botMessage.edit({
 					content: "",
@@ -413,7 +413,7 @@ const Settings = [
 				return [false, false];
 			} else {
 				const v = wait.data.custom_id.split("-")[1].split(".")[0];
-				await originalMessage.client.createInteractionResponse(wait.id, wait.token, Eris.Constants.InteractionResponseTypes.DEFERRED_UPDATE_MESSAGE);
+				await wait.acknowledge();
 				if (v === null) {
 					if (wait.data.custom_id.includes("back")) {
 						await botMessage.edit(b);

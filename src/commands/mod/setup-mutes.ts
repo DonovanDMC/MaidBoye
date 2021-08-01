@@ -61,7 +61,7 @@ export default new Command("setup-mutes")
 				.addInteractionButton(ComponentHelper.BUTTON_DANGER, `confirmmutes-no.${msg.author.id}`, false, undefined, "No")
 				.toJSON()
 		});
-		const w = await msg.channel.awaitComponentInteractions(3e4, (it) => it.data.custom_id.startsWith("confirmmutes-") && it.member.user.id === msg.author.id && it.message.id === m.id);
+		const w = await msg.channel.awaitComponentInteractions(3e4, (it) => it.data.custom_id.startsWith("confirmmutes-") && it.member!.user.id === msg.author.id && it.message.id === m.id);
 		if (w === null) return m.edit({
 			embeds: [
 				new EmbedBuilder(true, msg.author)
@@ -72,7 +72,7 @@ export default new Command("setup-mutes")
 			],
 			components: []
 		});
-		if (w.data.custom_id.includes("no")) return this.createInteractionResponse(w.id, w.token, Eris.Constants.InteractionResponseTypes.UPDATE_MESSAGE, {
+		if (w.data.custom_id.includes("no")) return w.createMessage({
 			embeds: [
 				new EmbedBuilder(true, msg.author)
 					.setTitle("Edits Cancelled")
@@ -80,11 +80,13 @@ export default new Command("setup-mutes")
 					.setDescription("Cancelled.")
 					.toJSON()
 			],
+			// @ts-ignore -- waiting for a pr update
 			components: []
 		});
-		await  this.createInteractionResponse(w.id, w.token, Eris.Constants.InteractionResponseTypes.UPDATE_MESSAGE, {
+		await w.createMessage({
 			content: "Processing..",
 			embeds: [],
+			// @ts-ignore -- waiting for a pr update
 			components: []
 		});
 		await msg.channel.sendTyping();

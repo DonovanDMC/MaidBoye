@@ -1,32 +1,30 @@
-import { APIMessageComponentInteractionData, APIMessageComponentInteraction, APIInteractionGuildMember } from "discord-api-types";
-
-export interface Interaction<T extends APIMessageComponentInteractionData> extends Omit<APIMessageComponentInteraction, "data"> {
-	data?: T;
-	member: APIInteractionGuildMember;
-}
-export interface InteractionWithData<T extends APIMessageComponentInteractionData> extends Omit<APIMessageComponentInteraction, "data"> {
-	data: T;
-	member: APIInteractionGuildMember;
-}
+import MaidBoye from "@MaidBoye";
+import Eris from "eris";
 export default class ComponentInteractionCollector {
+	static client: MaidBoye;
 	static collectors = [] as Array<{
 		channel: string;
-		filter: (interaction: InteractionWithData<APIMessageComponentInteractionData>) => boolean;
-		resolve: (value: Array<InteractionWithData<APIMessageComponentInteractionData>> | Interaction<APIMessageComponentInteractionData>) => void;
+		filter: (interaction: Eris.ComponentInteraction) => boolean;
+		resolve: (value: (Eris.ComponentInteraction) | Array<Eris.ComponentInteraction>) => void;
 		limit: number;
-		interactions: Array<InteractionWithData<APIMessageComponentInteractionData>>;
+		interactions: Array<Eris.ComponentInteraction>;
 		timeout: number;
 		i: NodeJS.Timeout;
 	}>;
+	static setClient(client: MaidBoye) {
+		this.client = client;
+		this.client.on("interactionCreate", this.processInteraction.bind(this));
+	}
 
-	static processInteraction(interaction: Interaction<APIMessageComponentInteractionData>) {
+	static processInteraction(interaction: Eris.PingInteraction | Eris.ComponentInteraction | Eris.CommandInteraction | Eris.UnknownInteraction) {
 		let used = false;
+		if (interaction instanceof Eris.PingInteraction || interaction instanceof Eris.UnknownInteraction || interaction instanceof Eris.CommandInteraction) return false;
 		if (interaction.data === undefined) return false;
-		const collectors = this.collectors.filter((col) => col.channel === interaction.channel_id);
+		const collectors = this.collectors.filter((col) => col.channel === interaction.channelID);
 		for (const c of collectors) {
-			if (c && c.filter(interaction as InteractionWithData<APIMessageComponentInteractionData>)) {
+			if (c && c.filter(interaction)) {
 				used = true;
-				c.interactions.push(interaction as InteractionWithData<APIMessageComponentInteractionData>);
+				c.interactions.push(interaction);
 			}
 			if (c.interactions.length >= c.limit) {
 				clearTimeout(c.i);
@@ -37,9 +35,9 @@ export default class ComponentInteractionCollector {
 		return used;
 	}
 
-	static async awaitInteractions<T extends APIMessageComponentInteractionData>(channelId: string, timeout: number, filter: (interaction: InteractionWithData<APIMessageComponentInteractionData>) => boolean, limit: number): Promise<Array<InteractionWithData<T>>>;
-	static async awaitInteractions<T extends APIMessageComponentInteractionData>(channelId: string, timeout: number, filter?: (interaction: InteractionWithData<APIMessageComponentInteractionData>) => boolean, limit?: 1): Promise<InteractionWithData<T> | null>;
-	static async awaitInteractions<T extends APIMessageComponentInteractionData>(channelId: string, timeout: number, filter: (interaction: InteractionWithData<APIMessageComponentInteractionData>) => boolean = (() => true), limit?: number): Promise<Array<InteractionWithData<T>> | T | null> {
+	static async awaitInteractions(channelId: string, timeout: number, filter: (interaction: Eris.ComponentInteraction) => boolean, limit: number): Promise<Array<Eris.ComponentInteraction>>;
+	static async awaitInteractions(channelId: string, timeout: number, filter?: (interaction: Eris.ComponentInteraction) => boolean, limit?: 1): Promise<Eris.ComponentInteraction | null>;
+	static async awaitInteractions(channelId: string, timeout: number, filter: (interaction: Eris.ComponentInteraction) => boolean = (() => true), limit?: number): Promise<Array<Eris.ComponentInteraction | null> | (Eris.ComponentInteraction | Eris.CommandInteraction | null)> {
 		return new Promise(resolve => {
 			this.collectors.push({
 				channel: channelId,

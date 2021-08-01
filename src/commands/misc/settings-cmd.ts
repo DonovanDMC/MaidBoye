@@ -7,7 +7,6 @@ import Settings, { ExecReturn } from "@util/Settings";
 import MaidBoye from "@MaidBoye";
 import Eris from "eris";
 import { Strings } from "@uwu-codes/utils";
-import { APIMessageSelectMenuInteractionData } from "discord-api-types";
 
 export default new Command("settings")
 	.setPermissions("bot", "embedLinks")
@@ -50,9 +49,9 @@ export default new Command("settings")
 					.toJSON()
 				// string (MessageContent) isn't assignable to InteractionPayload
 			} as Eris.AdvancedMessageContent;
-			if (id && token) await this.createInteractionResponse(id, token, Eris.Constants.InteractionResponseTypes.UPDATE_MESSAGE, body);
+			if (id && token) await this.createInteractionResponse(id, token, { type: Eris.Constants.InteractionResponseTypes.UPDATE_MESSAGE, data: body });
 			else await m.edit(body);
-			const wait = await msg.channel.awaitComponentInteractions(6e4, (it) => it.data.custom_id.startsWith("settings-") && it.member.user.id === msg.author.id && it.message.id === m.id);
+			const wait = await msg.channel.awaitComponentInteractions(6e4, (it) => it.data.custom_id.startsWith("settings-") && it.member!.user.id === msg.author.id && it.message.id === m.id);
 			if (wait === null) return void m.edit({
 				content: "",
 				embeds: [
@@ -78,38 +77,46 @@ export default new Command("settings")
 						if (e[1] === true) await new Promise(a => setTimeout(a, 3e3, undefined));
 						return void changePage.call(this);
 					}
-				} else return void this.createInteractionResponse(wait.id, wait.token, Eris.Constants.InteractionResponseTypes.UPDATE_MESSAGE, {
-					content: "",
-					embeds: [
-						new EmbedBuilder(true, msg.author)
-							.setTitle("Server Settings")
-							.setDescription("Exited.")
-							.toJSON()
-					],
-					components: []
+				} else return void this.createInteractionResponse(wait.id, wait.token, {
+					type: Eris.Constants.InteractionResponseTypes.UPDATE_MESSAGE,
+					data: {
+						content: "",
+						embeds: [
+							new EmbedBuilder(true, msg.author)
+								.setTitle("Server Settings")
+								.setDescription("Exited.")
+								.toJSON()
+						],
+						// @ts-ignore -- waiting for a pr update
+						components: []
+					}
 				});
 			}
 		}
 
 		async function configure(this: MaidBoye, id: string, token: string): Promise<ExecReturn> {
-			await this.createInteractionResponse(id, token, Eris.Constants.InteractionResponseTypes.UPDATE_MESSAGE, {
-				content: "",
-				embeds: [
-					formatEmbed(pages[page - 1])
-				],
-				components: new ComponentHelper()
-					.addSelectMenu(`settings-select.${msg.author.id}`, pages[page - 1].map(s => ({
-						label: s.name,
-						value: s.name.replace(/\s/g, "-").toLowerCase(),
-						// thanks Discord
-						description: Strings.truncate(s.shortDescription ?? s.description, 50),
-						emoji: s.emoji === null ? undefined : ComponentHelper.emojiToPartial(s.name === "Default Yiff Type" && msg.channel.nsfw ? config.emojis.custom.knot : s.emoji.value, s.emoji.type)
-					})), "Select A Setting To Configure", 1, 1)
-					.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-back.${msg.author.id}`, false, ComponentHelper.emojiToPartial(config.emojis.default.back, "default"), "Back")
-					.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-exit.${msg.author.id}`, false, ComponentHelper.emojiToPartial(config.emojis.default.x, "default"), "Exit")
-					.toJSON()
+			await this.createInteractionResponse(id, token, {
+				type: Eris.Constants.InteractionResponseTypes.UPDATE_MESSAGE,
+				data: {
+					content: "",
+					embeds: [
+						formatEmbed(pages[page - 1])
+					],
+					// @ts-ignore -- waiting for a pr update
+					components: new ComponentHelper()
+						.addSelectMenu(`settings-select.${msg.author.id}`, pages[page - 1].map(s => ({
+							label: s.name,
+							value: s.name.replace(/\s/g, "-").toLowerCase(),
+							// thanks Discord
+							description: Strings.truncate(s.shortDescription ?? s.description, 50),
+							emoji: s.emoji === null ? undefined : ComponentHelper.emojiToPartial(s.name === "Default Yiff Type" && msg.channel.nsfw ? config.emojis.custom.knot : s.emoji.value, s.emoji.type)
+						})), "Select A Setting To Configure", 1, 1)
+						.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-back.${msg.author.id}`, false, ComponentHelper.emojiToPartial(config.emojis.default.back, "default"), "Back")
+						.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-exit.${msg.author.id}`, false, ComponentHelper.emojiToPartial(config.emojis.default.x, "default"), "Exit")
+						.toJSON()
+				}
 			});
-			const wait = await msg.channel.awaitComponentInteractions(6e4, (it) => it.data.custom_id.startsWith("settings-") && it.member.user.id === msg.author.id && it.message.id === m.id);
+			const wait = await msg.channel.awaitComponentInteractions(6e4, (it) => it.data.custom_id.startsWith("settings-") && it.member!.user.id === msg.author.id && it.message.id === m.id);
 			if (wait === null) {
 				await m.edit({
 					content: "",
@@ -124,22 +131,26 @@ export default new Command("settings")
 				return [false, false];
 			} else {
 				if (wait.data.custom_id.includes("exit")) {
-					await this.createInteractionResponse(wait.id, wait.token, Eris.Constants.InteractionResponseTypes.UPDATE_MESSAGE, {
-						content: "",
-						embeds: [
-							new EmbedBuilder(true, msg.author)
-								.setTitle("Server Settings")
-								.setDescription("Exited.")
-								.toJSON()
-						],
-						components: []
+					await this.createInteractionResponse(wait.id, wait.token, {
+						type: Eris.Constants.InteractionResponseTypes.UPDATE_MESSAGE,
+						data: {
+							content: "",
+							embeds: [
+								new EmbedBuilder(true, msg.author)
+									.setTitle("Server Settings")
+									.setDescription("Exited.")
+									.toJSON()
+							],
+							// @ts-ignore -- waiting for a pr update
+							components: []
+						}
 					});
 					return [false, false];
 				}
-				await this.createInteractionResponse(wait.id, wait.token, Eris.Constants.InteractionResponseTypes.DEFERRED_UPDATE_MESSAGE);
-				const { values: v = [] } = (wait.data as APIMessageSelectMenuInteractionData);
+				await wait.acknowledge();
+				const v = !wait.data || !("values" in wait.data) ? null : wait.data.values![0];
 				if (wait.data.custom_id.includes("back")) return [true, false];
-				const n = Settings.find(s => s.name.replace(/\s/g, "-").toLowerCase() === v[0]);
+				const n = Settings.find(s => s.name.replace(/\s/g, "-").toLowerCase() === v);
 				if (n === undefined) {
 					await m.edit({
 						content: "There was an internal error..",

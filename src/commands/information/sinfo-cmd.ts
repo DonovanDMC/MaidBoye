@@ -203,7 +203,7 @@ export default new Command("sinfo", "serverinfo")
 		let m: Eris.Message<Eris.GuildTextableChannel> | undefined;
 		async function waitForEdit(this: MaidBoye): Promise<void> {
 			if (m === undefined) m = await msg.reply(sections[initialSection as keyof typeof sections]);
-			const c = await msg.channel.awaitComponentInteractions(6e4, (it) => it.channel_id === msg.channel.id && it.message.id === m!.id && it.data.custom_id.startsWith("sinfo") && it.data.custom_id.endsWith(msg.author.id) && !!it.member.user && it.member.user.id === msg.author.id);
+			const c = await msg.channel.awaitComponentInteractions(6e4, (it) => it.channelID === msg.channel.id && it.message.id === m!.id && it.data.custom_id.startsWith("sinfo") && it.data.custom_id.endsWith(msg.author.id) && it.member!.user.id === msg.author.id);
 			if (c === null) {
 				await m.edit({
 					embeds: m.embeds,
@@ -212,32 +212,32 @@ export default new Command("sinfo", "serverinfo")
 			} else {
 				switch (c.data.custom_id.split(".")[0].split("-")[1]) {
 					case "members": {
-						await this.createInteractionResponse(c.id, c.token, Eris.Constants.InteractionResponseTypes.UPDATE_MESSAGE, sections.members);
+						await c.createMessage(sections.members);
 						break;
 					}
 
 					case "channels": {
-						await this.createInteractionResponse(c.id, c.token, Eris.Constants.InteractionResponseTypes.UPDATE_MESSAGE, sections.channels);
+						await c.createMessage(sections.channels);
 						break;
 					}
 
 					case "icon": {
-						await this.createInteractionResponse(c.id, c.token, Eris.Constants.InteractionResponseTypes.UPDATE_MESSAGE, sections.icon);
+						await c.createMessage(sections.icon);
 						break;
 					}
 
 					case "splash": {
-						await this.createInteractionResponse(c.id, c.token, Eris.Constants.InteractionResponseTypes.UPDATE_MESSAGE, sections.splash);
+						await c.createMessage(sections.splash);
 						break;
 					}
 
 					case "banner": {
-						await this.createInteractionResponse(c.id, c.token, Eris.Constants.InteractionResponseTypes.UPDATE_MESSAGE, sections.banner);
+						await c.createMessage(sections.banner);
 						break;
 					}
 
 					case "back": {
-						await this.createInteractionResponse(c.id, c.token, Eris.Constants.InteractionResponseTypes.UPDATE_MESSAGE, sections.server);
+						await c.createMessage(sections.server);
 						break;
 					}
 				}

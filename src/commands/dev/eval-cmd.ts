@@ -11,6 +11,7 @@ import BotFunctions from "@util/BotFunctions";
 import CommandHandler from "@util/cmd/CommandHandler";
 import UserConfig from "@db/Models/User/UserConfig";
 import GuildConfig from "@db/Models/Guild/GuildConfig";
+import MaidBoye from "@MaidBoye";
 import util from "util";
 
 async function format(obj: unknown) {
@@ -75,6 +76,20 @@ export default new Command("eval", "ev")
 		const f = await format(res);
 		const t = Timer.calc(start, end, 3, false);
 
+		async function evalComponents(this: MaidBoye, m: Eris.Message<Eris.GuildTextableChannel>) {
+			const wait = await msg.channel.awaitComponentInteractions(3e5, (it) => it.message.id === msg.author.id && it.message.id === m.id && it.data.custom_id.startsWith("eval-"));
+			if (wait === null) return m.edit({
+				components: []
+			});
+			if (wait.data.custom_id.includes("trash")) return m.delete();
+			else {
+				await msg.delete();
+				await m.edit({
+					components: m.components?.slice(0, 1)
+				});
+				void evalComponents.call(this, m);
+			}
+		}
 		if (res instanceof Error) Logger.getLogger("Eval").error("Eval Error:", res);
 		if (msg.dashedArgs.value.includes("delete") || msg.dashedArgs.value.includes("d")) await msg.delete().catch(() => null);
 		if (!(msg.dashedArgs.value.includes("silent") || msg.dashedArgs.value.includes("s"))) {
@@ -88,7 +103,7 @@ export default new Command("eval", "ev")
 				out = "see attached file";
 			}
 
-			return msg.reply({
+			const m = await msg.reply({
 				embeds: [
 					new EmbedBuilder()
 						.setAuthor(msg.author.tag, msg.author.avatarURL)
@@ -99,18 +114,17 @@ export default new Command("eval", "ev")
 						.toJSON()
 				],
 				components: new ComponentHelper()
-				/* .addRow()
-					.addInteractionButton(ComponentHelper.BUTTON_DANGER, "eval.trash", false, ComponentHelper.emojiToPartial(config.emojis.default.trash, "default"), "Delete Response")
-					.addRow()
-					.addInteractionButton(ComponentHelper.BUTTON_SECONDARY, `eval.delete.${msg.id}`, false, ComponentHelper.emojiToPartial(config.emojis.default.x, "default"), "Delete Invocation") */
-
-					.addInteractionButton(ComponentHelper.BUTTON_DANGER, "eval.trash", false, ComponentHelper.emojiToPartial(config.emojis.default.trash, "default"))
-					.addInteractionButton(ComponentHelper.BUTTON_SECONDARY, `eval.delete.${msg.id}`, false, ComponentHelper.emojiToPartial(config.emojis.default.x, "default"))
+					// delete result
+					.addInteractionButton(ComponentHelper.BUTTON_DANGER, `eval-trash.${msg.author.id}`, false, ComponentHelper.emojiToPartial(config.emojis.default.trash, "default"))
+					// delete invocation
+					.addInteractionButton(ComponentHelper.BUTTON_SECONDARY, `eval-delete.${msg.author.id}`, false, ComponentHelper.emojiToPartial(config.emojis.default.x, "default"))
 					.toJSON()
 			}, file === undefined ? undefined : {
 				file,
 				name: "output.txt"
 			});
+
+			void evalComponents.call(this, m);
 		} else {
 			Logger.getLogger("Eval").info("Silent Eval Return (formatted):", f);
 			Logger.getLogger("Eval").info("Silent Eval Return (raw):", res);

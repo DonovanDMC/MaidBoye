@@ -22,7 +22,7 @@ export default new Command("divorce")
 				.addInteractionButton(ComponentHelper.BUTTON_DANGER, `divorce-no.${msg.author.id}`, false, undefined, "No")
 				.toJSON()
 		});
-		const wait = await msg.channel.awaitComponentInteractions(3e5, (it) => it.message.id === m.id && it.member.user.id === msg.author.id && it.data.custom_id.startsWith("marry-"));
+		const wait = await msg.channel.awaitComponentInteractions(3e5, (it) => it.message.id === m.id && it.member!.user.id === msg.author.id && it.data.custom_id.startsWith("marry-"));
 		if (wait === null || wait.data.custom_id.includes("no")) return m.edit({
 			content: "Cancelled.",
 			embeds: [],

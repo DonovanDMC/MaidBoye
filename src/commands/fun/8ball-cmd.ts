@@ -61,14 +61,14 @@ export default new Command("8ball")
 					.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `8ball-exit.${msg.author.id}`, undefined, ComponentHelper.emojiToPartial(config.emojis.default.x, "default"), "Exit")
 					.toJSON()
 			});
-			const wait = await msg.channel.awaitComponentInteractions(3e5, (it) => it.data.custom_id.startsWith("8ball-") && it.message.id === m.id && it.member.user.id === msg.author.id);
+			const wait = await msg.channel.awaitComponentInteractions(3e5, (it) => it.data.custom_id.startsWith("8ball-") && it.message.id === m.id && it.member!.id === msg.author.id);
 			if (wait === null) {
 				await m.edit({
 					components: []
 				});
 				return;
 			} else {
-				await this.createInteractionResponse(wait.id, wait.token, Eris.Constants.InteractionResponseTypes.DEFERRED_UPDATE_MESSAGE);
+				await wait.acknowledge();
 				if (wait.data.custom_id.includes("new")) void main.call(this);
 				else {
 					await m.edit({

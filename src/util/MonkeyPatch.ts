@@ -13,10 +13,9 @@ moduleAlias.addAliases({
 	"@MaidBoye": `${d}/src/main`
 });
 import MessageCollector from "./MessageCollector";
-import ComponentInteractionCollector, { InteractionWithData } from "./ComponentInteractionCollector";
+import ComponentInteractionCollector from "./ComponentInteractionCollector";
 import Eris from "eris";
 import sauce from "source-map-support";
-import { APIMessageComponentInteractionData } from "discord-api-types";
 import MaidBoye from "@MaidBoye";
 sauce.install({ hookRequire: true });
 
@@ -106,17 +105,7 @@ Object.defineProperties(Eris.Role.prototype, {
 
 const idRegex = /^[\d]{15,21}$/;
 Object.defineProperties(Eris.Message.prototype, {
-	interaction: {
-		value: false,
-		writable: true,
-		enumerable: true
-	},
-	interactionId: {
-		value: null,
-		writable: true,
-		enumerable: true
-	},
-	interactionToken: {
+	cmdInteracton: {
 		value: null,
 		writable: true,
 		enumerable: true
@@ -124,13 +113,7 @@ Object.defineProperties(Eris.Message.prototype, {
 	reply: {
 		value(this: Eris.Message, content: Eris.MessageContent, file: Eris.MessageFile | Array<Eris.MessageFile>) {
 			if (typeof content === "string") content = { content };
-			if (this.isInteraction === true && (this.interactionId !== null && this.interactionToken !== null)) {
-				if (this.firstReply === true) return this.client.createFollowupMessage(this.client.user.id, this.interactionToken, content);
-				else {
-					this.firstReply = true;
-					return this.client.createInteractionResponse(this.interactionId, this.interactionToken, 5, content);
-				}
-			} else return this.channel.createMessage({
+			else return this.channel.createMessage({
 				...content,
 				messageReference: {
 					messageID: this.id,
@@ -141,11 +124,9 @@ Object.defineProperties(Eris.Message.prototype, {
 			}, file);
 		}
 	},
-	setInteractionInfo: {
-		value(this: Eris.Message, isInteraction: boolean, interactionId: string | null, interactionToken: string | null) {
-			this.isInteraction = isInteraction;
-			this.interactionId = interactionId;
-			this.interactionToken = interactionToken;
+	setInteraction: {
+		value(this: Eris.Message, interaction: Eris.PingInteraction | Eris.CommandInteraction | Eris.ComponentInteraction | Eris.UnknownInteraction) {
+			this.cmdInteracton = !(interaction instanceof Eris.CommandInteraction) ? null : interaction;
 		}
 	},
 	getUserFromArgs: {
@@ -238,77 +219,6 @@ Object.defineProperties(Eris.Message.prototype, {
 	}
 });
 
-Object.defineProperties(Eris.Client.prototype, {
-	createInteractionResponse: {
-		async value(this: Eris.Client, id: string, token: string, type: typeof Eris["Constants"]["InteractionResponseTypes"][keyof typeof Eris["Constants"]["InteractionResponseTypes"]], content?: Eris.InteractionPayload) {
-			if (content && (!content.content && !content.file && !content.embeds) && !content.components) return Promise.reject(new Error("No content, file, embeds, or components"));
-			return this.requestHandler.request("POST", `/interactions/${id}/${token}/callback`, true, {
-				type,
-				data: content === undefined ? {} : {
-					content: content.content,
-					embeds: content.embeds,
-					allowed_mentions: this._formatAllowedMentions(content.allowedMentions ?? {}),
-					components: content.components,
-					flags: content.flags
-				}
-			}, content && content.file ? Array.isArray(content.file) ? content.file[0] : content.file : undefined, "/interactions/:id/:token/callback")
-				.then(v => {
-					try {
-						return new Eris.Message(v as Eris.BaseData, this);
-					} catch (e) {
-						return;
-					}
-				});
-		}
-	},
-	getOriginalInteractionResponse: {
-		value(this: Eris.Client, applicationId: string, token: string) {
-			return this.requestHandler.request("GET", `/webhooks/${applicationId}/${token}/messages/@original`, true, undefined, undefined, "/webhooks/:applicationId/:token/messages/@original").then((response) => new Eris.Message(response as Eris.BaseData, this));
-		}
-	},
-	editOriginalInteractionResponse: {
-		value(this: Eris.Client, applicationId: string, token: string, content: Eris.InteractionPayload) {
-			return this.editFollowupMessage(applicationId, token, "@original", content);
-		}
-	},
-	deleteOriginalInteractionResponse: {
-		value(this: Eris.Client, applicationId: string, token: string) {
-			return this.deleteFollowupMessage(applicationId, token, "@original");
-		}
-	},
-	createFollowupMessage: {
-		async value(this: Eris.Client, applicationId: string, token: string, content: Eris.InteractionPayload) {
-			if (content && (!content.content && !content.file && !content.embeds) && !content.components) return Promise.reject(new Error("No content, file, embeds, or components"));
-			return this.requestHandler.request("POST", `/webhooks/${applicationId}/${token}`, true, {
-				content: content.content,
-				embeds: content.embeds,
-				allowed_mentions: this._formatAllowedMentions(content.allowedMentions ?? {}),
-				components: content.components,
-				flags: content.flags
-			}, Array.isArray(content.file) ? content.file[0] : content.file, "/webhooks/:applicationId/:token")
-				.then(v => new Eris.Message(v as Eris.BaseData, this));
-		}
-	},
-	editFollowupMessage: {
-		async value(this: Eris.Client, applicationId: string, token: string, messageId: string, content: Eris.InteractionPayload) {
-			if (content && (!content.content && !content.file && !content.embeds) && !content.components) return Promise.reject(new Error("No content, file, embeds, or components"));
-			return this.requestHandler.request("PATCH", `/webhooks/${applicationId}/${token}/messages/${messageId}`, true, {
-				content: content.content,
-				embeds: content.embeds,
-				allowed_mentions: this._formatAllowedMentions(content.allowedMentions ?? {}),
-				components: content.components,
-				flags: content.flags
-			}, Array.isArray(content.file) ? content.file[0] : content.file, `/webhooks/:applicationId/:token/messages/${messageId === "@original" ? "@original" : ":messageId"}`)
-				.then(v => new Eris.Message(v as Eris.BaseData, this));
-		}
-	},
-	deleteFollowupMessage: {
-		async value(this: Eris.Client, applicationId: string, token: string, id: string) {
-			return this.requestHandler.request("DELETE", `/webhooks/${applicationId}/${token}/messages/${id}`, true, undefined, undefined, `/webhooks/:applicationId/:token/messages/${id === "@original" ? "@original" : ":id"}`);
-		}
-	}
-});
-
 Object.defineProperties(Eris.GuildChannel.prototype, {
 	awaitMessages: {
 		async value(this: Eris.GuildTextableChannel, timeout: number, filter: (msg: Eris.Message<Eris.TextableChannel>) => boolean = (() => true), limit?: number) {
@@ -316,7 +226,7 @@ Object.defineProperties(Eris.GuildChannel.prototype, {
 		}
 	},
 	awaitComponentInteractions: {
-		async value(this: Eris.GuildTextableChannel, timeout: number, filter: (interaction: InteractionWithData<APIMessageComponentInteractionData>) => boolean = (() => true), limit?: number) {
+		async value(this: Eris.GuildTextableChannel, timeout: number, filter: (interaction: Eris.ComponentInteraction) => boolean = (() => true), limit?: number) {
 			return ComponentInteractionCollector.awaitInteractions(this.id, timeout, filter, limit as 1);
 		}
 	},

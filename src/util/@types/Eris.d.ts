@@ -1,5 +1,3 @@
-import { InteractionWithData } from "@util/ComponentInteractionCollector";
-import { APIMessageComponentInteractionData } from "discord-api-types";
 import "eris";
 
 declare module "eris" {
@@ -34,10 +32,7 @@ declare module "eris" {
 	interface Message<T = GuildTextableChannel> {
 		args: Array<string>;
 		rawArgs: Array<string>;
-		isInteraction: boolean;
-		private interactionId: string | null;
-		private interactionToken: string | null;
-		private firstReply: boolean;
+		cmdInteracton: CommandInteraction | null;
 		private client: Client;
 		reply(content: MessageContent, file?: MessageFile | Array<MessageFile>): Promise<Message<T>>;
 		setInteractionInfo(interaction: boolean, interactionId: string | null, interactionToken: string | null): void;
@@ -51,15 +46,6 @@ declare module "eris" {
 	type InteractionPayload = Omit<WebhookPayload, "auth" | "avatarURL" | "username" | "wait"> & { flags?: number; };
 
 	interface Client {
-		createInteractionResponse(id: string, token: string, type: Constants["InteractionResponseTypes"][keyof Constants["InteractionResponseTypes"]]): Promise<void>;
-		createInteractionResponse(id: string, token: string, type: Constants["InteractionResponseTypes"][keyof Constants["InteractionResponseTypes"]], content: InteractionPayload): Promise<Message<TextChannel>>;
-		getOriginalInteractionResponse(applicationId: string, token: string): Promise<Message<TextChannel>>;
-		editOriginalInteractionResponse(applicationId: string, token: string, content: InteractionPayload): Promise<Message<TextChannel>>;
-		deleteOriginalInteractionResponse(applicationId: string, token: string): Promise<void>;
-
-		createFollowupMessage(applicationId: string, token: string, content: InteractionPayload): Promise<Message<TextChannel>>;
-		editFollowupMessage(applicationId: string, token: string, messageId: string, content: InteractionPayload): Promise<Message<TextChannel>>;
-		deleteFollowupMessage(applicationId: string, token: string, messageId: string): Promise<void>;
 		// just for internal use
 		private _formatAllowedMentions(allowed: AllowedMentions): unknown;
 	}
@@ -70,8 +56,8 @@ declare module "eris" {
 		async awaitMessages<T extends TextableChannel = Exclude<GuildTextableChannel, AnyThreadChannel>>(timeout: number, filter: (msg: Message<TextableChannel>) => boolean, limit: number): Promise<Array<Message<T>>>;
 		async awaitMessages<T extends TextableChannel = Exclude<GuildTextableChannel, AnyThreadChannel>>(timeout: number, filter?: (msg: Message<TextableChannel>) => boolean, limit?: 1): Promise<Message<T> | null>;
 
-		async awaitComponentInteractions<T extends APIMessageComponentInteractionData>(timeout: number, filter: (interaction: InteractionWithData<APIMessageComponentInteractionData>) => boolean, limit: number): Promise<Array<InteractionWithData<T>>>;
-		async awaitComponentInteractions<T extends APIMessageComponentInteractionData>(timeout: number, filter?: (interaction: InteractionWithData<APIMessageComponentInteractionData>) => boolean, limit?: 1): Promise<InteractionWithData<T> | null>;
+		async awaitComponentInteractions(timeout: number, filter: (interaction: ComponentInteraction) => boolean, limit: number): Promise<Array<ComponentInteraction>>;
+		async awaitComponentInteractions(timeout: number, filter?: (interaction: ComponentInteraction) => boolean, limit?: 1): Promise<ComponentInteraction | null>;
 	}
 
 	type GuildTextableChannelWithoutThreads = Exclude<GuildTextableChannel, AnyThreadChannel>;

@@ -88,7 +88,7 @@ export default new Command("inspect")
 					.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `inspect-warnings.${msg.author.id}`, false, undefined, "Warning History")
 					.toJSON()
 			});
-			const wait = await msg.channel.awaitComponentInteractions(3e5, (it) => it.data.custom_id.startsWith("inspect-") && it.message.id === m.id && it.member.user.id === msg.author.id);
+			const wait = await msg.channel.awaitComponentInteractions(3e5, (it) => it.data.custom_id.startsWith("inspect-") && it.message.id === m.id && it.member!.user.id === msg.author.id);
 			if (wait === null) {
 				await m.edit({
 					content: "",
@@ -103,7 +103,7 @@ export default new Command("inspect")
 				});
 				return;
 			} else {
-				await this.createInteractionResponse(wait.id, wait.token, Eris.Constants.InteractionResponseTypes.DEFERRED_UPDATE_MESSAGE);
+				await wait.acknowledge();
 				if (wait.data.custom_id.includes("strikes")) void strikeHistory.call(this);
 				else if (wait.data.custom_id.includes("moderation")) void moderationHistory.call(this);
 				else if (wait.data.custom_id.includes("warnings")) void warningHistory.call(this);
@@ -131,7 +131,7 @@ export default new Command("inspect")
 					.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `inspect-next.${msg.author.id}`, pStrike.length === 0 || page === pStrike.length, ComponentHelper.emojiToPartial(config.emojis.default.next, "default"), "Next Page")
 					.toJSON()
 			});
-			const wait = await msg.channel.awaitComponentInteractions(3e5, (it) => it.data.custom_id.startsWith("inspect-") && it.message.id === m.id && it.member.user.id === msg.author.id);
+			const wait = await msg.channel.awaitComponentInteractions(3e5, (it) => it.data.custom_id.startsWith("inspect-") && it.message.id === m.id && it.member!.user.id === msg.author.id);
 			if (wait === null) {
 				await m.edit({
 					content: "",
@@ -146,7 +146,7 @@ export default new Command("inspect")
 				});
 				return;
 			} else {
-				await this.createInteractionResponse(wait.id, wait.token, Eris.Constants.InteractionResponseTypes.DEFERRED_UPDATE_MESSAGE);
+				await wait.acknowledge();
 				if (wait.data.custom_id.includes("prev")){
 					page--;
 					void strikeHistory.call(this);
@@ -179,7 +179,7 @@ export default new Command("inspect")
 					.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `inspect-next.${msg.author.id}`, pMod.length === 0 || page === pMod.length, ComponentHelper.emojiToPartial(config.emojis.default.next, "default"), "Next Page")
 					.toJSON()
 			});
-			const wait = await msg.channel.awaitComponentInteractions(3e5, (it) => it.data.custom_id.startsWith("inspect-") && it.message.id === m.id && it.member.user.id === msg.author.id);
+			const wait = await msg.channel.awaitComponentInteractions(3e5, (it) => it.data.custom_id.startsWith("inspect-") && it.message.id === m.id && it.member!.user.id === msg.author.id);
 			if (wait === null) {
 				await m.edit({
 					content: "",
@@ -194,7 +194,7 @@ export default new Command("inspect")
 				});
 				return;
 			} else {
-				await this.createInteractionResponse(wait.id, wait.token, Eris.Constants.InteractionResponseTypes.DEFERRED_UPDATE_MESSAGE);
+				await wait.acknowledge();
 				if (wait.data.custom_id.includes("prev")){
 					page--;
 					void moderationHistory.call(this);
@@ -228,7 +228,7 @@ export default new Command("inspect")
 					.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `inspect-next.${msg.author.id}`, pWarnings.length === 0 || page === pWarnings.length, ComponentHelper.emojiToPartial(config.emojis.default.next, "default"), "Next Page")
 					.toJSON()
 			});
-			const wait = await msg.channel.awaitComponentInteractions(3e5, (it) => it.data.custom_id.startsWith("inspect-") && it.message.id === m.id && it.member.user.id === msg.author.id);
+			const wait = await msg.channel.awaitComponentInteractions(3e5, (it) => it.data.custom_id.startsWith("inspect-") && it.message.id === m.id && it.member!.user.id === msg.author.id);
 			if (wait === null) {
 				await m.edit({
 					content: "",
@@ -243,7 +243,7 @@ export default new Command("inspect")
 				});
 				return;
 			} else {
-				await this.createInteractionResponse(wait.id, wait.token, Eris.Constants.InteractionResponseTypes.DEFERRED_UPDATE_MESSAGE);
+				await wait.acknowledge();
 				if (wait.data.custom_id.includes("prev")){
 					page--;
 					void warningHistory.call(this);

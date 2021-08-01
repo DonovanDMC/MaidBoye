@@ -74,7 +74,7 @@ export default new Command("e621", "e6")
 				.setColor(post.rating === "s" ? "green" : post.rating === "q" ? "gold" : post.rating === "e" ? "red" : "bot")
 				.setFooter(`Post #${post.id} | ${i + 1}/${posts.length} | ${post.score.up} ${config.emojis.default.up} ${post.score.down} ${config.emojis.default.down} | ${post.fav_count} ${config.emojis.default.heart}`)
 				.removeDescription();
-			if (id && token) await this.createInteractionResponse(id, token, Eris.Constants.InteractionResponseTypes.DEFERRED_UPDATE_MESSAGE);
+			if (id && token) await this.createInteractionResponse(id, token, { type: Eris.Constants.InteractionResponseTypes.DEFERRED_UPDATE_MESSAGE });
 
 			if (post.file.ext === "swf") {
 				if (msg.dashedArgs.value.includes("no-flash")) {
@@ -98,15 +98,18 @@ export default new Command("e621", "e6")
 						endTime: string | null;
 						createTime: (Record<CreateTimeType, number> & Record<`${CreateTimeType}Ns`, string>) | null;
 					}
-					if (token && m) await this.editOriginalInteractionResponse(this.user.id, token, {
-						embeds: [
-							new EmbedBuilder(true, undefined, m.embeds[0])
-								.setDescription("Generating post preview..")
-								.setImage("https://assets.maid.gay/loading.gif")
-								.toJSON()
-						],
-						components: m.components
-					});
+
+					// @FIXME change this if original methods get added
+					if (token && m)
+						await this.editWebhookMessage(this.user.id, token, "@original", {
+							embeds: [
+								new EmbedBuilder(true, undefined, m.embeds[0])
+									.setDescription("Generating post preview..")
+									.setImage("https://assets.maid.gay/loading.gif")
+									.toJSON()
+							],
+							components: m.components
+						});
 					const b = await fetch("https://v2.yiff.rest/e621-thumb/create", {
 						method: "POST",
 						headers: {
@@ -172,13 +175,14 @@ export default new Command("e621", "e6")
 			});
 			else {
 				if (!token) return;
-				await this.editOriginalInteractionResponse(this.user.id, token,{
+				// @FIXME change this if original methods get added
+				await this.editWebhookMessage(this.user.id, token, "@original", {
 					embeds: [e.toJSON()],
 					components: c
 				});
 			}
 
-			const wait = await msg.channel.awaitComponentInteractions(3e5, (it) => it.channel_id === msg.channel.id && it.message.id === m!.id && it.data.custom_id.startsWith("e621-") && it.data.custom_id.endsWith(msg.author.id) && !!it.member.user && it.member.user.id === msg.author.id);
+			const wait = await msg.channel.awaitComponentInteractions(3e5, (it) => it.channelID === msg.channel.id && it.message.id === m!.id && it.data.custom_id.startsWith("e621-") && it.data.custom_id.endsWith(msg.author.id) && it.member!.user.id === msg.author.id);
 			if (wait === null) {
 				await m.edit({
 					embeds: m.embeds,

@@ -61,13 +61,14 @@ export default new Command("modlog")
 			});
 		}
 		if (skip === false) {
-			const section = await msg.channel.awaitComponentInteractions(6e4, (it) => it.channel_id === msg.channel.id && it.message.id === m.id && it.data.custom_id.startsWith("modlog-section") && it.data.custom_id.endsWith(msg.author.id) && !!it.member.user && it.member.user.id === msg.author.id);
+			const section = await msg.channel.awaitComponentInteractions(6e4, (it) => it.channelID === msg.channel.id && it.message.id === m.id && it.data.custom_id.startsWith("modlog-section") && it.data.custom_id.endsWith(msg.author.id) && it.member!.user.id === msg.author.id);
 			if (section === null) return m.edit({
 				content: "Selection timed out..",
 				components: []
 			});
-			await this.createInteractionResponse(section.id, section.token, Eris.Constants.InteractionResponseTypes.UPDATE_MESSAGE, {
+			await section.createMessage({
 				content: "Successfully selected, processing..",
+				// @ts-ignore -- waiting for a pr update
 				components: []
 			});
 			sect = section.data.custom_id.split(".")[0].split("-")[2];
@@ -91,13 +92,14 @@ export default new Command("modlog")
 						.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `select-modlogsetup-3.${msg.author.id}`, false, ComponentHelper.emojiToPartial(config.emojis.default.three, "default"), "Three")
 						.toJSON()
 				});
-				const sel = await msg.channel.awaitComponentInteractions(6e4, (it) => it.channel_id === msg.channel.id && it.message.id === m.id && it.data.custom_id.startsWith("select-modlogsetup") && it.data.custom_id.endsWith(msg.author.id) && !!it.member.user && it.member.user.id === msg.author.id);
+				const sel = await msg.channel.awaitComponentInteractions(6e4, (it) => it.channelID === msg.channel.id && it.message.id === m.id && it.data.custom_id.startsWith("select-modlogsetup") && it.data.custom_id.endsWith(msg.author.id) && it.member!.user.id === msg.author.id);
 				if (sel === null) return m.edit({
 					content: "Y-you took too long to respond..",
 					components: []
 				});
-				await this.createInteractionResponse(sel.id, sel.token, Eris.Constants.InteractionResponseTypes.UPDATE_MESSAGE, {
+				await sel.createMessage({
 					content: "Successfully selected, processing..",
+					// @ts-ignore -- waiting for a pr update
 					components: []
 				});
 
@@ -108,7 +110,7 @@ export default new Command("modlog")
 						enabled: true
 					} as GuildConfig["modlog"];
 					// ask defaults
-					const selC = await message.channel.awaitComponentInteractions(3e4, (it) => it.channel_id === msg.channel.id && it.message.id === message.id && it.data.custom_id.startsWith("modlogconfig") && it.data.custom_id.endsWith(msg.author.id) && !!it.member.user && it.member.user.id === msg.author.id);
+					const selC = await message.channel.awaitComponentInteractions(3e4, (it) => it.channelID === msg.channel.id && it.message.id === message.id && it.data.custom_id.startsWith("modlogconfig") && it.data.custom_id.endsWith(msg.author.id) &&  it.member!.user.id === msg.author.id);
 					// defaults timeout
 					if (selC === null) {
 						await message.edit({
@@ -118,22 +120,25 @@ export default new Command("modlog")
 						return v;
 					// defaults no
 					} else if (selC.data.custom_id.indexOf("no") !== -1) {
-						await this.createInteractionResponse(selC.id, selC.token, Eris.Constants.InteractionResponseTypes.UPDATE_MESSAGE, {
+						await selC.createMessage({
 							content: "Using default configuration options. Setup complete!",
+							// @ts-ignore -- waiting for a pr update
 							components: []
 						});
 						return v;
 					} else if (selC.data.custom_id.indexOf("cancel") !== -1) {
-						await this.createInteractionResponse(selC.id, selC.token, Eris.Constants.InteractionResponseTypes.UPDATE_MESSAGE, {
+						await selC.createMessage({
 							content: "Setup has been cancelled.",
+							// @ts-ignore -- waiting for a pr update
 							components: []
 						});
 						return null;
 					}
 
 					// ask case editing
-					await this.createInteractionResponse(selC.id, selC.token, Eris.Constants.InteractionResponseTypes.UPDATE_MESSAGE, {
+					await selC.createMessage({
 						content: "Do you want to enable **Case Editing** after cases have been made? (default: **yes**)",
+						// @ts-ignore -- waiting for a pr update
 						components: new ComponentHelper()
 							.addInteractionButton(ComponentHelper.BUTTON_SUCCESS, `configCaseEditing-yes.${msg.author.id}`, false, undefined, "Yes")
 							.addInteractionButton(ComponentHelper.BUTTON_DANGER, `configCaseEditing-no.${msg.author.id}`, false, undefined, "No")
@@ -141,7 +146,7 @@ export default new Command("modlog")
 							.toJSON()
 					});
 					// case editing collector
-					const cnfCaseEditing = await ComponentInteractionCollector.awaitInteractions(msg.channel.id, 3e4, (it) => it.channel_id === msg.channel.id && it.message.id === message.id && it.data.custom_id.startsWith("configCaseEditing") && it.data.custom_id.endsWith(msg.author.id) && !!it.member.user && it.member.user.id === msg.author.id);
+					const cnfCaseEditing = await ComponentInteractionCollector.awaitInteractions(msg.channel.id, 3e4, (it) => it.channelID === msg.channel.id && it.message.id === message.id && it.data.custom_id.startsWith("configCaseEditing") && it.data.custom_id.endsWith(msg.author.id) &&  it.member!.user.id === msg.author.id);
 
 					// buttons for case deletion, for less code duplication
 					const cnfCDComponents = new ComponentHelper()
@@ -157,28 +162,31 @@ export default new Command("modlog")
 					});
 					// case editing no
 					else if (cnfCaseEditing.data.custom_id.indexOf("no") !== -1) {
-						await this.createInteractionResponse(cnfCaseEditing.id, cnfCaseEditing.token, Eris.Constants.InteractionResponseTypes.UPDATE_MESSAGE, {
+						await cnfCaseEditing.createMessage({
 							content: `**Case Editing** has been set to disabled.\n\nNext: Do you want to enable **Case Deletion**? (default: **${v.caseDeletingEnabled ? "yes" : "no"}**)`,
+							// @ts-ignore -- waiting for a pr update
 							components: cnfCDComponents
 						});
 						v.caseEditingEnabled = false;
 					// case editing yes
 					} else if (cnfCaseEditing.data.custom_id.indexOf("yes") !== -1) {
-						await this.createInteractionResponse(cnfCaseEditing.id, cnfCaseEditing.token, Eris.Constants.InteractionResponseTypes.UPDATE_MESSAGE, {
+						await cnfCaseEditing.createMessage({
 							content: `**Case Editing** has been set to enabled.\n\nNext: Do you want to enable **Case Deletion**? (default: **${v.caseDeletingEnabled ? "yes" : "no"}**)`,
+							// @ts-ignore -- waiting for a pr update
 							components: cnfCDComponents
 						});
 						v.caseEditingEnabled = true;
 					// case editing exit
 					} else if (cnfCaseEditing.data.custom_id.indexOf("exit") !== -1) {
-						await this.createInteractionResponse(cnfCaseEditing.id, cnfCaseEditing.token, Eris.Constants.InteractionResponseTypes.UPDATE_MESSAGE, {
+						await cnfCaseEditing.createMessage({
 							content: "Exiting.",
+							// @ts-ignore -- waiting for a pr update
 							components: []
 						});
 						return v;
 					}
 					// case deletion collector
-					const cnfCaseDeletion = await ComponentInteractionCollector.awaitInteractions(msg.channel.id, 3e4, (it) => it.channel_id === msg.channel.id && it.message.id === message.id && it.data.custom_id.startsWith("configCaseDeletion") && it.data.custom_id.endsWith(msg.author.id) && !!it.member.user && it.member.user.id === msg.author.id);
+					const cnfCaseDeletion = await ComponentInteractionCollector.awaitInteractions(msg.channel.id, 3e4, (it) => it.channelID === msg.channel.id && it.message.id === message.id && it.data.custom_id.startsWith("configCaseDeletion") && it.data.custom_id.endsWith(msg.author.id) &&  it.member!.user.id === msg.author.id);
 
 					// buttons for edit others cases, for less code duplication
 					const cnfEOCComponents = new ComponentHelper()
@@ -194,28 +202,31 @@ export default new Command("modlog")
 					});
 					// case deletion no
 					else if (cnfCaseDeletion.data.custom_id.indexOf("no") !== -1) {
-						await this.createInteractionResponse(cnfCaseDeletion.id, cnfCaseDeletion.token, Eris.Constants.InteractionResponseTypes.UPDATE_MESSAGE, {
+						await cnfCaseDeletion.createMessage({
 							content: `**Case Deletion** has been set to disabled.\n\nNext: Do you want to enable **Editing Others Cases**? (default: **${v.editOthersCasesEnabled ? "yes" : "no"}**)`,
+							// @ts-ignore -- waiting for a pr update
 							components: cnfEOCComponents
 						});
 						v.caseDeletingEnabled = false;
 					// case deletion yes
 					} else if (cnfCaseDeletion.data.custom_id.indexOf("yes") !== -1) {
-						await this.createInteractionResponse(cnfCaseDeletion.id, cnfCaseDeletion.token, Eris.Constants.InteractionResponseTypes.UPDATE_MESSAGE, {
+						await cnfCaseDeletion.createMessage({
 							content: `**Case Deletion** has been set to enabled.\n\nNext: Do you want to enable **Editing Others Cases**? (default: **${v.editOthersCasesEnabled ? "yes" : "no"}**)`,
+							// @ts-ignore -- waiting for a pr update
 							components: cnfEOCComponents
 						});
 						v.caseDeletingEnabled = true;
 					// case deletion exit
 					} else if (cnfCaseDeletion.data.custom_id.indexOf("exit") !== -1) {
-						await this.createInteractionResponse(cnfCaseDeletion.id, cnfCaseDeletion.token, Eris.Constants.InteractionResponseTypes.UPDATE_MESSAGE, {
+						await cnfCaseDeletion.createMessage({
 							content: "Exiting.",
+							// @ts-ignore -- waiting for a pr update
 							components: []
 						});
 						return v;
 					}
 					// edit others cases collector
-					const cnfEditOthersCases = await ComponentInteractionCollector.awaitInteractions(msg.channel.id, 3e4, (it) => it.channel_id === msg.channel.id && it.message.id === message.id && it.data.custom_id.startsWith("configEditOthersCases") && it.data.custom_id.endsWith(msg.author.id) && !!it.member.user && it.member.user.id === msg.author.id);
+					const cnfEditOthersCases = await ComponentInteractionCollector.awaitInteractions(msg.channel.id, 3e4, (it) => it.channelID === msg.channel.id && it.message.id === message.id && it.data.custom_id.startsWith("configEditOthersCases") && it.data.custom_id.endsWith(msg.author.id) &&  it.member!.user.id === msg.author.id);
 
 					// edit others cases timeout
 					if (cnfEditOthersCases === null) await message.edit({
@@ -224,22 +235,25 @@ export default new Command("modlog")
 					});
 					// edit others cases no
 					else if (cnfEditOthersCases.data.custom_id.indexOf("no") !== -1) {
-						await this.createInteractionResponse(cnfEditOthersCases.id, cnfEditOthersCases.token, Eris.Constants.InteractionResponseTypes.UPDATE_MESSAGE, {
+						await cnfEditOthersCases.createMessage({
 							content: "**Edit Others Cases** has been set to disabled.\n\nSetup is complete.",
+							// @ts-ignore -- waiting for a pr update
 							components: []
 						});
 						v.editOthersCasesEnabled = false;
 					// edit others cases yes
 					} else if (cnfEditOthersCases.data.custom_id.indexOf("yes") !== -1) {
-						await this.createInteractionResponse(cnfEditOthersCases.id, cnfEditOthersCases.token, Eris.Constants.InteractionResponseTypes.UPDATE_MESSAGE, {
+						await cnfEditOthersCases.createMessage({
 							content: "**Edit Others Cases** has been set to enabled.\n\nSetup is complete.",
+							// @ts-ignore -- waiting for a pr update
 							components: []
 						});
 						v.editOthersCasesEnabled = true;
 					// edit others cases exit
 					} else if (cnfEditOthersCases.data.custom_id.indexOf("exit") !== -1) {
-						await this.createInteractionResponse(cnfEditOthersCases.id, cnfEditOthersCases.token, Eris.Constants.InteractionResponseTypes.UPDATE_MESSAGE, {
+						await cnfEditOthersCases.createMessage({
 							content: "Exiting.",
+							// @ts-ignore -- waiting for a pr update
 							components: []
 						});
 						return v;
@@ -265,18 +279,20 @@ export default new Command("modlog")
 							content: "Please select a webhook from the following.\n(if the button is disabled, we couldn't get all of the info we needed about the webhook)",
 							components: c.toJSON()
 						});
-						const selW = await ComponentInteractionCollector.awaitInteractions(msg.channel.id, 6e4, (it) => it.channel_id === msg.channel.id && it.message.id === m.id && it.data.custom_id.startsWith("select-webhook") && it.data.custom_id.endsWith(msg.author.id) && !!it.member.user && it.member.user.id === msg.author.id);
+						const selW = await ComponentInteractionCollector.awaitInteractions(msg.channel.id, 6e4, (it) => it.channelID === msg.channel.id && it.message.id === m.id && it.data.custom_id.startsWith("select-webhook") && it.data.custom_id.endsWith(msg.author.id) &&  it.member!.user.id === msg.author.id);
 						if (selW === null) return m.edit({
 							content: "Y-you took too long to respond..",
 							components: []
 						});
 						hook = hooks[Number(selW.data.custom_id.split(".")[0].split("-")[2])];
-						if (!hook) return this.createInteractionResponse(selW.id, selW.token, Eris.Constants.InteractionResponseTypes.UPDATE_MESSAGE, {
+						if (!hook) return selW.createMessage({
 							content: "Internal error.",
+							// @ts-ignore -- waiting for a pr update
 							components: []
 						});
-						await this.createInteractionResponse(selW.id, selW.token, Eris.Constants.InteractionResponseTypes.UPDATE_MESSAGE, {
+						await selW.createMessage({
 							content: `Successfully selected the webhook **${hook.name}** (${hook.id})\nWould you like to configure the more detailed options, or leave them at their defaults?`,
+							// @ts-ignore -- waiting for a pr update
 							components: new ComponentHelper()
 								.addInteractionButton(ComponentHelper.BUTTON_SUCCESS, `modlogconfig-yes.${msg.author.id}`, false, undefined, "Configure")
 								.addInteractionButton(ComponentHelper.BUTTON_DANGER, `modlogconfig-no.${msg.author.id}`, false, undefined, "Defaults")
@@ -315,7 +331,7 @@ export default new Command("modlog")
 							name: "Maid Boye Moderation Log",
 							avatar: `data:${mime};base64,${b64}`
 						});
-						await this.editOriginalInteractionResponse(this.user.id, sel.token, {
+						await sel.editOriginalMessage({
 							content: `Successfully created the webhook **${hook.name}** (${hook.id})\nWould you like to configure the more detailed options, or leave them at their defaults?`,
 							components: new ComponentHelper()
 								.addInteractionButton(ComponentHelper.BUTTON_SUCCESS, `modlogconfig-yes.${msg.author.id}`, false, undefined, "Configure")
@@ -378,7 +394,7 @@ export default new Command("modlog")
 								.addInteractionButton(ComponentHelper.BUTTON_SUCCESS, `delhook-cancel.${msg.author.id}`, false, undefined, "Cancel")
 								.toJSON()
 						});
-						const delHook = await msg.channel.awaitComponentInteractions(6e4, (it) => it.channel_id === msg.channel.id && it.message.id === m.id && it.data.custom_id.startsWith("delhook") && it.data.custom_id.endsWith(msg.author.id) && !!it.member.user && it.member.user.id === msg.author.id);
+						const delHook = await msg.channel.awaitComponentInteractions(6e4, (it) => it.channelID === msg.channel.id && it.message.id === m.id && it.data.custom_id.startsWith("delhook") && it.data.custom_id.endsWith(msg.author.id) && it.member!.user.id === msg.author.id);
 
 						if (delHook === null) return m.edit({
 							content: "Timeout detected, modlog has not been reset.",

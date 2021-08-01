@@ -3,6 +3,7 @@ import config from "@config";
 import db from "@db";
 const Redis = db.r;
 
+// @TODO use components for joining
 export default new Command("awoo", "howl")
 	.setPermissions("bot", "embedLinks", "useExternalEmojis")
 	.setDescription("Start a howl, or join one")
