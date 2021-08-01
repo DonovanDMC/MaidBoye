@@ -11,7 +11,6 @@ import Eris from "eris";
 import * as fs from "fs-extra";
 import { Node } from "lavalink";
 import ModLogHandler from "@util/handlers/ModLogHandler";
-import CheweyAPI from "@util/req/CheweyAPI";
 import YiffRocks from "yiff-rocks";
 import AntiSpam from "@util/cmd/AntiSpam";
 import ComponentInteractionCollector from "@util/ComponentInteractionCollector";
@@ -99,5 +98,29 @@ export default class MaidBoye extends Eris.Client {
 				} else return null;
 			}
 		}
+	}
+
+	async syncSlashCommands(guild?: string) {
+		const commands = CommandHandler.commands.filter(c => c.hasSlashVariant).map(cmd => ({
+			name: cmd.triggers[0],
+			description: cmd.description,
+			options: cmd.slashCommandOptions
+		}));
+
+		return (guild === undefined ? this.bulkEditCommands(commands) : this.bulkEditGuildCommands(guild, commands))
+			.then(
+				({ length }) => {
+					Logger.getLogger("SlashCommandSync").debug(`Synced ${length} commands`);
+					return true;
+				},
+				(err: Error) => {
+					Logger.getLogger("SlashCommandSync").debug("Error detected, printing command index list");
+					commands.forEach((cmd, index) => {
+						Logger.getLogger("SlashCommandSync").debug(`Command at index "${index}": ${cmd.name}`);
+					});
+					Logger.getLogger("SlashCommandSync").error(err);
+					return false;
+				}
+			);
 	}
 }

@@ -107,7 +107,7 @@ export default class BotFunctions {
 					...message.author.toJSON(),
 					public_flags: message.author.publicFlags
 				},
-				joined_at: new Date(message.member?.joinedAt ?? 0).toISOString(),
+				joined_at: !message.member || message.member.joinedAt === null ? undefined : new Date(message.member.joinedAt).toISOString(),
 				premium_since: message.member?.premiumSince,
 				deaf: !!message.member?.voiceState.deaf,
 				mute: !!message.member?.voiceState.mute,
@@ -115,7 +115,7 @@ export default class BotFunctions {
 			},
 			content: message.content,
 			timestamp: new Date(message.timestamp).toISOString(),
-			edited_timestamp: new Date(message.editedTimestamp ?? 0).toISOString(),
+			edited_timestamp: message.editedTimestamp === undefined ? undefined : new Date(message.editedTimestamp ?? 0).toISOString(),
 			tts: !!message.tts,
 			mention_everyone: message.mentionEveryone,
 			mentions: message.mentions.map(m => ({
@@ -165,6 +165,7 @@ export default class BotFunctions {
 			flags: message.flags,
 			// eslint-disable-next-line deprecation/deprecation
 			stickers: message.stickers,
+			sticker_items: message.stickerItems,
 			referenced_message: message.referencedMessage === undefined ? undefined : message.referencedMessage === null ? null : this.messageToOriginal(message.referencedMessage),
 			interaction: null,
 			components: message.components

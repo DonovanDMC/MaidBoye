@@ -113,6 +113,8 @@ Object.defineProperties(Eris.Message.prototype, {
 	reply: {
 		value(this: Eris.Message, content: Eris.MessageContent, file: Eris.MessageFile | Array<Eris.MessageFile>) {
 			if (typeof content === "string") content = { content };
+			// interactions
+			if (this.id === "000000000000000000") return this.channel.createMessage(content);
 			else return this.channel.createMessage({
 				...content,
 				messageReference: {
@@ -124,9 +126,10 @@ Object.defineProperties(Eris.Message.prototype, {
 			}, file);
 		}
 	},
-	setInteraction: {
+	setInteractionInfo: {
 		value(this: Eris.Message, interaction: Eris.PingInteraction | Eris.CommandInteraction | Eris.ComponentInteraction | Eris.UnknownInteraction) {
 			this.cmdInteracton = !(interaction instanceof Eris.CommandInteraction) ? null : interaction;
+			return this;
 		}
 	},
 	getUserFromArgs: {
@@ -234,16 +237,5 @@ Object.defineProperties(Eris.GuildChannel.prototype, {
 		get(this: Eris.GuildTextableChannel) {
 			return Object.entries(Eris.Constants.ChannelTypes).find(([, n]) => this.type === n)![0];
 		}
-	}
-});
-
-
-Object.defineProperty(Eris, "InteractionCallbackType", {
-	value: {
-		PONG: 1,
-		CHANNEL_MESSAGE_WITH_SOURCE: 4,
-		DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE: 5,
-		DEFERRED_UPDATE_MESSAGE: 6,
-		UPDATE_MESSAGE: 7
 	}
 });

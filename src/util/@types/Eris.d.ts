@@ -35,7 +35,7 @@ declare module "eris" {
 		cmdInteracton: CommandInteraction | null;
 		private client: Client;
 		reply(content: MessageContent, file?: MessageFile | Array<MessageFile>): Promise<Message<T>>;
-		setInteractionInfo(interaction: boolean, interactionId: string | null, interactionToken: string | null): void;
+		setInteractionInfo(interaction:  PingInteraction | CommandInteraction | ComponentInteraction | UnknownInteraction): this;
 		getUserFromArgs(argPosition?: number, mentionPosition?: number, parsed?: boolean): Promise<User | null>;
 		getMemberFromArgs(argPosition?: number, mentionPosition?: number, parsed?: boolean, nick?: boolean): Promise<Member | null>;
 		getChannelFromArgs<CH = AnyGuildChannel>(argPosition?: number, mentionPosition?: number, parsed?: boolean, type?: number, threads: true): Promise<CH | null>;

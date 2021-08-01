@@ -14,7 +14,6 @@ export default new Command("prefix")
 			type: Eris.Constants.CommandOptionTypes.SUB_COMMAND,
 			name: "add",
 			description: "Add additional prefixes",
-			required: true,
 			options: [
 				{
 					type: Eris.Constants.CommandOptionTypes.STRING,
@@ -44,7 +43,6 @@ export default new Command("prefix")
 			type: Eris.Constants.CommandOptionTypes.SUB_COMMAND,
 			name: "remove",
 			description: "remove a prefix",
-			required: true,
 			options: [
 				{
 					type: Eris.Constants.CommandOptionTypes.STRING,
@@ -58,14 +56,12 @@ export default new Command("prefix")
 			type: Eris.Constants.CommandOptionTypes.SUB_COMMAND,
 			name: "reset",
 			description: "Reset all prefixes",
-			required: true,
 			options: []
 		},
 		{
 			type: Eris.Constants.CommandOptionTypes.SUB_COMMAND,
 			name: "list",
 			description: "List current prefixes",
-			required: true,
 			options: []
 		}
 	])
