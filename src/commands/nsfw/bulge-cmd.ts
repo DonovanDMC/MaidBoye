@@ -43,7 +43,6 @@ export default new Command("bulge")
 					type: Eris.Constants.InteractionResponseTypes.UPDATE_MESSAGE,
 					data: {
 						embeds: [e],
-						// @ts-ignore -- waiting for a pr update
 						components: c
 					}
 				});

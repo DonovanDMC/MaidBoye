@@ -81,7 +81,6 @@ export default new Command("yiff", "thegoodstuff")
 					type: Eris.Constants.InteractionResponseTypes.UPDATE_MESSAGE,
 					data: {
 						embeds: [e],
-						// @ts-ignore -- waiting for a pr update
 						components: c
 					}
 				});

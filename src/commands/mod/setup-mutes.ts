@@ -80,13 +80,11 @@ export default new Command("setup-mutes")
 					.setDescription("Cancelled.")
 					.toJSON()
 			],
-			// @ts-ignore -- waiting for a pr update
 			components: []
 		});
 		await w.createMessage({
 			content: "Processing..",
 			embeds: [],
-			// @ts-ignore -- waiting for a pr update
 			components: []
 		});
 		await msg.channel.sendTyping();

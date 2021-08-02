@@ -67,7 +67,6 @@ export default new Command("modlog")
 			});
 			await section.createMessage({
 				content: "Successfully selected, processing..",
-				// @ts-ignore -- waiting for a pr update
 				components: []
 			});
 			sect = section.data.custom_id.split(".")[0].split("-")[2];
@@ -98,7 +97,6 @@ export default new Command("modlog")
 				});
 				await sel.createMessage({
 					content: "Successfully selected, processing..",
-					// @ts-ignore -- waiting for a pr update
 					components: []
 				});
 
@@ -121,14 +119,12 @@ export default new Command("modlog")
 					} else if (selC.data.custom_id.indexOf("no") !== -1) {
 						await selC.createMessage({
 							content: "Using default configuration options. Setup complete!",
-							// @ts-ignore -- waiting for a pr update
 							components: []
 						});
 						return v;
 					} else if (selC.data.custom_id.indexOf("cancel") !== -1) {
 						await selC.createMessage({
 							content: "Setup has been cancelled.",
-							// @ts-ignore -- waiting for a pr update
 							components: []
 						});
 						return null;
@@ -137,7 +133,6 @@ export default new Command("modlog")
 					// ask case editing
 					await selC.createMessage({
 						content: "Do you want to enable **Case Editing** after cases have been made? (default: **yes**)",
-						// @ts-ignore -- waiting for a pr update
 						components: new ComponentHelper()
 							.addInteractionButton(ComponentHelper.BUTTON_SUCCESS, `configCaseEditing-yes.${msg.author.id}`, false, undefined, "Yes")
 							.addInteractionButton(ComponentHelper.BUTTON_DANGER, `configCaseEditing-no.${msg.author.id}`, false, undefined, "No")
@@ -163,7 +158,6 @@ export default new Command("modlog")
 					else if (cnfCaseEditing.data.custom_id.indexOf("no") !== -1) {
 						await cnfCaseEditing.createMessage({
 							content: `**Case Editing** has been set to disabled.\n\nNext: Do you want to enable **Case Deletion**? (default: **${v.caseDeletingEnabled ? "yes" : "no"}**)`,
-							// @ts-ignore -- waiting for a pr update
 							components: cnfCDComponents
 						});
 						v.caseEditingEnabled = false;
@@ -171,7 +165,6 @@ export default new Command("modlog")
 					} else if (cnfCaseEditing.data.custom_id.indexOf("yes") !== -1) {
 						await cnfCaseEditing.createMessage({
 							content: `**Case Editing** has been set to enabled.\n\nNext: Do you want to enable **Case Deletion**? (default: **${v.caseDeletingEnabled ? "yes" : "no"}**)`,
-							// @ts-ignore -- waiting for a pr update
 							components: cnfCDComponents
 						});
 						v.caseEditingEnabled = true;
@@ -179,7 +172,6 @@ export default new Command("modlog")
 					} else if (cnfCaseEditing.data.custom_id.indexOf("exit") !== -1) {
 						await cnfCaseEditing.createMessage({
 							content: "Exiting.",
-							// @ts-ignore -- waiting for a pr update
 							components: []
 						});
 						return v;
@@ -203,7 +195,6 @@ export default new Command("modlog")
 					else if (cnfCaseDeletion.data.custom_id.indexOf("no") !== -1) {
 						await cnfCaseDeletion.createMessage({
 							content: `**Case Deletion** has been set to disabled.\n\nNext: Do you want to enable **Editing Others Cases**? (default: **${v.editOthersCasesEnabled ? "yes" : "no"}**)`,
-							// @ts-ignore -- waiting for a pr update
 							components: cnfEOCComponents
 						});
 						v.caseDeletingEnabled = false;
@@ -211,7 +202,6 @@ export default new Command("modlog")
 					} else if (cnfCaseDeletion.data.custom_id.indexOf("yes") !== -1) {
 						await cnfCaseDeletion.createMessage({
 							content: `**Case Deletion** has been set to enabled.\n\nNext: Do you want to enable **Editing Others Cases**? (default: **${v.editOthersCasesEnabled ? "yes" : "no"}**)`,
-							// @ts-ignore -- waiting for a pr update
 							components: cnfEOCComponents
 						});
 						v.caseDeletingEnabled = true;
@@ -219,7 +209,6 @@ export default new Command("modlog")
 					} else if (cnfCaseDeletion.data.custom_id.indexOf("exit") !== -1) {
 						await cnfCaseDeletion.createMessage({
 							content: "Exiting.",
-							// @ts-ignore -- waiting for a pr update
 							components: []
 						});
 						return v;
@@ -236,7 +225,6 @@ export default new Command("modlog")
 					else if (cnfEditOthersCases.data.custom_id.indexOf("no") !== -1) {
 						await cnfEditOthersCases.createMessage({
 							content: "**Edit Others Cases** has been set to disabled.\n\nSetup is complete.",
-							// @ts-ignore -- waiting for a pr update
 							components: []
 						});
 						v.editOthersCasesEnabled = false;
@@ -244,7 +232,6 @@ export default new Command("modlog")
 					} else if (cnfEditOthersCases.data.custom_id.indexOf("yes") !== -1) {
 						await cnfEditOthersCases.createMessage({
 							content: "**Edit Others Cases** has been set to enabled.\n\nSetup is complete.",
-							// @ts-ignore -- waiting for a pr update
 							components: []
 						});
 						v.editOthersCasesEnabled = true;
@@ -252,7 +239,6 @@ export default new Command("modlog")
 					} else if (cnfEditOthersCases.data.custom_id.indexOf("exit") !== -1) {
 						await cnfEditOthersCases.createMessage({
 							content: "Exiting.",
-							// @ts-ignore -- waiting for a pr update
 							components: []
 						});
 						return v;
@@ -286,12 +272,10 @@ export default new Command("modlog")
 						hook = hooks[Number(selW.data.custom_id.split(".")[0].split("-")[2])];
 						if (!hook) return selW.createMessage({
 							content: "Internal error.",
-							// @ts-ignore -- waiting for a pr update
 							components: []
 						});
 						await selW.createMessage({
 							content: `Successfully selected the webhook **${hook.name}** (${hook.id})\nWould you like to configure the more detailed options, or leave them at their defaults?`,
-							// @ts-ignore -- waiting for a pr update
 							components: new ComponentHelper()
 								.addInteractionButton(ComponentHelper.BUTTON_SUCCESS, `modlogconfig-yes.${msg.author.id}`, false, undefined, "Configure")
 								.addInteractionButton(ComponentHelper.BUTTON_DANGER, `modlogconfig-no.${msg.author.id}`, false, undefined, "Defaults")

@@ -87,7 +87,6 @@ export default new Command("settings")
 								.setDescription("Exited.")
 								.toJSON()
 						],
-						// @ts-ignore -- waiting for a pr update
 						components: []
 					}
 				});
@@ -102,7 +101,6 @@ export default new Command("settings")
 					embeds: [
 						formatEmbed(pages[page - 1])
 					],
-					// @ts-ignore -- waiting for a pr update
 					components: new ComponentHelper()
 						.addSelectMenu(`settings-select.${msg.author.id}`, pages[page - 1].map(s => ({
 							label: s.name,
@@ -141,7 +139,6 @@ export default new Command("settings")
 									.setDescription("Exited.")
 									.toJSON()
 							],
-							// @ts-ignore -- waiting for a pr update
 							components: []
 						}
 					});
