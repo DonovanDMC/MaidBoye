@@ -14,6 +14,7 @@ import ModLogHandler from "@util/handlers/ModLogHandler";
 import YiffRocks from "yiff-rocks";
 import AntiSpam from "@util/cmd/AntiSpam";
 import ComponentInteractionCollector from "@util/ComponentInteractionCollector";
+import Timer from "@util/Timer";
 import { performance } from "perf_hooks";
 
 
@@ -27,6 +28,7 @@ export default class MaidBoye extends Eris.Client {
 	}
 
 	async launch() {
+		this.dirCheck();
 		WebhookStore.setClient(this);
 		await db.init(true, true);
 		await this.loadEvents();
@@ -38,6 +40,14 @@ export default class MaidBoye extends Eris.Client {
 		AntiSpam.init();
 		YiffRocks.setUserAgent(config.userAgent);
 		await this.connect();
+	}
+
+	dirCheck(obj?: Record<string, string | Record<string, string>>) {
+		Object.entries(obj ?? config.dir).forEach(([key, dir]) => {
+			if (["src", "config", "commands", "events"].includes(key)) return;
+			if (typeof dir === "object") this.dirCheck(dir);
+			else fs.mkdirpSync(dir);
+		});
 	}
 
 	async loadEvents() {
@@ -100,17 +110,29 @@ export default class MaidBoye extends Eris.Client {
 		}
 	}
 
-	async syncSlashCommands(guild?: string) {
+	async syncSlashCommands(guild?: string, bypass = false) {
+		const start = process.hrtime.bigint();
 		const commands = CommandHandler.commands.filter(c => c.hasSlashVariant).map(cmd => ({
 			name: cmd.triggers[0],
 			description: cmd.description,
 			options: cmd.slashCommandOptions
 		}));
 
+		if (bypass !== true) {
+			// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+			const v = (fs.existsSync(`${config.dir.temp}/slash.json`) ? JSON.parse(fs.readFileSync(`${config.dir.temp}/slash.json`).toString()) : []) as typeof commands;
+			if (JSON.stringify(commands) === JSON.stringify(v)) {
+				Logger.getLogger("SlashCommandSync").debug("Skipping sync due to no changes");
+				return true;
+			}
+		}
+		fs.writeFileSync(`${config.dir.temp}/slash.json`, JSON.stringify(commands));
+
 		return (guild === undefined ? this.bulkEditCommands(commands) : this.bulkEditGuildCommands(guild, commands))
 			.then(
 				({ length }) => {
-					Logger.getLogger("SlashCommandSync").debug(`Synced ${length} commands`);
+					const end = process.hrtime.bigint();
+					Logger.getLogger("SlashCommandSync").debug(`Synced ${length} commands in ${Timer.calc(start, end, 2, false)}`);
 					return true;
 				},
 				(err: Error) => {

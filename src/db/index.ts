@@ -25,7 +25,7 @@ export default class db {
 		if (sql) await this.initMariaDb();
 		if (redis) await this.initRedis();
 		const end = Timer.end();
-		Logger.getLogger("Database[General]").debug(`Initialization complete in ${Timer.calc(start, end)}ms`);
+		Logger.getLogger("Database[General]").debug(`Initialization complete in ${Timer.calc(start, end, 0, false)}`);
 	}
 
 	static async initMariaDb() {
@@ -42,7 +42,7 @@ export default class db {
 			return;
 		}
 		const end = Timer.end();
-		Logger.getLogger("Database[MariaDB]").debug(`Successfully connected in ${end - start}ms`);
+		Logger.getLogger("Database[MariaDB]").debug(`Successfully connected in ${Timer.calc(start, end, 0, false)}`);
 	}
 
 	static async initRedis() {
@@ -59,7 +59,7 @@ export default class db {
 
 			this.r.on("connect", () => {
 				const end = Timer.end();
-				Logger.getLogger("Database[Redis]").debug(`Successfully connected in ${Timer.calc(start, end)}ms`);
+				Logger.getLogger("Database[Redis]").debug(`Successfully connected in ${Timer.calc(start, end, 0, false)}`);
 				resolve();
 			});
 		});
@@ -98,7 +98,7 @@ export default class db {
 		// if we somehow get another undefined
 		if (res === undefined) throw new TypeError("Unexpected undefined user in db#getUser");
 
-		if (config.beta) Logger.getLogger("Database[MariaDB]").debug(`Query for the user "${id}" took ${Timer.calc(start, end)}ms`);
+		if (config.beta) Logger.getLogger("Database[MariaDB]").debug(`Query for the user "${id}" took ${Timer.calc(start, end, 0, false)}`);
 
 		await this.r.setex(`cache:users:${id}`, 300, JSON.stringify({ user: res, selfRolesJoined }));
 
@@ -158,7 +158,7 @@ export default class db {
 		// if we somehow get another null
 		if (res === undefined) throw new TypeError("Unexpected undefined guild in db#getGuild");
 
-		if (config.beta) Logger.getLogger("Database[MariaDB]").debug(`Query for the guild "${id}" took ${Timer.calc(start, end)}ms`);
+		if (config.beta) Logger.getLogger("Database[MariaDB]").debug(`Query for the guild "${id}" took ${Timer.calc(start, end, 0, false)}`);
 
 		await this.r.setex(`cache:guilds:${id}`, 300, JSON.stringify({ guild: res, prefix, selfRoles, tags, logEvents }));
 
