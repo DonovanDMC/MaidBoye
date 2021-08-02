@@ -89,22 +89,22 @@ export default class UserConfig {
 		await db.query("INSERT INTO selfrolesjoined (id, user_id, guild_id, role) VALUES (?, ?, ?, ?)", [
 			id,
 			this.id,
-			role,
-			guild
+			guild,
+			role
 		]);
 		await this.reload();
 		return id;
 	}
 
-	async removeSelfRoleJoined(value: string, column: "id" | "role") {
-		const res = await db.query("DELETE FROM selfroles WHERE ?=? AND role=?", [column, value, this.id]).then((r: OkPacket) => r.affectedRows > 0);
+	async removeSelfRoleJoined(guild: string, value: string, column: "id" | "role") {
+		const res = await db.query(`DELETE FROM selfrolesjoined WHERE ${column}=? AND user_id=? AND guild_id=?`, [value, this.id, guild]).then((r: OkPacket) => r.affectedRows > 0);
 		if (res === false) return false;
 		await this.reload();
 		return true;
 	}
 
-	async resetSelfRoles(guild: string) {
-		const res = await db.query("DELETE FROM selfroles user_id=? AND guild_id=?", [this.id, guild]).then((r: OkPacket) => r.affectedRows > 0);
+	async resetSelfRolesJoined(guild: string) {
+		const res = await db.query("DELETE FROM selfrolesjoined user_id=? AND guild_id=?", [this.id, guild]).then((r: OkPacket) => r.affectedRows > 0);
 		if (res === false) return false;
 		await this.reload();
 		return true;

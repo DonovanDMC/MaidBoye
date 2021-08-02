@@ -17,7 +17,12 @@ export default class SelfRoleJoined {
 		this.id = data.id;
 		this.role = data.role;
 		this.guildId = data.guild_id;
-		this.user = user;
+		Object.defineProperty(this, "user", {
+			value: user,
+			enumerable: false,
+			configurable: false,
+			writable: false
+		});
 	}
 
 	get delete() { return this.user.removeSelfRoleJoined.bind(this.user, this.id, "id"); }

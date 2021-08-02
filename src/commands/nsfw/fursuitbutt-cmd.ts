@@ -7,6 +7,7 @@ export default new Command("fursuitbutt")
 	.setPermissions("bot", "embedLinks")
 	.setDescription("Get an image of a fursuit butt")
 	.setRestrictions("nsfw")
+	.setSlashOptions(true, [])
 	.setCooldown(3e3)
 	.setExecutor(async function(msg) {
 		const img = await Yiffy.furry.butts("json", 1);

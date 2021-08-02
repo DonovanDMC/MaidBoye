@@ -118,6 +118,15 @@ export default class MaidBoye extends Eris.Client {
 			options: cmd.slashCommandOptions
 		}));
 
+		// due to not all categories being loaded before the help command
+		commands.find(cmd => cmd.name === "help")!.options[0].choices = CommandHandler.categories.map(cat => {
+			if (cat.restrictions.includes("disabled") || cat.restrictions.includes("developer") || (cat.restrictions.includes("beta") && !config.beta)) return;
+			else return {
+				name: cat.displayName.text,
+				value: cat.name
+			};
+		}).filter(Boolean) as Eris.SlashCommandOptions["choices"];
+
 		if (bypass !== true) {
 			// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
 			const v = (fs.existsSync(`${config.dir.temp}/slash.json`) ? JSON.parse(fs.readFileSync(`${config.dir.temp}/slash.json`).toString()) : []) as typeof commands;

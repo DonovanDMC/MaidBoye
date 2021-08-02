@@ -17,7 +17,12 @@ export default class Prefix {
 		this.id = data.id;
 		this.value = data.value;
 		this.space = data.space;
-		this.guild = guild;
+		Object.defineProperty(this, "guild", {
+			value: guild,
+			enumerable: false,
+			configurable: false,
+			writable: false
+		});
 	}
 
 	get delete() { return this.guild.removePrefix.bind(this.guild, this.id, "id"); }

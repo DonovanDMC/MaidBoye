@@ -84,8 +84,8 @@ Object.defineProperties(Eris.Role.prototype, {
 		value(this: Eris.Role, to: Eris.Role | string) {
 			if (!(to instanceof Eris.Role)) to = this.guild.roles.get(to)!;
 			if (!to) return "invalid";
-			if (this.position > to.position) return "lower";
-			else if (this.position < to.position) return "higher";
+			if (this.position > to.position) return "higher";
+			else if (this.position < to.position) return "lower";
 			else if (this.position === to.position) return "same";
 			else return "unknown";
 		}
@@ -95,8 +95,8 @@ Object.defineProperties(Eris.Role.prototype, {
 			if (!(to instanceof Eris.Member)) to = this.guild.members.get(to)!;
 			if (!to) return "invalid";
 			const pos = (to.topRole?.position ?? -1);
-			if (this.position > pos) return "lower";
-			else if (this.position < pos) return "higher";
+			if (this.position > pos) return "higher";
+			else if (this.position < pos) return "lower";
 			else if (this.position === pos) return "same";
 			else return "unknown";
 		}

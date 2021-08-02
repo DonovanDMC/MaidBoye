@@ -150,14 +150,14 @@ export default class GuildConfig {
 	}
 
 	async editTag(value: string, column: "id" | "name", content: string, blame?: string) {
-		const res = await db.query("UPDATE tags SET content=?, modified_at=?, modified_by=? WHERE id=?", [content, Date.now(), blame ?? null, column, value]).then((r: OkPacket) => r.affectedRows > 0);
+		const res = await db.query(`UPDATE tags SET content=?, modified_at=?, modified_by=? WHERE ${column}=?`, [content, Date.now(), blame ?? null, value]).then((r: OkPacket) => r.affectedRows > 0);
 		if (res === false) return false;
 		await this.reload();
 		return true;
 	}
 
 	async removeTag(value: string, column: "id" | "name") {
-		return db.query("DELETE FROM tags WHERE ?=? AND guild_id=?", [column, value, this.id]).then((r: OkPacket) => r.affectedRows > 0);
+		return db.query(`DELETE FROM tags WHERE ${column}=? AND guild_id=?`, [value, this.id]).then((r: OkPacket) => r.affectedRows > 0);
 	}
 
 	async resetTags() {
@@ -180,7 +180,7 @@ export default class GuildConfig {
 	}
 
 	async removePrefix(value: string, column: "id" | "value") {
-		const res = await db.query("DELETE FROM prefix WHERE ?=? AND guild_id=?", [column, value, this.id]).then((r: OkPacket) => r.affectedRows > 0);
+		const res = await db.query(`DELETE FROM prefix WHERE ${column}=? AND guild_id=?`, [value, this.id]).then((r: OkPacket) => r.affectedRows > 0);
 		if (res === false) return false;
 		await this.reload();
 		return true;
@@ -226,6 +226,7 @@ export default class GuildConfig {
 			id,
 			this.id,
 			role,
+			Date.now(),
 			blame
 		]);
 		await this.reload();
@@ -233,7 +234,7 @@ export default class GuildConfig {
 	}
 
 	async removeSelfRole(value: string, column: "id" | "role") {
-		const res = await db.query("DELETE FROM selfroles WHERE ?=? AND guild_id=?", [column, value, this.id]).then((r: OkPacket) => r.affectedRows > 0);
+		const res = await db.query(`DELETE FROM selfroles WHERE ${column}=? AND guild_id=?`, [value, this.id]).then((r: OkPacket) => r.affectedRows > 0);
 		if (res === false) return false;
 		await this.reload();
 		return true;

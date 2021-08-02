@@ -14,11 +14,39 @@ import Timer from "@util/Timer";
 import mariadb, { Pool } from "mariadb";
 import crypto from "crypto";
 
+export
+interface MariaDBUserStats {
+	USER: string;
+	TOTAL_CONNECTIONS: number;
+	CONCURRENT_CONNECTIONS: number;
+	CONNECTED_TIME: number;
+	BUSY_TIME: number;
+	CPU_TIME: number;
+	BYTES_RECEIVED: bigint;
+	BYTES_SENT: bigint;
+	BINLOG_VYTES_WRITTEN: bigint;
+	ROWS_READ: bigint;
+	ROWS_SENT: bigint;
+	ROWS_INSERTED: bigint;
+	ROWS_UPDATED: bigint;
+	SELECT_COMMANDS: bigint;
+	UPDATE_COMMANDS: bigint;
+	OTHER_COMMANDS: bigint;
+	COMMIT_TRANSACTIONS: bigint;
+	ROLLBACK_TRANSACTIONS: bigint;
+	DENIED_CONNECTIONS: bigint;
+	LOST_CONNECTIONS: bigint;
+	ACCESS_DENIED: bigint;
+	EMPTY_QUERIES: bigint;
+	TOTAL_SSL_CONNECTIONS: bigint;
+	MAX_STATEMENT_TIME_EXCEEDED: bigint;
+}
 
 export default class db {
 	static redisDb: number;
 	static r: IORedis.Redis;
 	static pool: Pool;
+	static rootPool: Pool;
 
 	static async init(sql = true, redis = true) {
 		const start = Timer.start();
@@ -36,6 +64,12 @@ export default class db {
 			this.pool = mariadb.createPool({
 				...config.services.mariadb,
 				database: config.services.mariadb.db[config.beta ? "beta" : "prod"]
+			});
+			this.rootPool = mariadb.createPool({
+				...config.services.mariadb,
+				database: config.services.mariadb.db[config.beta ? "beta" : "prod"],
+				user: "root",
+				password: config.services.mariadb.rootPass
 			});
 		} catch (err) {
 			Logger.getLogger("Database[MariaDB]").error("Error while connecting:", err);
@@ -65,7 +99,12 @@ export default class db {
 		});
 	}
 
+	static async getStats() {
+		return (this.rootQuery("SELECT * FROM INFORMATION_SCHEMA.USER_STATISTICS WHERE USER=?", [config.services.mariadb.user]) as Promise<[MariaDBUserStats?]>).then(v => v[0]);
+	}
+
 	static get query() { return this.pool.query.bind(this.pool); }
+	static get rootQuery() { return this.rootPool.query.bind(this.rootPool); }
 	static async insert(table: string, data: Record<string, unknown>) {
 		const keys = Object.keys(data);
 		const values = Object.values(data);
@@ -100,7 +139,7 @@ export default class db {
 
 		if (config.beta) Logger.getLogger("Database[MariaDB]").debug(`Query for the user "${id}" took ${Timer.calc(start, end, 0, false)}`);
 
-		await this.r.setex(`cache:users:${id}`, 300, JSON.stringify({ user: res, selfRolesJoined }));
+		await this.r.setex(`cache:users:${id}`, 300, JSON.stringify({ user: res, selfRolesJoined }, (k, v: unknown) => typeof v === "bigint" ? String(v) : v));
 
 		if (raw) return {
 			user: res,
@@ -160,7 +199,7 @@ export default class db {
 
 		if (config.beta) Logger.getLogger("Database[MariaDB]").debug(`Query for the guild "${id}" took ${Timer.calc(start, end, 0, false)}`);
 
-		await this.r.setex(`cache:guilds:${id}`, 300, JSON.stringify({ guild: res, prefix, selfRoles, tags, logEvents }));
+		await this.r.setex(`cache:guilds:${id}`, 300, JSON.stringify({ guild: res, prefix, selfRoles, tags, logEvents }, (k, v: unknown) => typeof v === "bigint" ? String(v) : v));
 
 		if (raw) return {
 			guild: res,

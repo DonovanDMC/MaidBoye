@@ -20,7 +20,12 @@ export default class SelfRole {
 		this.role = data.role;
 		this.addedAt = Number(data.added_at);
 		this.addedby = data.added_by;
-		this.guild = guild;
+		Object.defineProperty(this, "guild", {
+			value: guild,
+			enumerable: false,
+			configurable: false,
+			writable: false
+		});
 	}
 
 	get delete() { return this.guild.removeSelfRole.bind(this.guild, this.id, "id"); }

@@ -15,9 +15,14 @@ export default class LogEvent {
 	channel: string;
 	constructor(data: RawLogEvent, guild: GuildConfig) {
 		this.id = data.id;
-		this.guild = guild;
 		this.event = data.event;
 		this.channel = data.channel;
+		Object.defineProperty(this, "guild", {
+			value: guild,
+			enumerable: false,
+			configurable: false,
+			writable: false
+		});
 	}
 
 	get delete() { return this.guild.removeLogEvent.bind(this.guild, this.id, "id"); }

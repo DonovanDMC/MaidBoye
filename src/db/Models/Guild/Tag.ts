@@ -29,7 +29,12 @@ export default class Tag {
 		this.createdBy = data.created_by;
 		this.modifiedAt = data.modified_at === null ? null : Number(data.modified_at);
 		this.modifiedBy = data.modified_by;
-		this.guild = guild;
+		Object.defineProperty(this, "guild", {
+			value: guild,
+			enumerable: false,
+			configurable: false,
+			writable: false
+		});
 	}
 
 	get edit() { return this.guild.editTag.bind(this.guild); }

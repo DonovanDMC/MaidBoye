@@ -19,15 +19,18 @@ export default new ClientEvent("interactionCreate", async function(interaction) 
 			await interaction.acknowledge();
 			const userMentions = [] as Array<string>, roleMentions = [] as Array<string>;
 			// eslint-disable-next-line no-inner-declarations
-			function formatArg(option: Eris.InteractionDataOptions) {
+			function formatArg(option: Eris.InteractionDataOptions): string {
+				// console.log("o", option);
+				if (option.value === undefined && option.type !== Eris.Constants.CommandOptionTypes.SUB_COMMAND) return "";
 				switch (option.type) {
 					// we only need to reconstruct user & role mentions, because channelMentions
 					// are done by Eris
-					case Eris.Constants.CommandOptionTypes.BOOLEAN: return `<#${option.value! ? "true" : "false"}>`;
-					case Eris.Constants.CommandOptionTypes.USER: userMentions.push(String(option.value)); return `<@!${option.value!}>`;
-					case Eris.Constants.CommandOptionTypes.CHANNEL: return `<#${option.value!}>`;
-					case Eris.Constants.CommandOptionTypes.ROLE: roleMentions.push(String(option.value)); return `<@&${option.value!}>`;
-					default: return option.value!.toString();
+					case Eris.Constants.CommandOptionTypes.SUB_COMMAND: return `${option.name} ${(option.options ?? []).map(o => formatArg(o)).join(" ")}`;
+					case Eris.Constants.CommandOptionTypes.BOOLEAN: return `<#${option.value ? "true" : "false"}>`;
+					case Eris.Constants.CommandOptionTypes.USER: userMentions.push(String(option.value)); return `<@!${String(option.value)}>`;
+					case Eris.Constants.CommandOptionTypes.CHANNEL: return `<#${String(option.value)}>`;
+					case Eris.Constants.CommandOptionTypes.ROLE: roleMentions.push(String(option.value)); return `<@&${String(option.value)}>`;
+					default: return String(option.value);
 				}
 			}
 			const gConfig = await db.getGuild(interaction.guildID);

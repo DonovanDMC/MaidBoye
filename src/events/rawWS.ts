@@ -4,15 +4,18 @@ import { GatewayDispatchEvents, GatewayGuildCreateDispatchData, GatewayOpcodes }
 import { VoiceServerUpdate, VoiceStateUpdate } from "lavalink";
 import StatsHandler from "@util/handlers/StatsHandler";
 import EventsASecondHandler from "@util/handlers/EventsASecondHandler";
+import db from "@db";
+const Redis = db.r;
 
 export default new ClientEvent("rawWS", async function({ op, d, t }) {
-	EventsASecondHandler.add("general");
+	EventsASecondHandler.add("GENERAL");
 	const type = t as GatewayDispatchEvents | undefined;
 	switch (op) {
 		case GatewayOpcodes.Dispatch: {
 			if (typeof t !== "string") Logger.getLogger("RawWS").info("Non string event type,", type);
 			StatsHandler.trackNoResponse("stats", "events", type!);
 			EventsASecondHandler.add(type!);
+			void Redis.incr(`stats:events:${type!}`);
 			switch (type) {
 				case "VOICE_STATE_UPDATE": {
 					if (!this.lava) return;

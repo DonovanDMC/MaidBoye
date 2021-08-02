@@ -1,12 +1,27 @@
 import Command from "@cmd/Command";
 import ComponentHelper from "@util/ComponentHelper";
 import EmbedBuilder from "@util/EmbedBuilder";
+import Eris from "eris";
 import YiffRocks, { APIError } from "yiff-rocks";
 
 export default new Command("shorten")
 	.setPermissions("bot", "embedLinks")
 	.setDescription("Shorten a url, using yiff.rocks")
 	.setUsage("<url> [code]")
+	.setSlashOptions(true, [
+		{
+			type: Eris.Constants.CommandOptionTypes.STRING,
+			name: "url",
+			description: "The url to shorten",
+			required: true
+		},
+		{
+			type: Eris.Constants.CommandOptionTypes.STRING,
+			name: "code",
+			description: "The short code to use (none for random)",
+			required: true
+		}
+	])
 	.setCooldown(3e3)
 	.setExecutor(async function(msg) {
 		if (msg.args.length < 1) return msg.reply("H-hey! You have to provide a url to shorten..");

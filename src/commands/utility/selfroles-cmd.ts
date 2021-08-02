@@ -32,7 +32,7 @@ export default new Command("selfroles")
 		{
 			type: Eris.Constants.CommandOptionTypes.SUB_COMMAND,
 			name: "leave",
-			description: "Leave a self assignable role"
+			description: "Leave a self assignable role (opens select menu)"
 		},
 		{
 			type: Eris.Constants.CommandOptionTypes.SUB_COMMAND,
@@ -199,7 +199,7 @@ export default new Command("selfroles")
 
 			case "leave": {
 				if (msg.gConfig.selfRoles.size === 0) return msg.reply("Th-this server doesnt't have any self roles..");
-				if (selfList.length === 0) return msg.reply("Y-you haven't gained any roles via self roles..\n(you cannot remove roles that have been manually added to you via this)");
+				if (selfList.length === 0) return msg.reply("Y-you haven't gained any roles via self roles..");
 				const makeChoice = await msg.reply({
 					embeds: [
 						new EmbedBuilder(true, msg.author)
@@ -251,7 +251,7 @@ export default new Command("selfroles")
 					components: []
 				}); */
 				if (msg.member.roles.includes(made)) await msg.member.removeRole(made, "SelfRoles[Leave]");
-				await msg.uConfig.removeSelfRoleJoined(made, "role");
+				await msg.uConfig.removeSelfRoleJoined(msg.channel.guild.id, made, "role");
 				await msg.uConfig.fix();
 				return choice.editOriginalMessage({
 					embeds: [
@@ -285,7 +285,8 @@ export default new Command("selfroles")
 				const role = await msg.getRoleFromArgs(1, 0);
 				if (role === null) return msg.reply("Th-that wasn't a valid role..");
 				if (!msg.gConfig.selfRoles.map(r => r.role).includes(role.id)) return msg.reply("Th-that role isn't self assignable..");
-				await msg.gConfig.removeSelfRole(role.id, "role");
+				const r = await msg.gConfig.removeSelfRole(role.id, "role");
+				if (r === false) return msg.reply("Internal removal function failed..");
 				return msg.reply(`The role <@&${role.id}> is no longer self assignable`);
 				break;
 			}

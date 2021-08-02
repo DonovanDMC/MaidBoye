@@ -199,6 +199,7 @@ export default new Command("e621", "e6")
 						components:  m.components?.slice(0, 1)
 					});
 					if (t) clearTimeout(t);
+					return;
 				}
 				if (wait.data.custom_id.includes("next")) i++;
 				if (wait.data.custom_id.includes("last")) i = posts.length - 1;
