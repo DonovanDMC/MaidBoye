@@ -57,8 +57,9 @@ export default new Command("e621", "e6")
 	.setCooldown(3e3)
 	.setParsedFlags("no-video", "no-flash")
 	.setExecutor(async function(msg) {
-		const tags = Array.from(msg.rawArgs);
+		const tags = Array.from(msg.rawArgs).map(t => t.toLowerCase());
 		if (!tags.find(t => t.includes("order:"))) tags.push("order:favcount");
+		if (["cub", "young"].some(v => tags.includes(v))) return msg.reply("H-hey! You tried using a blacklisted tag, don't do that!");
 		const posts = await E621.getPosts(tags, 100);
 		/* for (const p of posts) {
 			if (msg.dashedArgs.value.includes("no-video") && p.file.ext === "webm") posts.splice(posts.indexOf(p), 1);
@@ -74,6 +75,11 @@ export default new Command("e621", "e6")
 				.setFooter(`Post #${post.id} | ${i + 1}/${posts.length} | ${post.score.up} ${config.emojis.default.up} ${post.score.down} ${config.emojis.default.down} | ${post.fav_count} ${config.emojis.default.heart}`)
 				.removeDescription();
 			if (id && token) await this.createInteractionResponse(id, token, { type: Eris.Constants.InteractionResponseTypes.DEFERRED_UPDATE_MESSAGE });
+
+			if (post.tags.general.includes("young")) {
+				posts.splice(i, 1);
+				return changePost.call(this, undefined, token);
+			}
 
 			if (post.file.ext === "swf") {
 				if (msg.dashedArgs.value.includes("no-flash")) {
