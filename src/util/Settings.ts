@@ -433,8 +433,8 @@ const Settings = [
 					}
 				}
 
-				if (originalMessage.gConfig.settings.e621ThumbnailType === v) {
-					const dup = await duplicate(originalMessage, botMessage, this.name, originalMessage.gConfig.settings.e621ThumbnailType);
+				if ((originalMessage.gConfig.settings.commandImages === false && v === "disabled") || (originalMessage.gConfig.settings.commandImages === true && v === "enabled")) {
+					const dup = await duplicate(originalMessage, botMessage, this.name, originalMessage.gConfig.settings.commandImages ? "Enabled" : "Disabled");
 					if (dup === true) {
 						await botMessage.edit(b);
 						return [true, false];
@@ -444,6 +444,90 @@ const Settings = [
 				await originalMessage.gConfig.edit({
 					settings: {
 						commandImages: v === "enabled" ? true : false
+					}
+				});
+				await botMessage.edit({
+					content: `**${this.name}** has been updated to \`${v}\`. Returning to menu in 3 seconds..`,
+					embeds: b.embeds,
+					components: b.components
+				});
+				return [true, true];
+			}
+		}
+	},
+	{
+		name: "Snipes Disabled",
+		description: "if snipe/editsnipe should be disabled",
+		shortDescription: null,
+		validValuesDescription: "`yes` or `no`",
+		emoji: {
+			value: config.emojis.default.pencil,
+			type: "default" as const
+		},
+		displayFormat(guild: GuildConfig) { return `\`${guild.settings.snipeDisabled ? "Yes" : "No"}\``; },
+		async exec(originalMessage: ExtendedMessage, botMessage: Eris.Message<Eris.GuildTextableChannel>): Promise<ExecReturn> {
+			const b = JSON.parse<Eris.AdvancedMessageContent>(JSON.stringify({ embeds: botMessage.embeds, components: botMessage.components }));
+			await botMessage.edit({
+				embeds: [
+					new EmbedBuilder(true, originalMessage.author)
+						.setTitle(`Server Settings: ${this.name}`)
+						.setDescription("Please select an option from below.")
+						.toJSON()
+				],
+				components: new ComponentHelper()
+					.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-back.${originalMessage.author.id}`, false, ComponentHelper.emojiToPartial(config.emojis.default.back, "default"), "Back")
+					.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-exit.${originalMessage.author.id}`, false, ComponentHelper.emojiToPartial(config.emojis.default.x, "default"), "Exit")
+					.addRow()
+					.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-yes.${originalMessage.author.id}`, false, ComponentHelper.emojiToPartial(config.emojis.custom.greenTick, "custom"), "Yes")
+					.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-no.${originalMessage.author.id}`, false, ComponentHelper.emojiToPartial(config.emojis.custom.redTick, "custom"), "No")
+					.toJSON()
+			});
+			const wait = await originalMessage.channel.awaitComponentInteractions(6e4, (it) => it.data.custom_id.startsWith("settings-") && it.member!.user.id === originalMessage.author.id && it.message.id === botMessage.id);
+			if (wait === null) {
+				await botMessage.edit({
+					content: "",
+					embeds: [
+						new EmbedBuilder(true, originalMessage.author)
+							.setTitle(`Server Settings: ${this.name}`)
+							.setDescription("Menu closed due to time out.")
+							.toJSON()
+					],
+					components: []
+				});
+				return [false, false];
+			} else {
+				const v = wait.data.custom_id.split("-")[1].split(".")[0];
+				await wait.acknowledge();
+				if (v === null) {
+					if (wait.data.custom_id.includes("back")) {
+						await botMessage.edit(b);
+						return [true, false];
+					} else {
+						await botMessage.edit({
+							content: "",
+							embeds: [
+								new EmbedBuilder(true, originalMessage.author)
+									.setTitle("Server Settings")
+									.setDescription("Exited.")
+									.toJSON()
+							],
+							components: []
+						});
+						return [false, false];
+					}
+				}
+
+				if ((originalMessage.gConfig.settings.commandImages === false && v === "no") || (originalMessage.gConfig.settings.commandImages === true && v === "yes")) {
+					const dup = await duplicate(originalMessage, botMessage, this.name, originalMessage.gConfig.settings.commandImages ? "Yes" : "No");
+					if (dup === true) {
+						await botMessage.edit(b);
+						return [true, false];
+					}
+					return [false, false];
+				}
+				await originalMessage.gConfig.edit({
+					settings: {
+						snipeDisabled: v === "yes" ? true : false
 					}
 				});
 				await botMessage.edit({

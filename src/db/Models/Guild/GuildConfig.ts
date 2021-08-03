@@ -30,7 +30,8 @@ export interface RawGuildConfig {
 	settings_default_yiff_type: string;
 	settings_e621_thumbnail_type: string;
 	settings_mute_role: string | null;
-	settings_command_images: boolean;
+	settings_command_images: 0 | 1;
+	settings_snipe_disabled: 0 | 1;
 }
 
 export type GuildConfigKV = DataTypes<GuildConfig>;
@@ -52,6 +53,7 @@ export default class GuildConfig {
 		e621ThumbnailType: "gif" | "image" | "none";
 		muteRole: string | null;
 		commandImages: boolean;
+		snipeDisabled: boolean;
 	};
 	constructor(id: string, data: RawGuildConfig, prefixData: Array<RawPrefix>, selfRolesData: Array<RawSelfRole>, tagsData: Array<RawTag>, logEventsData: Array<RawLogEvent>) {
 		this.id = id;
@@ -81,7 +83,8 @@ export default class GuildConfig {
 			defaultYiffType: data.settings_default_yiff_type as GuildConfig["settings"]["defaultYiffType"],
 			e621ThumbnailType: data.settings_e621_thumbnail_type as GuildConfig["settings"]["e621ThumbnailType"],
 			muteRole: data.settings_mute_role,
-			commandImages: data.settings_command_images
+			commandImages: Boolean(data.settings_command_images),
+			snipeDisabled: Boolean(data.settings_snipe_disabled)
 		};
 		return this;
 	}
@@ -109,7 +112,8 @@ export default class GuildConfig {
 			settings_default_yiff_type: data.settings === undefined ? undefined : data.settings.defaultYiffType ?? undefined,
 			settings_e621_thumbnail_type: data.settings === undefined ? undefined : data.settings.e621ThumbnailType ?? undefined,
 			settings_mute_role: data.settings === undefined ? undefined : data.settings.muteRole === null ? null : data.settings.muteRole ?? undefined,
-			settings_command_images: data.settings === undefined ? undefined : data.settings.commandImages
+			settings_command_images: data.settings === undefined ? undefined : Boolean(data.settings.commandImages) === true ? 1 : 0,
+			settings_snipe_disabled: data.settings === undefined ? undefined : Boolean(data.settings.snipeDisabled) === true ? 1 : 0
 		} as Omit<RawGuildConfig, "id">;
 
 		const keys = Object.keys(v).filter(k => v[k as keyof typeof v] !== undefined);
