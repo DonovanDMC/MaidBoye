@@ -1,10 +1,9 @@
-import MaidBoye from "../../main";
 import Route from "../Route";
 import config from "@config";
 
 
 export default class LinksRoute extends Route {
-	constructor(client: MaidBoye) {
+	constructor() {
 		super("/links");
 
 		this.app
