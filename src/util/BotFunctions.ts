@@ -3,11 +3,15 @@ import Command from "./cmd/Command";
 import ExtendedMessage from "./ExtendedMessage";
 import Yiffy from "./req/Yiffy";
 import CommandError from "./cmd/CommandError";
+import { AntiSpamEntry } from "./cmd/AntiSpam";
+import TempFiles from "./handlers/TempFiles";
 import GuildConfig from "../db/Models/Guild/GuildConfig";
 import Eris from "eris";
 import { Strings } from "@uwu-codes/utils";
 import MaidBoye from "@MaidBoye";
 import config from "@config";
+import * as fs from "fs-extra";
+import crypto from "crypto";
 
 // since a lot of the fun commands are generic, we have to do this
 const funCommandResponses = (msg: ExtendedMessage) => ({
@@ -315,5 +319,40 @@ export default class BotFunctions {
 			.map(([k, u]) => str = str.replace(k, `<@!${u!.id}>`));
 
 		return str;
+	}
+
+	static generateReport(user: Eris.User, entries: Array<AntiSpamEntry>) {
+		const now = Date.now();
+		const nowD = new Date(now);
+		const dir = `${config.dir.antiSpam}/${user.id}`;
+		fs.mkdirpSync(dir);
+		const oldFiles = fs.readdirSync(dir).filter(r => (fs.lstatSync(`${dir}/${r}`).birthtimeMs + 1.2e5) > now);
+		oldFiles.forEach(f => TempFiles.markForDeletion(`${dir}/${f}`, now + 1.8e+6));
+		const id = crypto.randomBytes(12).toString("hex");
+		fs.writeFileSync(`${dir}/${id}.rpt`, [
+			"-- Maid Boye Spam Repot --",
+			`Generated Time: ${(nowD.getDate() + 1).toString().padStart(2, "0")}/${nowD.getMonth().toString().padStart(2, "0")}/${nowD.getFullYear().toString().padStart(4, "0")} ${nowD.getHours().toString().padStart(2, "0")}:${nowD.getMinutes().toString().padStart(2, "0")}:${nowD.getSeconds().toString().padStart(2, "0")}`,
+			`Beta: ${config.beta ? "Yes" : "No"}`,
+			`User: ${user.tag} (${user.id})`,
+			`Report Location: ${dir}/${id}.rpt`,
+			`Total VL: ${entries.length}`,
+			"",
+			"",
+			...entries.map(e => {
+				const d = new Date(e.addedAt);
+				return [
+					"-- New Entry --",
+					`Command: ${e.command}`,
+					`Time: ${(d.getDate() + 1).toString().padStart(2, "0")}/${d.getMonth().toString().padStart(2, "0")}/${d.getFullYear().toString().padStart(4, "0")} ${d.getHours().toString().padStart(2, "0")}:${d.getMinutes().toString().padStart(2, "0")}:${d.getSeconds().toString().padStart(2, "0")}`,
+					"",
+					""
+				].join("\n");
+			})
+		].join("\n"));
+		return {
+			file: `${dir}/${id}.rpt`,
+			id,
+			url: `${config.api.url}/reports/${user.id}/${id}`
+		};
 	}
 }

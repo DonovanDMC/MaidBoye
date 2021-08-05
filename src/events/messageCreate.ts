@@ -1,3 +1,8 @@
+import UserConfig from "../db/Models/User/UserConfig";
+import AntiSpam from "../util/cmd/AntiSpam";
+import WebhookStore from "../util/WebhookStore";
+import BotFunctions from "../util/BotFunctions";
+import GuildConfig from "../db/Models/Guild/GuildConfig";
 import ClientEvent from "@util/ClientEvent";
 import EmbedBuilder from "@util/EmbedBuilder";
 import Logger from "@util/Logger";
@@ -14,7 +19,19 @@ import EventsASecondHandler from "@util/handlers/EventsASecondHandler";
 export default new ClientEvent("messageCreate", async function (message) {
 	const t = new Timers((config.developers.includes(message.author.id) || config.beta) === true ? (label, info) => Logger.getLogger(label).debug(info) : false);
 	if (message.author.bot === true || !("type" in message.channel) || message.channel.type === Eris.Constants.ChannelTypes.GROUP_DM) return;
-	// @TODO blacklist
+
+	t.start("userBl");
+	const userBl = await UserConfig.prototype.checkBlacklist.call({ id: message.author.id });
+	if (userBl.active.length > 0) {
+		if (userBl.noticeNotShown.active.length > 0) {
+			const bl = userBl.noticeNotShown.active[0];
+			await message.reply(`H-hey! You've been blacklisted..\nDeveloper: **${bl.createdByTag}**\nReason: ${bl.reason ?? "None Provided."}\nExpiry: ${bl.expireTime === 0 ? "Never" : BotFunctions.formatDiscordTime(bl.expireTime, "short-datetime", true)}`);
+			// we should only show one notice, as to not annoy them too much
+			await Promise.all(userBl.noticeNotShown.active.map(async (b) => b.setNoticeShown(true)));
+		}
+		return;
+	}
+	t.end("userBl");
 
 	t.start("dm");
 	if (message.channel.type === Eris.Constants.ChannelTypes.DM) {
@@ -40,6 +57,18 @@ export default new ClientEvent("messageCreate", async function (message) {
 	// (we need to check channel and guild to remove Uncached and PrivateChannel)
 	if ("channel" in message && "guild" in message.channel && !message.channel.permissionsOf(this.user.id).has("sendMessages")) return;
 
+	t.start("guildBl");
+	const guildBl = await GuildConfig.prototype.checkBlacklist.call({ id: message.guildID });
+	if (guildBl.active.length > 0) {
+		if (guildBl.noticeNotShown.active.length > 0) {
+			const bl = userBl.noticeNotShown.active[0];
+			await message.reply(`H-hey! This server has been blacklisted..\nDeveloper: **${bl.createdByTag}**\nReason: ${bl.reason ?? "None Provided."}\nExpiry: ${bl.expireTime === 0 ? "Never" : BotFunctions.formatDiscordTime(bl.expireTime, "short-datetime", true)}`);
+			// we should only show one notice, as to not annoy them too much
+			await Promise.all(guildBl.noticeNotShown.active.map(async (b) => b.setNoticeShown(true)));
+		}
+		return;
+	}
+	t.end("guildBl");
 	// we completely ignore messages inside of threads
 	if ([
 		Eris.Constants.ChannelTypes.GUILD_NEWS_THREAD,
@@ -79,8 +108,25 @@ export default new ClientEvent("messageCreate", async function (message) {
 	// ignore commands in report channels
 	if (/^user-report-([a-z\d]+)$/i.exec(msg.channel.name) && !cmd.triggers.includes("report")) return;
 
-	t.start("restrictions");
 	if (!config.developers.includes(msg.author.id)) {
+		t.start("antispam");
+		AntiSpam.add(msg.author.id, cmd);
+		const anti = AntiSpam.get(msg.author.id);
+		if ((anti.length % config.antiSpam.warnThreshold)) {
+			const report = BotFunctions.generateReport(msg.author, anti);
+			await WebhookStore.execute("antispam", {
+				embeds: [
+					new EmbedBuilder(true, msg.author)
+						.setTitle(`Possible Command Spam | VL: ${anti.length}`)
+						.setDescription(`Report URL: ${report.id}\n[Report URL](${report.url})`)
+						.toJSON()
+				]
+			});
+			if (anti.length > config.antiSpam.maxVL) await msg.uConfig.addBlacklist("antispam", this.user.id, "Command Spam", Date.now() + 2.592e+8, report.id);
+		}
+		t.end("antispam");
+
+		t.start("restrictions");
 		if (cmd.restrictions.includes("developer")) {
 			StatsHandler.trackBulkNoResponse(
 				"stats:restrictionFail:developer",
@@ -123,7 +169,8 @@ export default new ClientEvent("messageCreate", async function (message) {
 			);
 			return msg.reply(`H-hey! You're missing the ${Strings.plural("permission", missingUser)} **${Strings.joinAnd(missingUser.map(p => config.permissions[p] || p), "**, **")}**.. You must have these to use this command!`);
 		}
-	}
+		// needs to be started either way or end will error
+	} else t.start("restrictions");
 
 	// we still check these when developers run commands
 	const optionalBot = [] as Array<Permissions>;

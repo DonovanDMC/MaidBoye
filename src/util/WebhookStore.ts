@@ -34,7 +34,8 @@ class Webhook {
 
 export default class WebhookStore {
 	private static list = new Map<string, Webhook>();
-	private static client: MaidBoye;
+	// this is now public for random client usage
+	static client: MaidBoye;
 	static setClient(client: MaidBoye) { this.client = client; }
 	static get(name: keyof typeof config["webhooks"]) { return (this.list.get(name) ?? this.list.set(name, new Webhook(config.webhooks[name], this.client)).get(name))!; }
 

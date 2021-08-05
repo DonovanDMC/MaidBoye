@@ -10,13 +10,17 @@ import {
 	WarnEntry
 } from "./ModLog/All";
 import LogEvent, { RawLogEvent } from "./LogEvent";
+import DisableEntry, { RawDisableEntry } from "./DisableEntry";
+import Blacklist, { GuildBlacklist, RawGuildBlacklist } from "../Blacklist";
+import WebhookStore from "../../../util/WebhookStore";
+import EmbedBuilder from "../../../util/EmbedBuilder";
 import { OkPacket } from "@util/@types/MariaDB";
 import { DataTypes, DeepPartial, SomePartial, Writeable } from "@uwu-codes/types";
 import BotFunctions from "@util/BotFunctions";
 import config from "@config";
 import db from "@db";
 import { Collection } from "@augu/collections";
-import crypto from "crypto";
+import * as crypto from "crypto";
 
 export interface RawGuildConfig {
 	id: string;
@@ -41,6 +45,7 @@ export default class GuildConfig {
 	tags = new Collection<string, Tag>();
 	selfRoles = new Collection<string, SelfRole>();
 	logEvents: Array<LogEvent>;
+	disable: Array<DisableEntry>;
 	modlog: {
 		enabled: boolean;
 		caseEditingEnabled: boolean;
@@ -55,12 +60,12 @@ export default class GuildConfig {
 		commandImages: boolean;
 		snipeDisabled: boolean;
 	};
-	constructor(id: string, data: RawGuildConfig, prefixData: Array<RawPrefix>, selfRolesData: Array<RawSelfRole>, tagsData: Array<RawTag>, logEventsData: Array<RawLogEvent>) {
+	constructor(id: string, data: RawGuildConfig, prefixData: Array<RawPrefix>, selfRolesData: Array<RawSelfRole>, tagsData: Array<RawTag>, logEventsData: Array<RawLogEvent>, disabeData: Array<RawDisableEntry>) {
 		this.id = id;
-		this.load(data, prefixData, selfRolesData, tagsData, logEventsData);
+		this.load(data, prefixData, selfRolesData, tagsData, logEventsData, disabeData);
 	}
 
-	private load(data: RawGuildConfig, prefixData: Array<RawPrefix>, selfRolesData: Array<RawSelfRole>, tagsData: Array<RawTag>, logEventsData: Array<RawLogEvent>) {
+	private load(data: RawGuildConfig, prefixData: Array<RawPrefix>, selfRolesData: Array<RawSelfRole>, tagsData: Array<RawTag>, logEventsData: Array<RawLogEvent>, disabeData: Array<RawDisableEntry>) {
 		this.id = data.id;
 		this.prefix = prefixData.map(d => new Prefix(d, this));
 		this.tags.clear();
@@ -68,6 +73,7 @@ export default class GuildConfig {
 		this.selfRoles.clear();
 		selfRolesData.forEach(d => this.selfRoles.set(d.role, new SelfRole(d, this)));
 		this.logEvents = logEventsData.map(l => new LogEvent(l, this));
+		this.disable = disabeData.map(d => new DisableEntry(d, this));
 		this.modlog = {
 			enabled: Boolean(data.modlog_enabled),
 			caseEditingEnabled: Boolean(data.modlog_case_editing_enabled),
@@ -92,7 +98,7 @@ export default class GuildConfig {
 	async reload() {
 		const v = await db.getGuild(this.id, true, true);
 		if (!v) throw new Error(`Unexpected undefined on GuildConfig#reload (id: ${this.id})`);
-		this.load(v.guild, v.prefix, v.selfRoles, v.tags, v.logEvents);
+		this.load(v.guild, v.prefix, v.selfRoles, v.tags, v.logEvents, v.disable);
 		return this;
 	}
 
@@ -100,6 +106,8 @@ export default class GuildConfig {
 		if (data.prefix) throw new TypeError("Field 'prefix' cannot be used in the generic edit function.");
 		if (data.tags) throw new TypeError("Field 'tags' cannot be used in the generic edit function.");
 		if (data.selfRoles) throw new TypeError("Field 'selfRoles' cannot be used in the generic edit function.");
+		if (data.logEvents) throw new TypeError("Field 'logEvents' cannot be used in the generic edit function.");
+		if (data.disable) throw new TypeError("Field 'disable' cannot be used in the generic edit function.");
 
 		const v = {
 			modlog_enabled: data.modlog === undefined || data.modlog.enabled === undefined ? undefined : Boolean(data.modlog.enabled) === true ? 1 : 0,
@@ -251,6 +259,33 @@ export default class GuildConfig {
 		return true;
 	}
 
+	async addDisableEntry(type: 0 | 1 | 2, value: string | null, channel: string | null) {
+		const id = crypto.randomBytes(6).toString("hex");
+		await db.query("INSERT INTO disable (id, guild_id, type, value, channel) VALUES (?, ?, ?, ?, ?)", [
+			id,
+			this.id,
+			type,
+			value,
+			channel
+		]);
+		await this.reload();
+		return id;
+	}
+
+	async removeDisableEntry(id: string) {
+		const res = await db.query("DELETE FROM disable WHERE id=? AND guild_id=?", [id, this.id]).then((r: OkPacket) => r.affectedRows > 0);
+		if (res === false) return false;
+		await this.reload();
+		return true;
+	}
+
+	async resetDisableEntries() {
+		const res = await db.query("DELETE FROM disable guild_id=?", [this.id]).then((r: OkPacket) => r.affectedRows > 0);
+		if (res === false) return false;
+		await this.reload();
+		return true;
+	}
+
 	async editModlog(entryId: number, reason: string, blame?: string) {
 		const res = await db.query("UPDATE modlog SET reason=?, last_edited_at=?, last_edited_by=? WHERE guild_id=? AND entry_id=?", [reason, Date.now(), blame ?? null, this.id, entryId]).then((r: OkPacket) => r.affectedRows > 0);
 		if (res === false) return false;
@@ -300,5 +335,53 @@ export default class GuildConfig {
 				case "warn": return new WarnEntry(v, this);
 			}
 		})); */
+	}
+
+	async checkBlacklist() {
+		const res = await db.query("SELECT * FROM blacklist WHERE type=? AND guild_id=?", [Blacklist.GUILD, this.id]).then((r: Array<RawGuildBlacklist>) => r.map(b => new GuildBlacklist(b)));
+		return {
+			active: res.filter(b => b.active),
+			expired: res.filter(b => b.expired),
+			noticeShown: {
+				active: res.filter(b => b.active && b.noticeShown),
+				expired: res.filter(b => b.expired && b.noticeShown)
+			},
+			noticeNotShown: {
+				active: res.filter(b => b.active && !b.noticeShown),
+				expired: res.filter(b => b.expired && !b.noticeShown)
+			}
+		};
+	}
+
+	async addBlacklist(createdBy: string, createdByTag: string, reason: string | null, expiry: number, report: string | null) {
+		await db.createGuildIfNotExists(this.id); // prototype calls
+		const d = Date.now();
+		const id = crypto.randomBytes(6).toString("hex");
+		await db.query("INSERT INTO blacklist (id, guild_id, type, reason, expire_time, created_by, created_by_tag, created_at, report) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)", [
+			id,
+			this.id,
+			Blacklist.GUILD,
+			reason,
+			expiry ?? 0,
+			createdBy,
+			createdByTag,
+			d,
+			report
+		]);
+		await WebhookStore.execute("blacklist", {
+			embeds: [
+				new EmbedBuilder()
+					.setTitle("New Guild Blacklist")
+					.setDescription([
+						`Guild: ${WebhookStore.client.guilds.get(this.id)?.name ?? "Unknown"} (${this.id})`,
+						`Reason: ${reason ?? "None Provided."}`,
+						`Expiry: ${(expiry ?? 0) === 0 ? "Never" : BotFunctions.formatDiscordTime(expiry, "short-datetime", true)}`,
+						`Created By: ${createdByTag} (${createdBy})`
+					].join("\n"))
+					.toJSON()
+			]
+		});
+		const [res] = await db.query("SELECT * FROM blacklist WHERE type=? AND guild_id=? AND id=? LIMIT 1", [Blacklist.GUILD, this.id, id]).then((r: Array<RawGuildBlacklist>) => r.map(b => new GuildBlacklist(b)));
+		return res;
 	}
 }

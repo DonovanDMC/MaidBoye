@@ -3,6 +3,10 @@ import Strike, { RawStrike, StrikeGroup } from "../Strike";
 import { AnyRawEntry, BanEntry, ClearWarningsEntry, DeleteWarningEntry, KickEntry, LockDownEntry, LockEntry, MuteEntry, SoftBanEntry, UnBanEntry, UnLockDownEntry, UnLockEntry, UnMuteEntry, WarnEntry } from "../Guild/ModLog/All";
 import GuildConfig from "../Guild/GuildConfig";
 import Warning, { RawWarning } from "../Warning";
+import WebhookStore from "../../../util/WebhookStore";
+import EmbedBuilder from "../../../util/EmbedBuilder";
+import BotFunctions from "../../../util/BotFunctions";
+import Blacklist, { RawUserBlacklist, UserBlacklist } from "../Blacklist";
 import db from "@db";
 import Logger from "@util/Logger";
 import { DataTypes, DeepPartial, Writeable } from "@uwu-codes/types";
@@ -193,5 +197,53 @@ export default class UserConfig {
 		]);
 
 		return warningId + 1;
+	}
+
+	async checkBlacklist() {
+		const res = await db.query("SELECT * FROM blacklist WHERE type=? AND user_id=?", [Blacklist.USER, this.id]).then((r: Array<RawUserBlacklist>) => r.map(b => new UserBlacklist(b)));
+		return {
+			active: res.filter(b => b.active),
+			expired: res.filter(b => b.expired),
+			noticeShown: {
+				active: res.filter(b => b.active && b.noticeShown),
+				expired: res.filter(b => b.expired && b.noticeShown)
+			},
+			noticeNotShown: {
+				active: res.filter(b => b.active && !b.noticeShown),
+				expired: res.filter(b => b.expired && !b.noticeShown)
+			}
+		};
+	}
+
+	async addBlacklist(createdBy: string, createdByTag: string, reason: string | null, expiry: number, report: string | null) {
+		await db.createGuildIfNotExists(this.id); // prototype calls
+		const d = Date.now();
+		const id = crypto.randomBytes(6).toString("hex");
+		await db.query("INSERT INTO blacklist (id, guild_id, type, reason, expire_time, created_by, created_by_tag, created_at, report) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)", [
+			id,
+			this.id,
+			Blacklist.USER,
+			reason,
+			expiry ?? 0,
+			createdBy,
+			createdByTag,
+			d,
+			report
+		]);
+		await WebhookStore.execute("blacklist", {
+			embeds: [
+				new EmbedBuilder()
+					.setTitle("New User Blacklist")
+					.setDescription([
+						`Guild: ${WebhookStore.client.users.get(this.id)?.tag ?? "Unknown"} (${this.id})`,
+						`Reason: ${reason ?? "None Provided."}`,
+						`Expiry: ${expiry === 0 ? "Never" : BotFunctions.formatDiscordTime(expiry, "short-datetime", true)}`,
+						`Created By: ${createdByTag} (${createdBy})`
+					].join("\n"))
+					.toJSON()
+			]
+		});
+		const [res] = await db.query("SELECT * FROM blacklist WHERE type=? AND user_id=? AND id=? LIMIT 1", [Blacklist.USER, this.id, id]).then((r: Array<RawUserBlacklist>) => r.map(b => new UserBlacklist(b)));
+		return res;
 	}
 }
