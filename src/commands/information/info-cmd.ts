@@ -41,7 +41,7 @@ export default new Command("info")
 						`${config.emojis.default.dot} Version: **${pkg.version}** (Build Date: ${pkg.buildDate === null ? "Unknown" : `${String(pkg.buildDate).slice(0, 2)}/${String(pkg.buildDate).slice(2, 4)}/${String(pkg.buildDate).slice(4, 8)}`})`,
 						`${config.emojis.default.dot} Node Version: **${process.version}**`,
 						`${config.emojis.default.dot} Typescript Version: **${shrinkDependencies.typescript.version}**`,
-						`${config.emojis.default.dot} Support Server: [${config.client.links.supprt}](${config.client.links.supprt})`
+						`${config.emojis.default.dot} Support Server: [${config.client.links.support}](${config.client.links.support})`
 					)
 					.toJSON()
 			]

@@ -13,12 +13,12 @@ export default new Command("links", "support", "invite", "inv")
 				new EmbedBuilder(true, msg.author)
 					.setTitle("Invite Info")
 					.setDescription(
-						`[Support Server](${config.client.links.supprt})`,
+						`[Support Server](${config.client.links.support})`,
 						`[Twitter](${config.client.links.twitter})`,
 						`[Website](${config.client.links.website})`,
 						`[Developer](${config.client.links.dev})`,
 						`[Ko-Fi (Donate)](${config.client.links.kofi})`,
-						"[Invite](https://maid.gay/closed-beta)"
+						"[Invite](https://api.maid.gay/links/invite)"
 					)
 					.toJSON()
 			]

@@ -46,7 +46,7 @@ export default new ClientEvent("messageCreate", async function (message) {
 			embeds: [
 				new EmbedBuilder()
 					.setTitle("Hi!")
-					.setDescription(`H-hey... I see you direct messaged me.. If you need some help, y-you can join my support server.. <${config.client.links.supprt}>\nMy default prefix is \`${config.defaults.prefix.trim()}\`, and you can list my commands b-by using \`${config.defaults.prefix}help\` in a server.\n\nI-if you don't want this response, run \`${config.defaults.prefix}toggledmresponse\` in a server..`)
+					.setDescription(`H-hey... I see you direct messaged me.. If you need some help, y-you can join my support server.. <${config.client.links.support}>\nMy default prefix is \`${config.defaults.prefix.trim()}\`, and you can list my commands b-by using \`${config.defaults.prefix}help\` in a server.\n\nI-if you don't want this response, run \`${config.defaults.prefix}toggledmresponse\` in a server..`)
 					.setAuthor(message.author.tag, message.author.avatarURL)
 					.setFooter(">w<")
 					.toJSON()
@@ -281,6 +281,6 @@ export default new ClientEvent("messageCreate", async function (message) {
 			const code = await ErrorHandler.handleError(err, msg);
 
 			if (code === null) return msg.reply("S-sorry! There was an error while running that.. Our internal error reporting service didn't return any further info.");
-			else return msg.reply(`S-sorry! There was an error while running that.. I-if you want, you can report it to my developers, or try again later..\nCode: \`${code}\`\nSupport: ${config.client.links.supprt}`);
+			else return msg.reply(`S-sorry! There was an error while running that.. I-if you want, you can report it to my developers, or try again later..\nCode: \`${code}\`\nSupport: ${config.client.links.support}`);
 		});
 });
