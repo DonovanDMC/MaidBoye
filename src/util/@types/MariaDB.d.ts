@@ -8,5 +8,6 @@ declare namespace MariaDB {
 	type CountResponse = [first: Record<"COUNT(*)", bigint>];
 
 	type BooleanData = 0 | 1;
+	type BitData = Buffer | [number] | ReturnType<Buffer["toJSON"]>;
 }
 export = MariaDB;

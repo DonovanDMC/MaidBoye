@@ -1,6 +1,7 @@
-import { mariadb as dbConfig } from "../src/config/extra/other/services.json";
+import { mariadb as dbConfig, redis as rConfig } from "../src/config/extra/other/services.json";
 import mariadb from "mariadb";
 import * as fs from "fs-extra";
+import IORedis from "ioredis";
 
 const db = "maid";
 const dbBeta = "maidbeta";
@@ -9,6 +10,7 @@ process.nextTick(async() => {
 	let beta = process.argv.join(" ").includes("--beta");
 	let database = beta ? dbBeta : db;
 
+	console.log("Using Database:", database);
 	if (beta === false) {
 		process.stdout.write("!WARING! This will delete and recreate the PRODUCTION database, are you sure you want to do this? (y/b/N)\n> ");
 		await new Promise<void>((resolve, reject) => {
@@ -43,8 +45,23 @@ process.nextTick(async() => {
 		connectionLimit: Infinity
 	});
 
+	const r = new IORedis(rConfig.port, rConfig.host, {
+		username: rConfig.username,
+		password: rConfig.password,
+		db: rConfig[beta ? "dbBeta" : "db"],
+		connectionName: `MaidBoye${beta ? "Beta" : ""}`
+	});
+
+	console.log("deleting tables");
 	const tables = await pool.query(`SELECT table_name FROM information_schema.tables WHERE table_schema = '${database}'`).then((v: Array<{ table_name: string; }>) => v.map(d => d.table_name));
 	for (const t of tables) await pool.query(`SET FOREIGN_KEY_CHECKS=0; DROP TABLE ${database}.${t}`);
+
+	console.log("clearing redis cache");
+	const cache = await r.keys("cache:*:*");
+	const m = r.multi();
+	for (const c of cache) m.del(c);
+	await m.exec();
+
 	const schemaList = fs.readdirSync(schemaDir).map(v => [
 		v,
 		fs.readFileSync(`${schemaDir}/${v}/table.sql`).toString(),

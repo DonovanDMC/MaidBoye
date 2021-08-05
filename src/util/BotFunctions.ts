@@ -5,6 +5,7 @@ import Yiffy from "./req/Yiffy";
 import CommandError from "./cmd/CommandError";
 import { AntiSpamEntry } from "./cmd/AntiSpam";
 import TempFiles from "./handlers/TempFiles";
+import { BitData } from "./@types/MariaDB";
 import GuildConfig from "../db/Models/Guild/GuildConfig";
 import Eris from "eris";
 import { Strings } from "@uwu-codes/utils";
@@ -354,5 +355,13 @@ export default class BotFunctions {
 			id,
 			url: `${config.api.url}/reports/${user.id}/${id}`
 		};
+	}
+
+	static parseBit(d: BitData) {
+		// @ts-ignore -- mariadb bit types suck
+		return Object.keys(d).includes(0) ? Number(d) :
+			"toJSON" in d ? d.toJSON().data[0] :
+				"data" in d ? d.data[0] :
+					-1;
 	}
 }

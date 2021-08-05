@@ -7,5 +7,6 @@ CREATE TABLE `disable` (
 	`filter_type` BIT(2) NOT NULL,
 	PRIMARY KEY (`id`),
 	UNIQUE KEY `id` (`id`),
-	KEY `guild_id` (`guild_id`)
+	KEY `guild_id` (`guild_id`),
+	UNIQUE KEY `exact_entry_type` (`type`, `filter_type`, `value`, `filter_value`)
 );
