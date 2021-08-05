@@ -16,7 +16,7 @@ export default new Command("impostor")
 	.setCooldown(3e3)
 	.setExecutor(async function(msg) {
 		const m = msg.args.length === 0 ? msg.member : await msg.getMemberFromArgs();
-		return msg.channel.createMessage({
+		return msg.reply({
 			content: [
 				"。　　　　•　    　ﾟ　　。",
 				" 　　.　　　.　　　  　　.　　　　　。　　   。　.",

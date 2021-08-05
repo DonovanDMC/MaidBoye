@@ -105,7 +105,7 @@ export default new Command("ship")
 			throw new TypeError("Unknown Error");
 		}
 
-		return msg.channel.createMessage({
+		return msg.reply({
 			embed: new EmbedBuilder(true, msg.author)
 				.setTitle("Shipping")
 				.setDescription(`Shipping <@!${member1.id}> and <@!${member2.id}>\n**${ship.amount}%** - ${ship.name}`)

@@ -77,15 +77,15 @@ export default new Command("kick")
 			dm = await member.user.createMessage(`You were kicked from **${msg.channel.guild.name}** by **${msg.author.tag}**\nReason:\n\`\`\`\n${reason ?? "None Provided"}\`\`\``)
 				.catch((err: Error) => ((dmError = `${err.name}: ${err.message}`, null)));
 		await member.kick(`Kick: ${msg.author.tag} (${msg.author.id}) -> ${reason ?? "None Provided"}`)
-			// catch first so we only catch an error from ban
-			.catch(async(err: Error) => {
+			.then(
+				async() => {
+					const mdl = await ModLogHandler.createKickEntry(msg.gConfig, member, msg.author, `Kick: ${msg.author.tag} -> ${reason ?? "None Provided"}`);
+					if (msg.gConfig.settings.deleteModCommands && msg.channel.guild.permissionsOf(this.user.id)) await msg.delete().catch(() => null);
+					return msg.channel.createMessage(`**${member.tag}** was kicked, ***${reason ?? "None Provided"}***${dmError !== undefined ? `\n\nFailed to send dm:\n\`${dmError}\`` : ""}${mdl.check !== false ? `\nFor more info, check <#${msg.gConfig.modlog.webhook!.channelId}> (case: **#${mdl.entryId}**)` : ""}`);
+				},
+				async(err: Error) => {
 				// delete the dm if we didn't ban them
-				if (dm !== null) await dm.delete().catch(() => null);
-				return msg.channel.createMessage(`I-I failed to kick **${member.tag}**..\n\`${err.name}: ${err.message}\``);
-			})
-			.then(async() => {
-				const mdl = await ModLogHandler.createKickEntry(msg.gConfig, member, msg.author, `Kick: ${msg.author.tag} -> ${reason ?? "None Provided"}`);
-				if (msg.gConfig.settings.deleteModCommands && msg.channel.guild.permissionsOf(this.user.id)) await msg.delete().catch(() => null);
-				return msg.channel.createMessage(`**${member.tag}** was kicked, ***${reason ?? "None Provided"}***${dmError !== undefined ? `\n\nFailed to send dm:\n\`${dmError}\`` : ""}${mdl.check !== false ? `\nFor more info, check <#${msg.gConfig.modlog.webhook!.channelId}> (case: **#${mdl.entryId}**)` : ""}`);
-			});
+					if (dm !== null) await dm.delete().catch(() => null);
+					return msg.reply(`I-I failed to kick **${member.tag}**..\n\`${err.name}: ${err.message}\``);
+				});
 	});

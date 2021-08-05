@@ -48,17 +48,20 @@ export default new Command("unmute")
 		if (reason && reason.length > 500) return msg.reply("Th-that reason is too long!");
 
 		await member.removeRole(r.id, `Unmute: ${msg.author.tag} (${msg.author.id}) -> ${reason ?? "None Provided"}`)
-			.catch(async(err: Error) => msg.channel.createMessage(`I-I failed to unmute **${member.tag}**..\n\`${err.name}: ${err.message}\``))
-			.then(async() => {
-				if (member.voiceState.channelID !== null) {
-					try {
-						await member.edit({ mute: false }, `Unmute: ${msg.author.tag} (${msg.author.id}) -> ${reason ?? "None Provided"}`);
-					} catch {
+			.then(
+				async() => {
+					if (member.voiceState.channelID !== null) {
+						try {
+							await member.edit({ mute: false }, `Unmute: ${msg.author.tag} (${msg.author.id}) -> ${reason ?? "None Provided"}`);
+						} catch {
 						// they need to be in a voice channel for this to work
+						}
 					}
-				}
-				const mdl = await ModLogHandler.createUnMuteEntry(msg.gConfig, member, msg.author, reason);
-				if (msg.gConfig.settings.deleteModCommands && msg.channel.guild.permissionsOf(this.user.id)) await msg.delete().catch(() => null);
-				return msg.channel.createMessage(`**${member.tag}** was unmuted, ***${reason ?? "None Provided"}***${mdl.check !== false ? `\nFor more info, check <#${msg.gConfig.modlog.webhook!.channelId}> (case: **#${mdl.entryId}**)` : ""}`);
-			});
+					const mdl = await ModLogHandler.createUnMuteEntry(msg.gConfig, member, msg.author, reason);
+					if (msg.gConfig.settings.deleteModCommands && msg.channel.guild.permissionsOf(this.user.id)) await msg.delete().catch(() => null);
+					return msg.channel.createMessage(`**${member.tag}** was unmuted, ***${reason ?? "None Provided"}***${mdl.check !== false ? `\nFor more info, check <#${msg.gConfig.modlog.webhook!.channelId}> (case: **#${mdl.entryId}**)` : ""}`);
+				},
+				async(err: Error) =>
+					msg.reply(`I-I failed to unmute **${member.tag}**..\n\`${err.name}: ${err.message}\``)
+			);
 	});

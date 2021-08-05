@@ -72,7 +72,7 @@ export default new Command("setup-mutes")
 			],
 			components: []
 		});
-		if (w.data.custom_id.includes("no")) return w.createMessage({
+		if (w.data.custom_id.includes("no")) return w.editParent({
 			embeds: [
 				new EmbedBuilder(true, msg.author)
 					.setTitle("Edits Cancelled")
@@ -82,7 +82,7 @@ export default new Command("setup-mutes")
 			],
 			components: []
 		});
-		await w.createMessage({
+		await w.editParent({
 			content: "Processing..",
 			embeds: [],
 			components: []

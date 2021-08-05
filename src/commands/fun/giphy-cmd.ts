@@ -31,7 +31,7 @@ export default new Command("giphy")
 		if (data.length === 0) return msg.reply("That query returned no results..");
 
 
-		return msg.channel.createMessage({
+		return msg.reply({
 			embeds: [
 				new EmbedBuilder(true, msg.author)
 					.setTitle(`Giphy Search: ${Strings.truncate(msg.args.join(" "), 30)}`)

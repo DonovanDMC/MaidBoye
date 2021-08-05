@@ -65,7 +65,7 @@ export default new Command("modlog")
 				content: "Selection timed out..",
 				components: []
 			});
-			await section.createMessage({
+			await section.editParent({
 				content: "Successfully selected, processing..",
 				components: []
 			});
@@ -95,7 +95,7 @@ export default new Command("modlog")
 					content: "Y-you took too long to respond..",
 					components: []
 				});
-				await sel.createMessage({
+				await sel.editParent({
 					content: "Successfully selected, processing..",
 					components: []
 				});
@@ -117,13 +117,13 @@ export default new Command("modlog")
 						return v;
 					// defaults no
 					} else if (selC.data.custom_id.indexOf("no") !== -1) {
-						await selC.createMessage({
+						await selC.editParent({
 							content: "Using default configuration options. Setup complete!",
 							components: []
 						});
 						return v;
 					} else if (selC.data.custom_id.indexOf("cancel") !== -1) {
-						await selC.createMessage({
+						await selC.editParent({
 							content: "Setup has been cancelled.",
 							components: []
 						});
@@ -131,7 +131,7 @@ export default new Command("modlog")
 					}
 
 					// ask case editing
-					await selC.createMessage({
+					await selC.editParent({
 						content: "Do you want to enable **Case Editing** after cases have been made? (default: **yes**)",
 						components: new ComponentHelper()
 							.addInteractionButton(ComponentHelper.BUTTON_SUCCESS, `configCaseEditing-yes.${msg.author.id}`, false, undefined, "Yes")
@@ -156,21 +156,21 @@ export default new Command("modlog")
 					});
 					// case editing no
 					else if (cnfCaseEditing.data.custom_id.indexOf("no") !== -1) {
-						await cnfCaseEditing.createMessage({
+						await cnfCaseEditing.editParent({
 							content: `**Case Editing** has been set to disabled.\n\nNext: Do you want to enable **Case Deletion**? (default: **${v.caseDeletingEnabled ? "yes" : "no"}**)`,
 							components: cnfCDComponents
 						});
 						v.caseEditingEnabled = false;
 					// case editing yes
 					} else if (cnfCaseEditing.data.custom_id.indexOf("yes") !== -1) {
-						await cnfCaseEditing.createMessage({
+						await cnfCaseEditing.editParent({
 							content: `**Case Editing** has been set to enabled.\n\nNext: Do you want to enable **Case Deletion**? (default: **${v.caseDeletingEnabled ? "yes" : "no"}**)`,
 							components: cnfCDComponents
 						});
 						v.caseEditingEnabled = true;
 					// case editing exit
 					} else if (cnfCaseEditing.data.custom_id.indexOf("exit") !== -1) {
-						await cnfCaseEditing.createMessage({
+						await cnfCaseEditing.editParent({
 							content: "Exiting.",
 							components: []
 						});
@@ -193,21 +193,21 @@ export default new Command("modlog")
 					});
 					// case deletion no
 					else if (cnfCaseDeletion.data.custom_id.indexOf("no") !== -1) {
-						await cnfCaseDeletion.createMessage({
+						await cnfCaseDeletion.editParent({
 							content: `**Case Deletion** has been set to disabled.\n\nNext: Do you want to enable **Editing Others Cases**? (default: **${v.editOthersCasesEnabled ? "yes" : "no"}**)`,
 							components: cnfEOCComponents
 						});
 						v.caseDeletingEnabled = false;
 					// case deletion yes
 					} else if (cnfCaseDeletion.data.custom_id.indexOf("yes") !== -1) {
-						await cnfCaseDeletion.createMessage({
+						await cnfCaseDeletion.editParent({
 							content: `**Case Deletion** has been set to enabled.\n\nNext: Do you want to enable **Editing Others Cases**? (default: **${v.editOthersCasesEnabled ? "yes" : "no"}**)`,
 							components: cnfEOCComponents
 						});
 						v.caseDeletingEnabled = true;
 					// case deletion exit
 					} else if (cnfCaseDeletion.data.custom_id.indexOf("exit") !== -1) {
-						await cnfCaseDeletion.createMessage({
+						await cnfCaseDeletion.editParent({
 							content: "Exiting.",
 							components: []
 						});
@@ -223,21 +223,21 @@ export default new Command("modlog")
 					});
 					// edit others cases no
 					else if (cnfEditOthersCases.data.custom_id.indexOf("no") !== -1) {
-						await cnfEditOthersCases.createMessage({
+						await cnfEditOthersCases.editParent({
 							content: "**Edit Others Cases** has been set to disabled.\n\nSetup is complete.",
 							components: []
 						});
 						v.editOthersCasesEnabled = false;
 					// edit others cases yes
 					} else if (cnfEditOthersCases.data.custom_id.indexOf("yes") !== -1) {
-						await cnfEditOthersCases.createMessage({
+						await cnfEditOthersCases.editParent({
 							content: "**Edit Others Cases** has been set to enabled.\n\nSetup is complete.",
 							components: []
 						});
 						v.editOthersCasesEnabled = true;
 					// edit others cases exit
 					} else if (cnfEditOthersCases.data.custom_id.indexOf("exit") !== -1) {
-						await cnfEditOthersCases.createMessage({
+						await cnfEditOthersCases.editParent({
 							content: "Exiting.",
 							components: []
 						});
@@ -270,11 +270,11 @@ export default new Command("modlog")
 							components: []
 						});
 						hook = hooks[Number(selW.data.custom_id.split(".")[0].split("-")[2])];
-						if (!hook) return selW.createMessage({
+						if (!hook) return selW.editParent({
 							content: "Internal error.",
 							components: []
 						});
-						await selW.createMessage({
+						await selW.editParent({
 							content: `Successfully selected the webhook **${hook.name}** (${hook.id})\nWould you like to configure the more detailed options, or leave them at their defaults?`,
 							components: new ComponentHelper()
 								.addInteractionButton(ComponentHelper.BUTTON_SUCCESS, `modlogconfig-yes.${msg.author.id}`, false, undefined, "Configure")

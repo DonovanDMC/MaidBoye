@@ -15,7 +15,7 @@ export default class API {
 	static async launch(client: MaidBoye) {
 		this.app = express()
 			.set("trust proxy", true)
-			.set("views", [`${config.dir.src}/api/templates`])
+			.set("views", [`${config.dir.base}/src/api/templates`])
 			.set("view engine", "ejs")
 			.use("/errors", express.static(config.dir.logs.errors))
 			.use("/assets", express.static(config.dir.assets))

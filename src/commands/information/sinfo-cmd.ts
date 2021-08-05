@@ -211,32 +211,32 @@ export default new Command("sinfo", "serverinfo")
 			} else {
 				switch (c.data.custom_id.split(".")[0].split("-")[1]) {
 					case "members": {
-						await c.createMessage(sections.members);
+						await c.editParent(sections.members);
 						break;
 					}
 
 					case "channels": {
-						await c.createMessage(sections.channels);
+						await c.editParent(sections.channels);
 						break;
 					}
 
 					case "icon": {
-						await c.createMessage(sections.icon);
+						await c.editParent(sections.icon);
 						break;
 					}
 
 					case "splash": {
-						await c.createMessage(sections.splash);
+						await c.editParent(sections.splash);
 						break;
 					}
 
 					case "banner": {
-						await c.createMessage(sections.banner);
+						await c.editParent(sections.banner);
 						break;
 					}
 
 					case "back": {
-						await c.createMessage(sections.server);
+						await c.editParent(sections.server);
 						break;
 					}
 				}
