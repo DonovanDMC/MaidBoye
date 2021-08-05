@@ -2,7 +2,7 @@ import E621 from "../../util/req/E621";
 import Logger from "../../util/Logger";
 import SauceNAO from "@util/req/SauceNAO";
 import Command from "@cmd/Command";
-import Eris, { Message } from "eris";
+import Eris from "eris";
 import ExtendedMessage from "@util/ExtendedMessage";
 import { SagiriResult } from "sagiri";
 import { APIError, Post } from "e621";
@@ -95,7 +95,7 @@ export default new Command("sauce")
 					if (sn) {
 						const s = await sauce(v, msg);
 						if (s === null) return;
-						if (s instanceof Message) return s;
+						if (s instanceof Eris.Message) return s;
 						post = s.post;
 						type = s.type;
 					} else {
@@ -114,7 +114,7 @@ export default new Command("sauce")
 				} else {
 					const s = await sauce(c, msg);
 					if (s === null) return;
-					if (s instanceof Message) return s;
+					if (s instanceof Eris.Message) return s;
 					post = s.post;
 					type = s.type;
 				}
@@ -124,7 +124,7 @@ export default new Command("sauce")
 
 			const s = await sauce(msg.attachments[0].url, msg);
 			if (s === null) return;
-			if (s instanceof Message) return s;
+			if (s instanceof Eris.Message) return s;
 			post = s.post;
 			type = s.type;
 		}
