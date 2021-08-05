@@ -108,11 +108,23 @@ export default new ClientEvent("messageCreate", async function (message) {
 	// ignore commands in report channels
 	if (/^user-report-([a-z\d]+)$/i.exec(msg.channel.name) && !cmd.triggers.includes("report")) return;
 
+
 	if (!config.developers.includes(msg.author.id)) {
+		t.start("disable");
+		if (msg.gConfig.disable.length > 0 && !msg.member.permissions.has("manageGuild")) {
+			const server = msg.gConfig.disable.filter(d => d.filterType === "server" && ((d.type === "all" && d.value === null) || ("command" && cmd.triggers[0] === d.value) || (d.type === "category" && cmd.category === d.value)));
+			const user = msg.gConfig.disable.filter(d => d.filterType === "user" && msg.author.id === d.filterValue && ((d.type === "all" && d.value === null) || ("command" && cmd.triggers[0] === d.value) || (d.type === "category" && cmd.category === d.value)));
+			const role = msg.gConfig.disable.filter(d => d.filterType === "role" && msg.member.roles.includes(d.filterValue) && ((d.type === "all" && d.value === null) || ("command" && cmd.triggers[0] === d.value) || (d.type === "category" && cmd.category === d.value)));
+			const channel = msg.gConfig.disable.filter(d => d.filterType === "channel" && msg.channel.id === d.filterValue && ((d.type === "all" && d.value === null) || ("command" && cmd.triggers[0] === d.value) || (d.type === "category" && cmd.category === d.value)));
+
+			if (server.length || user.length || role.length || channel.length) return;
+		}
+		t.end("disable");
+
 		t.start("antispam");
 		AntiSpam.add(msg.author.id, cmd);
 		const anti = AntiSpam.get(msg.author.id);
-		if ((anti.length % config.antiSpam.warnThreshold)) {
+		if ((anti.length % config.antiSpam.warnThreshold) === 0) {
 			const report = BotFunctions.generateReport(msg.author, anti);
 			await WebhookStore.execute("antispam", {
 				embeds: [

@@ -10,7 +10,7 @@ import {
 	WarnEntry
 } from "./ModLog/All";
 import LogEvent, { RawLogEvent } from "./LogEvent";
-import DisableEntry, { RawDisableEntry } from "./DisableEntry";
+import DisableEntry, { AnyDisableEntry, RawDisableEntry } from "./DisableEntry";
 import Blacklist, { GuildBlacklist, RawGuildBlacklist } from "../Blacklist";
 import WebhookStore from "../../../util/WebhookStore";
 import EmbedBuilder from "../../../util/EmbedBuilder";
@@ -45,7 +45,7 @@ export default class GuildConfig {
 	tags = new Collection<string, Tag>();
 	selfRoles = new Collection<string, SelfRole>();
 	logEvents: Array<LogEvent>;
-	disable: Array<DisableEntry>;
+	disable: Array<AnyDisableEntry>;
 	modlog: {
 		enabled: boolean;
 		caseEditingEnabled: boolean;
@@ -65,7 +65,7 @@ export default class GuildConfig {
 		this.load(data, prefixData, selfRolesData, tagsData, logEventsData, disabeData);
 	}
 
-	private load(data: RawGuildConfig, prefixData: Array<RawPrefix>, selfRolesData: Array<RawSelfRole>, tagsData: Array<RawTag>, logEventsData: Array<RawLogEvent>, disabeData: Array<RawDisableEntry>) {
+	private load(data: RawGuildConfig, prefixData: Array<RawPrefix>, selfRolesData: Array<RawSelfRole>, tagsData: Array<RawTag>, logEventsData: Array<RawLogEvent>, disableData: Array<RawDisableEntry>) {
 		this.id = data.id;
 		this.prefix = prefixData.map(d => new Prefix(d, this));
 		this.tags.clear();
@@ -73,7 +73,7 @@ export default class GuildConfig {
 		this.selfRoles.clear();
 		selfRolesData.forEach(d => this.selfRoles.set(d.role, new SelfRole(d, this)));
 		this.logEvents = logEventsData.map(l => new LogEvent(l, this));
-		this.disable = disabeData.map(d => new DisableEntry(d, this));
+		this.disable = disableData.map(d => new DisableEntry(d, this) as AnyDisableEntry);
 		this.modlog = {
 			enabled: Boolean(data.modlog_enabled),
 			caseEditingEnabled: Boolean(data.modlog_case_editing_enabled),
@@ -259,14 +259,15 @@ export default class GuildConfig {
 		return true;
 	}
 
-	async addDisableEntry(type: 0 | 1 | 2, value: string | null, channel: string | null) {
+	async addDisableEntry(type: 0 | 1 | 2, value: string | null, filterType: 0 | 1 | 2 | 3, filterValue: string | null) {
 		const id = crypto.randomBytes(6).toString("hex");
-		await db.query("INSERT INTO disable (id, guild_id, type, value, channel) VALUES (?, ?, ?, ?, ?)", [
+		await db.query("INSERT INTO disable (id, guild_id, type, value, filter_type, filter_value) VALUES (?, ?, ?, ?, ?, ?)", [
 			id,
 			this.id,
 			type,
 			value,
-			channel
+			filterType,
+			filterValue
 		]);
 		await this.reload();
 		return id;
