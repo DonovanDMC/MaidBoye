@@ -106,25 +106,27 @@ export default new ClientEvent("messageCreate", async function (message) {
 			);
 			if (msg.gConfig.settings.announceLevelUp) {
 				let m: Eris.Message;
-				if (msg.channel.permissionsOf(this.user.id).has("sendMessages")) m = await msg.channel.createMessage({
-					embeds: [
-						new EmbedBuilder(true, msg.author)
-							.setTitle("Level Up!")
-							.setDescription(`<@!${msg.author.id}> leveled up from **${oldLevel}** to **${level}**!`, roles.length === 0 ? [] : [
-								"Roles Gained:",
-								...roles.map(r => `- <@&${r.role}>`)
-							])
-							.toJSON()
-					]
-				});
-				else m = await msg.channel.createMessage({
-					content: `Congrats <@!${msg.author.id}> on leveling up from **${oldLevel}** to **${level}**!`,
-					allowedMentions: { users: false }
-				});
-				setTimeout(() => {
-					void m.delete().catch(() => null);
-				}, 2e4);
-			} else void msg.author.createMessage(`You leveled up in **${msg.channel.guild.name}** from **${oldLevel}** to **${level}**\n(I sent this here because I couldn't create messages in the channel you leveled up in)`);
+				if (msg.channel.permissionsOf(this.user.id).has("sendMessages")) {
+					if (msg.channel.permissionsOf(this.user.id).has("embedLinks")) m = await msg.channel.createMessage({
+						embeds: [
+							new EmbedBuilder(true, msg.author)
+								.setTitle("Level Up!")
+								.setDescription(`<@!${msg.author.id}> leveled up from **${oldLevel}** to **${level}**!`, roles.length === 0 ? [] : [
+									"Roles Gained:",
+									...roles.map(r => `- <@&${r.role}>`)
+								])
+								.toJSON()
+						]
+					});
+					else m = await msg.channel.createMessage({
+						content: `Congrats <@!${msg.author.id}> on leveling up from **${oldLevel}** to **${level}**!`,
+						allowedMentions: { users: false }
+					});
+					setTimeout(() => {
+						void m.delete().catch(() => null);
+					}, 2e4);
+				} else void msg.author.createMessage(`You leveled up in **${msg.channel.guild.name}** from **${oldLevel}** to **${level}**\n(I sent this here because I couldn't create messages in the channel you leveled up in)`);
+			}
 		}
 
 	}
