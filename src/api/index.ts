@@ -17,7 +17,10 @@ export default class API {
 			.set("trust proxy", true)
 			.set("views", [`${config.dir.base}/src/api/templates`])
 			.set("view engine", "ejs")
-			.use("/errors", express.static(config.dir.logs.errors))
+			.use("/errors/:id", async(req, res) => {
+				if (!fs.existsSync(`${config.dir.logs.errors}/${req.params.id}`)) return res.status(404).end("not found");
+				else return res.status(200).header("Content-Type", "text/plain").sendFile(`${config.dir.logs.errors}/${req.params.id}`);
+			})
 			.use("/assets", express.static(config.dir.assets))
 			.use(morgan("combined"))
 			.use(express.json())
