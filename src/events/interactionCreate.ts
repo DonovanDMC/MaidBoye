@@ -1,7 +1,7 @@
 import db from "@db";
 import ClientEvent from "@util/ClientEvent";
 import Logger from "@util/Logger";
-import Eris from "eris";
+import Eris, { CommandInteraction } from "eris";
 import util from "util";
 
 export default new ClientEvent("interactionCreate", async function(interaction) {
@@ -30,6 +30,16 @@ export default new ClientEvent("interactionCreate", async function(interaction) 
 					case Eris.Constants.CommandOptionTypes.USER: userMentions.push(String(option.value)); return `<@!${String(option.value)}>`;
 					case Eris.Constants.CommandOptionTypes.CHANNEL: return `<#${String(option.value)}>`;
 					case Eris.Constants.CommandOptionTypes.ROLE: roleMentions.push(String(option.value)); return `<@&${String(option.value)}>`;
+					case Eris.Constants.CommandOptionTypes.MENTIONABLE: {
+						const isUser = (interaction as CommandInteraction).data.resolved?.users?.[String(option.value)] !== undefined;
+						if (isUser) {
+							userMentions.push(String(option.value));
+							return `<@!${String(option.value)}>`;
+						} else {
+							roleMentions.push(String(option.value));
+							return `<@&${String(option.value)}>`;
+						}
+					}
 					default: return String(option.value);
 				}
 			}

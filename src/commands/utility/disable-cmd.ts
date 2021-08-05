@@ -9,6 +9,7 @@ import config from "@config";
 import CommandHandler from "@util/cmd/CommandHandler";
 import DisableEntry, { RawDisableEntry } from "@db/Models/Guild/DisableEntry";
 import chunk from "chunk";
+import Eris from "eris";
 
 export default new Command("disable")
 	.setPermissions("bot", "embedLinks")
@@ -41,6 +42,45 @@ export default new Command("disable")
 			]
 		};
 	})
+	.setSlashOptions(true, [
+		{
+			type: Eris.Constants.CommandOptionTypes.SUB_COMMAND,
+			name: "add",
+			description: "Add a disable entry (provide no last argument for server wide)",
+			options: [
+				{
+					type: Eris.Constants.CommandOptionTypes.STRING,
+					name: "type",
+					description: "The type. Either a command, category, or \"all\".",
+					required: true
+				},
+				{
+					type: Eris.Constants.CommandOptionTypes.MENTIONABLE,
+					name: "filter",
+					description: "Where this applies (for channel, regular commands must be used)",
+					required: false
+				}
+			]
+		},
+		{
+			type: Eris.Constants.CommandOptionTypes.SUB_COMMAND,
+			name: "remove",
+			description: "Remove a disable entry",
+			options: [
+				{
+					type: Eris.Constants.CommandOptionTypes.INTEGER,
+					name: "id",
+					description: "The id of the entry to remove (see list)",
+					required: true
+				}
+			]
+		},
+		{
+			type: Eris.Constants.CommandOptionTypes.SUB_COMMAND,
+			name: "list",
+			description: "List the current disable entries"
+		}
+	])
 	.setCooldown(3e3)
 	.setExecutor(async function(msg) {
 		if (msg.args.length < 1) return msg.reply(`H-hey! You used that command wrong.. Try looking at \`${msg.gConfig.getFormattedPrefix()}help disable\``);
