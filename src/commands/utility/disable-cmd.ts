@@ -254,11 +254,11 @@ export default new Command("disable")
 										}
 									}
 								}))
-								.setFooter(`Page #${page + 1}/${pages.length} | UwU`)
+								.setFooter(`Page ${page + 1}/${pages.length} | UwU`)
 								.toJSON()
 						],
 						components: new ComponentHelper()
-							.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `disable-last.${msg.author.id}`, page === 0, ComponentHelper.emojiToPartial(config.emojis.default.last, "default"))
+							.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `disable-back.${msg.author.id}`, page === 0, ComponentHelper.emojiToPartial(config.emojis.default.last, "default"))
 							.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `disable-stop.${msg.author.id}`, page === 0, ComponentHelper.emojiToPartial(config.emojis.default.stop, "default"))
 							.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `disable-next.${msg.author.id}`, page === 0, ComponentHelper.emojiToPartial(config.emojis.default.next, "default"))
 							.toJSON()
@@ -271,7 +271,7 @@ export default new Command("disable")
 						});
 						return;
 					} else {
-						if (wait.data.custom_id.includes("last")) void setPage.call(this,  page - 1);
+						if (wait.data.custom_id.includes("back")) void setPage.call(this,  page - 1);
 						if (wait.data.custom_id.includes("stop")) {
 							await m.edit({
 								content: "",

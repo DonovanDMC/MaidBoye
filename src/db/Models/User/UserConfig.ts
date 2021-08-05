@@ -22,6 +22,13 @@ export interface RawUserConfig {
 	marriage: string | null;
 }
 
+export interface RawLevel {
+	id: string;
+	guild_id: string;
+	user_id: string;
+	xp: number;
+}
+
 export type UserConfigKV = DataTypes<UserConfig>;
 export default class UserConfig {
 	id: string;
@@ -245,5 +252,27 @@ export default class UserConfig {
 		});
 		const [res] = await db.query("SELECT * FROM blacklist WHERE type=? AND user_id=? AND id=? LIMIT 1", [Blacklist.USER, this.id, id]).then((r: Array<RawUserBlacklist>) => r.map(b => new UserBlacklist(b)));
 		return res;
+	}
+
+	async getExp(guild: string) {
+		const res = await db.query("SELECT * FROM levels WHERE user_id=? AND guild_id=?", [
+			this.id,
+			guild
+		]) as Array<RawLevel>;
+		if (res.length === 0) {
+			const id = crypto.randomBytes(6).toString("hex");
+			await db.query("INSERT INTO levels (id, guild_id, user_id, xp) VALUES (?, ?, ?, ?)", [id, guild, this.id, 0]);
+			return 0;
+		}
+		return res[0].xp;
+	}
+
+	async setExp(guild: string, amount: number) {
+		return db.query("UPDATE levels SET xp=? WHERE user_id=? AND guild_id=?", [amount, this.id, guild]).then((r: OkPacket) => r.affectedRows > 0);
+	}
+
+	async addExp(guild: string, amount: number) {
+		const xp = await this.getExp(guild);
+		return UserConfig.prototype.setExp.call(this, guild, xp + amount);
 	}
 }

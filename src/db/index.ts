@@ -8,6 +8,7 @@ import { RawPrefix } from "./Models/Guild/Prefix";
 import { RawTag } from "./Models/Guild/Tag";
 import { RawLogEvent } from "./Models/Guild/LogEvent";
 import { RawDisableEntry } from "./Models/Guild/DisableEntry";
+import { RawLevelRole } from "./Models/Guild/LevelRole";
 import Logger from "@util/Logger";
 import config from "@config";
 import IORedis from "ioredis";
@@ -154,6 +155,7 @@ export default class db {
 		guild: RawGuildConfig;
 		prefix: Array<RawPrefix>;
 		selfRoles: Array<RawSelfRole>;
+		levelRoles: Array<RawLevelRole>;
 		tags: Array<RawTag>;
 		logEvents: Array<RawLogEvent>;
 		disable: Array<RawDisableEntry>;
@@ -167,18 +169,20 @@ export default class db {
 				guild: RawGuildConfig;
 				prefix: Array<RawPrefix>;
 				selfRoles: Array<RawSelfRole>;
+				levelRoles: Array<RawLevelRole>;
 				tags: Array<RawTag>;
 				logEvents: Array<RawLogEvent>;
 				disable: Array<RawDisableEntry>;
 			}>(cache);
-			if (v === undefined || v.guild === undefined || v.prefix === undefined || v.selfRoles === undefined || v.tags === undefined || v.logEvents === undefined || v.disable === undefined) return this.getGuild(id, raw as true);
+			if (v === undefined || v.guild === undefined || v.prefix === undefined || v.selfRoles === undefined || v.levelRoles === undefined || v.tags === undefined || v.logEvents === undefined || v.disable === undefined) return this.getGuild(id, raw as true);
 			if (raw) return v;
-			else return new GuildConfig(id, v.guild, v.prefix, v.selfRoles, v.tags, v.logEvents, v.disable);
+			else return new GuildConfig(id, v.guild, v.prefix, v.selfRoles, v.levelRoles, v.tags, v.logEvents, v.disable);
 		}
 		const start = Timer.start();
 		let res = await this.pool.query("SELECT * FROM guilds WHERE id=? LIMIT 1", [id]).then(v => (v as Array<RawGuildConfig>)[0]);
 		let prefix = await this.pool.query("SELECT * FROM prefix WHERE guild_id=?", [id]).then(v => (v as Array<RawPrefix>));
 		const selfRoles = await this.pool.query("SELECT * FROM selfroles WHERE guild_id=?", [id]).then(v => (v as Array<RawSelfRole>));
+		const levelRoles = await this.pool.query("SELECT * FROM levelroles WHERE guild_id=?", [id]).then(v => (v as Array<RawLevelRole>));
 		const tags = await this.pool.query("SELECT * FROM tags WHERE guild_id=?", [id]).then(v => (v as Array<RawTag>));
 		const logEvents = await this.pool.query("SELECT * FROM logevents WHERE guild_id=?", [id]).then(v => (v as Array<RawLogEvent>));
 		const disable = await this.pool.query("SELECT * FROM disable WHERE guild_id=?", [id]).then(v => (v as Array<RawDisableEntry>));
@@ -203,16 +207,17 @@ export default class db {
 
 		if (config.beta) Logger.getLogger("Database[MariaDB]").debug(`Query for the guild "${id}" took ${Timer.calc(start, end, 0, false)}`);
 
-		await this.r.setex(`cache:guilds:${id}`, 300, JSON.stringify({ guild: res, prefix, selfRoles, tags, logEvents, disable }, (k, v: unknown) => typeof v === "bigint" ? String(v) : v));
+		await this.r.setex(`cache:guilds:${id}`, 300, JSON.stringify({ guild: res, prefix, selfRoles, levelRoles, tags, logEvents, disable }, (k, v: unknown) => typeof v === "bigint" ? String(v) : v));
 
 		if (raw) return {
 			guild: res,
 			prefix,
 			selfRoles,
+			levelRoles,
 			tags,
 			logEvents,
 			disable
 		};
-		else return new GuildConfig(id, res, prefix, selfRoles, tags, logEvents, disable);
+		else return new GuildConfig(id, res, prefix, selfRoles, levelRoles, tags, logEvents, disable);
 	}
 }

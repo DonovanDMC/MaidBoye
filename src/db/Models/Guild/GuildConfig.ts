@@ -11,10 +11,11 @@ import {
 } from "./ModLog/All";
 import LogEvent, { RawLogEvent } from "./LogEvent";
 import DisableEntry, { AnyDisableEntry, RawDisableEntry } from "./DisableEntry";
+import LevelRole, { RawLevelRole } from "./LevelRole";
 import Blacklist, { GuildBlacklist, RawGuildBlacklist } from "../Blacklist";
 import WebhookStore from "../../../util/WebhookStore";
 import EmbedBuilder from "../../../util/EmbedBuilder";
-import { OkPacket } from "@util/@types/MariaDB";
+import { BooleanData, OkPacket } from "@util/@types/MariaDB";
 import { DataTypes, DeepPartial, SomePartial, Writeable } from "@uwu-codes/types";
 import BotFunctions from "@util/BotFunctions";
 import config from "@config";
@@ -24,19 +25,20 @@ import * as crypto from "crypto";
 
 export interface RawGuildConfig {
 	id: string;
-	modlog_enabled: 0 | 1;
-	modlog_case_editing_enabled: 0 | 1;
-	modlog_case_deleting_enabled: 0 | 1;
-	modlog_edit_others_cases_enabled: 0 | 1;
+	modlog_enabled: BooleanData;
+	modlog_case_editing_enabled: BooleanData;
+	modlog_case_deleting_enabled: BooleanData;
+	modlog_edit_others_cases_enabled: BooleanData;
 	modlog_webhook_id: string | null;
 	modlog_webhook_token: string | null;
 	modlog_webhook_channel_id: string | null;
 	settings_default_yiff_type: string;
 	settings_e621_thumbnail_type: string;
 	settings_mute_role: string | null;
-	settings_command_images: 0 | 1;
-	settings_snipe_disabled: 0 | 1;
-	settings_delete_mod_commands: 0 | 1;
+	settings_command_images: BooleanData;
+	settings_snipe_disabled: BooleanData;
+	settings_delete_mod_commands: BooleanData;
+	settings_announce_level_up: BooleanData;
 }
 
 export type GuildConfigKV = DataTypes<GuildConfig>;
@@ -45,6 +47,7 @@ export default class GuildConfig {
 	prefix: Array<Prefix>;
 	tags = new Collection<string, Tag>();
 	selfRoles = new Collection<string, SelfRole>();
+	levelRoles: Array<LevelRole>;
 	logEvents: Array<LogEvent>;
 	disable: Array<AnyDisableEntry>;
 	modlog: {
@@ -61,19 +64,21 @@ export default class GuildConfig {
 		commandImages: boolean;
 		snipeDisabled: boolean;
 		deleteModCommands: boolean;
+		announceLevelUp: boolean;
 	};
-	constructor(id: string, data: RawGuildConfig, prefixData: Array<RawPrefix>, selfRolesData: Array<RawSelfRole>, tagsData: Array<RawTag>, logEventsData: Array<RawLogEvent>, disabeData: Array<RawDisableEntry>) {
+	constructor(id: string, data: RawGuildConfig, prefixData: Array<RawPrefix>, selfRolesData: Array<RawSelfRole>, levelRolesData: Array<RawLevelRole>, tagsData: Array<RawTag>, logEventsData: Array<RawLogEvent>, disabeData: Array<RawDisableEntry>) {
 		this.id = id;
-		this.load(data, prefixData, selfRolesData, tagsData, logEventsData, disabeData);
+		this.load(data, prefixData, selfRolesData, levelRolesData, tagsData, logEventsData, disabeData);
 	}
 
-	private load(data: RawGuildConfig, prefixData: Array<RawPrefix>, selfRolesData: Array<RawSelfRole>, tagsData: Array<RawTag>, logEventsData: Array<RawLogEvent>, disableData: Array<RawDisableEntry>) {
+	private load(data: RawGuildConfig, prefixData: Array<RawPrefix>, selfRolesData: Array<RawSelfRole>, levelRolesData: Array<RawLevelRole>, tagsData: Array<RawTag>, logEventsData: Array<RawLogEvent>, disableData: Array<RawDisableEntry>) {
 		this.id = data.id;
 		this.prefix = prefixData.map(d => new Prefix(d, this));
 		this.tags.clear();
 		tagsData.forEach(d => this.tags.set(d.name, new Tag(d, this)));
 		this.selfRoles.clear();
 		selfRolesData.forEach(d => this.selfRoles.set(d.role, new SelfRole(d, this)));
+		this.levelRoles = levelRolesData.map(l => new LevelRole(l, this));
 		this.logEvents = logEventsData.map(l => new LogEvent(l, this));
 		this.disable = disableData.map(d => new DisableEntry(d, this) as AnyDisableEntry);
 		this.modlog = {
@@ -93,7 +98,8 @@ export default class GuildConfig {
 			muteRole: data.settings_mute_role,
 			commandImages: Boolean(data.settings_command_images),
 			snipeDisabled: Boolean(data.settings_snipe_disabled),
-			deleteModCommands: Boolean(data.settings_delete_mod_commands)
+			deleteModCommands: Boolean(data.settings_delete_mod_commands),
+			announceLevelUp: Boolean(data.settings_announce_level_up)
 		};
 		return this;
 	}
@@ -101,7 +107,7 @@ export default class GuildConfig {
 	async reload() {
 		const v = await db.getGuild(this.id, true, true);
 		if (!v) throw new Error(`Unexpected undefined on GuildConfig#reload (id: ${this.id})`);
-		this.load(v.guild, v.prefix, v.selfRoles, v.tags, v.logEvents, v.disable);
+		this.load(v.guild, v.prefix, v.selfRoles, v.levelRoles, v.tags, v.logEvents, v.disable);
 		return this;
 	}
 
@@ -109,6 +115,7 @@ export default class GuildConfig {
 		if (data.prefix) throw new TypeError("Field 'prefix' cannot be used in the generic edit function.");
 		if (data.tags) throw new TypeError("Field 'tags' cannot be used in the generic edit function.");
 		if (data.selfRoles) throw new TypeError("Field 'selfRoles' cannot be used in the generic edit function.");
+		if (data.levelRoles) throw new TypeError("Field 'levelRoles' cannot be used in the generic edit function.");
 		if (data.logEvents) throw new TypeError("Field 'logEvents' cannot be used in the generic edit function.");
 		if (data.disable) throw new TypeError("Field 'disable' cannot be used in the generic edit function.");
 
@@ -125,7 +132,8 @@ export default class GuildConfig {
 			settings_mute_role: data.settings === undefined ? undefined : data.settings.muteRole === null ? null : data.settings.muteRole ?? undefined,
 			settings_command_images: data.settings === undefined ? undefined : Boolean(data.settings.commandImages) === true ? 1 : 0,
 			settings_snipe_disabled: data.settings === undefined ? undefined : Boolean(data.settings.snipeDisabled) === true ? 1 : 0,
-			settings_delete_mod_commands: data.settings === undefined ? undefined : Boolean(data.settings.deleteModCommands) === true ? 1 : 0
+			settings_delete_mod_commands: data.settings === undefined ? undefined : Boolean(data.settings.deleteModCommands) === true ? 1 : 0,
+			settings_announce_level_up: data.settings === undefined ? undefined : Boolean(data.settings.announceLevelUp) === true ? 1 : 0
 		} as Omit<RawGuildConfig, "id">;
 
 		const keys = Object.keys(v).filter(k => v[k as keyof typeof v] !== undefined);
@@ -251,6 +259,25 @@ export default class GuildConfig {
 
 	async removeSelfRole(value: string, column: "id" | "role") {
 		const res = await db.query(`DELETE FROM selfroles WHERE ${column}=? AND guild_id=?`, [value, this.id]).then((r: OkPacket) => r.affectedRows > 0);
+		if (res === false) return false;
+		await this.reload();
+		return true;
+	}
+
+	async addLevelRole(role: string, xpRequired: number) {
+		const id = crypto.randomBytes(6).toString("hex");
+		await db.query("INSERT INTO levelroles (id, guild_id, role, xp_required) VALUES (?, ?, ?, ?)", [
+			id,
+			this.id,
+			role,
+			xpRequired
+		]);
+		await this.reload();
+		return id;
+	}
+
+	async removeLevelRole(value: string, column: "id" | "role") {
+		const res = await db.query(`DELETE FROM levelroles WHERE ${column}=? AND guild_id=?`, [value, this.id]).then((r: OkPacket) => r.affectedRows > 0);
 		if (res === false) return false;
 		await this.reload();
 		return true;

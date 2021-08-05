@@ -15,6 +15,8 @@ import { Strings, Timers } from "@uwu-codes/utils";
 import Eris from "eris";
 import StatsHandler from "@util/handlers/StatsHandler";
 import EventsASecondHandler from "@util/handlers/EventsASecondHandler";
+import db from "@db";
+const Redis = db.r;
 
 export default new ClientEvent("messageCreate", async function (message) {
 	const t = new Timers((config.developers.includes(message.author.id) || config.beta) === true ? (label, info) => Logger.getLogger(label).debug(info) : false);
@@ -86,6 +88,47 @@ export default new ClientEvent("messageCreate", async function (message) {
 	if (msg.content.split(" ").slice(1).join(" ").trim().toLowerCase().startsWith("fuck me")) return msg.reply("I-I don't even know you..");
 	const { cmd } = msg;
 	StatsHandler.trackNoResponse("stats", "message", msg.channel.typeString);
+
+	t.start("leveling");
+	const levelingCooldown = await Redis.exists(`leveling:${msg.author.id}:${msg.channel.guild.id}:cooldown`);
+	if (!levelingCooldown) {
+		await Redis.setex(`leveling:${msg.author.id}:${msg.channel.guild.id}:cooldown`, 60, "");
+		const amount = Math.floor(Math.random() * 10) + 5;
+		const oldExp = await msg.uConfig.getExp(msg.channel.guild.id);
+		const { level: oldLevel } = BotFunctions.calcLevel(oldExp);
+		await msg.uConfig.addExp(msg.channel.guild.id, amount);
+		const exp = await msg.uConfig.getExp(msg.channel.guild.id);
+		const { level } = BotFunctions.calcLevel(exp);
+		if (level > oldLevel) {
+			const roles = msg.gConfig.levelRoles.filter(l => l.xpRequired <= exp && !msg.member.roles.includes(l.role));
+			for (const { role, id } of roles) await msg.member.addRole(role, `Leveling (${oldLevel} -> ${level})`).catch(() =>
+				void msg.gConfig.removeLevelRole(id, "id")
+			);
+			if (msg.gConfig.settings.announceLevelUp) {
+				let m: Eris.Message;
+				if (msg.channel.permissionsOf(this.user.id).has("sendMessages")) m = await msg.channel.createMessage({
+					embeds: [
+						new EmbedBuilder(true, msg.author)
+							.setTitle("Level Up!")
+							.setDescription(`<@!${msg.author.id}> leveled up from **${oldLevel}** to **${level}**!`, roles.length === 0 ? [] : [
+								"Roles Gained:",
+								...roles.map(r => `- <@&${r.role}>`)
+							])
+							.toJSON()
+					]
+				});
+				else m = await msg.channel.createMessage({
+					content: `Congrats <@!${msg.author.id}> on leveling up from **${oldLevel}** to **${level}**!`,
+					allowedMentions: { users: false }
+				});
+				setTimeout(() => {
+					void m.delete().catch(() => null);
+				}, 2e4);
+			} else void msg.author.createMessage(`You leveled up in **${msg.channel.guild.name}** from **${oldLevel}** to **${level}**\n(I sent this here because I couldn't create messages in the channel you leveled up in)`);
+		}
+
+	}
+
 	if (load === false || cmd === null || msg.member === null) return;
 	/* const user = await msg.getUserFromArgs();
 	const member = await msg.getMemberFromArgs();
