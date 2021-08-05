@@ -68,7 +68,7 @@ export default class CommandHandler {
 		d.triggers.forEach(t => this.commandMap.set(t, d));
 		return d;
 	}
-	static getCommand(cmd: string) { return this.commandMap.get(cmd) ?? null; }
+	static getCommand(cmd: string) { return this.commandMap.get(cmd.toLowerCase()) ?? null; }
 	static removeCommand(d: string, log = true) {
 		const cmd = this.getCommand(d);
 		if (!cmd) throw new Error(`Invalid command "${d}" provided in CommandHandler#removeCommand`);
