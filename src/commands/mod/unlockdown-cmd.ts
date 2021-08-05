@@ -44,6 +44,7 @@ export default new Command("unlockdown")
 
 		await Redis.del(`lockdown:${msg.channel.guild.id}`);
 		const mdl = await ModLogHandler.createUnLockDownEntry(msg.gConfig, msg.member, reason);
+		if (msg.gConfig.settings.deleteModCommands && msg.channel.guild.permissionsOf(this.user.id)) await msg.delete().catch(() => null);
 		await m.edit(`Unlocked **${i}** channel${i !== 1 ? "s" : ""}. ${mdl.check === false ? "" : ` (case #${mdl.entryId})`}`);
 
 	});

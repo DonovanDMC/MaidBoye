@@ -43,5 +43,6 @@ export default new Command("warn")
 
 		const w = await UserConfig.prototype.addWarning.call({ id: member.id }, msg.channel.guild.id, msg.author.id, reason);
 		const mdl = await ModLogHandler.createWarnEntry(msg.gConfig, member, msg.author, reason, w);
+		if (msg.gConfig.settings.deleteModCommands && msg.channel.guild.permissionsOf(this.user.id)) await msg.delete().catch(() => null);
 		return msg.reply(`**${member.tag}** was warned, ***${reason ?? "None Provided"}***${mdl.check !== false ? `\nFor more info, check <#${msg.gConfig.modlog.webhook!.channelId}> (case: **#${mdl.entryId}**)` : ""}`);
 	});

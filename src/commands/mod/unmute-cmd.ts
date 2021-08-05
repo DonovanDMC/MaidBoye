@@ -58,6 +58,7 @@ export default new Command("unmute")
 					}
 				}
 				const mdl = await ModLogHandler.createUnMuteEntry(msg.gConfig, member, msg.author, reason);
+				if (msg.gConfig.settings.deleteModCommands && msg.channel.guild.permissionsOf(this.user.id)) await msg.delete().catch(() => null);
 				return msg.channel.createMessage(`**${member.tag}** was unmuted, ***${reason ?? "None Provided"}***${mdl.check !== false ? `\nFor more info, check <#${msg.gConfig.modlog.webhook!.channelId}> (case: **#${mdl.entryId}**)` : ""}`);
 			});
 	});

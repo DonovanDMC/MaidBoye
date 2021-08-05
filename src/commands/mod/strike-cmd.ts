@@ -40,6 +40,7 @@ export default new Command("strike")
 		const count = await UserConfig.prototype.getStrikeCount.call({
 			id: member.id
 		}, msg.channel.guild.id);
+		if (msg.gConfig.settings.deleteModCommands && msg.channel.guild.permissionsOf(this.user.id)) await msg.delete().catch(() => null);
 		return msg.reply({
 			content: `Successfully added **${amount}** strike${amount !== 1 ? "s" : ""} to <@!${member.id}>, they now have **${count}** strike${count !== 1 ? "s" : ""}`,
 			allowedMentions: {

@@ -50,4 +50,5 @@ export default new Command("lock")
 					.toJSON()
 			]
 		});
+		if (msg.gConfig.settings.deleteModCommands && msg.channel.guild.permissionsOf(this.user.id)) await msg.delete().catch(() => null);
 	});

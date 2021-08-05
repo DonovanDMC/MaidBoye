@@ -36,6 +36,7 @@ export interface RawGuildConfig {
 	settings_mute_role: string | null;
 	settings_command_images: 0 | 1;
 	settings_snipe_disabled: 0 | 1;
+	settings_delete_mod_commands: 0 | 1;
 }
 
 export type GuildConfigKV = DataTypes<GuildConfig>;
@@ -59,6 +60,7 @@ export default class GuildConfig {
 		muteRole: string | null;
 		commandImages: boolean;
 		snipeDisabled: boolean;
+		deleteModCommands: boolean;
 	};
 	constructor(id: string, data: RawGuildConfig, prefixData: Array<RawPrefix>, selfRolesData: Array<RawSelfRole>, tagsData: Array<RawTag>, logEventsData: Array<RawLogEvent>, disabeData: Array<RawDisableEntry>) {
 		this.id = id;
@@ -90,7 +92,8 @@ export default class GuildConfig {
 			e621ThumbnailType: data.settings_e621_thumbnail_type as GuildConfig["settings"]["e621ThumbnailType"],
 			muteRole: data.settings_mute_role,
 			commandImages: Boolean(data.settings_command_images),
-			snipeDisabled: Boolean(data.settings_snipe_disabled)
+			snipeDisabled: Boolean(data.settings_snipe_disabled),
+			deleteModCommands: Boolean(data.settings_delete_mod_commands)
 		};
 		return this;
 	}
@@ -121,7 +124,8 @@ export default class GuildConfig {
 			settings_e621_thumbnail_type: data.settings === undefined ? undefined : data.settings.e621ThumbnailType ?? undefined,
 			settings_mute_role: data.settings === undefined ? undefined : data.settings.muteRole === null ? null : data.settings.muteRole ?? undefined,
 			settings_command_images: data.settings === undefined ? undefined : Boolean(data.settings.commandImages) === true ? 1 : 0,
-			settings_snipe_disabled: data.settings === undefined ? undefined : Boolean(data.settings.snipeDisabled) === true ? 1 : 0
+			settings_snipe_disabled: data.settings === undefined ? undefined : Boolean(data.settings.snipeDisabled) === true ? 1 : 0,
+			settings_delete_mod_commands: data.settings === undefined ? undefined : Boolean(data.settings.deleteModCommands) === true ? 1 : 0
 		} as Omit<RawGuildConfig, "id">;
 
 		const keys = Object.keys(v).filter(k => v[k as keyof typeof v] !== undefined);

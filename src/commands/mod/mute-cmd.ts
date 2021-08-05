@@ -119,6 +119,7 @@ export default new Command("mute")
 					}
 				}
 				const mdl = await ModLogHandler.createMuteEntry(msg.gConfig, member, msg.author, reason, time);
+				if (msg.gConfig.settings.deleteModCommands && msg.channel.guild.permissionsOf(this.user.id)) await msg.delete().catch(() => null);
 				return msg.channel.createMessage(`**${member.tag}** was muted ${time === 0 ? "permanently" : `for \`${Time.ms(time, true, true, false)}\``}, ***${reason ?? "None Provided"}***${dmError !== undefined ? `\n\nFailed to send dm:\n\`${dmError}\`` : ""}${mdl.check !== false ? `\nFor more info, check <#${msg.gConfig.modlog.webhook!.channelId}> (case: **#${mdl.entryId}**)` : ""}`);
 			});
 	});

@@ -12,6 +12,7 @@ CREATE TABLE `guilds` (
 	`settings_mute_role` VARCHAR(21) DEFAULT NULL,
 	`settings_command_images` TINYINT(1) NOT NULL DEFAULT 0,
 	`settings_snipe_disabled` TINYINT(1) NOT NULL DEFAULT 0,
+	`settings_delete_mod_commands` TINYINT(1) NOT NULL DEFAULT 0,
 	PRIMARY KEY (`id`),
 	UNIQUE KEY `id` (`id`)
 );

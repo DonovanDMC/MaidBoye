@@ -63,6 +63,7 @@ export default new Command("unban")
 			)
 			.then(async() => {
 				const mdl = await ModLogHandler.createSoftBanEntry(msg.gConfig, member, msg.author, reason, delDays);
+				if (msg.gConfig.settings.deleteModCommands && msg.channel.guild.permissionsOf(this.user.id)) await msg.delete().catch(() => null);
 				return msg.channel.createMessage(`**${member.tag}** was softbanned, ***${reason ?? "None Provided"}***${dmError !== undefined ? `\n\nFailed to send dm:\n\`${dmError}\`` : ""}${mdl.check !== false ? `\nFor more info, check <#${msg.gConfig.modlog.webhook!.channelId}> (case: **#${mdl.entryId}**)` : ""}`);
 			});
 	});

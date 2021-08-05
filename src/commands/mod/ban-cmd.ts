@@ -120,6 +120,7 @@ export default new Command("ban")
 			})
 			.then(async() => {
 				const mdl = await ModLogHandler.createBanEntry(msg.gConfig, user, msg.author, reason, time, delDays);
+				if (msg.gConfig.settings.deleteModCommands && msg.channel.guild.permissionsOf(this.user.id)) await msg.delete().catch(() => null);
 				return msg.channel.createMessage(`**${user.tag}** was banned ${time === 0 ? "permanently" : `for \`${Time.ms(time, true, true, false)}\``}, ***${reason ?? "None Provided"}***${dmError !== undefined ? `\n\nFailed to send dm:\n\`${dmError}\`` : ""}${mdl.check !== false ? `\nFor more info, check <#${msg.gConfig.modlog.webhook!.channelId}> (case: **#${mdl.entryId}**)` : ""}`);
 			});
 	});
