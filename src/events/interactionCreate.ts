@@ -1,3 +1,4 @@
+import config from "../config";
 import db from "@db";
 import ClientEvent from "@util/ClientEvent";
 import Logger from "@util/Logger";
@@ -15,7 +16,7 @@ export default new ClientEvent("interactionCreate", async function(interaction) 
 				content: "Slash Commands cannot be used in direct messages.",
 				flags: 64
 			});
-			Logger.getLogger("InteractionCreate").debug("new command interaction recieved:", util.inspect(interaction.data, { depth: 3, colors: true }));
+			if (config.beta) Logger.getLogger("InteractionCreate").debug("new command interaction recieved:", util.inspect(interaction.data, { depth: 3, colors: true }));
 			await interaction.acknowledge();
 			const userMentions = [] as Array<string>, roleMentions = [] as Array<string>;
 			// eslint-disable-next-line no-inner-declarations
