@@ -21,6 +21,10 @@ export default class API {
 				if (!fs.existsSync(`${config.dir.logs.errors}/${req.params.id}`)) return res.status(404).end("not found");
 				else return res.status(200).header("Content-Type", "text/plain").sendFile(`${config.dir.logs.errors}/${req.params.id}`);
 			})
+			.use("/reports/:user/:id", async(req, res) => {
+				if (!fs.existsSync(`${config.dir.antiSpam}/${req.params.user}/${req.params.id}`)) return res.status(404).end("not found");
+				else return res.status(200).header("Content-Type", "text/plain").sendFile(`${config.dir.antiSpam}/${req.params.user}/${req.params.id}`);
+			})
 			.use("/assets", express.static(config.dir.assets))
 			.use(morgan("combined"))
 			.use(express.json())
