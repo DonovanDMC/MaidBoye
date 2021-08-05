@@ -77,9 +77,12 @@ const funCommandResponses = (msg: ExtendedMessage) => ({
 	pounce: [
 		`<@!${msg.author.id}> pounces onto ${BotFunctions.extraArgParsing(msg)} uwu`
 	],
-	slap: [
+	sniff: [
 		// rip siff
 		`<@!${msg.author.id}> sniffs ${BotFunctions.extraArgParsing(msg)}\nMaybe they smell good..?`
+	],
+	slap: [
+		`<@!${msg.author.id}> slaps ${BotFunctions.extraArgParsing(msg)}.. ouch`
 	],
 	snowball: [
 		`<@!${msg.author.id}> throws a snowball at ${BotFunctions.extraArgParsing(msg)}!`
@@ -252,7 +255,7 @@ export default class BotFunctions {
 
 		const embed = new EmbedBuilder(true, msg.author)
 			.setAuthor(msg.author.tag, msg.author.avatarURL)
-			.setDescription(r[Math.floor(Math.random() * r.length)])
+			.setDescription(!r ? "Failed To Look Up Language String " : r[Math.floor(Math.random() * r.length)])
 			.setTimestamp(new Date().toISOString());
 
 		if (cmd.triggers.includes("bap")) embed.setImage("https://assets.maid.gay/bap.gif");
@@ -272,7 +275,7 @@ export default class BotFunctions {
 
 		const embed = new EmbedBuilder(true, msg.author)
 			.setAuthor(msg.author.tag, msg.author.avatarURL)
-			.setDescription(r[Math.floor(Math.random() * r.length)])
+			.setDescription(!r ? "Failed To Look Up Language String " : r[Math.floor(Math.random() * r.length)])
 			.setTimestamp(new Date().toISOString());
 
 		if (msg.gConfig.settings.commandImages) {
