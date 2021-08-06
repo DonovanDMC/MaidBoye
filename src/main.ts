@@ -6,6 +6,7 @@ import db from "./db";
 import Category from "./util/cmd/Category";
 import CommandHandler from "./util/cmd/CommandHandler";
 import MessageCollector from "./util/MessageCollector";
+import CheweyAPI from "./util/req/CheweyAPI";
 import { Strings, Utility } from "@uwu-codes/utils";
 import Eris from "eris";
 import * as fs from "fs-extra";
@@ -36,7 +37,7 @@ export default class MaidBoye extends Eris.Client {
 		MessageCollector.setClient(this);
 		ComponentInteractionCollector.setClient(this);
 		ModLogHandler.setClient(this);
-		// if(!config.beta) CheweyAPI.analytics.initAutoPosting(this);
+		if (!config.beta) CheweyAPI.analytics.initAutoPosting(this);
 		AntiSpam.init();
 		YiffRocks.setUserAgent(config.userAgent);
 		await this.connect();
