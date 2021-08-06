@@ -7,19 +7,19 @@ import Eris from "eris";
 
 const answers = [
 	// Neutral
-	["Reply Hazy, Try Again Later", "https://assets.maid.gay/8Ball/Neutral1.png"],
-	["Concentrate And Ask Again", "https://assets.maid.gay/8Ball/Neutral2.png"],
-	["Ask Again Later", "https://assets.maid.gay/8Ball/Neutral3.png"],
+	"https://assets.maid.gay/8Ball/Neutral1.png",
+	"https://assets.maid.gay/8Ball/Neutral2.png",
+	"https://assets.maid.gay/8Ball/Neutral3.png",
 
 	// Positive
-	["It Is Certain", "https://assets.maid.gay/8Ball/Positive1.png"],
-	["Without A Doubt", "https://assets.maid.gay/8Ball/Positive2.png"],
-	["My Sources Say Yes", "https://assets.maid.gay/8Ball/Positive3.png"],
+	"https://assets.maid.gay/8Ball/Positive1.png",
+	"https://assets.maid.gay/8Ball/Positive2.png",
+	"https://assets.maid.gay/8Ball/Positive3.png",
 
 	// Negative
-	["Don't Count On It", "https://assets.maid.gay/8Ball/Negative1.png"],
-	["Very Doubtful", "https://assets.maid.gay/8Ball/Negative2.png"],
-	["My Sources Say No", "https://assets.maid.gay/8Ball/Negative3.png"]
+	"https://assets.maid.gay/8Ball/Negative1.png",
+	"https://assets.maid.gay/8Ball/Negative2.png",
+	"https://assets.maid.gay/8Ball/Negative3.png"
 ];
 
 // Image Credit: Raypop#2504
@@ -38,14 +38,14 @@ export default new Command("8ball")
 	.setCooldown(3e3)
 	.setExecutor(async function(msg) {
 		if (msg.args.length === 0) return msg.reply("H-hey! You have to provide a question to ask..");
-		const m = await msg.reply("Warning up..");
+		const m = await msg.reply("Warming up..");
 		async function main(this: MaidBoye) {
-			const [text, image] = answers[Math.floor(Math.random() * answers.length)];
+			const [image] = answers[Math.floor(Math.random() * answers.length)];
 			await m.edit({
+				content: "",
 				embeds: [
 					new EmbedBuilder(true, msg.author)
 						.setTitle("8ball Question")
-						.setDescription(text)
 						.setImage(image)
 						.setFooter("Disclaimer: Do not take any answers seriously!")
 						.toJSON()
