@@ -68,6 +68,8 @@ export default new Command("e621", "e6")
 
 		let m: Eris.Message<Eris.GuildTextableChannel> | undefined, i = 0;
 		async function changePost(this: MaidBoye, id?: string, token?: string): Promise<void> {
+			if (i < 0) i = 0;
+			if (i > (posts.length - 1)) i = posts.length - 1;
 			const post = posts[i];
 			const e = new EmbedBuilder()
 				.setTitle(`E621 | Tags: ${msg.rawArgs.length === 0 ? "None" : `"${msg.rawArgs.join(" ").slice(0, 500)}"`}`)
