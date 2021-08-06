@@ -7,7 +7,7 @@ import ComponentInteractionCollector from "@util/ComponentInteractionCollector";
 import { Strings } from "@uwu-codes/utils";
 import Eris from "eris";
 
-export default new Command("selfroles")
+export default new Command("selfroles", "selfrole")
 	.setPermissions("bot", "embedLinks", "manageRoles")
 	.setDescription("Manage self roles")
 	.setSlashOptions(true, [
