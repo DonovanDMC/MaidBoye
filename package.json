@@ -14,7 +14,7 @@
     "discord-command-parser": "^1.5.3",
     "e621": "^1.0.8",
     "ejs": "^3.1.6",
-    "eris": "github:DonovanDMC/eris#merge",
+    "eris": "github:DonovanDMC/eris#v9-components-interactions-more",
     "express": "^4.17.1",
     "express-session": "^1.17.2",
     "file-type": "^16.5.3",
