@@ -260,6 +260,8 @@ export default new Command("modlog")
 							c.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `select-webhook-${i - 1}.${msg.author.id}`, !w.token, ComponentHelper.emojiToPartial(config.emojis.default[config.names.number[i as unknown as "0"] as "zero"], "default"), w?.name || "Unknown");
 							if ((i % 2) === 0) c.addRow();
 						}
+						// we somehow end up with no usable components
+						if (c.toJSON().length === 0 || c.toJSON()[0].components.length === 0) return m.edit("Th-that channel doesn't have any webhooks to use..");
 						await m.edit({
 							content: "Please select a webhook from the following.\n(if the button is disabled, we couldn't get all of the info we needed about the webhook)",
 							components: c.toJSON()
