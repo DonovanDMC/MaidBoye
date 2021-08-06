@@ -35,7 +35,7 @@ export default new Command("editsnipe", "esnipe")
 					new EmbedBuilder(true, msg.author)
 						.setTitle("Edit Snipe")
 						.setDescription([
-							`From <@!${d.author}> - Deleted At ${BotFunctions.formatDiscordTime(d.time, "short-datetime", true)}`,
+							`From <@!${d.author}> - Edited At ${BotFunctions.formatDiscordTime(d.time, "short-datetime", true)}`,
 							`Old Content: ${Strings.truncate(d.oldContent, 125, true)}`,
 							`New Content: ${Strings.truncate(d.newContent, 125, true)}`,
 							""
