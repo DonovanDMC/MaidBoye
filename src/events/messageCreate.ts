@@ -84,8 +84,8 @@ export default new ClientEvent("messageCreate", async function (message) {
 	t.start("process");
 	const load = await msg.load();
 	t.end("process");
-	if (msg.content.split(" ").slice(1).join(" ").replace(/go/, "").trim().toLowerCase().startsWith("make me")) return msg.reply("Th-that's not my purpose..");
-	if (msg.content.split(" ").slice(1).join(" ").trim().toLowerCase().startsWith("fuck me")) return msg.reply("I-I don't even know you..");
+	if (msg.content.toLowerCase().startsWith("maid make")) return msg.reply("Th-that's not my purpose..");
+	if (msg.content.toLowerCase() === "maid fuck me") return msg.reply("I-I don't even know you..");
 	const { cmd } = msg;
 	StatsHandler.trackNoResponse("stats", "message", msg.channel.typeString);
 
