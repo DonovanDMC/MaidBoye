@@ -34,7 +34,7 @@ export async function handleCommand (interaction: APIApplicationCommandGuildInte
 		data: {
 			embeds: [
 				new EmbedBuilder(true, user)
-					.setDescription(`You Asked: "${options.question}"\nThe Magic 8Ball's Answer:`)
+					.setDescription(`You Asked:\n\`\`\`\n${options.question}\`\`\`\nThe Magic 8Ball's Answer:`)
 					.setImage(url)
 					.setFooter("Disclaimer: Do not take any answers seriously!")
 					.toJSON()
