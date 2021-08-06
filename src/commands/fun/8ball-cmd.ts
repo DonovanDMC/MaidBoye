@@ -46,6 +46,7 @@ export default new Command("8ball")
 				embeds: [
 					new EmbedBuilder(true, msg.author)
 						.setTitle("8ball Question")
+						.setDescription(`You Asked: "${msg.args.join(" ")}"\nThe Magic 8Ball's Answer:`)
 						.setImage(image)
 						.setFooter("Disclaimer: Do not take any answers seriously!")
 						.toJSON()
