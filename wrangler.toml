@@ -2,7 +2,11 @@ name = "maid-boye-lite"
 type = "javascript"
 account_id = "f6a5a0da7220b39ff2cc701c6bae0bf5"
 workers_dev = true
-vars = { PUBLIC_KEY = "eb9687e11cf67ac81fcc78028f7fc79e517ac77f23de1f46a3c5d38ab0870458", BOT_ID = "872385644595388436", BOT_ICON = "https://i.maid.gay/lite.png" }
+[vars]
+PUBLIC_KEY = "eb9687e11cf67ac81fcc78028f7fc79e517ac77f23de1f46a3c5d38ab0870458"
+BOT_ID = "872385644595388436"
+BOT_ICON = "https://i.maid.gay/lite.png"
+BOT_COLOR = "0xA7A4AA"
 
 [build]
 command = "npm install && npm run build"

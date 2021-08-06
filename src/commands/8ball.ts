@@ -1,6 +1,6 @@
 import { APIApplicationCommandGuildInteraction, APIGuildMember, APIMessageComponentInteraction, APIUser, InteractionResponseType } from "discord-api-types";
+import EmbedBuilder from "../EmbedBuilder";
 import { RespondFunction } from "../types/other";
-import { formatAvatar } from "../util";
 
 const images = [
 	// Neutral
@@ -18,7 +18,7 @@ const images = [
 	"https://assets.maid.gay/8Ball/Negative2.png",
 	"https://assets.maid.gay/8Ball/Negative3.png"
 ];
-export function handleCommand (interaction: APIApplicationCommandGuildInteraction, member: APIGuildMember, user: APIUser, options: Record<string, string>, respond: RespondFunction<"command">): Response {
+export async function handleCommand (interaction: APIApplicationCommandGuildInteraction, member: APIGuildMember, user: APIUser, options: Record<string, string>, respond: RespondFunction<"command">): Promise<Response> {
 	if(!options.question) return respond({
 		type: InteractionResponseType.ChannelMessageWithSource,
 		data: {
@@ -33,19 +33,10 @@ export function handleCommand (interaction: APIApplicationCommandGuildInteractio
 		type: InteractionResponseType.ChannelMessageWithSource,
 		data: {
 			embeds: [
-				{
-					author: {
-						name: `${user.username}#${user.discriminator}`,
-						icon_url: formatAvatar(user, 2048)
-					},
-					image: {
-						url
-					},
-					footer: {
-						text: "Disclaimer: Do not take any answers seriously!",
-						icon_url: BOT_ICON
-					}
-				}
+				new EmbedBuilder(true, user)
+					.setImage(url)
+					.setFooter("Disclaimer: Do not take any answers seriously!")
+					.toJSON()
 			],
 			components: [
 				{
@@ -73,7 +64,7 @@ export function handleCommand (interaction: APIApplicationCommandGuildInteractio
 	});
 }
 
-export function handleComponent(interaction: APIMessageComponentInteraction, member: APIGuildMember, user: APIUser, section: string, respond: RespondFunction<"component">): Response {
+export async function handleComponent(interaction: APIMessageComponentInteraction, member: APIGuildMember, user: APIUser, section: string, respond: RespondFunction<"component">): Promise<Response> {
 	switch(section) {
 		case "new": {
 			const url = images[Math.floor(Math.random() * images.length)];
@@ -81,19 +72,10 @@ export function handleComponent(interaction: APIMessageComponentInteraction, mem
 				type: InteractionResponseType.UpdateMessage,
 				data: {
 					embeds: [
-						{
-							author: {
-								name: `${user.username}#${user.discriminator}`,
-								icon_url: formatAvatar(user, 2048)
-							},
-							image: {
-								url
-							},
-							footer: {
-								text: "Disclaimer: Do not take any answers seriously!",
-								icon_url: BOT_ICON
-							}
-						}
+						new EmbedBuilder(true, user)
+							.setImage(url)
+							.setFooter("Disclaimer: Do not take any answers seriously!")
+							.toJSON()
 					]
 				}
 			});
