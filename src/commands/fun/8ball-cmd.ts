@@ -6,28 +6,23 @@ import EmbedBuilder from "@util/EmbedBuilder";
 import Eris from "eris";
 
 const answers = [
-	["Outlook Good", "https://indra.com/8ball/images/1.gif"],
-	["Reply Hazy, Try Again", "https://indra.com/8ball/images/2.gif"],
-	["Outlook Not So Good", "https://indra.com/8ball/images/3.gif"],
-	["Most Likely", "https://indra.com/8ball/images/4.gif"],
-	["As I See It, Yes", "https://indra.com/8ball/images/5.gif"],
-	["Don't Count On It", "https://indra.com/8ball/images/6.gif"],
-	["Concentrate And Ask Again", "https://indra.com/8ball/images/7.gif"],
-	["It Is Certain", "https://indra.com/8ball/images/8.gif"],
-	["It Is Decidedly So", "https://indra.com/8ball/images/9.gif"],
-	["My Reply Is No", "https://indra.com/8ball/images/10.gif"],
-	["Without A Doubt", "https://indra.com/8ball/images/11.gif"],
-	["Cannot Predict Now", "https://indra.com/8ball/images/12.gif"],
-	["Better Not Tell You Now", "https://indra.com/8ball/images/13.gif"],
-	["Very Doubtful", "https://indra.com/8ball/images/14.gif"],
-	["Signs Point To Yes", "https://indra.com/8ball/images/15.gif"],
-	["Yes, Definitely", "https://indra.com/8ball/images/16.gif"],
-	["Yes", "https://indra.com/8ball/images/17.gif"],
-	["You May Rely On It", "https://indra.com/8ball/images/18.gif"],
-	["My Sources Say No", "https://indra.com/8ball/images/19.gif"],
-	["Ask Again Later", "https://indra.com/8ball/images/20.gif"]
+	// Neutral
+	["Reply Hazy, Try Again Later", "https://assets.maid.gay/8Ball/Neutral1.png"],
+	["Concentrate And Ask Again", "https://assets.maid.gay/8Ball/Neutral2.png"],
+	["Ask Again Later", "https://assets.maid.gay/8Ball/Neutral3.png"],
+
+	// Positive
+	["It Is Certain", "https://assets.maid.gay/8Ball/Positive1.png"],
+	["Without A Doubt", "https://assets.maid.gay/8Ball/Positive2.png"],
+	["My Sources Say Yes", "https://assets.maid.gay/8Ball/Positive3.png"],
+
+	// Negative
+	["Don't Count On It", "https://assets.maid.gay/8Ball/Negative1.png"],
+	["Very Doubtful", "https://assets.maid.gay/8Ball/Negative2.png"],
+	["My Sources Say No", "https://assets.maid.gay/8Ball/Negative3.png"]
 ];
 
+// Image Credit: Raypop#2504
 export default new Command("8ball")
 	.setPermissions("bot", "embedLinks")
 	.setDescription("Ask the magic 8 ball")
