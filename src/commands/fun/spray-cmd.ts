@@ -6,7 +6,7 @@ export default new Command("spray")
 	.setPermissions("bot", "embedLinks")
 	.setDescription("Spray someone with water")
 	.setUsage("<@user/text>")
-	.setSlashOptions(true, [
+	.setSlashOptions("lite", [
 		{
 			type: Eris.Constants.CommandOptionTypes.USER,
 			name: "user",

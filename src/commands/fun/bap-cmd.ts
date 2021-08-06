@@ -6,7 +6,7 @@ export default new Command("bap")
 	.setPermissions("bot", "embedLinks", "attachFiles")
 	.setDescription("Bap someone on the snoot")
 	.setUsage("<@user/text>")
-	.setSlashOptions(true, [
+	.setSlashOptions("lite", [
 		{
 			type: Eris.Constants.CommandOptionTypes.USER,
 			name: "user",

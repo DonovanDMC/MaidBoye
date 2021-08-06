@@ -6,7 +6,7 @@ export default new Command("hug")
 	.setPermissions("bot", "embedLinks")
 	.setDescription("Hug someone")
 	.setUsage("<@user/text>")
-	.setSlashOptions(true, [
+	.setSlashOptions("lite", [
 		{
 			type: Eris.Constants.CommandOptionTypes.USER,
 			name: "user",

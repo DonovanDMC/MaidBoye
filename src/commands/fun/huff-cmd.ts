@@ -6,7 +6,7 @@ export default new Command("huff")
 	.setPermissions("bot", "embedLinks")
 	.setDescription("Blow someone's house down")
 	.setUsage("<@user/text>")
-	.setSlashOptions(true, [
+	.setSlashOptions("lite", [
 		{
 			type: Eris.Constants.CommandOptionTypes.USER,
 			name: "user",

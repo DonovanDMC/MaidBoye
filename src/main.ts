@@ -16,6 +16,8 @@ import YiffRocks from "yiff-rocks";
 import AntiSpam from "@util/cmd/AntiSpam";
 import ComponentInteractionCollector from "@util/ComponentInteractionCollector";
 import Timer from "@util/Timer";
+import fetch from "node-fetch";
+import { RESTPostOAuth2ClientCredentialsResult } from "discord-api-types";
 import { performance } from "perf_hooks";
 
 
@@ -153,6 +155,68 @@ export default class MaidBoye extends Eris.Client {
 					Logger.getLogger("SlashCommandSync").error(err);
 					return false;
 				}
+			);
+	}
+
+	async syncLiteSlashCommands(guild?: string, bypass = false) {
+		const start = process.hrtime.bigint();
+		const commands = [
+			// since our help command is not stateless, we have to add a custom one
+			{
+				name: "help",
+				description: "List my commands",
+				options: []
+			},
+			...CommandHandler.commands.filter(c => c.hasSlashVariant === "lite").map(cmd => ({
+				name: cmd.triggers[0],
+				description: cmd.description,
+				options: cmd.slashCommandOptions
+			}))
+		];
+
+		if (bypass !== true) {
+			// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+			const v = (fs.existsSync(`${config.dir.temp}/slash-lite.json`) ? JSON.parse(fs.readFileSync(`${config.dir.temp}/slash-lite.json`).toString()) : []) as typeof commands;
+			if (JSON.stringify(commands) === JSON.stringify(v)) {
+				Logger.getLogger("SlashCommandSync").debug("Skipping sync due to no changes");
+				return true;
+			}
+		}
+		fs.writeFileSync(`${config.dir.temp}/slash-lite.json`, JSON.stringify(commands));
+
+		const grant = await fetch("https://discord.com/api/oauth2/token", {
+			method: "POST",
+			body: "grant_type=client_credentials&scope=applications.commands.update",
+			headers: {
+				"Authorization": `Basic ${Buffer.from(`${config.client.lite.id}:${config.client.lite.secret}`).toString("base64")}`,
+				"User-Agent": config.userAgent,
+				"Content-Type": "application/x-www-form-urlencoded"
+			}
+		});
+		const token = await grant.json().then((v: RESTPostOAuth2ClientCredentialsResult) => v.access_token);
+
+		return fetch(`https://discord.com/api/v9/applications/${config.client.lite.id}${guild === undefined ? "/commands" : `/guilds/${guild}/commands`}`, {
+			method: "POST",
+			body: JSON.stringify(commands),
+			headers: {
+				"Authorization": `Bearer ${token}`,
+				"User-Agent": config.userAgent,
+				"Content-Type": "application/json"
+			}
+		})
+			.then(() => {
+				const end = process.hrtime.bigint();
+				Logger.getLogger("SlashCommandSync").debug(`Synced ${commands.length} commands in ${Timer.calc(start, end, 2, false)}`);
+				return true;
+			},
+			(err: Error) => {
+				Logger.getLogger("SlashCommandSync").debug("Error detected, printing command index list");
+				commands.forEach((cmd, index) => {
+					Logger.getLogger("SlashCommandSync").debug(`Command at index "${index}": ${cmd.name}`);
+				});
+				Logger.getLogger("SlashCommandSync").error(err);
+				return false;
+			}
 			);
 	}
 }

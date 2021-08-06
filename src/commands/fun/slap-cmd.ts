@@ -6,7 +6,7 @@ export default new Command("slap")
 	.setPermissions("bot", "embedLinks")
 	.setDescription("Slap someone")
 	.setUsage("<@user/text>")
-	.setSlashOptions(true, [
+	.setSlashOptions("lite", [
 		{
 			type: Eris.Constants.CommandOptionTypes.USER,
 			name: "user",

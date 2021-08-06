@@ -6,7 +6,7 @@ export default new Command("sniff")
 	.setPermissions("bot", "embedLinks")
 	.setDescription("sniff someone")
 	.setUsage("<@user/text>")
-	.setSlashOptions(true, [
+	.setSlashOptions("lite", [
 		{
 			type: Eris.Constants.CommandOptionTypes.USER,
 			name: "user",

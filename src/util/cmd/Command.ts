@@ -19,7 +19,7 @@ export default class Command {
 	slashCommandOptions = [] as Array<Eris.SlashCommandOptions>;
 	cooldown = 0;
 	donatorCooldown = 0;
-	hasSlashVariant = false;
+	hasSlashVariant: boolean | "lite" = false;
 	category: string;
 	file: string;
 	run: (this: MaidBoye, msg: ExtendedMessage, cmd: Command) => Promise<unknown>;
@@ -58,7 +58,7 @@ export default class Command {
 		return this;
 	}
 
-	setSlashOptions(hasSlash: boolean, options: Array<Eris.SlashCommandOptions>) {
+	setSlashOptions(hasSlash: boolean | "lite", options: Array<Eris.SlashCommandOptions>) {
 		this.hasSlashVariant = hasSlash;
 		this.slashCommandOptions = options;
 		return this;

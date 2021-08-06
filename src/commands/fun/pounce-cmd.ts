@@ -6,7 +6,7 @@ export default new Command("pounce")
 	.setPermissions("bot", "embedLinks")
 	.setDescription("Pounce onto someone")
 	.setUsage("<@user/text>")
-	.setSlashOptions(true, [
+	.setSlashOptions("lite", [
 		{
 			type: Eris.Constants.CommandOptionTypes.USER,
 			name: "user",

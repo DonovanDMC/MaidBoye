@@ -6,7 +6,7 @@ export default new Command("snowball")
 	.setPermissions("bot", "embedLinks")
 	.setDescription("Throw a snowball at someone")
 	.setUsage("<@user/text>")
-	.setSlashOptions(true, [
+	.setSlashOptions("lite", [
 		{
 			type: Eris.Constants.CommandOptionTypes.USER,
 			name: "user",

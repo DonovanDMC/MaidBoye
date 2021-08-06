@@ -6,7 +6,7 @@ export default new Command("flop")
 	.setPermissions("bot", "embedLinks")
 	.setDescription("Flop onto someone")
 	.setUsage("<@user/text>")
-	.setSlashOptions(true, [
+	.setSlashOptions("lite", [
 		{
 			type: Eris.Constants.CommandOptionTypes.USER,
 			name: "user",

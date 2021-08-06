@@ -6,7 +6,7 @@ export default new Command("pat", "pet")
 	.setPermissions("bot", "embedLinks")
 	.setDescription("Pat someone's head")
 	.setUsage("<@user/text>")
-	.setSlashOptions(true, [
+	.setSlashOptions("lite", [
 		{
 			type: Eris.Constants.CommandOptionTypes.USER,
 			name: "user",

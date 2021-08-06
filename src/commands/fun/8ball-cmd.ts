@@ -27,12 +27,12 @@ export default new Command("8ball")
 	.setPermissions("bot", "embedLinks")
 	.setDescription("Ask the magic 8 ball")
 	.setUsage("<question>")
-	.setSlashOptions(true, [
+	.setSlashOptions("lite", [
 		{
 			type: Eris.Constants.CommandOptionTypes.STRING,
 			name: "question",
 			description: "The question to ask the magic 8ball.",
-			required: false
+			required: true
 		}
 	])
 	.setCooldown(3e3)
@@ -40,7 +40,7 @@ export default new Command("8ball")
 		if (msg.args.length === 0) return msg.reply("H-hey! You have to provide a question to ask..");
 		const m = await msg.reply("Warming up..");
 		async function main(this: MaidBoye) {
-			const [image] = answers[Math.floor(Math.random() * answers.length)];
+			const image = answers[Math.floor(Math.random() * answers.length)];
 			await m.edit({
 				content: "",
 				embeds: [
