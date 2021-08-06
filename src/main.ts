@@ -19,7 +19,7 @@ import Timer from "@util/Timer";
 import fetch from "node-fetch";
 import { RESTPostOAuth2ClientCredentialsResult } from "discord-api-types";
 import { performance } from "perf_hooks";
-
+import util from "util";
 
 export default class MaidBoye extends Eris.Client {
 	events = new Map<string, ClientEvent>();
@@ -196,7 +196,7 @@ export default class MaidBoye extends Eris.Client {
 		const token = await grant.json().then((v: RESTPostOAuth2ClientCredentialsResult) => v.access_token);
 
 		return fetch(`https://discord.com/api/v9/applications/${config.client.lite.id}${guild === undefined ? "/commands" : `/guilds/${guild}/commands`}`, {
-			method: "POST",
+			method: "PUT",
 			body: JSON.stringify(commands),
 			headers: {
 				"Authorization": `Bearer ${token}`,
@@ -204,17 +204,19 @@ export default class MaidBoye extends Eris.Client {
 				"Content-Type": "application/json"
 			}
 		})
-			.then(() => {
+			.then(async(res) => {
 				const end = process.hrtime.bigint();
-				Logger.getLogger("SlashCommandSync").debug(`Synced ${commands.length} commands in ${Timer.calc(start, end, 2, false)}`);
+				Logger.getLogger("LiteSlashCommandSync").debug(`Synced ${commands.length} commands in ${Timer.calc(start, end, 2, false)}`);
+				const body = await res.json() as unknown;
+				if (res.status >= 400) Logger.getLogger("LiteSlashCommandSync").error(util.inspect(body, { depth: null, colors: true }));
 				return true;
 			},
 			(err: Error) => {
-				Logger.getLogger("SlashCommandSync").debug("Error detected, printing command index list");
+				Logger.getLogger("LiteSlashCommandSync").debug("Error detected, printing command index list");
 				commands.forEach((cmd, index) => {
-					Logger.getLogger("SlashCommandSync").debug(`Command at index "${index}": ${cmd.name}`);
+					Logger.getLogger("LiteSlashCommandSync").debug(`Command at index "${index}": ${cmd.name}`);
 				});
-				Logger.getLogger("SlashCommandSync").error(err);
+				Logger.getLogger("LiteSlashCommandSync").error(err);
 				return false;
 			}
 			);

@@ -39,13 +39,13 @@ export default new Command("help")
 
 			const eCat = new EmbedBuilder()
 				.setTitle(`${cat.displayName.emojiCustom ?? cat.displayName.emojiDefault ?? ""} ${cat.displayName.text}`)
-				.setDescription(`Description: ${cat.description || "None"}\nTotal Commands: ${cat.commands.length}\n\\* - Has Slash Command Version`)
+				.setDescription(`Description: ${cat.description || "None"}\nTotal Commands: ${cat.commands.length}\n\\* - Has Slash Command Version\n\\*\\* - Requires [Lite](https://lite.maid.gay/invite) version for slash commands`)
 				.setAuthor(msg.author.tag, msg.author.avatarURL);
 			const cmdDesc = [] as Array<string>;
 			const totalLen = cat.commands.reduce((a,b) => a + `\`${b.triggers[0]}\` - ${b.description}\n`.length, 0);
 			cat.commands.forEach(cmd => {
 				if (totalLen > 1900) cmdDesc.push(`\`${cmd.triggers[0]}\``);
-				else cmdDesc.push(`\`${cmd.triggers[0]}\`${cmd.hasSlashVariant ? "\\*" : ""} - ${cmd.description || "No Description"}`);
+				else cmdDesc.push(`\`${cmd.triggers[0]}\`${cmd.hasSlashVariant === true ? "\\*" : cmd.hasSlashVariant === "lite" ? "\\*\\*" : ""} - ${cmd.description || "No Description"}`);
 			});
 			eCat.setDescription(`${eCat.getDescription() ?? ""}\n\n${totalLen > 1900 ? cmdDesc.join(", ") : cmdDesc.join("\n")}`);
 			categories[cat.name] = {
