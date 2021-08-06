@@ -1,14 +1,20 @@
 import "./util/MonkeyPatch";
 import config, { isPterodactyl, isWSL, wslVersion } from "./config";
 import MaidBoye from "./main";
-import Logger from "./util/Logger";
+import Logger from "@util/Logger";
 import { Time } from "@uwu-codes/utils";
+import ErrorHandler from "@util/handlers/ErrorHandler";
 import { execSync } from "child_process";
 
-
 process
-	.on("uncaughtException", (err) => Logger.getLogger("Uncaught Exception").error(err))
-	.on("unhandledRejection", (err, p) => Logger.getLogger("Unhandled Rejection").error(err, p))
+	.on("uncaughtException", (err) => {
+		void ErrorHandler.handleError(err, "Uncaught Exception");
+		Logger.getLogger("Uncaught Exception").error(err);
+	})
+	.on("unhandledRejection", (err, p) => {
+		void ErrorHandler.handleError(err as Error, "Unhandled Rejection");
+		Logger.getLogger("Unhandled Rejection").error(err, p);
+	})
 	.on("SIGINT", () => process.kill(process.pid));
 
 const bot = new MaidBoye(config.client.token, config.client.options);
