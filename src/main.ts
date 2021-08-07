@@ -115,7 +115,7 @@ export default class MaidBoye extends Eris.Client {
 
 	async syncSlashCommands(guild?: string, bypass = false) {
 		const start = process.hrtime.bigint();
-		const commands = CommandHandler.commands.filter(c => c.hasSlashVariant).map(cmd => ({
+		const commands = CommandHandler.commands.filter(c => c.hasSlashVariant === true).map(cmd => ({
 			name: cmd.triggers[0],
 			description: cmd.description,
 			options: cmd.slashCommandOptions
