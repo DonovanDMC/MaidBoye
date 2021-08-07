@@ -68,7 +68,7 @@ export default new Command("prefix")
 	.setCooldown(5e3)
 	.setParsedFlags("space")
 	.setExecutor(async function(msg) {
-		switch (msg.args[0]) {
+		switch (msg.args[0]?.toLowerCase()) {
 			case "add": {
 				const space = msg.dashedArgs.value.includes("space") || msg.dashedArgs.keyValue.space === "true";
 				if (msg.gConfig.prefix.length >= 10) return msg.reply("H-hey! This server already has 10 prefixes, please remove some before you add more!");

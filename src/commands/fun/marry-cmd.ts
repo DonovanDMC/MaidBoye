@@ -39,7 +39,7 @@ export default new Command("marry")
 			content: "Better luck next time..",
 			embeds: [],
 			components: []
-		});
+		}).catch(() => null);
 		else {
 			await msg.uConfig.edit({
 				marriage: member.id

@@ -1,9 +1,11 @@
+import Logger from "../../util/Logger";
 import Command from "@cmd/Command";
 import config from "@config";
 import MaidBoye from "@MaidBoye";
 import ComponentHelper from "@util/ComponentHelper";
 import EmbedBuilder from "@util/EmbedBuilder";
 import Eris from "eris";
+import { DiscordHTTPError } from "slash-create";
 
 const answers = [
 	// Neutral
@@ -37,41 +39,53 @@ export default new Command("8ball")
 	])
 	.setCooldown(3e3)
 	.setExecutor(async function(msg) {
-		if (msg.args.length === 0) return msg.reply("H-hey! You have to provide a question to ask..");
-		const m = await msg.reply("Warming up..");
-		async function main(this: MaidBoye) {
-			const image = answers[Math.floor(Math.random() * answers.length)];
-			await m.edit({
-				content: "",
-				embeds: [
-					new EmbedBuilder(true, msg.author)
-						.setTitle("8ball Question")
-						.setDescription(`You Asked:\n\`\`\`\n${msg.args.join(" ")}\`\`\`\nThe Magic 8Ball's Answer:`)
-						.setImage(image)
-						.setFooter("Disclaimer: Do not take any answers seriously!")
-						.toJSON()
-				],
-				components: new ComponentHelper()
-					.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `8ball-new.${msg.author.id}`, undefined, undefined, "New Answer")
-					.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `8ball-exit.${msg.author.id}`, undefined, ComponentHelper.emojiToPartial(config.emojis.default.x, "default"), "Exit")
-					.toJSON()
-			});
-			const wait = await msg.channel.awaitComponentInteractions(3e5, (it) => it.data.custom_id.startsWith("8ball-") && it.message.id === m.id && it.member!.id === msg.author.id);
-			if (wait === null) {
+		try {
+			if (msg.args.length === 0) return msg.reply("H-hey! You have to provide a question to ask..");
+			const m = await msg.reply("Warming up..");
+			async function main(this: MaidBoye) {
+				const image = answers[Math.floor(Math.random() * answers.length)];
 				await m.edit({
-					components: []
+					content: "",
+					embeds: [
+						new EmbedBuilder(true, msg.author)
+							.setTitle("8ball Question")
+							.setDescription(`You Asked:\n\`\`\`\n${msg.args.join(" ")}\`\`\`\nThe Magic 8Ball's Answer:`)
+							.setImage(image)
+							.setFooter("Disclaimer: Do not take any answers seriously!")
+							.toJSON()
+					],
+					components: new ComponentHelper()
+						.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `8ball-new.${msg.author.id}`, undefined, undefined, "New Answer")
+						.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `8ball-exit.${msg.author.id}`, undefined, ComponentHelper.emojiToPartial(config.emojis.default.x, "default"), "Exit")
+						.toJSON()
 				});
-				return;
-			} else {
-				await wait.acknowledge();
-				if (wait.data.custom_id.includes("new")) void main.call(this);
-				else {
+				const wait = await msg.channel.awaitComponentInteractions(3e5, (it) => it.data.custom_id.startsWith("8ball-") && it.message.id === m.id && it.member!.id === msg.author.id);
+				if (wait === null) {
 					await m.edit({
 						components: []
 					});
+					return;
+				} else {
+					await wait.acknowledge();
+					if (wait.data.custom_id.includes("new")) void main.call(this);
+					else {
+						await m.edit({
+							components: []
+						});
+					}
 				}
 			}
-		}
 
-		void main.call(this);
+			void main.call(this);
+		} catch (err) {
+			if (err instanceof DiscordHTTPError) {
+				// Unknown message error
+				if (err.code === 10008) {
+					Logger.getLogger("8BallCommand").error(err);
+					return;
+				}
+			}
+
+			throw err;
+		}
 	});

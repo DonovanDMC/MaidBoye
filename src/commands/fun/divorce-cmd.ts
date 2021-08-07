@@ -27,7 +27,7 @@ export default new Command("divorce")
 			content: "Cancelled.",
 			embeds: [],
 			components: []
-		});
+		}).catch(() => null);
 		await msg.uConfig.edit({ marriage: null });
 		await UserConfig.prototype.edit.call({ id: msg.uConfig.marriage }, { marriage: null });
 		return m.edit({

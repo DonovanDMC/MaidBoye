@@ -3,9 +3,11 @@ import MaidBoye from "../../main";
 import EmbedBuilder from "../../util/EmbedBuilder";
 import ComponentHelper from "../../util/ComponentHelper";
 import config from "../../config";
+import Logger from "../../util/Logger";
 import chunk from "chunk";
 import Command from "@cmd/Command";
 import Eris from "eris";
+import { DiscordHTTPError } from "slash-create";
 
 export default new Command("levelroles")
 	.setPermissions("bot", "manageRoles")
@@ -81,47 +83,59 @@ export default new Command("levelroles")
 			}
 
 			case "list": {
-				if (msg.gConfig.levelRoles.length === 0) return msg.reply("This server doesn't have any level roles to list..");
-				const pages = chunk(msg.gConfig.levelRoles, 10);
-				const m = await msg.reply("Warming up..");
-				// eslint-disable-next-line no-inner-declarations
-				async function setPage(this: MaidBoye, page: number) {
-					await m.edit({
-						content: "",
-						embeds: [
-							new EmbedBuilder(true, msg.author)
-								.setTitle("Level Roles List")
-								.setDescription(pages[page].map((r) => `<@&${r.role}> - **level ${BotFunctions.calcLevel(r.xpRequired).level}**`))
-								.setFooter(`Page ${page + 1}/${pages.length} | UwU`)
-								.toJSON()
-						],
-						components: new ComponentHelper()
-							.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `levelroles-back.${msg.author.id}`, page === 0, ComponentHelper.emojiToPartial(config.emojis.default.last, "default"))
-							.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `levelroles-stop.${msg.author.id}`, page === 0, ComponentHelper.emojiToPartial(config.emojis.default.stop, "default"))
-							.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `levelroles-next.${msg.author.id}`, page === 0, ComponentHelper.emojiToPartial(config.emojis.default.next, "default"))
-							.toJSON()
-					});
-					const wait = await msg.channel.awaitComponentInteractions(6e4, (it) => it.message.id === m.id && it.member!.user.id === msg.author.id && it.data.custom_id.startsWith("diable-"));
-					if (wait === null) {
+				try {
+					if (msg.gConfig.levelRoles.length === 0) return msg.reply("This server doesn't have any level roles to list..");
+					const pages = chunk(msg.gConfig.levelRoles, 10);
+					const m = await msg.reply("Warming up..");
+					// eslint-disable-next-line no-inner-declarations
+					async function setPage(this: MaidBoye, page: number) {
 						await m.edit({
 							content: "",
-							components: []
+							embeds: [
+								new EmbedBuilder(true, msg.author)
+									.setTitle("Level Roles List")
+									.setDescription(pages[page].map((r) => `<@&${r.role}> - **level ${BotFunctions.calcLevel(r.xpRequired).level}**`))
+									.setFooter(`Page ${page + 1}/${pages.length} | UwU`)
+									.toJSON()
+							],
+							components: new ComponentHelper()
+								.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `levelroles-back.${msg.author.id}`, page === 0, ComponentHelper.emojiToPartial(config.emojis.default.last, "default"))
+								.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `levelroles-stop.${msg.author.id}`, page === 0, ComponentHelper.emojiToPartial(config.emojis.default.stop, "default"))
+								.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `levelroles-next.${msg.author.id}`, page === 0, ComponentHelper.emojiToPartial(config.emojis.default.next, "default"))
+								.toJSON()
 						});
-						return;
-					} else {
-						if (wait.data.custom_id.includes("last")) void setPage.call(this,  page - 1);
-						if (wait.data.custom_id.includes("stop")) {
+						const wait = await msg.channel.awaitComponentInteractions(6e4, (it) => it.message.id === m.id && it.member!.user.id === msg.author.id && it.data.custom_id.startsWith("diable-"));
+						if (wait === null) {
 							await m.edit({
 								content: "",
 								components: []
 							});
 							return;
+						} else {
+							if (wait.data.custom_id.includes("last")) void setPage.call(this,  page - 1);
+							if (wait.data.custom_id.includes("stop")) {
+								await m.edit({
+									content: "",
+									components: []
+								});
+								return;
+							}
+							if (wait.data.custom_id.includes("next")) void setPage.call(this,  page + 1);
 						}
-						if (wait.data.custom_id.includes("next")) void setPage.call(this,  page + 1);
 					}
-				}
 
-				void setPage.call(this, 0);
+					void setPage.call(this, 0);
+				} catch (err) {
+					if (err instanceof DiscordHTTPError) {
+						// Unknown message error
+						if (err.code === 10008) {
+							Logger.getLogger("LevelRolesCommand").error(err);
+							return;
+						}
+					}
+
+					throw err;
+				}
 			}
 		}
 	});
