@@ -42,7 +42,8 @@ export default new Command("ship")
 		if (member1 === null || member2 === null) return msg.reply("H-hey! That wasn't a valid member..");
 
 		if (!Object.keys(msg.dashedArgs.value).includes("random")) amount = Number((BigInt(member1.id) + BigInt(member2.id)) % 100n);
-
+		if (amount < 1) amount = 1;
+		if (amount > 100) amount = 100;
 		const ship = {
 			amount,
 			name: member1.username.slice(0, Math.floor(Math.random() * 5) + 3) + member2.username.slice(-(Math.floor(Math.random() * 5) + 3)),
