@@ -12,7 +12,7 @@ export default new Command("giphy")
 	.setCooldown(3e3)
 	.setExecutor(async function(msg) {
 		if (msg.args.length < 1) return msg.reply("H-hey! You have to provide something to search..");
-		const { data } = await fetch(`https://api.giphy.com/v1/gifs/search?api_key=${config.apiKeys.giphy}&q=${msg.args.join("%20")}&limit=50&offset=7&rating=PG-13&lang=en`, {
+		const { data } = await fetch(`https://api.giphy.com/v1/gifs/search?api_key=${config.apiKeys.giphy}&q=${msg.args.join("%20")}&limit=50&offset=7&rating=G&lang=en`, {
 			method: "GET",
 			headers: {
 				"User-Agent": config.userAgent
