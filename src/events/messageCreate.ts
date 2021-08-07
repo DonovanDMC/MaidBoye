@@ -262,27 +262,29 @@ export default new ClientEvent("messageCreate", async function (message) {
 
 	t.start("run");
 	void cmd.run.call(this, msg, cmd)
-		.then(res => {
-			t.end("run");
-			if (res instanceof Error) throw res;
-		})
-		.catch(async(err: Error) => {
-			if (err instanceof CommandError) {
-				if (err.message === "INVALID_USAGE") {
-					StatsHandler.trackBulkNoResponse(
-						`stats:commands:${cmd.triggers[0]}:invalidUsage`,
-						`stats:users:${msg.author.id}:commands:${cmd.triggers[0]}:invalidUsage`
-					);
-					return msg.reply(`H-hey! You didn't use that command right. check \`${msg.gConfig.getFormattedPrefix(0)}help ${cmd.triggers[0]}\` for info on how to use it..`);
+		.then(
+			res => {
+				t.end("run");
+				if (res instanceof Error) throw res;
+			},
+			async(err: Error) => {
+				if (err instanceof CommandError) {
+					if (err.message === "INVALID_USAGE") {
+						StatsHandler.trackBulkNoResponse(
+							`stats:commands:${cmd.triggers[0]}:invalidUsage`,
+							`stats:users:${msg.author.id}:commands:${cmd.triggers[0]}:invalidUsage`
+						);
+						return msg.reply(`H-hey! You didn't use that command right. check \`${msg.gConfig.getFormattedPrefix(0)}help ${cmd.triggers[0]}\` for info on how to use it..`);
+					}
+					return;
 				}
-				return;
+
+				StatsHandler.trackNoResponse(`stats:commands:${cmd.triggers[0]}:error`);
+
+				const code = await ErrorHandler.handleError(err, msg);
+
+				if (code === null) return msg.reply("S-sorry! There was an error while running that.. Our internal error reporting service didn't return any further info.");
+				else return msg.reply(`S-sorry! There was an error while running that.. I-if you want, you can report it to my developers, or try again later..\nCode: \`${code}\`\nSupport: ${config.client.links.support}`);
 			}
-
-			StatsHandler.trackNoResponse(`stats:commands:${cmd.triggers[0]}:error`);
-
-			const code = await ErrorHandler.handleError(err, msg);
-
-			if (code === null) return msg.reply("S-sorry! There was an error while running that.. Our internal error reporting service didn't return any further info.");
-			else return msg.reply(`S-sorry! There was an error while running that.. I-if you want, you can report it to my developers, or try again later..\nCode: \`${code}\`\nSupport: ${config.client.links.support}`);
-		});
+		);
 });

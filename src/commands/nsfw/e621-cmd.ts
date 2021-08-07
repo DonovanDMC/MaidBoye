@@ -62,11 +62,10 @@ export default new Command("e621", "e6")
 			const tags = Array.from(msg.rawArgs).map(t => t.toLowerCase());
 			if (!tags.find(t => t.includes("order:"))) tags.push("order:favcount");
 			if (["cub", "young"].some(v => tags.includes(v))) return msg.reply("H-hey! You tried using a blacklisted tag, don't do that!");
-			const posts = await E621.getPosts(tags, 100);
-			/* for (const p of posts) {
-			if (msg.dashedArgs.value.includes("no-video") && p.file.ext === "webm") posts.splice(posts.indexOf(p), 1);
-			else if (msg.dashedArgs.value.includes("no-flash") && p.file.ext === "swf") posts.splice(posts.indexOf(p), 1);
-		} */
+			const unfilteredPosts = await E621.getPosts(tags, 100);
+			const filterWebm = msg.dashedArgs.value.includes("no-video");
+			const filterFlash = msg.dashedArgs.value.includes("no-flash");
+			const posts = unfilteredPosts.filter(p => !(filterWebm && p.file.ext === "webm") && !(filterFlash && p.file.ext === "swf"));
 
 			let m: Eris.Message<Eris.GuildTextableChannel> | undefined, i = 0;
 			async function changePost(this: MaidBoye, id?: string, token?: string): Promise<void> {
@@ -86,16 +85,8 @@ export default new Command("e621", "e6")
 				}
 
 				if (post.file.ext === "swf") {
-					if (msg.dashedArgs.value.includes("no-flash")) {
-						posts.splice(i, 1);
-						return changePost.call(this, undefined, token);
-					}
 					e.setDescription(`This post is a flash animation. Please view it [directly](https://e621.net/posts/${post.id}) on e621.`);
 				} else if (post.file.ext === "webm") {
-					if (msg.dashedArgs.value.includes("no-video")) {
-						posts.splice(i, 1);
-						return changePost.call(this, undefined, token);
-					}
 					e.setDescription(`This post is a video. Please view it [directly](https://e621.net/posts/${post.id}) on e621.`);
 					if (msg.gConfig.settings.e621ThumbnailType !== "none") {
 						let url = "https://http.cat/500";
