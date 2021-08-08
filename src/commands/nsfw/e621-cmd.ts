@@ -152,6 +152,12 @@ export default new Command("e621", "e6")
 				if (post.tags.artist.length === 0) a = "unknown_artist";
 				else if (post.tags.artist.length === 1) a = post.tags.artist[0];
 				else a = post.tags.artist.find(v => !["conditional_dnp", "sound_warning"].includes(v)) || "unknown_artist";
+				post.sources.forEach((source, index) => {
+					if (!source.startsWith("http") || !source.startsWith("https")) {
+						Logger.getLogger("E621Command").info("Found post with invalid source, https://e621.net/posts/%d", post.id);
+						post.sources.splice(index, 1);
+					}
+				});
 				const c = new ComponentHelper()
 					.addURLButton(`https://e621.net/posts/${post.id}`, false, undefined, "Open Post")
 					.addURLButton(post.file.url, false, undefined, "Full Image")
