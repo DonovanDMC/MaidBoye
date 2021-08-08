@@ -15,7 +15,7 @@ export default new ClientEvent("ready", async function() {
 		const d = new Date();
 		const status = config.client.statuses(this).find(s => s.filter(d.getHours(), d.getMinutes(), d.getSeconds()));
 		if (status) this.editStatus("online", status);
-	}, 500);
+	}, 1e3);
 	await API.launch(this);
 	this.cpuUsage = await Utility.getCPUUsage();
 	setInterval(async() =>
