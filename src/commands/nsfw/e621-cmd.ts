@@ -63,6 +63,7 @@ export default new Command("e621", "e6")
 			if (!tags.find(t => t.includes("order:"))) tags.push("order:favcount");
 			if (["cub", "young"].some(v => tags.includes(v))) return msg.reply("H-hey! You tried using a blacklisted tag, don't do that!");
 			const unfilteredPosts = await E621.getPosts(tags, 100);
+			if (unfilteredPosts.length === 0) return msg.reply("H-hey! We didn't find any results with what you provided..");
 			const filterWebm = msg.dashedArgs.value.includes("no-video");
 			const filterFlash = msg.dashedArgs.value.includes("no-flash");
 			const posts = unfilteredPosts.filter(p => !(filterWebm && p.file.ext === "webm") && !(filterFlash && p.file.ext === "swf"));
