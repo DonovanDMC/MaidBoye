@@ -1,10 +1,9 @@
-import Logger from "../../util/Logger";
 import Command from "@cmd/Command";
-import Eris from "eris";
+import Eris, { DiscordRESTError } from "eris";
 import EmbedBuilder from "@util/EmbedBuilder";
 import ComponentHelper from "@util/ComponentHelper";
 import MaidBoye from "@MaidBoye";
-import { DiscordHTTPError } from "slash-create";
+import ErrorHandler from "@util/handlers/ErrorHandler";
 
 export default new Command("furpile")
 	.setPermissions("bot", "embedLinks")
@@ -74,14 +73,7 @@ export default new Command("furpile")
 
 			void awaitJoin.call(this);
 		} catch (err) {
-			if (err instanceof DiscordHTTPError) {
-				// Unknown message error
-				if (err.code === 10008) {
-					Logger.getLogger("FurpileCommand").error(err);
-					return;
-				}
-			}
-
-			throw err;
+			if (err instanceof DiscordRESTError) return ErrorHandler.handleDiscordError(err, msg);
+			else throw err;
 		}
 	});

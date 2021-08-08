@@ -1,10 +1,10 @@
-import Logger from "../../util/Logger";
 import Command from "@cmd/Command";
 import config from "@config";
 import MaidBoye from "@MaidBoye";
 import ComponentHelper from "@util/ComponentHelper";
 import EmbedBuilder from "@util/EmbedBuilder";
-import { DiscordHTTPError } from "slash-create";
+import { DiscordRESTError } from "eris";
+import ErrorHandler from "@util/handlers/ErrorHandler";
 
 export default new Command("awoo", "howl")
 	.setPermissions("bot", "embedLinks", "useExternalEmojis")
@@ -63,14 +63,7 @@ export default new Command("awoo", "howl")
 
 			void awaitJoin.call(this);
 		} catch (err) {
-			if (err instanceof DiscordHTTPError) {
-				// Unknown message error
-				if (err.code === 10008) {
-					Logger.getLogger("AwooCommand").error(err);
-					return;
-				}
-			}
-
-			throw err;
+			if (err instanceof DiscordRESTError) return ErrorHandler.handleDiscordError(err, msg);
+			else throw err;
 		}
 	});

@@ -1,14 +1,14 @@
-import GuildConfig from "../../db/Models/Guild/GuildConfig";
+import GuildConfig from "@db/Models/Guild/GuildConfig";
+import ErrorHandler from "@util/handlers/ErrorHandler";
 import Command from "@cmd/Command";
 import EmbedBuilder from "@util/EmbedBuilder";
 import config from "@config";
 import Logger from "@util/Logger";
 import Yiffy from "@util/req/Yiffy";
 import { Strings } from "@uwu-codes/utils";
-import Eris from "eris";
+import Eris, { DiscordRESTError } from "eris";
 import ComponentHelper from "@util/ComponentHelper";
 import MaidBoye from "@MaidBoye";
-import { DiscordHTTPError } from "slash-create";
 
 export default new Command("yiff", "thegoodstuff")
 	.setPermissions("bot", "embedLinks", "attachFiles")
@@ -101,14 +101,7 @@ export default new Command("yiff", "thegoodstuff")
 
 			void refreshImage.call(this);
 		} catch (err) {
-			if (err instanceof DiscordHTTPError) {
-				// Unknown message error
-				if (err.code === 10008) {
-					Logger.getLogger("YiffCommand").error(err);
-					return;
-				}
-			}
-
-			throw err;
+			if (err instanceof DiscordRESTError) return ErrorHandler.handleDiscordError(err, msg);
+			else throw err;
 		}
 	});

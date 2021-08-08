@@ -2,12 +2,11 @@ import BotFunctions from "../../util/BotFunctions";
 import MaidBoye from "../../main";
 import EmbedBuilder from "../../util/EmbedBuilder";
 import ComponentHelper from "../../util/ComponentHelper";
-import config from "../../config";
-import Logger from "../../util/Logger";
+import config from "@config";
 import chunk from "chunk";
 import Command from "@cmd/Command";
-import Eris from "eris";
-import { DiscordHTTPError } from "slash-create";
+import Eris, { DiscordRESTError } from "eris";
+import ErrorHandler from "@util/handlers/ErrorHandler";
 
 export default new Command("levelroles")
 	.setPermissions("bot", "manageRoles")
@@ -126,15 +125,8 @@ export default new Command("levelroles")
 
 					void setPage.call(this, 0);
 				} catch (err) {
-					if (err instanceof DiscordHTTPError) {
-						// Unknown message error
-						if (err.code === 10008) {
-							Logger.getLogger("LevelRolesCommand").error(err);
-							return;
-						}
-					}
-
-					throw err;
+					if (err instanceof DiscordRESTError) return ErrorHandler.handleDiscordError(err, msg);
+					else throw err;
 				}
 			}
 		}

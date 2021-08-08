@@ -1,14 +1,13 @@
-import Logger from "../../util/Logger";
 import config from "@config";
 import Command from "@cmd/Command";
 import CommandHandler from "@cmd/CommandHandler";
 import ComponentHelper from "@util/ComponentHelper";
 import EmbedBuilder from "@util/EmbedBuilder";
 import BotFunctions from "@util/BotFunctions";
-import Eris from "eris";
+import Eris, { DiscordRESTError } from "eris";
 import { Strings } from "@uwu-codes/utils";
 import MaidBoye from "@MaidBoye";
-import { DiscordHTTPError } from "slash-create";
+import ErrorHandler from "@util/handlers/ErrorHandler";
 
 export default new Command("help")
 	.setPermissions("bot", "embedLinks")
@@ -46,9 +45,9 @@ export default new Command("help")
 					.setAuthor(msg.author.tag, msg.author.avatarURL);
 				const cmdDesc = [] as Array<string>;
 				const totalLen = cat.commands.reduce((a,b) => a + `\`${b.triggers[0]}\` - ${b.description}\n`.length, 0);
-				cat.commands.forEach(cmd => {
-					if (totalLen > 1900) cmdDesc.push(`\`${cmd.triggers[0]}\``);
-					else cmdDesc.push(`\`${cmd.triggers[0]}\`${cmd.hasSlashVariant === true ? "\\*" : cmd.hasSlashVariant === "lite" ? "\\*\\*" : ""} - ${cmd.description || "No Description"}`);
+				cat.commands.forEach(d => {
+					if (totalLen > 1900) cmdDesc.push(`\`${d.triggers[0]}\``);
+					else cmdDesc.push(`\`${d.triggers[0]}\`${d.hasSlashVariant === true ? "\\*" : d.hasSlashVariant === "lite" ? "\\*\\*" : ""} - ${d.description || "No Description"}`);
 				});
 				eCat.setDescription(`${eCat.getDescription() ?? ""}\n\n${totalLen > 1900 ? cmdDesc.join(", ") : cmdDesc.join("\n")}`);
 				categories[cat.name] = {
@@ -72,8 +71,8 @@ export default new Command("help")
 
 				if (cat !== null) void goCat.call(this, cat.name);
 				else {
-					const cmd = CommandHandler.getCommand(msg.args[0]);
-					if (cmd !== null) void goCommand.call(this, cmd);
+					const d = CommandHandler.getCommand(msg.args[0]);
+					if (d !== null) void goCommand.call(this, d);
 					else return msg.reply("I-I couldn't find anything with what you provided..");
 				}
 			}
@@ -108,8 +107,8 @@ export default new Command("help")
 				}
 			}
 
-			async function goCommand(this: MaidBoye, cmd: Command) {
-				const usage = await cmd.usage.call(this, msg, cmd);
+			async function goCommand(this: MaidBoye, d: Command) {
+				const usage = await d.usage.call(this, msg, d);
 				if (typeof usage !== "string" && usage !== null) await m.edit({
 					components: [],
 					embeds: [],
@@ -121,15 +120,15 @@ export default new Command("help")
 						.setTitle("Command Help")
 						.setColor("green")
 						.setDescription([
-							`Description: ${cmd.description || "None"}`,
-							`Usage: \`${BotFunctions.formatPrefix(msg.gConfig)}${cmd.triggers[0]}${usage === null ? "" : ` ${usage}`}\``,
-							`Restrictions: ${cmd.restrictions.length === 0 ? "None" : ""}`,
-							...(cmd.restrictions.length === 0 ? [] : cmd.restrictions.map(r => `- **${Strings.ucwords(r)}**`)),
+							`Description: ${d.description || "None"}`,
+							`Usage: \`${BotFunctions.formatPrefix(msg.gConfig)}${d.triggers[0]}${usage === null ? "" : ` ${usage}`}\``,
+							`Restrictions: ${d.restrictions.length === 0 ? "None" : ""}`,
+							...(d.restrictions.length === 0 ? [] : d.restrictions.map(r => `- **${Strings.ucwords(r)}**`)),
 							"",
-							`User Permissions: ${cmd.userPermissions.length === 0 ? "None" : ""}`,
-							...(cmd.userPermissions.length === 0 ? [] : ["```diff\n--- (red = optional)", ...cmd.userPermissions.map(([perm, optional]) => `${optional ? "-" : "+"} ${config.permissions[perm]}`), "\n```"]),
-							`Bot Permissions: ${cmd.botPermissions.length === 0 ? "None" : ""}`,
-							...(cmd.botPermissions.length === 0 ? [] : ["```diff\n--- (red = optional)", ...cmd.botPermissions.map(([perm, optional]) => `${optional ? "-" : "+"} ${config.permissions[perm]}`), "\n```"])
+							`User Permissions: ${d.userPermissions.length === 0 ? "None" : ""}`,
+							...(d.userPermissions.length === 0 ? [] : ["```diff\n--- (red = optional)", ...d.userPermissions.map(([perm, optional]) => `${optional ? "-" : "+"} ${config.permissions[perm]}`), "\n```"]),
+							`Bot Permissions: ${d.botPermissions.length === 0 ? "None" : ""}`,
+							...(d.botPermissions.length === 0 ? [] : ["```diff\n--- (red = optional)", ...d.botPermissions.map(([perm, optional]) => `${optional ? "-" : "+"} ${config.permissions[perm]}`), "\n```"])
 						].join("\n"))
 						.setAuthor(msg.author.tag, msg.author.avatarURL);
 					await m.edit({
@@ -153,14 +152,7 @@ export default new Command("help")
 				}
 			}
 		} catch (err) {
-			if (err instanceof DiscordHTTPError) {
-				// Unknown message error
-				if (err.code === 10008) {
-					Logger.getLogger("HelpCommand").error(err);
-					return;
-				}
-			}
-
-			throw err;
+			if (err instanceof DiscordRESTError) return ErrorHandler.handleDiscordError(err, msg);
+			else throw err;
 		}
 	});

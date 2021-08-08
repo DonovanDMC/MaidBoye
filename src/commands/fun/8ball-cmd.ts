@@ -1,11 +1,10 @@
-import Logger from "../../util/Logger";
 import Command from "@cmd/Command";
 import config from "@config";
 import MaidBoye from "@MaidBoye";
 import ComponentHelper from "@util/ComponentHelper";
 import EmbedBuilder from "@util/EmbedBuilder";
-import Eris from "eris";
-import { DiscordHTTPError } from "slash-create";
+import Eris, { DiscordRESTError } from "eris";
+import ErrorHandler from "@util/handlers/ErrorHandler";
 
 const answers = [
 	// Neutral
@@ -78,14 +77,7 @@ export default new Command("8ball")
 
 			void main.call(this);
 		} catch (err) {
-			if (err instanceof DiscordHTTPError) {
-				// Unknown message error
-				if (err.code === 10008) {
-					Logger.getLogger("8BallCommand").error(err);
-					return;
-				}
-			}
-
-			throw err;
+			if (err instanceof DiscordRESTError) return ErrorHandler.handleDiscordError(err, msg);
+			else throw err;
 		}
 	});

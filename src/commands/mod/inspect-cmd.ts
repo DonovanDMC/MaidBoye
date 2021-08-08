@@ -1,10 +1,9 @@
-import Logger from "../../util/Logger";
 import Command from "@cmd/Command";
 import db from "@db";
 import EmbedBuilder from "@util/EmbedBuilder";
 import ComponentHelper from "@util/ComponentHelper";
 import MaidBoye from "@MaidBoye";
-import Eris from "eris";
+import Eris, { DiscordRESTError } from "eris";
 import chunk from "chunk";
 import config from "@config";
 import BotFunctions from "@util/BotFunctions";
@@ -12,7 +11,7 @@ import { Strings } from "@uwu-codes/utils";
 import WarnEntry from "@db/Models/Guild/ModLog/WarnEntry";
 import { AnyEntry } from "@db/Models/Guild/ModLog/All";
 import ModLogHandler from "@util/handlers/ModLogHandler";
-import { DiscordHTTPError } from "slash-create";
+import ErrorHandler from "@util/handlers/ErrorHandler";
 
 export default new Command("inspect")
 	.setPermissions("bot", "embedLinks")
@@ -265,14 +264,7 @@ export default new Command("inspect")
 				default: return void main.call(this);
 			}
 		} catch (err) {
-			if (err instanceof DiscordHTTPError) {
-				// Unknown message error
-				if (err.code === 10008) {
-					Logger.getLogger("InspectCommand").error(err);
-					return;
-				}
-			}
-
-			throw err;
+			if (err instanceof DiscordRESTError) return ErrorHandler.handleDiscordError(err, msg);
+			else throw err;
 		}
 	});

@@ -1,11 +1,10 @@
-import Logger from "../../util/Logger";
 import Command from "@cmd/Command";
 import EmbedBuilder from "@util/EmbedBuilder";
 import Yiffy from "@util/req/Yiffy";
-import Eris from "eris";
+import Eris, { DiscordRESTError } from "eris";
 import ComponentHelper from "@util/ComponentHelper";
 import MaidBoye from "@MaidBoye";
-import { DiscordHTTPError } from "slash-create";
+import ErrorHandler from "@util/handlers/ErrorHandler";
 
 export default new Command("bulge")
 	.setPermissions("bot", "embedLinks", "attachFiles")
@@ -63,14 +62,7 @@ export default new Command("bulge")
 
 			void refreshImage.call(this);
 		} catch (err) {
-			if (err instanceof DiscordHTTPError) {
-				// Unknown message error
-				if (err.code === 10008) {
-					Logger.getLogger("BulgeCommand").error(err);
-					return;
-				}
-			}
-
-			throw err;
+			if (err instanceof DiscordRESTError) return ErrorHandler.handleDiscordError(err, msg);
+			else throw err;
 		}
 	});

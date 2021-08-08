@@ -1,5 +1,4 @@
 import EmbedBuilder from "../../util/EmbedBuilder";
-import Logger from "../../util/Logger";
 import MaidBoye from "@MaidBoye";
 import Command from "@cmd/Command";
 import config from "@config";
@@ -7,11 +6,11 @@ import CommandError from "@cmd/CommandError";
 import ModLogUtil from "@util/handlers/ModLogHandler";
 import ComponentHelper from "@util/ComponentHelper";
 import ComponentInteractionCollector from "@util/ComponentInteractionCollector";
-import Eris from "eris";
+import Eris, { DiscordRESTError } from "eris";
 import { Request } from "@uwu-codes/utils";
 import FileType from "file-type";
 import GuildConfig from "@db/Models/Guild/GuildConfig";
-import { DiscordHTTPError } from "slash-create";
+import ErrorHandler from "@util/handlers/ErrorHandler";
 
 export default new Command("modlog")
 	.setPermissions("bot", "embedLinks", "manageChannels", "manageWebhooks")
@@ -457,14 +456,7 @@ export default new Command("modlog")
 				default: return new CommandError("INVALID_USAGE", cmd);
 			}
 		} catch (err) {
-			if (err instanceof DiscordHTTPError) {
-				// Unknown message error
-				if (err.code === 10008) {
-					Logger.getLogger("ModlogCommand").error(err);
-					return;
-				}
-			}
-
-			throw err;
+			if (err instanceof DiscordRESTError) return ErrorHandler.handleDiscordError(err, msg);
+			else throw err;
 		}
 	});

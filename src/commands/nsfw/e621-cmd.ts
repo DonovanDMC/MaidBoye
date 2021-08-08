@@ -1,13 +1,13 @@
 import Command from "@cmd/Command";
 import EmbedBuilder from "@util/EmbedBuilder";
 import config from "@config";
-import Eris from "eris";
+import Eris, { DiscordRESTError } from "eris";
 import ComponentHelper from "@util/ComponentHelper";
 import MaidBoye from "@MaidBoye";
 import E621 from "@util/req/E621";
 import fetch from "node-fetch";
 import Logger from "@util/Logger";
-import { DiscordHTTPError } from "slash-create";
+import ErrorHandler from "@util/handlers/ErrorHandler";
 
 // attachment version: https://pastebin.com/D4ZBuLjw
 export default new Command("e621", "e6")
@@ -209,11 +209,7 @@ export default new Command("e621", "e6")
 
 			void changePost.call(this);
 		} catch (err) {
-			if (err instanceof DiscordHTTPError) {
-				// Unknown message error
-				if (err.code === 10008) return;
-			}
-
-			throw err;
+			if (err instanceof DiscordRESTError) return ErrorHandler.handleDiscordError(err, msg);
+			else throw err;
 		}
 	});

@@ -6,7 +6,7 @@ import { dependencies } from "@root/package.json";
 import { dependencies as shrinkDependencies } from "@root/package-lock.json";
 import config from "@config";
 import * as fs from "fs-extra";
-import Eris from "eris";
+import Eris, { DiscordRESTError } from "eris";
 import * as os from "os";
 import crypto from "crypto";
 
@@ -82,5 +82,16 @@ export default class ErrorHandler {
 		});
 
 		return code;
+	}
+
+	static async handleDiscordError(err: DiscordRESTError, msg: ExtendedMessage) {
+		if ([
+			10008, // unknown message
+			10062, // unknown interaction
+			50001  // missing access
+		].includes(err.code)) {
+			Logger.getLogger(`ErrorHandler[DiscordRESTError/${msg.cmd!.triggers[0]}]`).error("(ignored)", err);
+			return;
+		} else return this.handleError(err, msg);
 	}
 }

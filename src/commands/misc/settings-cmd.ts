@@ -1,4 +1,4 @@
-import Logger from "../../util/Logger";
+import ErrorHandler from "@util/handlers/ErrorHandler";
 import Command from "@cmd/Command";
 import config from "@config";
 import ComponentHelper from "@util/ComponentHelper";
@@ -6,9 +6,8 @@ import EmbedBuilder from "@util/EmbedBuilder";
 import chunk from "chunk";
 import Settings, { ExecReturn } from "@util/Settings";
 import MaidBoye from "@MaidBoye";
-import Eris from "eris";
+import Eris, { DiscordRESTError } from "eris";
 import { Strings } from "@uwu-codes/utils";
-import { DiscordHTTPError } from "slash-create";
 
 export default new Command("settings")
 	.setPermissions("bot", "embedLinks")
@@ -164,14 +163,7 @@ export default new Command("settings")
 
 			void changePage.call(this);
 		} catch (err) {
-			if (err instanceof DiscordHTTPError) {
-				// Unknown message error
-				if (err.code === 10008) {
-					Logger.getLogger("SettingsCommand").error(err);
-					return;
-				}
-			}
-
-			throw err;
+			if (err instanceof DiscordRESTError) return ErrorHandler.handleDiscordError(err, msg);
+			else throw err;
 		}
 	});

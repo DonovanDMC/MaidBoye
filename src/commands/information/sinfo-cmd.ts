@@ -1,12 +1,11 @@
-import Logger from "../../util/Logger";
+import ErrorHandler from "@util/handlers/ErrorHandler";
 import config from "@config";
 import Command from "@cmd/Command";
 import EmbedBuilder from "@util/EmbedBuilder";
-import Eris from "eris";
+import Eris, { DiscordRESTError } from "eris";
 import ComponentHelper from "@util/ComponentHelper";
 import MaidBoye from "@MaidBoye";
 import BotFunctions from "@util/BotFunctions";
-import { DiscordHTTPError } from "slash-create";
 
 export default new Command("sinfo", "serverinfo")
 	.setPermissions("bot", "embedLinks", "attachFiles")
@@ -249,14 +248,7 @@ export default new Command("sinfo", "serverinfo")
 			}
 			void waitForEdit.call(this);
 		} catch (err) {
-			if (err instanceof DiscordHTTPError) {
-				// Unknown message error
-				if (err.code === 10008) {
-					Logger.getLogger("SInfoCommand").error(err);
-					return;
-				}
-			}
-
-			throw err;
+			if (err instanceof DiscordRESTError) return ErrorHandler.handleDiscordError(err, msg);
+			else throw err;
 		}
 	});
