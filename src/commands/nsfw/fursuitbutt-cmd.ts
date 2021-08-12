@@ -15,7 +15,7 @@ export default new Command("fursuitbutt")
 		return msg.reply({
 			embeds: [
 				new EmbedBuilder(true, msg.author)
-					.setTitle("Fursui Butt")
+					.setTitle("Fursuit Butt")
 					.setImage(img.url)
 					.toJSON()
 			],
