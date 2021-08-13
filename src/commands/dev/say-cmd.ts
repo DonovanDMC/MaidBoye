@@ -15,7 +15,7 @@ export default new Command("say")
 				guildID: msg.channel.guild.id
 			},
 			allowedMentions: {
-				repliedUser: !!msg.dashedArgs.keyValue.reply && msg.dashedArgs.value.includes("mention")
+				repliedUser: !!(msg.dashedArgs.keyValue.reply && msg.dashedArgs.value.includes("mention"))
 			},
 			stickerIDs: msg.dashedArgs.keyValue.sticker ? [msg.dashedArgs.keyValue.sticker] : []
 		});

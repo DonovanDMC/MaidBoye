@@ -4,7 +4,7 @@ import CommandError from "@cmd/CommandError";
 import UserConfig from "@db/Models/User/UserConfig";
 import Eris from "eris";
 
-export default new Command("warn")
+export default new Command("warn", "bonk")
 	.setPermissions("bot", "embedLinks")
 	.setPermissions("user", "kickMembers")
 	.setDescription("warn a user for something they're doing")
