@@ -10,7 +10,7 @@
     "cheweyapi": "^1.0.3",
     "chunk": "^0.0.3",
     "dankmemerapi": "^1.0.22",
-    "dd-trace": "^1.1.1",
+    "dd-trace": "^1.1.2",
     "discord-command-parser": "^1.5.3",
     "e621": "^1.0.8",
     "ejs": "^3.1.6",
@@ -59,15 +59,15 @@
     "@types/express": "^4.17.13",
     "@types/express-session": "^1.17.4",
     "@types/fs-extra": "^9.0.12",
-    "@types/ioredis": "^4.26.6",
+    "@types/ioredis": "^4.26.7",
     "@types/module-alias": "^2.0.1",
     "@types/morgan": "^1.9.3",
-    "@types/node": "^16.4.12",
+    "@types/node": "^16.6.1",
     "@types/node-fetch": "^2.5.12",
     "@types/source-map-support": "^0.5.4",
     "@uwu-codes/types": "^1.0.5",
     "discord-api-types": "^0.22.0",
-    "ts-node": "^10.1.0"
+    "ts-node": "^10.2.0"
   },
   "engine": {
     "node": ">=16.x",
