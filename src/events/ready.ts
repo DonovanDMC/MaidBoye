@@ -32,9 +32,6 @@ export default new ClientEvent("ready", async function() {
 		}
 	});
 
-	const slashApplicationTesting = true;
-	if(slashApplicationTesting) void this.syncApplicationCommands.call(this, undefined, true);
-
 	if (!config.beta) {
 		void this.syncApplicationCommands.call(this);
 		void this.syncLiteApplicationCommands.call(this);
