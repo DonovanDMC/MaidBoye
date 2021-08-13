@@ -9,7 +9,7 @@ import ErrorHandler from "@util/handlers/ErrorHandler";
 export default new Command("conga")
 	.setPermissions("bot", "embedLinks", "useExternalEmojis")
 	.setDescription("Start a conga, or join one")
-	.setSlashOptions(true, [
+	.addApplicationCommand(Eris.Constants.CommandTypes.CHAT_INPUT, [
 		{
 			type: Eris.Constants.CommandOptionTypes.USER,
 			name: "user",

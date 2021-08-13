@@ -7,7 +7,7 @@ export default new Command("unlock")
 	.setPermissions("user", "kickMembers")
 	.setDescription("undo a lock")
 	.setUsage("[<channel> [reason]]")
-	.setSlashOptions(true, [
+	.addApplicationCommand(Eris.Constants.CommandTypes.CHAT_INPUT, [
 		{
 			type: Eris.Constants.CommandOptionTypes.CHANNEL,
 			name: "channel",

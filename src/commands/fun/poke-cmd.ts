@@ -6,7 +6,7 @@ export default new Command("poke", "annoy")
 	.setPermissions("bot", "embedLinks")
 	.setDescription("Poke someone")
 	.setUsage("<@user/text>")
-	.setSlashOptions("lite", [
+	.addLiteApplicationCommand(Eris.Constants.CommandTypes.CHAT_INPUT, [
 		{
 			type: Eris.Constants.CommandOptionTypes.USER,
 			name: "user",

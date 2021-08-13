@@ -14,7 +14,7 @@ export default new Command("e621", "e6")
 	.setPermissions("bot", "embedLinks", "attachFiles")
 	.setDescription("Search for posts from e621")
 	.setUsage("[tags]")
-	.setSlashOptions(true, [
+	.addApplicationCommand(Eris.Constants.CommandTypes.CHAT_INPUT, [
 		{
 			type: Eris.Constants.CommandOptionTypes.STRING,
 			name: "tags",

@@ -11,7 +11,7 @@ export default new Command("reason")
 	.setPermissions("user", "manageMessages")
 	.setDescription("change a cases reason")
 	.setUsage("<case> <newReason>")
-	.setSlashOptions(true, [
+	.addApplicationCommand(Eris.Constants.CommandTypes.CHAT_INPUT, [
 		{
 			type: Eris.Constants.CommandOptionTypes.INTEGER,
 			name: "case-number",

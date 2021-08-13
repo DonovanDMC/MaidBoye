@@ -18,7 +18,7 @@ export default new Command("inspect")
 	.setPermissions("user", "manageMessages")
 	.setDescription("Get the moderation info of a user")
 	.setUsage("<user> [section]")
-	.setSlashOptions(true, [
+	.addApplicationCommand(Eris.Constants.CommandTypes.CHAT_INPUT, [
 		{
 			type: Eris.Constants.CommandOptionTypes.USER,
 			name: "user",
@@ -46,6 +46,7 @@ export default new Command("inspect")
 			]
 		}
 	])
+	.addApplicationCommand(Eris.Constants.CommandTypes.USER, "Inspect User")
 	.setCooldown(3e3)
 	.setParsedFlags("debug")
 	.setExecutor(async function(msg) {

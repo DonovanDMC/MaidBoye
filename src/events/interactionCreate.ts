@@ -4,6 +4,7 @@ import ClientEvent from "@util/ClientEvent";
 import Logger from "@util/Logger";
 import Eris, { CommandInteraction } from "eris";
 import util from "util";
+import CommandHandler from "../util/cmd/CommandHandler";
 
 export default new ClientEvent("interactionCreate", async function(interaction) {
 	if (interaction instanceof Eris.UnknownInteraction) {
@@ -11,14 +12,17 @@ export default new ClientEvent("interactionCreate", async function(interaction) 
 		return;
 	}
 	switch (interaction.type) {
-		case Eris.Constants.InteractionTypes.SLASH_COMMAND: {
+		case Eris.Constants.InteractionTypes.APPLICATION_COMMAND: {
+			// @ts-ignore -- waiting on pr updates
+			const type = interaction.data.type as 1 | 2 | 3;
 			if (interaction.guildID === undefined || interaction.member === undefined) return interaction.createMessage({
-				content: "Slash Commands cannot be used in direct messages.",
+				content: "Application Commands cannot be used in direct messages.",
 				flags: 64
 			});
 			if (config.beta) Logger.getLogger("InteractionCreate").debug("new command interaction recieved:", util.inspect(interaction.data, { depth: 3, colors: true }));
 			await interaction.acknowledge();
 			const userMentions = [] as Array<string>, roleMentions = [] as Array<string>;
+			let content = "";
 			// eslint-disable-next-line no-inner-declarations
 			function formatArg(option: Eris.InteractionDataOptions): string {
 				// console.log("o", option);
@@ -44,7 +48,26 @@ export default new ClientEvent("interactionCreate", async function(interaction) 
 					default: return String(option.value);
 				}
 			}
+
 			const gConfig = await db.getGuild(interaction.guildID);
+			switch(type) {
+				case Eris.Constants.CommandTypes.CHAT_INPUT: {
+					content = `${gConfig.getFormattedPrefix()}${(interaction as Eris.CommandInteraction).data.name} ${((interaction as Eris.CommandInteraction).data.options ?? []).map(o => formatArg(o)).join(" ")}`.trim();
+					break;
+				}
+
+				case Eris.Constants.CommandTypes.USER: {
+					// @ts-ignore -- waiting on pr updates
+					const target = interaction.data.target_id as string;
+					const cmd = CommandHandler.commands.find(cmd => !!cmd.applicationCommands.find(a => a.name === (interaction as Eris.CommandInteraction).data.name))
+					if(cmd === undefined) return interaction.createMessage({
+						content: "We couldn't figure out how to execute that command.",
+						flags: 64
+					});
+					content = `${gConfig.getFormattedPrefix()}${cmd.triggers[0]} ${target}`.trim()
+					break;
+				}
+			}
 			const msg = new Eris.Message({
 				// @ts-ignore fake messages don't have ids
 				id: null,
@@ -66,7 +89,7 @@ export default new ClientEvent("interactionCreate", async function(interaction) 
 					mute: interaction.member.voiceState.mute,
 					pending: interaction.member.pending
 				},
-				content: `${gConfig.getFormattedPrefix()}${(interaction as Eris.CommandInteraction).data.name} ${((interaction as Eris.CommandInteraction).data.options ?? []).map(o => formatArg(o)).join(" ")}`.trim(),
+				content,
 				timestamp: new Date().toISOString(),
 				tts: false,
 				mention_everyone: false,

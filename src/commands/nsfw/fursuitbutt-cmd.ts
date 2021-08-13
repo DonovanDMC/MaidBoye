@@ -2,12 +2,13 @@ import Command from "@cmd/Command";
 import ComponentHelper from "@util/ComponentHelper";
 import EmbedBuilder from "@util/EmbedBuilder";
 import Yiffy from "@util/req/Yiffy";
+import Eris from "eris";
 
 export default new Command("fursuitbutt")
 	.setPermissions("bot", "embedLinks")
 	.setDescription("Get an image of a fursuit butt")
 	.setRestrictions("nsfw")
-	.setSlashOptions(true, [])
+	.addApplicationCommand(Eris.Constants.CommandTypes.CHAT_INPUT, [])
 	.setCooldown(3e3)
 	.setExecutor(async function(msg) {
 		const img = await Yiffy.furry.butts("json", 1);

@@ -6,7 +6,7 @@ export default new Command("moveall")
 	.setPermissions("user", "voiceMoveMembers")
 	.setDescription("move all voice members from one channel to another")
 	.setUsage("<from> <to>")
-	.setSlashOptions(true, [
+	.addApplicationCommand(Eris.Constants.CommandTypes.CHAT_INPUT, [
 		{
 			type: Eris.Constants.CommandOptionTypes.CHANNEL,
 			name: "from",

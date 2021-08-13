@@ -1,11 +1,12 @@
 import Command from "@cmd/Command";
 import config from "@config";
 import EmbedBuilder from "@util/EmbedBuilder";
+import Eris from "eris";
 
 export default new Command("links", "support", "invite", "inv")
 	.setPermissions("bot", "embedLinks")
 	.setDescription("Get some of my important links")
-	.setSlashOptions(true, [])
+	.addApplicationCommand(Eris.Constants.CommandTypes.CHAT_INPUT, [])
 	.setCooldown(3e3)
 	.setExecutor(async function(msg) {
 		return msg.reply({

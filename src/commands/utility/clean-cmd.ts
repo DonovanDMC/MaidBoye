@@ -10,7 +10,7 @@ export default new Command("clean", "clear", "prune", "purge")
 	.setPermissions("bot", "embedLinks", "manageMessages")
 	.setPermissions("user", "manageMessages")
 	.setDescription("Clean up some messages")
-	.setSlashOptions(true, [
+	.addApplicationCommand(Eris.Constants.CommandTypes.CHAT_INPUT, [
 		{
 			type: Eris.Constants.CommandOptionTypes.SUB_COMMAND,
 			name: "all",

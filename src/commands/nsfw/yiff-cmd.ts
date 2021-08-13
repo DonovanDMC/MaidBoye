@@ -14,7 +14,7 @@ export default new Command("yiff", "thegoodstuff")
 	.setPermissions("bot", "embedLinks", "attachFiles")
 	.setDescription("Y-you know what this is..")
 	.setUsage(`<${config.yiffTypes.join("/")}>`)
-	.setSlashOptions(true, [
+	.addApplicationCommand(Eris.Constants.CommandTypes.CHAT_INPUT, [
 		{
 			type: Eris.Constants.CommandOptionTypes.STRING,
 			name: "type",

@@ -2,11 +2,12 @@ import Command from "@cmd/Command";
 import config from "@config";
 import EmbedBuilder from "@util/EmbedBuilder";
 import fetch from "node-fetch";
+import Eris from "eris";
 
 export default new Command("dadjoke", "joke")
 	.setPermissions("bot", "embedLinks")
 	.setDescription("Get a dadjoke")
-	.setSlashOptions(true, [])
+	.addApplicationCommand(Eris.Constants.CommandTypes.CHAT_INPUT, [])
 	.setCooldown(3e3)
 	.setExecutor(async function(msg) {
 		const { joke } = await fetch("https://icanhazdadjoke.com", {

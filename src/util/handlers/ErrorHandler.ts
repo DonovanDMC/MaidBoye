@@ -9,6 +9,7 @@ import * as fs from "fs-extra";
 import Eris, { DiscordRESTError } from "eris";
 import * as os from "os";
 import crypto from "crypto";
+import { Strings } from "@uwu-codes/utils";
 
 export default class ErrorHandler {
 	static getId() { return crypto.randomBytes(6).toString("hex"); }
@@ -57,9 +58,8 @@ export default class ErrorHandler {
 
 		await WebhookStore.execute("errors", {
 			embeds: [
-				EmbedBuilder
-					.new()
-					.setTitle(`${err.name}: ${err.message}`)
+				new EmbedBuilder()
+					.setTitle(Strings.truncate(`${err.name}: ${err.message}`, 256))
 					.setDescription([
 						...(from instanceof ExtendedMessage ? [
 							"Source: Message",

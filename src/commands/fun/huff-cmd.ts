@@ -6,7 +6,7 @@ export default new Command("huff")
 	.setPermissions("bot", "embedLinks")
 	.setDescription("Blow someone's house down")
 	.setUsage("<@user/text>")
-	.setSlashOptions("lite", [
+	.addLiteApplicationCommand(Eris.Constants.CommandTypes.CHAT_INPUT, [
 		{
 			type: Eris.Constants.CommandOptionTypes.USER,
 			name: "user",

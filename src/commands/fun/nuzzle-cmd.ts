@@ -6,7 +6,7 @@ export default new Command("nuzzle")
 	.setPermissions("bot", "embedLinks")
 	.setDescription("Nuzzle someone")
 	.setUsage("<@user/text>")
-	.setSlashOptions("lite", [
+	.addLiteApplicationCommand(Eris.Constants.CommandTypes.CHAT_INPUT, [
 		{
 			type: Eris.Constants.CommandOptionTypes.USER,
 			name: "user",

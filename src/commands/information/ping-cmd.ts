@@ -2,11 +2,12 @@ import config from "@config";
 import Command from "@cmd/Command";
 import EmbedBuilder from "@util/EmbedBuilder";
 import { performance } from "perf_hooks";
+import Eris from "eris";
 
 export default new Command("ping")
 	.setPermissions("bot", "embedLinks")
 	.setDescription("Get my ping info..")
-	.setSlashOptions(true, [])
+	.addApplicationCommand(Eris.Constants.CommandTypes.CHAT_INPUT, [])
 	.setCooldown(3e3)
 	.setExecutor(async function(msg) {
 		const m = await msg.channel.createMessage("this will be edited soon");

@@ -16,10 +16,10 @@ export default class Command {
 	usage: ((this: MaidBoye, msg: ExtendedMessage, cmd: Command) => Eris.MessageContent | null | Promise<Eris.MessageContent | null>) = () => null;
 	description = "";
 	parsedFlags = [] as Array<string>;
-	slashCommandOptions = [] as Array<Eris.SlashCommandOptions>;
+	applicationCommands = [] as Array<Eris.ApplicationCommandStructure>;
+	liteApplicationCommands = [] as Array<Eris.ApplicationCommandStructure>;
 	cooldown = 0;
 	donatorCooldown = 0;
-	hasSlashVariant: boolean | "lite" = false;
 	category: string;
 	file: string;
 	run: (this: MaidBoye, msg: ExtendedMessage, cmd: Command) => Promise<unknown>;
@@ -58,9 +58,27 @@ export default class Command {
 		return this;
 	}
 
-	setSlashOptions(hasSlash: boolean | "lite", options: Array<Eris.SlashCommandOptions>) {
-		this.hasSlashVariant = hasSlash;
-		this.slashCommandOptions = options;
+	addApplicationCommand(type: 1, options: Array<Eris.ApplicationCommandOptions>): this
+	addApplicationCommand(type: 2 | 3, name: string): this
+	addApplicationCommand(type: 1 | 2 | 3, nameOrOptions: Array<Eris.ApplicationCommandOptions> | string) {
+		this.applicationCommands.push({
+			name: type === Eris.Constants.CommandTypes.CHAT_INPUT ? this.triggers[0] : String(nameOrOptions),
+			description: type === Eris.Constants.CommandTypes.CHAT_INPUT ? this.description : undefined,
+			type,
+			options: type === Eris.Constants.CommandTypes.CHAT_INPUT ? Array.isArray(nameOrOptions) ? nameOrOptions : [] : [],
+			defaultPermission: true
+		})
+		return this;
+	}
+
+	addLiteApplicationCommand(type: (typeof Eris["Constants"]["CommandTypes"])[keyof typeof Eris["Constants"]["CommandTypes"]], options: Array<Eris.ApplicationCommandOptions>) {
+		this.liteApplicationCommands.push({
+			name: this.triggers[0],
+			description: this.description,
+			type,
+			options,
+			defaultPermission: true
+		})
 		return this;
 	}
 

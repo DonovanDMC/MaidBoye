@@ -8,7 +8,7 @@ export default new Command("unban")
 	.setPermissions("user", "banMembers")
 	.setDescription("Remove the ban for someone..")
 	.setUsage("<@user> [reason]")
-	.setSlashOptions(true, [
+	.addApplicationCommand(Eris.Constants.CommandTypes.CHAT_INPUT, [
 		{
 			type: Eris.Constants.CommandOptionTypes.USER,
 			name: "user",

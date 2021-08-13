@@ -8,7 +8,7 @@ export default new Command("shorten")
 	.setPermissions("bot", "embedLinks")
 	.setDescription("Shorten a url, using yiff.rocks")
 	.setUsage("<url> [code]")
-	.setSlashOptions(true, [
+	.addApplicationCommand(Eris.Constants.CommandTypes.CHAT_INPUT, [
 		{
 			type: Eris.Constants.CommandOptionTypes.STRING,
 			name: "url",

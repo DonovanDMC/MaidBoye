@@ -6,7 +6,7 @@ export default new Command("bellyrub")
 	.setPermissions("bot", "embedLinks", "attachFiles")
 	.setDescription("Rub someone's belly")
 	.setUsage("<@user/text>")
-	.setSlashOptions("lite", [
+	.addLiteApplicationCommand(Eris.Constants.CommandTypes.CHAT_INPUT, [
 		{
 			type: Eris.Constants.CommandOptionTypes.USER,
 			name: "user",

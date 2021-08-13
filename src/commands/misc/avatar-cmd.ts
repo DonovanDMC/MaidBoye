@@ -7,7 +7,7 @@ export default new Command("avatar")
 	.setPermissions("bot", "embedLinks", "attachFiles")
 	.setDescription("Get someone's avatar..")
 	.setUsage("<@user>")
-	.setSlashOptions(true, [
+	.addApplicationCommand(Eris.Constants.CommandTypes.CHAT_INPUT, [
 		{
 			type: Eris.Constants.CommandOptionTypes.USER,
 			name: "user",
@@ -15,6 +15,7 @@ export default new Command("avatar")
 			required: false
 		}
 	])
+	.addApplicationCommand(Eris.Constants.CommandTypes.USER, "View Avatar")
 	.setCooldown(3e3)
 	.setExecutor(async function(msg) {
 		const user = msg.args.length === 0 ? msg.author : await msg.getUserFromArgs();

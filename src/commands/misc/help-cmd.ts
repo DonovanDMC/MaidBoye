@@ -13,7 +13,7 @@ export default new Command("help")
 	.setPermissions("bot", "embedLinks")
 	.setDescription("Find out how to use me..")
 	.setUsage("[command]")
-	.setSlashOptions(true, [
+	.addApplicationCommand(Eris.Constants.CommandTypes.CHAT_INPUT, [
 		{
 			type: Eris.Constants.CommandOptionTypes.STRING,
 			name: "category",
@@ -47,7 +47,7 @@ export default new Command("help")
 				const totalLen = cat.commands.reduce((a,b) => a + `\`${b.triggers[0]}\` - ${b.description}\n`.length, 0);
 				cat.commands.forEach(d => {
 					if (totalLen > 1900) cmdDesc.push(`\`${d.triggers[0]}\``);
-					else cmdDesc.push(`\`${d.triggers[0]}\`${d.hasSlashVariant === true ? "\\*" : d.hasSlashVariant === "lite" ? "\\*\\*" : ""} - ${d.description || "No Description"}`);
+					else cmdDesc.push(`\`${d.triggers[0]}\`${d.applicationCommands.length > 0 ? "\\*" : d.liteApplicationCommands.length > 0 ? "\\*\\*" : ""} - ${d.description || "No Description"}`);
 				});
 				eCat.setDescription(`${eCat.getDescription() ?? ""}\n\n${totalLen > 1900 ? cmdDesc.join(", ") : cmdDesc.join("\n")}`);
 				categories[cat.name] = {

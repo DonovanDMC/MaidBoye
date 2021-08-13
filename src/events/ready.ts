@@ -31,8 +31,12 @@ export default new ClientEvent("ready", async function() {
 			this.shards.get(Number(((BigInt(guildId) >> 22n) % BigInt(this.shards.size)).toString()))?.sendWS((packet as { op: number; }).op, (packet as { d: Record<string, unknown>; }).d);
 		}
 	});
+
+	const slashApplicationTesting = true;
+	if(slashApplicationTesting) void this.syncApplicationCommands.call(this, undefined, true);
+
 	if (!config.beta) {
-		void this.syncSlashCommands.call(this);
-		void this.syncLiteSlashCommands.call(this);
+		void this.syncApplicationCommands.call(this);
+		void this.syncLiteApplicationCommands.call(this);
 	} else Logger.getLogger("Ready").info("Not syncing commands due to being in beta mode");
 });

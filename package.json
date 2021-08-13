@@ -6,7 +6,7 @@
   "main": "index.js",
   "dependencies": {
     "@augu/collections": "^1.0.12",
-    "@uwu-codes/utils": "^1.0.50",
+    "@uwu-codes/utils": "^1.0.51",
     "cheweyapi": "^1.0.3",
     "chunk": "^0.0.3",
     "dankmemerapi": "^1.0.22",

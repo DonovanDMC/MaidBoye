@@ -6,7 +6,7 @@ import Eris from "eris";
 export default new Command("gayrate")
 	.setPermissions("bot", "embedLinks")
 	.setDescription("Rate someone's gayness")
-	.setSlashOptions(true, [
+	.addApplicationCommand(Eris.Constants.CommandTypes.CHAT_INPUT, [
 		{
 			type: Eris.Constants.CommandOptionTypes.USER,
 			name: "user",

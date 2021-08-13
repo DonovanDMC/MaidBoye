@@ -113,22 +113,18 @@ export default class MaidBoye extends Eris.Client {
 		}
 	}
 
-	async syncSlashCommands(guild?: string, bypass = false) {
+	async syncApplicationCommands(guild?: string, bypass = false) {
 		const start = process.hrtime.bigint();
-		const commands = CommandHandler.commands.filter(c => c.hasSlashVariant === true).map(cmd => ({
-			name: cmd.triggers[0],
-			description: cmd.description,
-			options: cmd.slashCommandOptions
-		}));
+		const commands = CommandHandler.commands.reduce<Array<Eris.ApplicationCommandStructure>>((a, b) => a.concat(...b.applicationCommands), []);
 
 		// due to not all categories being loaded before the help command
-		commands.find(cmd => cmd.name === "help")!.options[0].choices = CommandHandler.categories.map(cat => {
+		commands.find(cmd => cmd.name === "help")!.options![0].choices = CommandHandler.categories.map(cat => {
 			if (cat.restrictions.includes("disabled") || cat.restrictions.includes("developer") || (cat.restrictions.includes("beta") && !config.beta)) return;
 			else return {
 				name: cat.displayName.text,
 				value: cat.name
 			};
-		}).filter(Boolean) as Eris.SlashCommandOptions["choices"];
+		}).filter(Boolean) as Eris.ApplicationCommandOptions["choices"];
 
 		if (bypass !== true) {
 			// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
@@ -150,7 +146,7 @@ export default class MaidBoye extends Eris.Client {
 				(err: Error) => {
 					Logger.getLogger("SlashCommandSync").debug("Error detected, printing command index list");
 					commands.forEach((cmd, index) => {
-						Logger.getLogger("SlashCommandSync").debug(`Command at index "${index}": ${cmd.name}`);
+						Logger.getLogger("SlashCommandSync").debug(`Command at index "${index}": ${cmd.name} (type: ${Object.entries(Eris.Constants.CommandTypes).find(([k, v]) => cmd.type === v)![0]})`);
 					});
 					Logger.getLogger("SlashCommandSync").error(err);
 					return false;
@@ -158,7 +154,7 @@ export default class MaidBoye extends Eris.Client {
 			);
 	}
 
-	async syncLiteSlashCommands(guild?: string, bypass = false) {
+	async syncLiteApplicationCommands(guild?: string, bypass = false) {
 		const start = process.hrtime.bigint();
 		const commands = [
 			// since our help command is not stateless, we have to add a custom one
@@ -167,11 +163,7 @@ export default class MaidBoye extends Eris.Client {
 				description: "List my commands",
 				options: []
 			},
-			...CommandHandler.commands.filter(c => c.hasSlashVariant === "lite").map(cmd => ({
-				name: cmd.triggers[0],
-				description: cmd.description,
-				options: cmd.slashCommandOptions
-			}))
+			...CommandHandler.commands.reduce<Array<Eris.ApplicationCommandStructure>>((a, b) => a.concat(...b.liteApplicationCommands), [])
 		];
 
 		if (bypass !== true) {

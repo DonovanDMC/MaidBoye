@@ -8,7 +8,7 @@ import Eris from "eris";
 export default new Command("uinfo", "userinfo")
 	.setPermissions("bot", "embedLinks", "attachFiles")
 	.setDescription("Get info about someone..")
-	.setSlashOptions(true, [
+	.addApplicationCommand(Eris.Constants.CommandTypes.CHAT_INPUT, [
 		{
 			type: Eris.Constants.CommandOptionTypes.USER,
 			name: "user",
@@ -16,6 +16,7 @@ export default new Command("uinfo", "userinfo")
 			required: false
 		}
 	])
+	.addApplicationCommand(Eris.Constants.CommandTypes.USER, "User Info")
 	.setCooldown(3e3)
 	.setExecutor(async function(msg) {
 		let user = msg.args.length === 0 ? msg.author : await msg.getUserFromArgs();

@@ -9,7 +9,7 @@ export default new Command("strike")
 	.setPermissions("user", "manageMessages")
 	.setDescription("Add a strike or several to a user")
 	.setUsage("<user> [amount]")
-	.setSlashOptions(true, [
+	.addApplicationCommand(Eris.Constants.CommandTypes.CHAT_INPUT, [
 		{
 			type: Eris.Constants.CommandOptionTypes.USER,
 			name: "user",

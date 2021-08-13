@@ -9,7 +9,7 @@ export default new Command("ship")
 	.setPermissions("bot", "embedLinks", "attachFiles")
 	.setDescription("Ship two people")
 	.setUsage("[@member1] [@member2]")
-	.setSlashOptions(true, [
+	.addApplicationCommand(Eris.Constants.CommandTypes.CHAT_INPUT, [
 		{
 			type: Eris.Constants.CommandOptionTypes.USER,
 			name: "user1",

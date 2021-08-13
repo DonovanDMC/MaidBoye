@@ -8,7 +8,7 @@ export default new Command("lock")
 	.setPermissions("user", "kickMembers")
 	.setDescription("keep everyone from speaking in a channel")
 	.setUsage("[<channel> [reason]]")
-	.setSlashOptions(true, [
+	.addApplicationCommand(Eris.Constants.CommandTypes.CHAT_INPUT, [
 		{
 			type: Eris.Constants.CommandOptionTypes.CHANNEL,
 			name: "channel",

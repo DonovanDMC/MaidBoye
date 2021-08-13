@@ -10,7 +10,7 @@ import Eris from "eris";
 export default new Command("selfroles", "selfrole")
 	.setPermissions("bot", "embedLinks", "manageRoles")
 	.setDescription("Manage self roles")
-	.setSlashOptions(true, [
+	.addApplicationCommand(Eris.Constants.CommandTypes.CHAT_INPUT, [
 		{
 			type: Eris.Constants.CommandOptionTypes.SUB_COMMAND,
 			name: "list",

@@ -17,7 +17,7 @@ export default new Command("modlog")
 	.setPermissions("user", "manageGuild")
 	.setDescription("Manage this server's modlog")
 	.setUsage("(no arguments)")
-	.setSlashOptions(true, [
+	.addApplicationCommand(Eris.Constants.CommandTypes.CHAT_INPUT, [
 		{
 			type: Eris.Constants.CommandOptionTypes.STRING,
 			name: "section",

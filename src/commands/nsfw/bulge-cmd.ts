@@ -9,7 +9,7 @@ import ErrorHandler from "@util/handlers/ErrorHandler";
 export default new Command("bulge")
 	.setPermissions("bot", "embedLinks", "attachFiles")
 	.setDescription("Bolgy wolgy uwu")
-	.setSlashOptions(true, [])
+	.addApplicationCommand(Eris.Constants.CommandTypes.CHAT_INPUT, [])
 	.setRestrictions("nsfw")
 	.setCooldown(3e3)
 	.setExecutor(async function(msg) {

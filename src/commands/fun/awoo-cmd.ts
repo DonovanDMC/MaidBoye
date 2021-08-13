@@ -3,13 +3,13 @@ import config from "@config";
 import MaidBoye from "@MaidBoye";
 import ComponentHelper from "@util/ComponentHelper";
 import EmbedBuilder from "@util/EmbedBuilder";
-import { DiscordRESTError } from "eris";
+import Eris, { DiscordRESTError } from "eris";
 import ErrorHandler from "@util/handlers/ErrorHandler";
 
 export default new Command("awoo", "howl")
 	.setPermissions("bot", "embedLinks", "useExternalEmojis")
 	.setDescription("Start a howl, or join one")
-	.setSlashOptions(true, [])
+	.addApplicationCommand(Eris.Constants.CommandTypes.CHAT_INPUT, [])
 	.setCooldown(3e3)
 	.setExecutor(async function(msg) {
 		try {

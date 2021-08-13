@@ -11,7 +11,7 @@ export default new Command("editsnipe", "esnipe")
 	.setPermissions("user")
 	.setDescription("Get the last edited message in a channel")
 	.setUsage("[#channel]")
-	.setSlashOptions(true, [
+	.addApplicationCommand(Eris.Constants.CommandTypes.CHAT_INPUT, [
 		{
 			type: Eris.Constants.CommandOptionTypes.CHANNEL,
 			name: "channel",

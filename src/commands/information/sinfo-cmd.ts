@@ -10,7 +10,7 @@ import BotFunctions from "@util/BotFunctions";
 export default new Command("sinfo", "serverinfo")
 	.setPermissions("bot", "embedLinks", "attachFiles")
 	.setDescription("Get some info about this server")
-	.setSlashOptions(true, [
+	.addApplicationCommand(Eris.Constants.CommandTypes.CHAT_INPUT, [
 		{
 			type: Eris.Constants.CommandOptionTypes.STRING,
 			name: "section",

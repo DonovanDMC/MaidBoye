@@ -9,7 +9,7 @@ export default new Command("gay")
 	.setPermissions("bot", "embedLinks")
 	.setDescription("Make someone gay")
 	.setUsage("[@user/text]")
-	.setSlashOptions(true, [
+	.addApplicationCommand(Eris.Constants.CommandTypes.CHAT_INPUT, [
 		{
 			type: Eris.Constants.CommandOptionTypes.USER,
 			name: "user",

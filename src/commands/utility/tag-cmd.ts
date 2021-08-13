@@ -8,7 +8,7 @@ export default new Command("tag", "tags")
 	.setPermissions("bot", "embedLinks")
 	.setDescription("Manage this server's tags")
 	.setUsage("<create/modify/list/help/tagname>")
-	.setSlashOptions(true, [
+	.addApplicationCommand(Eris.Constants.CommandTypes.CHAT_INPUT, [
 		{
 			type: Eris.Constants.CommandOptionTypes.SUB_COMMAND,
 			name: "create",

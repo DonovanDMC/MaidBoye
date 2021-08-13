@@ -9,7 +9,7 @@ export default new Command("lockdown")
 	.setPermissions("user", "kickMembers", "manageGuild")
 	.setDescription("lock all channels in the server")
 	.setUsage("[reason]")
-	.setSlashOptions(true, [
+	.addApplicationCommand(Eris.Constants.CommandTypes.CHAT_INPUT, [
 		{
 			type: Eris.Constants.CommandOptionTypes.STRING,
 			name: "reason",
