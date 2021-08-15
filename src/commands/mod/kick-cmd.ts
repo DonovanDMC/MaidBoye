@@ -23,21 +23,21 @@ export default new Command("kick")
 			]
 		};
 	})
-	.addApplicationCommand(Eris.Constants.CommandTypes.CHAT_INPUT, [
+	.addApplicationCommand(Eris.Constants.ApplicationCommandTypes.CHAT_INPUT, [
 		{
-			type: Eris.Constants.CommandOptionTypes.USER,
+			type: Eris.Constants.ApplicationCommandOptionTypes.USER,
 			name: "user",
 			description: "The user to kick",
 			required: true
 		},
 		{
-			type: Eris.Constants.CommandOptionTypes.STRING,
+			type: Eris.Constants.ApplicationCommandOptionTypes.STRING,
 			name: "reason",
 			description: "The reason for kicking the user",
 			required: false
 		},
 		{
-			type: Eris.Constants.CommandOptionTypes.STRING,
+			type: Eris.Constants.ApplicationCommandOptionTypes.STRING,
 			name: "no-dm",
 			description: "If we should attempt to dm the kicked user with some info",
 			required: false,

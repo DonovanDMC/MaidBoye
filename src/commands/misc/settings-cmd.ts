@@ -13,7 +13,7 @@ export default new Command("settings")
 	.setPermissions("bot", "embedLinks")
 	.setPermissions("user", "manageGuild")
 	.setDescription("manage this server's settings")
-	.addApplicationCommand(Eris.Constants.CommandTypes.CHAT_INPUT, [])
+	.addApplicationCommand(Eris.Constants.ApplicationCommandTypes.CHAT_INPUT, [])
 	.setCooldown(3e3)
 	.setExecutor(async function(msg) {
 		try {

@@ -6,9 +6,9 @@ export default new Command("flop")
 	.setPermissions("bot", "embedLinks")
 	.setDescription("Flop onto someone")
 	.setUsage("<@user/text>")
-	.addLiteApplicationCommand(Eris.Constants.CommandTypes.CHAT_INPUT, [
+	.addLiteApplicationCommand(Eris.Constants.ApplicationCommandTypes.CHAT_INPUT, [
 		{
-			type: Eris.Constants.CommandOptionTypes.USER,
+			type: Eris.Constants.ApplicationCommandOptionTypes.USER,
 			name: "user",
 			description: "The user to flop on",
 			required: true

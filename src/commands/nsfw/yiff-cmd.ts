@@ -14,9 +14,9 @@ export default new Command("yiff", "thegoodstuff")
 	.setPermissions("bot", "embedLinks", "attachFiles")
 	.setDescription("Y-you know what this is..")
 	.setUsage(`<${config.yiffTypes.join("/")}>`)
-	.addApplicationCommand(Eris.Constants.CommandTypes.CHAT_INPUT, [
+	.addApplicationCommand(Eris.Constants.ApplicationCommandTypes.CHAT_INPUT, [
 		{
-			type: Eris.Constants.CommandOptionTypes.STRING,
+			type: Eris.Constants.ApplicationCommandOptionTypes.STRING,
 			name: "type",
 			description: "The type of yiff to fetch",
 			required: false,

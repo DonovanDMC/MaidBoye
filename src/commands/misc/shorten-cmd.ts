@@ -8,15 +8,15 @@ export default new Command("shorten")
 	.setPermissions("bot", "embedLinks")
 	.setDescription("Shorten a url, using yiff.rocks")
 	.setUsage("<url> [code]")
-	.addApplicationCommand(Eris.Constants.CommandTypes.CHAT_INPUT, [
+	.addApplicationCommand(Eris.Constants.ApplicationCommandTypes.CHAT_INPUT, [
 		{
-			type: Eris.Constants.CommandOptionTypes.STRING,
+			type: Eris.Constants.ApplicationCommandOptionTypes.STRING,
 			name: "url",
 			description: "The url to shorten",
 			required: true
 		},
 		{
-			type: Eris.Constants.CommandOptionTypes.STRING,
+			type: Eris.Constants.ApplicationCommandOptionTypes.STRING,
 			name: "code",
 			description: "The short code to use (none for random)",
 			required: true

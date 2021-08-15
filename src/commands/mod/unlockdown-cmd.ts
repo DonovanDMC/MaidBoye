@@ -9,9 +9,9 @@ export default new Command("unlockdown")
 	.setPermissions("user", "kickMembers", "manageGuild")
 	.setDescription("unlock all channels in the server")
 	.setUsage("[reason]")
-	.addApplicationCommand(Eris.Constants.CommandTypes.CHAT_INPUT, [
+	.addApplicationCommand(Eris.Constants.ApplicationCommandTypes.CHAT_INPUT, [
 		{
-			type: Eris.Constants.CommandOptionTypes.STRING,
+			type: Eris.Constants.ApplicationCommandOptionTypes.STRING,
 			name: "reason",
 			description: "The reason for unlocking the server",
 			required: false

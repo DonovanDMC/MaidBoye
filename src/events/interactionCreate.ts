@@ -26,16 +26,16 @@ export default new ClientEvent("interactionCreate", async function(interaction) 
 			// eslint-disable-next-line no-inner-declarations
 			function formatArg(option: Eris.InteractionDataOptions): string {
 				// console.log("o", option);
-				if (option.value === undefined && option.type !== Eris.Constants.CommandOptionTypes.SUB_COMMAND) return "";
+				if (option.value === undefined && option.type !== Eris.Constants.ApplicationCommandOptionTypes.SUB_COMMAND) return "";
 				switch (option.type) {
 					// we only need to reconstruct user & role mentions, because channelMentions
 					// are done by Eris
-					case Eris.Constants.CommandOptionTypes.SUB_COMMAND: return `${option.name} ${(option.options ?? []).map(o => formatArg(o)).join(" ")}`;
-					case Eris.Constants.CommandOptionTypes.BOOLEAN: return `<#${option.value ? "true" : "false"}>`;
-					case Eris.Constants.CommandOptionTypes.USER: userMentions.push(String(option.value)); return `<@!${String(option.value)}>`;
-					case Eris.Constants.CommandOptionTypes.CHANNEL: return `<#${String(option.value)}>`;
-					case Eris.Constants.CommandOptionTypes.ROLE: roleMentions.push(String(option.value)); return `<@&${String(option.value)}>`;
-					case Eris.Constants.CommandOptionTypes.MENTIONABLE: {
+					case Eris.Constants.ApplicationCommandOptionTypes.SUB_COMMAND: return `${option.name} ${(option.options ?? []).map(o => formatArg(o)).join(" ")}`;
+					case Eris.Constants.ApplicationCommandOptionTypes.BOOLEAN: return `<#${option.value ? "true" : "false"}>`;
+					case Eris.Constants.ApplicationCommandOptionTypes.USER: userMentions.push(String(option.value)); return `<@!${String(option.value)}>`;
+					case Eris.Constants.ApplicationCommandOptionTypes.CHANNEL: return `<#${String(option.value)}>`;
+					case Eris.Constants.ApplicationCommandOptionTypes.ROLE: roleMentions.push(String(option.value)); return `<@&${String(option.value)}>`;
+					case Eris.Constants.ApplicationCommandOptionTypes.MENTIONABLE: {
 						const isUser = (interaction as CommandInteraction).data.resolved?.users?.[String(option.value)] !== undefined;
 						if (isUser) {
 							userMentions.push(String(option.value));
@@ -51,12 +51,12 @@ export default new ClientEvent("interactionCreate", async function(interaction) 
 
 			const gConfig = await db.getGuild(interaction.guildID);
 			switch(type) {
-				case Eris.Constants.CommandTypes.CHAT_INPUT: {
+				case Eris.Constants.ApplicationCommandTypes.CHAT_INPUT: {
 					content = `${gConfig.getFormattedPrefix()}${(interaction as Eris.CommandInteraction).data.name} ${((interaction as Eris.CommandInteraction).data.options ?? []).map(o => formatArg(o)).join(" ")}`.trim();
 					break;
 				}
 
-				case Eris.Constants.CommandTypes.USER: {
+				case Eris.Constants.ApplicationCommandTypes.USER: {
 					// @ts-ignore -- waiting on pr updates
 					const target = interaction.data.target_id as string;
 					const cmd = CommandHandler.commands.find(cmd => !!cmd.applicationCommands.find(a => a.name === (interaction as Eris.CommandInteraction).data.name))

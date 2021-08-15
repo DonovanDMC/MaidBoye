@@ -29,27 +29,27 @@ export default new Command("ban")
 			]
 		};
 	})
-	.addApplicationCommand(Eris.Constants.CommandTypes.CHAT_INPUT, [
+	.addApplicationCommand(Eris.Constants.ApplicationCommandTypes.CHAT_INPUT, [
 		{
-			type: Eris.Constants.CommandOptionTypes.USER,
+			type: Eris.Constants.ApplicationCommandOptionTypes.USER,
 			name: "user",
 			description: "The user to ban",
 			required: true
 		},
 		{
-			type: Eris.Constants.CommandOptionTypes.STRING,
+			type: Eris.Constants.ApplicationCommandOptionTypes.STRING,
 			name: "reason",
 			description: "The reason for banning the user",
 			required: false
 		},
 		{
-			type: Eris.Constants.CommandOptionTypes.STRING,
+			type: Eris.Constants.ApplicationCommandOptionTypes.STRING,
 			name: "time",
 			description: "The time until the ban expires (ex: 2 days)",
 			required: false
 		},
 		{
-			type: Eris.Constants.CommandOptionTypes.STRING,
+			type: Eris.Constants.ApplicationCommandOptionTypes.STRING,
 			name: "no-dm",
 			description: "If we should attempt to dm the banned user with some info",
 			required: false,
@@ -65,7 +65,7 @@ export default new Command("ban")
 			]
 		},
 		{
-			type: Eris.Constants.CommandOptionTypes.STRING,
+			type: Eris.Constants.ApplicationCommandOptionTypes.STRING,
 			name: "delete-days",
 			description: "The amount of days of messages that should be deleted",
 			choices: new Array(8).fill(null).map((_, i) => ({

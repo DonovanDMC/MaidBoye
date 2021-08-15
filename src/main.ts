@@ -146,7 +146,7 @@ export default class MaidBoye extends Eris.Client {
 				(err: Error) => {
 					Logger.getLogger("SlashCommandSync").debug("Error detected, printing command index list");
 					commands.forEach((cmd, index) => {
-						Logger.getLogger("SlashCommandSync").debug(`Command at index "${index}": ${cmd.name} (type: ${Object.entries(Eris.Constants.CommandTypes).find(([k, v]) => cmd.type === v)![0]})`);
+						Logger.getLogger("SlashCommandSync").debug(`Command at index "${index}": ${cmd.name} (type: ${Object.entries(Eris.Constants.ApplicationCommandTypes).find(([k, v]) => cmd.type === v)![0]})`);
 					});
 					Logger.getLogger("SlashCommandSync").error(err);
 					return false;

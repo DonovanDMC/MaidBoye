@@ -49,15 +49,15 @@ async function sauce(url: string, msg: ExtendedMessage) {
 export default new Command("sauce")
 	.setPermissions("bot", "embedLinks", "attachFiles")
 	.setDescription("Get the sauce for an image")
-	.addApplicationCommand(Eris.Constants.CommandTypes.CHAT_INPUT, [
+	.addApplicationCommand(Eris.Constants.ApplicationCommandTypes.CHAT_INPUT, [
 		{
-			type: Eris.Constants.CommandOptionTypes.STRING,
+			type: Eris.Constants.ApplicationCommandOptionTypes.STRING,
 			name: "url",
 			description: "The url of the image to search for",
 			required: true
 		},
 		{
-			type: Eris.Constants.CommandOptionTypes.STRING,
+			type: Eris.Constants.ApplicationCommandOptionTypes.STRING,
 			name: "saucenao",
 			description: "If we should use saucenao for searching",
 			required: false,

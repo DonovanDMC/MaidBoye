@@ -17,9 +17,9 @@ export default new Command("modlog")
 	.setPermissions("user", "manageGuild")
 	.setDescription("Manage this server's modlog")
 	.setUsage("(no arguments)")
-	.addApplicationCommand(Eris.Constants.CommandTypes.CHAT_INPUT, [
+	.addApplicationCommand(Eris.Constants.ApplicationCommandTypes.CHAT_INPUT, [
 		{
-			type: Eris.Constants.CommandOptionTypes.STRING,
+			type: Eris.Constants.ApplicationCommandOptionTypes.STRING,
 			name: "section",
 			description: "the section of modlog configuration to open",
 			choices:[

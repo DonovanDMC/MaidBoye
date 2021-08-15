@@ -6,15 +6,15 @@ export default new Command("moveall")
 	.setPermissions("user", "voiceMoveMembers")
 	.setDescription("move all voice members from one channel to another")
 	.setUsage("<from> <to>")
-	.addApplicationCommand(Eris.Constants.CommandTypes.CHAT_INPUT, [
+	.addApplicationCommand(Eris.Constants.ApplicationCommandTypes.CHAT_INPUT, [
 		{
-			type: Eris.Constants.CommandOptionTypes.CHANNEL,
+			type: Eris.Constants.ApplicationCommandOptionTypes.CHANNEL,
 			name: "from",
 			description: "The channel to move people from",
 			required: true
 		},
 		{
-			type: Eris.Constants.CommandOptionTypes.CHANNEL,
+			type: Eris.Constants.ApplicationCommandOptionTypes.CHANNEL,
 			name: "to",
 			description: "The channel to move people to",
 			required: true

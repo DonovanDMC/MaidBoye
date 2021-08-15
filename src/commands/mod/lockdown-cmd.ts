@@ -9,9 +9,9 @@ export default new Command("lockdown")
 	.setPermissions("user", "kickMembers", "manageGuild")
 	.setDescription("lock all channels in the server")
 	.setUsage("[reason]")
-	.addApplicationCommand(Eris.Constants.CommandTypes.CHAT_INPUT, [
+	.addApplicationCommand(Eris.Constants.ApplicationCommandTypes.CHAT_INPUT, [
 		{
-			type: Eris.Constants.CommandOptionTypes.STRING,
+			type: Eris.Constants.ApplicationCommandOptionTypes.STRING,
 			name: "reason",
 			description: "The reason for locking the server",
 			required: false

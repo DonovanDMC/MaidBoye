@@ -13,9 +13,9 @@ export default new Command("help")
 	.setPermissions("bot", "embedLinks")
 	.setDescription("Find out how to use me..")
 	.setUsage("[command]")
-	.addApplicationCommand(Eris.Constants.CommandTypes.CHAT_INPUT, [
+	.addApplicationCommand(Eris.Constants.ApplicationCommandTypes.CHAT_INPUT, [
 		{
-			type: Eris.Constants.CommandOptionTypes.STRING,
+			type: Eris.Constants.ApplicationCommandOptionTypes.STRING,
 			name: "category",
 			description: "The category to get help with",
 			required: false,

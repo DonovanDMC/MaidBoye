@@ -8,9 +8,9 @@ import ErrorHandler from "@util/handlers/ErrorHandler";
 export default new Command("furpile")
 	.setPermissions("bot", "embedLinks")
 	.setDescription("Start a furpile, or join one")
-	.addApplicationCommand(Eris.Constants.CommandTypes.CHAT_INPUT, [
+	.addApplicationCommand(Eris.Constants.ApplicationCommandTypes.CHAT_INPUT, [
 		{
-			type: Eris.Constants.CommandOptionTypes.USER,
+			type: Eris.Constants.ApplicationCommandOptionTypes.USER,
 			name: "user",
 			description: "The user to start a furpile on",
 			required: true

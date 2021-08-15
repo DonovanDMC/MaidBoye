@@ -9,9 +9,9 @@ import ErrorHandler from "@util/handlers/ErrorHandler";
 export default new Command("conga")
 	.setPermissions("bot", "embedLinks", "useExternalEmojis")
 	.setDescription("Start a conga, or join one")
-	.addApplicationCommand(Eris.Constants.CommandTypes.CHAT_INPUT, [
+	.addApplicationCommand(Eris.Constants.ApplicationCommandTypes.CHAT_INPUT, [
 		{
-			type: Eris.Constants.CommandOptionTypes.USER,
+			type: Eris.Constants.ApplicationCommandOptionTypes.USER,
 			name: "user",
 			description: "The user to start a conga with",
 			required: true

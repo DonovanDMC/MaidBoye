@@ -6,9 +6,9 @@ export default new Command("spray")
 	.setPermissions("bot", "embedLinks")
 	.setDescription("Spray someone with water")
 	.setUsage("<@user/text>")
-	.addLiteApplicationCommand(Eris.Constants.CommandTypes.CHAT_INPUT, [
+	.addLiteApplicationCommand(Eris.Constants.ApplicationCommandTypes.CHAT_INPUT, [
 		{
-			type: Eris.Constants.CommandOptionTypes.USER,
+			type: Eris.Constants.ApplicationCommandOptionTypes.USER,
 			name: "user",
 			description: "The user to spray",
 			required: true

@@ -9,20 +9,20 @@ export default new Command("prefix")
 	.setPermissions("user", "manageGuild")
 	.setDescription("Set the prefix you use me with")
 	.setUsage("<add/remove/reset/list>")
-	.addApplicationCommand(Eris.Constants.CommandTypes.CHAT_INPUT, [
+	.addApplicationCommand(Eris.Constants.ApplicationCommandTypes.CHAT_INPUT, [
 		{
-			type: Eris.Constants.CommandOptionTypes.SUB_COMMAND,
+			type: Eris.Constants.ApplicationCommandOptionTypes.SUB_COMMAND,
 			name: "add",
 			description: "Add additional prefixes",
 			options: [
 				{
-					type: Eris.Constants.CommandOptionTypes.STRING,
+					type: Eris.Constants.ApplicationCommandOptionTypes.STRING,
 					name: "value",
 					description: "The prefix to add",
 					required: true
 				},
 				{
-					type: Eris.Constants.CommandOptionTypes.STRING,
+					type: Eris.Constants.ApplicationCommandOptionTypes.STRING,
 					name: "space",
 					description: "If this prefix should have a space before the command",
 					required: false,
@@ -40,12 +40,12 @@ export default new Command("prefix")
 			]
 		},
 		{
-			type: Eris.Constants.CommandOptionTypes.SUB_COMMAND,
+			type: Eris.Constants.ApplicationCommandOptionTypes.SUB_COMMAND,
 			name: "remove",
 			description: "remove a prefix",
 			options: [
 				{
-					type: Eris.Constants.CommandOptionTypes.STRING,
+					type: Eris.Constants.ApplicationCommandOptionTypes.STRING,
 					name: "prefix",
 					description: "The prefix to remove (see list Subcommand)",
 					required: true
@@ -53,13 +53,13 @@ export default new Command("prefix")
 			]
 		},
 		{
-			type: Eris.Constants.CommandOptionTypes.SUB_COMMAND,
+			type: Eris.Constants.ApplicationCommandOptionTypes.SUB_COMMAND,
 			name: "reset",
 			description: "Reset all prefixes",
 			options: []
 		},
 		{
-			type: Eris.Constants.CommandOptionTypes.SUB_COMMAND,
+			type: Eris.Constants.ApplicationCommandOptionTypes.SUB_COMMAND,
 			name: "list",
 			description: "List current prefixes",
 			options: []

@@ -7,7 +7,7 @@ import Eris from "eris";
 export default new Command("birb")
 	.setPermissions("bot", "embedLinks")
 	.setDescription("Get an image of a birb!")
-	.addApplicationCommand(Eris.Constants.CommandTypes.CHAT_INPUT, [])
+	.addApplicationCommand(Eris.Constants.ApplicationCommandTypes.CHAT_INPUT, [])
 	.setCooldown(3e3)
 	.setExecutor(async function(msg) {
 		const img = await (Math.random() > .5 ? Yiffy.animals.birb("json", 1).then(y => y.url) : CheweyAPI.birb());

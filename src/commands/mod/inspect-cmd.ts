@@ -18,15 +18,15 @@ export default new Command("inspect")
 	.setPermissions("user", "manageMessages")
 	.setDescription("Get the moderation info of a user")
 	.setUsage("<user> [section]")
-	.addApplicationCommand(Eris.Constants.CommandTypes.CHAT_INPUT, [
+	.addApplicationCommand(Eris.Constants.ApplicationCommandTypes.CHAT_INPUT, [
 		{
-			type: Eris.Constants.CommandOptionTypes.USER,
+			type: Eris.Constants.ApplicationCommandOptionTypes.USER,
 			name: "user",
 			description: "The user to inspect",
 			required: true
 		},
 		{
-			type: Eris.Constants.CommandOptionTypes.STRING,
+			type: Eris.Constants.ApplicationCommandOptionTypes.STRING,
 			name: "section",
 			description: "The section to open",
 			required: false,
@@ -46,7 +46,7 @@ export default new Command("inspect")
 			]
 		}
 	])
-	.addApplicationCommand(Eris.Constants.CommandTypes.USER, "Inspect User")
+	.addApplicationCommand(Eris.Constants.ApplicationCommandTypes.USER, "Inspect User")
 	.setCooldown(3e3)
 	.setParsedFlags("debug")
 	.setExecutor(async function(msg) {

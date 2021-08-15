@@ -7,7 +7,7 @@ import Eris from "eris";
 export default new Command("dadjoke", "joke")
 	.setPermissions("bot", "embedLinks")
 	.setDescription("Get a dadjoke")
-	.addApplicationCommand(Eris.Constants.CommandTypes.CHAT_INPUT, [])
+	.addApplicationCommand(Eris.Constants.ApplicationCommandTypes.CHAT_INPUT, [])
 	.setCooldown(3e3)
 	.setExecutor(async function(msg) {
 		const { joke } = await fetch("https://icanhazdadjoke.com", {

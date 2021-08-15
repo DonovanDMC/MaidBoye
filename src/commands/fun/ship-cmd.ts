@@ -9,15 +9,15 @@ export default new Command("ship")
 	.setPermissions("bot", "embedLinks", "attachFiles")
 	.setDescription("Ship two people")
 	.setUsage("[@member1] [@member2]")
-	.addApplicationCommand(Eris.Constants.CommandTypes.CHAT_INPUT, [
+	.addApplicationCommand(Eris.Constants.ApplicationCommandTypes.CHAT_INPUT, [
 		{
-			type: Eris.Constants.CommandOptionTypes.USER,
+			type: Eris.Constants.ApplicationCommandOptionTypes.USER,
 			name: "user1",
 			description: "The first user to ship (none for random)",
 			required: false
 		},
 		{
-			type: Eris.Constants.CommandOptionTypes.USER,
+			type: Eris.Constants.ApplicationCommandOptionTypes.USER,
 			name: "user2",
 			description: "The second user to ship (none for you)",
 			required: false

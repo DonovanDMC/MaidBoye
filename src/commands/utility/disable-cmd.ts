@@ -42,20 +42,20 @@ export default new Command("disable")
 			]
 		};
 	})
-	.addApplicationCommand(Eris.Constants.CommandTypes.CHAT_INPUT, [
+	.addApplicationCommand(Eris.Constants.ApplicationCommandTypes.CHAT_INPUT, [
 		{
-			type: Eris.Constants.CommandOptionTypes.SUB_COMMAND,
+			type: Eris.Constants.ApplicationCommandOptionTypes.SUB_COMMAND,
 			name: "add",
 			description: "Add a disable entry (provide no last argument for server wide)",
 			options: [
 				{
-					type: Eris.Constants.CommandOptionTypes.STRING,
+					type: Eris.Constants.ApplicationCommandOptionTypes.STRING,
 					name: "type",
 					description: "The type. Either a command, category, or \"all\".",
 					required: true
 				},
 				{
-					type: Eris.Constants.CommandOptionTypes.MENTIONABLE,
+					type: Eris.Constants.ApplicationCommandOptionTypes.MENTIONABLE,
 					name: "filter",
 					description: "Where this applies (for channel, regular commands must be used)",
 					required: false
@@ -63,12 +63,12 @@ export default new Command("disable")
 			]
 		},
 		{
-			type: Eris.Constants.CommandOptionTypes.SUB_COMMAND,
+			type: Eris.Constants.ApplicationCommandOptionTypes.SUB_COMMAND,
 			name: "remove",
 			description: "Remove a disable entry",
 			options: [
 				{
-					type: Eris.Constants.CommandOptionTypes.INTEGER,
+					type: Eris.Constants.ApplicationCommandOptionTypes.INTEGER,
 					name: "id",
 					description: "The id of the entry to remove (see list)",
 					required: true
@@ -76,7 +76,7 @@ export default new Command("disable")
 			]
 		},
 		{
-			type: Eris.Constants.CommandOptionTypes.SUB_COMMAND,
+			type: Eris.Constants.ApplicationCommandOptionTypes.SUB_COMMAND,
 			name: "list",
 			description: "List the current disable entries"
 		}

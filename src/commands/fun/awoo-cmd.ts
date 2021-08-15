@@ -9,7 +9,7 @@ import ErrorHandler from "@util/handlers/ErrorHandler";
 export default new Command("awoo", "howl")
 	.setPermissions("bot", "embedLinks", "useExternalEmojis")
 	.setDescription("Start a howl, or join one")
-	.addApplicationCommand(Eris.Constants.CommandTypes.CHAT_INPUT, [])
+	.addApplicationCommand(Eris.Constants.ApplicationCommandTypes.CHAT_INPUT, [])
 	.setCooldown(3e3)
 	.setExecutor(async function(msg) {
 		try {

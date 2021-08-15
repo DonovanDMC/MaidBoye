@@ -7,7 +7,7 @@ import Eris from "eris";
 export default new Command("ping")
 	.setPermissions("bot", "embedLinks")
 	.setDescription("Get my ping info..")
-	.addApplicationCommand(Eris.Constants.CommandTypes.CHAT_INPUT, [])
+	.addApplicationCommand(Eris.Constants.ApplicationCommandTypes.CHAT_INPUT, [])
 	.setCooldown(3e3)
 	.setExecutor(async function(msg) {
 		const m = await msg.channel.createMessage("this will be edited soon");

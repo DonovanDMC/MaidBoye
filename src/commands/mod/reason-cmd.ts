@@ -11,15 +11,15 @@ export default new Command("reason")
 	.setPermissions("user", "manageMessages")
 	.setDescription("change a cases reason")
 	.setUsage("<case> <newReason>")
-	.addApplicationCommand(Eris.Constants.CommandTypes.CHAT_INPUT, [
+	.addApplicationCommand(Eris.Constants.ApplicationCommandTypes.CHAT_INPUT, [
 		{
-			type: Eris.Constants.CommandOptionTypes.INTEGER,
+			type: Eris.Constants.ApplicationCommandOptionTypes.INTEGER,
 			name: "case-number",
 			description: "The number of the case to change",
 			required: true
 		},
 		{
-			type: Eris.Constants.CommandOptionTypes.STRING,
+			type: Eris.Constants.ApplicationCommandOptionTypes.STRING,
 			name: "new-reason",
 			description: "The new reason for the case",
 			required: true

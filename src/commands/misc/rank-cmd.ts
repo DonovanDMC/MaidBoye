@@ -9,9 +9,9 @@ export default new Command("rank")
 	.setPermissions("bot", "embedLinks")
 	.setDescription("Get someone's rank..")
 	.setUsage("<@user>")
-	.addApplicationCommand(Eris.Constants.CommandTypes.CHAT_INPUT, [
+	.addApplicationCommand(Eris.Constants.ApplicationCommandTypes.CHAT_INPUT, [
 		{
-			type: Eris.Constants.CommandOptionTypes.USER,
+			type: Eris.Constants.ApplicationCommandOptionTypes.USER,
 			name: "user",
 			description: "The user to get the rank of (none for yourself)",
 			required: false

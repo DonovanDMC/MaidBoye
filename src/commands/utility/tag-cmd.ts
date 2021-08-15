@@ -8,20 +8,20 @@ export default new Command("tag", "tags")
 	.setPermissions("bot", "embedLinks")
 	.setDescription("Manage this server's tags")
 	.setUsage("<create/modify/list/help/tagname>")
-	.addApplicationCommand(Eris.Constants.CommandTypes.CHAT_INPUT, [
+	.addApplicationCommand(Eris.Constants.ApplicationCommandTypes.CHAT_INPUT, [
 		{
-			type: Eris.Constants.CommandOptionTypes.SUB_COMMAND,
+			type: Eris.Constants.ApplicationCommandOptionTypes.SUB_COMMAND,
 			name: "create",
 			description: "[Management] create a tag",
 			options: [
 				{
-					type: Eris.Constants.CommandOptionTypes.STRING,
+					type: Eris.Constants.ApplicationCommandOptionTypes.STRING,
 					name: "name",
 					description: "The name of the tag",
 					required: true
 				},
 				{
-					type: Eris.Constants.CommandOptionTypes.STRING,
+					type: Eris.Constants.ApplicationCommandOptionTypes.STRING,
 					name: "content",
 					description: "The content of the tag",
 					required: true
@@ -29,18 +29,18 @@ export default new Command("tag", "tags")
 			]
 		},
 		{
-			type: Eris.Constants.CommandOptionTypes.SUB_COMMAND,
+			type: Eris.Constants.ApplicationCommandOptionTypes.SUB_COMMAND,
 			name: "modify",
 			description: "[Management] modify a tag",
 			options: [
 				{
-					type: Eris.Constants.CommandOptionTypes.STRING,
+					type: Eris.Constants.ApplicationCommandOptionTypes.STRING,
 					name: "name",
 					description: "The name of the tag to modify",
 					required: true
 				},
 				{
-					type: Eris.Constants.CommandOptionTypes.STRING,
+					type: Eris.Constants.ApplicationCommandOptionTypes.STRING,
 					name: "content",
 					description: "The new content of the tag",
 					required: true
@@ -48,12 +48,12 @@ export default new Command("tag", "tags")
 			]
 		},
 		{
-			type: Eris.Constants.CommandOptionTypes.SUB_COMMAND,
+			type: Eris.Constants.ApplicationCommandOptionTypes.SUB_COMMAND,
 			name: "delete",
 			description: "[Management] Delete a tag",
 			options: [
 				{
-					type: Eris.Constants.CommandOptionTypes.STRING,
+					type: Eris.Constants.ApplicationCommandOptionTypes.STRING,
 					name: "name",
 					description: "The name of the tag to delete",
 					required: true
@@ -61,22 +61,22 @@ export default new Command("tag", "tags")
 			]
 		},
 		{
-			type: Eris.Constants.CommandOptionTypes.SUB_COMMAND,
+			type: Eris.Constants.ApplicationCommandOptionTypes.SUB_COMMAND,
 			name: "list",
 			description: "List the servers tags"
 		},
 		{
-			type: Eris.Constants.CommandOptionTypes.SUB_COMMAND,
+			type: Eris.Constants.ApplicationCommandOptionTypes.SUB_COMMAND,
 			name: "help",
 			description: "Get help with using tags"
 		},
 		{
-			type: Eris.Constants.CommandOptionTypes.SUB_COMMAND,
+			type: Eris.Constants.ApplicationCommandOptionTypes.SUB_COMMAND,
 			name: "get",
 			description: "Get a tag",
 			options: [
 				{
-					type: Eris.Constants.CommandOptionTypes.STRING,
+					type: Eris.Constants.ApplicationCommandOptionTypes.STRING,
 					name: "name",
 					description: "The name of the tag to get",
 					required: true

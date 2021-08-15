@@ -9,9 +9,9 @@ export default new Command("gay")
 	.setPermissions("bot", "embedLinks")
 	.setDescription("Make someone gay")
 	.setUsage("[@user/text]")
-	.addApplicationCommand(Eris.Constants.CommandTypes.CHAT_INPUT, [
+	.addApplicationCommand(Eris.Constants.ApplicationCommandTypes.CHAT_INPUT, [
 		{
-			type: Eris.Constants.CommandOptionTypes.USER,
+			type: Eris.Constants.ApplicationCommandOptionTypes.USER,
 			name: "user",
 			description: "The user to gayify (none for yourself)",
 			required: false

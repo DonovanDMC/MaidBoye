@@ -10,19 +10,19 @@ import Eris from "eris";
 export default new Command("selfroles", "selfrole")
 	.setPermissions("bot", "embedLinks", "manageRoles")
 	.setDescription("Manage self roles")
-	.addApplicationCommand(Eris.Constants.CommandTypes.CHAT_INPUT, [
+	.addApplicationCommand(Eris.Constants.ApplicationCommandTypes.CHAT_INPUT, [
 		{
-			type: Eris.Constants.CommandOptionTypes.SUB_COMMAND,
+			type: Eris.Constants.ApplicationCommandOptionTypes.SUB_COMMAND,
 			name: "list",
 			description: "List this server's self assignable roles"
 		},
 		{
-			type: Eris.Constants.CommandOptionTypes.SUB_COMMAND,
+			type: Eris.Constants.ApplicationCommandOptionTypes.SUB_COMMAND,
 			name: "join",
 			description: "Join a self assignable role",
 			options: [
 				{
-					type: Eris.Constants.CommandOptionTypes.STRING,
+					type: Eris.Constants.ApplicationCommandOptionTypes.STRING,
 					name: "role",
 					description: "The name of the role you want to join (see list)",
 					required: true
@@ -30,17 +30,17 @@ export default new Command("selfroles", "selfrole")
 			]
 		},
 		{
-			type: Eris.Constants.CommandOptionTypes.SUB_COMMAND,
+			type: Eris.Constants.ApplicationCommandOptionTypes.SUB_COMMAND,
 			name: "leave",
 			description: "Leave a self assignable role (opens select menu)"
 		},
 		{
-			type: Eris.Constants.CommandOptionTypes.SUB_COMMAND,
+			type: Eris.Constants.ApplicationCommandOptionTypes.SUB_COMMAND,
 			name: "add",
 			description: "[Management] Add a self assignable role",
 			options: [
 				{
-					type: Eris.Constants.CommandOptionTypes.ROLE,
+					type: Eris.Constants.ApplicationCommandOptionTypes.ROLE,
 					name: "role",
 					description: "The role to make self assignable",
 					required: true
@@ -48,12 +48,12 @@ export default new Command("selfroles", "selfrole")
 			]
 		},
 		{
-			type: Eris.Constants.CommandOptionTypes.SUB_COMMAND,
+			type: Eris.Constants.ApplicationCommandOptionTypes.SUB_COMMAND,
 			name: "remove",
 			description: "[Management] Remove a self assignable role",
 			options: [
 				{
-					type: Eris.Constants.CommandOptionTypes.ROLE,
+					type: Eris.Constants.ApplicationCommandOptionTypes.ROLE,
 					name: "role",
 					description: "The role to make not self assignable",
 					required: true

@@ -6,7 +6,7 @@ import Eris from "eris";
 export default new Command("fox")
 	.setPermissions("bot", "embedLinks")
 	.setDescription("Get an image of a fox!")
-	.addApplicationCommand(Eris.Constants.CommandTypes.CHAT_INPUT, [])
+	.addApplicationCommand(Eris.Constants.ApplicationCommandTypes.CHAT_INPUT, [])
 	.setCooldown(3e3)
 	.setExecutor(async function(msg) {
 		const img = await CheweyAPI.fox();

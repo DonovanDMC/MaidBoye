@@ -9,15 +9,15 @@ export default new Command("warn", "bonk")
 	.setPermissions("user", "kickMembers")
 	.setDescription("warn a user for something they're doing")
 	.setUsage("<user> [reason]")
-	.addApplicationCommand(Eris.Constants.CommandTypes.CHAT_INPUT, [
+	.addApplicationCommand(Eris.Constants.ApplicationCommandTypes.CHAT_INPUT, [
 		{
-			type: Eris.Constants.CommandOptionTypes.USER,
+			type: Eris.Constants.ApplicationCommandOptionTypes.USER,
 			name: "user",
 			description: "The user to warn",
 			required: true
 		},
 		{
-			type: Eris.Constants.CommandOptionTypes.STRING,
+			type: Eris.Constants.ApplicationCommandOptionTypes.STRING,
 			name: "reason",
 			description: "The reason for warning the user",
 			required: false

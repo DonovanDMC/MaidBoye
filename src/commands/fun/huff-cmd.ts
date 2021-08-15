@@ -6,9 +6,9 @@ export default new Command("huff")
 	.setPermissions("bot", "embedLinks")
 	.setDescription("Blow someone's house down")
 	.setUsage("<@user/text>")
-	.addLiteApplicationCommand(Eris.Constants.CommandTypes.CHAT_INPUT, [
+	.addLiteApplicationCommand(Eris.Constants.ApplicationCommandTypes.CHAT_INPUT, [
 		{
-			type: Eris.Constants.CommandOptionTypes.USER,
+			type: Eris.Constants.ApplicationCommandOptionTypes.USER,
 			name: "user",
 			// @FIXME grammar
 			description: "The user of whose house you want to blow down",

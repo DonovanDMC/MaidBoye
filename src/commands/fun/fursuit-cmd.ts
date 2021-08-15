@@ -7,7 +7,7 @@ import Eris from "eris";
 export default new Command("fursuit")
 	.setPermissions("bot", "embedLinks")
 	.setDescription("Get an image of a fursuit")
-	.addApplicationCommand(Eris.Constants.CommandTypes.CHAT_INPUT, [])
+	.addApplicationCommand(Eris.Constants.ApplicationCommandTypes.CHAT_INPUT, [])
 	.setCooldown(3e3)
 	.setExecutor(async function(msg) {
 		const butt = msg.args[0] === "butt";

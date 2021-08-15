@@ -62,16 +62,16 @@ export default class Command {
 	addApplicationCommand(type: 2 | 3, name: string): this
 	addApplicationCommand(type: 1 | 2 | 3, nameOrOptions: Array<Eris.ApplicationCommandOptions> | string) {
 		this.applicationCommands.push({
-			name: type === Eris.Constants.CommandTypes.CHAT_INPUT ? this.triggers[0] : String(nameOrOptions),
-			description: type === Eris.Constants.CommandTypes.CHAT_INPUT ? this.description : undefined,
+			name: type === Eris.Constants.ApplicationCommandTypes.CHAT_INPUT ? this.triggers[0] : String(nameOrOptions),
+			description: type === Eris.Constants.ApplicationCommandTypes.CHAT_INPUT ? this.description : undefined,
 			type,
-			options: type === Eris.Constants.CommandTypes.CHAT_INPUT ? Array.isArray(nameOrOptions) ? nameOrOptions : [] : [],
+			options: type === Eris.Constants.ApplicationCommandTypes.CHAT_INPUT ? Array.isArray(nameOrOptions) ? nameOrOptions : [] : [],
 			defaultPermission: true
 		})
 		return this;
 	}
 
-	addLiteApplicationCommand(type: (typeof Eris["Constants"]["CommandTypes"])[keyof typeof Eris["Constants"]["CommandTypes"]], options: Array<Eris.ApplicationCommandOptions>) {
+	addLiteApplicationCommand(type: (typeof Eris["Constants"]["ApplicationCommandTypes"])[keyof typeof Eris["Constants"]["ApplicationCommandTypes"]], options: Array<Eris.ApplicationCommandOptions>) {
 		this.liteApplicationCommands.push({
 			name: this.triggers[0],
 			description: this.description,

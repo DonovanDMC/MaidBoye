@@ -6,7 +6,7 @@ import Eris from "eris";
 export default new Command("links", "support", "invite", "inv")
 	.setPermissions("bot", "embedLinks")
 	.setDescription("Get some of my important links")
-	.addApplicationCommand(Eris.Constants.CommandTypes.CHAT_INPUT, [])
+	.addApplicationCommand(Eris.Constants.ApplicationCommandTypes.CHAT_INPUT, [])
 	.setCooldown(3e3)
 	.setExecutor(async function(msg) {
 		return msg.reply({

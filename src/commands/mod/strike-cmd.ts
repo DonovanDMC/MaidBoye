@@ -9,15 +9,15 @@ export default new Command("strike")
 	.setPermissions("user", "manageMessages")
 	.setDescription("Add a strike or several to a user")
 	.setUsage("<user> [amount]")
-	.addApplicationCommand(Eris.Constants.CommandTypes.CHAT_INPUT, [
+	.addApplicationCommand(Eris.Constants.ApplicationCommandTypes.CHAT_INPUT, [
 		{
-			type: Eris.Constants.CommandOptionTypes.USER,
+			type: Eris.Constants.ApplicationCommandOptionTypes.USER,
 			name: "user",
 			description: "The user to strike",
 			required: true
 		},
 		{
-			type: Eris.Constants.CommandOptionTypes.INTEGER,
+			type: Eris.Constants.ApplicationCommandOptionTypes.INTEGER,
 			name: "amount",
 			description: "The amount of strikes to give the user",
 			required: false

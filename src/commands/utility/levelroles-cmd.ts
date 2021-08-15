@@ -13,20 +13,20 @@ export default new Command("levelroles")
 	.setPermissions("user")
 	.setDescription("Manage this servers level up roles")
 	.setUsage("todo")
-	.addApplicationCommand(Eris.Constants.CommandTypes.CHAT_INPUT, [
+	.addApplicationCommand(Eris.Constants.ApplicationCommandTypes.CHAT_INPUT, [
 		{
-			type: Eris.Constants.CommandOptionTypes.SUB_COMMAND,
+			type: Eris.Constants.ApplicationCommandOptionTypes.SUB_COMMAND,
 			name: "add",
 			description: "Add a level role",
 			options: [
 				{
-					type: Eris.Constants.CommandOptionTypes.ROLE,
+					type: Eris.Constants.ApplicationCommandOptionTypes.ROLE,
 					name: "role",
 					description: "The role to add to users when they reach the level",
 					required: true
 				},
 				{
-					type: Eris.Constants.CommandOptionTypes.INTEGER,
+					type: Eris.Constants.ApplicationCommandOptionTypes.INTEGER,
 					name: "level",
 					description: "The level at which to give the role",
 					required: true
@@ -34,12 +34,12 @@ export default new Command("levelroles")
 			]
 		},
 		{
-			type: Eris.Constants.CommandOptionTypes.SUB_COMMAND,
+			type: Eris.Constants.ApplicationCommandOptionTypes.SUB_COMMAND,
 			name: "remove",
 			description: "Remove a level role",
 			options: [
 				{
-					type: Eris.Constants.CommandOptionTypes.ROLE,
+					type: Eris.Constants.ApplicationCommandOptionTypes.ROLE,
 					name: "role",
 					description: "The role to remove",
 					required: true
@@ -47,7 +47,7 @@ export default new Command("levelroles")
 			]
 		},
 		{
-			type: Eris.Constants.CommandOptionTypes.SUB_COMMAND,
+			type: Eris.Constants.ApplicationCommandOptionTypes.SUB_COMMAND,
 			name: "list",
 			description: "List the level roles"
 		}

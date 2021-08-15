@@ -14,15 +14,15 @@ export default new Command("e621", "e6")
 	.setPermissions("bot", "embedLinks", "attachFiles")
 	.setDescription("Search for posts from e621")
 	.setUsage("[tags]")
-	.addApplicationCommand(Eris.Constants.CommandTypes.CHAT_INPUT, [
+	.addApplicationCommand(Eris.Constants.ApplicationCommandTypes.CHAT_INPUT, [
 		{
-			type: Eris.Constants.CommandOptionTypes.STRING,
+			type: Eris.Constants.ApplicationCommandOptionTypes.STRING,
 			name: "tags",
 			description: "The tags to search with (default order: favcount), max 40",
 			required: false
 		},
 		{
-			type: Eris.Constants.CommandOptionTypes.STRING,
+			type: Eris.Constants.ApplicationCommandOptionTypes.STRING,
 			name: "no-video",
 			description: "If we should filter out video files",
 			required: false,
@@ -38,7 +38,7 @@ export default new Command("e621", "e6")
 			]
 		},
 		{
-			type: Eris.Constants.CommandOptionTypes.STRING,
+			type: Eris.Constants.ApplicationCommandOptionTypes.STRING,
 			name: "no-flash",
 			description: "If we should filter out flash files",
 			required: false,

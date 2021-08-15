@@ -8,15 +8,15 @@ export default new Command("lock")
 	.setPermissions("user", "kickMembers")
 	.setDescription("keep everyone from speaking in a channel")
 	.setUsage("[<channel> [reason]]")
-	.addApplicationCommand(Eris.Constants.CommandTypes.CHAT_INPUT, [
+	.addApplicationCommand(Eris.Constants.ApplicationCommandTypes.CHAT_INPUT, [
 		{
-			type: Eris.Constants.CommandOptionTypes.CHANNEL,
+			type: Eris.Constants.ApplicationCommandOptionTypes.CHANNEL,
 			name: "channel",
 			description: "The channel to lock (none for current channel)",
 			required: false
 		},
 		{
-			type: Eris.Constants.CommandOptionTypes.STRING,
+			type: Eris.Constants.ApplicationCommandOptionTypes.STRING,
 			name: "reason",
 			description: "The reason for locking the channel",
 			required: false

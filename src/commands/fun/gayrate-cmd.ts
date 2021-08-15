@@ -6,9 +6,9 @@ import Eris from "eris";
 export default new Command("gayrate")
 	.setPermissions("bot", "embedLinks")
 	.setDescription("Rate someone's gayness")
-	.addApplicationCommand(Eris.Constants.CommandTypes.CHAT_INPUT, [
+	.addApplicationCommand(Eris.Constants.ApplicationCommandTypes.CHAT_INPUT, [
 		{
-			type: Eris.Constants.CommandOptionTypes.USER,
+			type: Eris.Constants.ApplicationCommandOptionTypes.USER,
 			name: "user",
 			description: "The user to rate (none for yourself)",
 			required: false

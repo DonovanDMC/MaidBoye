@@ -28,9 +28,9 @@ export default new Command("8ball")
 	.setPermissions("bot", "embedLinks")
 	.setDescription("Ask the magic 8 ball")
 	.setUsage("<question>")
-	.addLiteApplicationCommand(Eris.Constants.CommandTypes.CHAT_INPUT, [
+	.addLiteApplicationCommand(Eris.Constants.ApplicationCommandTypes.CHAT_INPUT, [
 		{
-			type: Eris.Constants.CommandOptionTypes.STRING,
+			type: Eris.Constants.ApplicationCommandOptionTypes.STRING,
 			name: "question",
 			description: "The question to ask the magic 8ball.",
 			required: true

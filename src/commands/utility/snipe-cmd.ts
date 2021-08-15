@@ -11,9 +11,9 @@ export default new Command("snipe")
 	.setPermissions("user")
 	.setDescription("Get the last deleted message in a channel")
 	.setUsage("[#channel]")
-	.addApplicationCommand(Eris.Constants.CommandTypes.CHAT_INPUT, [
+	.addApplicationCommand(Eris.Constants.ApplicationCommandTypes.CHAT_INPUT, [
 		{
-			type: Eris.Constants.CommandOptionTypes.CHANNEL,
+			type: Eris.Constants.ApplicationCommandOptionTypes.CHANNEL,
 			name: "channel",
 			description: "The channel to snipe (none for current)",
 			required: false

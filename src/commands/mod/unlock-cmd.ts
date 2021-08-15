@@ -7,15 +7,15 @@ export default new Command("unlock")
 	.setPermissions("user", "kickMembers")
 	.setDescription("undo a lock")
 	.setUsage("[<channel> [reason]]")
-	.addApplicationCommand(Eris.Constants.CommandTypes.CHAT_INPUT, [
+	.addApplicationCommand(Eris.Constants.ApplicationCommandTypes.CHAT_INPUT, [
 		{
-			type: Eris.Constants.CommandOptionTypes.CHANNEL,
+			type: Eris.Constants.ApplicationCommandOptionTypes.CHANNEL,
 			name: "channel",
 			description: "The channel to unlock (none for current channel)",
 			required: false
 		},
 		{
-			type: Eris.Constants.CommandOptionTypes.STRING,
+			type: Eris.Constants.ApplicationCommandOptionTypes.STRING,
 			name: "reason",
 			description: "The reason for unlocking the channel",
 			required: false

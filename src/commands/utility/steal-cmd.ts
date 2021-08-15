@@ -12,15 +12,15 @@ export default new Command("steal")
 	.setPermissions("user", "manageEmojis")
 	.setDescription("Steal an emoji for this server, or create one from a url")
 	.setUsage("<emoji/url>")
-	.addApplicationCommand(Eris.Constants.CommandTypes.CHAT_INPUT, [
+	.addApplicationCommand(Eris.Constants.ApplicationCommandTypes.CHAT_INPUT, [
 		{
-			type: Eris.Constants.CommandOptionTypes.STRING,
+			type: Eris.Constants.ApplicationCommandOptionTypes.STRING,
 			name: "input",
 			description: "The emoji or url you want to steal",
 			required: true
 		},
 		{
-			type: Eris.Constants.CommandOptionTypes.STRING,
+			type: Eris.Constants.ApplicationCommandOptionTypes.STRING,
 			name: "name",
 			description: "What to name the emoji (default original name, or filename)",
 			required: false
