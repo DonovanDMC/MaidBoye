@@ -2,7 +2,7 @@
   "name": "maidboye",
   "version": "1.0.2",
   "buildDate": null,
-  "description": "A cute little maid bot for keep your server nice and tidy.",
+  "description": "A cute little maid bot for keeping your server nice and tidy.",
   "main": "index.js",
   "dependencies": {
     "@augu/collections": "^1.0.12",
@@ -48,12 +48,12 @@
     "bot",
     "discord-bot"
   ],
-  "author": "Donovan_DMC <hewwo@yiff.rocks>",
+  "author": "Donovan Daniels <hewwo@yiff.rocks> (https://donovan.is.gay)",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/DonovanDMC/MaidBoye/issues"
   },
-  "homepage": "https://github.com/DonovanDMC/MaidBoye#readme",
+  "homepage": "https://github.com/DonovanDMC/MaidBoye/blob/master/README.md",
   "devDependencies": {
     "@types/chunk": "*",
     "@types/express": "^4.17.13",
@@ -67,7 +67,8 @@
     "@types/source-map-support": "^0.5.4",
     "@uwu-codes/types": "^1.0.5",
     "discord-api-types": "^0.22.0",
-    "ts-node": "^10.2.0"
+    "ts-node": "^10.2.0",
+    "typescript": "^4.3.5"
   },
   "engine": {
     "node": ">=16.x",
