@@ -57,7 +57,7 @@ export default new ClientEvent("messageCreate", async function (message) {
 
 	// ignore if we can't send messages
 	// (we need to check channel and guild to remove Uncached and PrivateChannel)
-	if ("channel" in message && "guild" in message.channel && !message.channel.permissionsOf(this.user.id).has("sendMessages")) return;
+	if (!("channel" in message) || !("guild" in message.channel) || !message.channel.permissionsOf(this.user.id).has("sendMessages")) return;
 
 	t.start("guildBl");
 	const guildBl = await GuildConfig.prototype.checkBlacklist.call({ id: message.guildID });

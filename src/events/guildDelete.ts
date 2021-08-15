@@ -29,7 +29,7 @@ export default new ClientEvent("guildDelete", async function(guild) {
 			owner = `${u.username}#${u.discriminator} (${u.id})`;
 		}
 	}
-	Logger.getLogger("GuildCreare").info(`New guild joined: ${guild.name} (${guild.id}), owner: ${owner} (${guild.ownerID}), member count: ${guild.memberCount}`);
+	Logger.getLogger("GuildDelete").info(`Guild left: ${guild.name} (${guild.id}), owner: ${owner} (${guild.ownerID}), member count: ${guild.memberCount}`);
 	await WebhookStore.execute("guilds", {
 		embeds: [
 			new EmbedBuilder(true)
