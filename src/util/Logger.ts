@@ -1,9 +1,9 @@
 import config from "@config";
-import { ILogObject, Logger as L } from "tslog";
+import { ILogObject, Logger as TSLog } from "tslog";
 import * as fs from "fs-extra";
 
 export default class Logger {
-	private static log = new L();
+	private static log = new TSLog();
 	private static saveToFile(obj: ILogObject) {
 		fs.mkdirpSync(config.dir.logs.client);
 		const d = new Date();
