@@ -1,0 +1,50 @@
+{
+  "name": "maidboye-telegram",
+  "version": "1.0.0",
+  "buildDate": null,
+  "description": "A cute little maid bot for keeping your groups lively.",
+  "main": "index.js",
+  "dependencies": {
+    "fs-extra": "^10.0.0",
+    "module-alias": "^2.2.2",
+    "source-map-support": "^0.5.19",
+    "telegraf": "^4.4.1",
+    "tslog": "^3.2.0"
+  },
+  "scripts": {
+    "build": "rm -rf build && tsc && ts-node scripts/build-date.ts && echo Build Finished",
+    "dev": "ts-node src/index.ts",
+    "start": "npm run build && node index.js",
+    "start:nobuild": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DonovanDMC/MaidBoye.git"
+  },
+  "keywords": [
+    "maid",
+    "bot",
+    "telegram-bot"
+  ],
+  "author": "Donovan Daniels <hewwo@yiff.rocks> (https://donovan.is.gay)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/DonovanDMC/MaidBoye/issues"
+  },
+  "homepage": "https://github.com/DonovanDMC/MaidBoye/blob/telegram/README.md",
+  "devDependencies": {
+    "@types/fs-extra": "^9.0.12",
+    "@types/module-alias": "^2.0.1",
+    "@types/node": "^16.6.1",
+    "@types/source-map-support": "^0.5.4",
+    "@uwu-codes/eslint-config": "^1.0.18",
+    "@uwu-codes/tsconfig": "^1.0.1",
+    "@uwu-codes/types": "^1.0.5",
+    "ts-node": "^10.2.0",
+    "typescript": "^4.3.5"
+  },
+  "engine": {
+    "node": ">=16.x",
+    "npm": ">=7.x"
+  }
+}
