@@ -1,3 +1,4 @@
 [submodule "src/config"]
 	path = src/config
 	url = https://github.com/DonovanDMC/MaidBoyeConfig
+	branch = master
