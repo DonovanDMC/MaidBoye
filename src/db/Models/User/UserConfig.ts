@@ -97,7 +97,9 @@ export default class UserConfig {
 
 	async addSelfRoleJoined(role: string, guild: string) {
 		const id = crypto.randomBytes(6).toString("hex");
-		await db.query("INSERT INTO selfrolesjoined (id, user_id, guild_id, role) VALUES (?, ?, ?, ?)", [
+		// we would never see duplicates but I'm not getting into events yet
+		// (to remove entries on manual role removal)
+		await db.query("REPLACE INTO selfrolesjoined (id, user_id, guild_id, role) VALUES (?, ?, ?, ?)", [
 			id,
 			this.id,
 			guild,
