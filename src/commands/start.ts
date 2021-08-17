@@ -1,5 +1,5 @@
-import Command from "../util/Command";
-import { USERNAME } from "../util/Escape";
+import Command from "@util/Command";
+import { USERNAME } from "@util/Escape";
 
 export default new Command("start", "Start using me", async(ctx) => {
 	return ctx.reply([

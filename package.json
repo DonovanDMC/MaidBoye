@@ -5,11 +5,14 @@
   "description": "A cute little maid bot for keeping your groups lively.",
   "main": "index.js",
   "dependencies": {
+    "@uwu-codes/utils": "^1.0.51",
     "fs-extra": "^10.0.0",
     "module-alias": "^2.2.2",
     "source-map-support": "^0.5.19",
     "telegraf": "^4.4.1",
-    "tslog": "^3.2.0"
+    "telegraf-middleware-console-time": "^2.1.0",
+    "tslog": "^3.2.0",
+    "yiffy": "^2.0.14"
   },
   "scripts": {
     "build": "rm -rf build && tsc && ts-node scripts/build-date.ts && echo Build Finished",

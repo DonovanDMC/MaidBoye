@@ -1,6 +1,4 @@
-import { Composer } from "telegraf";
-import * as fs from "fs-extra";
-import Command from "../util/Command";
+import Command from "@util/Command";
 import bot from "..";
 
 export default new Command("help", "List my commands", async(ctx) => {
