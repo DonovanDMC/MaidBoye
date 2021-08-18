@@ -71,12 +71,13 @@ export default new ClientEvent("messageCreate", async function (message) {
 		return;
 	}
 	t.end("guildBl");
+	// not anymore
 	// we completely ignore messages inside of threads
-	if ([
+	/* if ([
 		Eris.Constants.ChannelTypes.GUILD_NEWS_THREAD,
 		Eris.Constants.ChannelTypes.GUILD_PUBLIC_THREAD,
 		Eris.Constants.ChannelTypes.GUILD_PRIVATE_THREAD
-	].includes(message.channel.type as 10)) return;
+	].includes(message.channel.type as 10)) return; */
 
 	t.start("extend");
 	const msg = new ExtendedMessage(message as Eris.Message<Exclude<Eris.GuildTextableChannel, Eris.AnyThreadChannel>>, this);
