@@ -24,7 +24,7 @@ Object.defineProperties(Eris.User.prototype, {
 		get(this: Eris.User) { return `${this.username}#${this.discriminator}`; }
 	},
 	createMessage: {
-		value(this: Eris.User, content: Eris.MessageContent, file: Eris.MessageFile | Array<Eris.MessageFile>) {
+		value(this: Eris.User, content: Eris.MessageContent, file: Eris.FileContent | Array<Eris.FileContent>) {
 			return this.getDMChannel().then(ch => ch.createMessage(content, file));
 		}
 	}
@@ -111,7 +111,7 @@ Object.defineProperties(Eris.Message.prototype, {
 		enumerable: true
 	},
 	reply: {
-		value(this: Eris.Message, content: Eris.MessageContent, file: Eris.MessageFile | Array<Eris.MessageFile>) {
+		value(this: Eris.Message, content: Eris.MessageContent, file: Eris.FileContent | Array<Eris.FileContent>) {
 			if (typeof content === "string") content = { content };
 			// interactions
 			if (this.id === "000000000000000000") return this.channel.createMessage(content);

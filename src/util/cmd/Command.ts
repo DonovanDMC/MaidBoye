@@ -5,7 +5,7 @@ import { ArrayOneOrMore } from "@uwu-codes/types";
 import Eris from "eris";
 
 export type CommandRestrictions = "beta" | "developer" | "nsfw";
-export type DeprecatedPermissions = "viewAuditLogs" | "stream" | "readMessages" | "externalEmojis";
+export type DeprecatedPermissions = "viewAuditLogs" | "stream" | "readMessages" | "externalEmojis" | "manageEmojis" | "useSlashCommands";
 export type FakePermissions = "allGuild" | "allText" | "allVoice" | "all";
 export type Permissions = Exclude<keyof typeof Eris["Constants"]["Permissions"], DeprecatedPermissions | FakePermissions>;
 export default class Command {

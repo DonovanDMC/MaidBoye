@@ -30,7 +30,7 @@ export default class ExtendedMessage extends Message<Eris.GuildTextableChannel> 
 		if (!this.client) this.client = client;
 		// for interactions
 		const self = this;
-		this.channel.createMessage = async function createMessage(content: Eris.MessageContent, file?: Eris.MessageFile | Array<Eris.MessageFile> | undefined) {
+		this.channel.createMessage = async function createMessage(content: Eris.MessageContent, file?: Eris.FileContent | Array<Eris.FileContent> | undefined) {
 			if (self.cmdInteracton !== null) {
 				// interaction message isn't a real message
 				if (typeof content !== "string" && content.messageReference) delete content.messageReference;

@@ -8,8 +8,8 @@ import Tinify from "tinify";
 import { URL } from "url";
 
 export default new Command("steal")
-	.setPermissions("bot", "embedLinks", "attachFiles", "manageEmojis")
-	.setPermissions("user", "manageEmojis")
+	.setPermissions("bot", "embedLinks", "attachFiles", "manageEmojisAndStickers")
+	.setPermissions("user", "manageEmojisAndStickers")
 	.setDescription("Steal an emoji for this server, or create one from a url")
 	.setUsage("<emoji/url>")
 	.addApplicationCommand(Eris.Constants.ApplicationCommandTypes.CHAT_INPUT, [
