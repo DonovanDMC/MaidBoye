@@ -15,7 +15,7 @@ import ErrorHandler from "@util/handlers/ErrorHandler";
 
 export default new Command("inspect")
 	.setPermissions("bot", "embedLinks")
-	.setPermissions("user", "manageMessages")
+	.setPermissions("user")
 	.setDescription("Get the moderation info of a user")
 	.setUsage("<user> [section]")
 	.addApplicationCommand(Eris.Constants.ApplicationCommandTypes.CHAT_INPUT, [
