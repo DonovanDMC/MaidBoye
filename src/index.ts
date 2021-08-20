@@ -28,7 +28,7 @@ void bot.getBotGateway().then(function preLaunchInfo({ session_start_limit: { re
 
 // for shutdown in pterodactyl
 if (process.env.PTR === "1") {
-	process.stdin.on("data", async(d) => {
+	process.stdin.on("data", (async function ptrEval(this: MaidBoye, d: Buffer) {
 		// slice for newline at the end
 		let [cmd, args] = d.toString().slice(0, -1).split(":");
 
@@ -47,7 +47,8 @@ if (process.env.PTR === "1") {
 		}
 
 		switch (cmd.toLowerCase()) {
-			case "node": {
+			case "node":
+			default: {
 				// eslint-disable-next-line
 				const out = eval(args);
 				console.log(`Eval Output (${args}):`);
@@ -69,12 +70,12 @@ if (process.env.PTR === "1") {
 				await g!.leave();
 				process.stdout.write(`Left the guild "${cmd}".\n`);
 				break;
-			}
+			}/* 
 
 			default: {
 				if (!cmd) process.stderr.write("No command provided.\n");
 				else process.stderr.write(`Invalid command "${cmd}".\n`);
-			}
+			} */
 		}
-	});
+	}).bind(bot));
 }
