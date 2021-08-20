@@ -279,6 +279,9 @@ export default new ClientEvent("messageCreate", async function (message) {
 				return;
 			}
 
+			// ignore errors from eval command
+			if(cmd.triggers.includes("eval")) return;
+
 			StatsHandler.trackNoResponse(`stats:commands:${cmd.triggers[0]}:error`);
 
 			const code = await ErrorHandler.handleError(err, msg);
