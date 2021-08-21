@@ -28,7 +28,7 @@ export default class Logger {
 				config.client.token,
 				config.client.secret
 			],
-			dateTimeTimezone: "cst",
+			dateTimeTimezone: "America/Chicago",
 			// Levels: https://github.com/fullstack-build/tslog/blob/2760b4144691a354126059a9d100a8c3c4879895/src/interfaces.ts#L8-L16
 			// Default Colors: https://github.com/fullstack-build/tslog/blob/2760b4144691a354126059a9d100a8c3c4879895/src/LoggerWithoutCallSite.ts#L66-L74
 			logLevelsColors: [
