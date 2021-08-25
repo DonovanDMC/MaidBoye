@@ -8,6 +8,7 @@ export default class LinksRoute extends Route {
 
 		this.app
 			.get("/invite/done", async(req,res) => res.status(200).render("invite-done"))
+			.get("/invite/done-lite", async(req,res) => res.status(200).render("invite-done-lite"))
 			.get("/:link", async(req,res, next) => {
 				if (config.client.links[req.params.link as "support"]) return res.redirect(config.client.links[req.params.link as "support"]);
 				else return next();
