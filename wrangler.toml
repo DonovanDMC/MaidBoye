@@ -3,10 +3,11 @@ type = "javascript"
 account_id = "f6a5a0da7220b39ff2cc701c6bae0bf5"
 workers_dev = true
 [vars]
-PUBLIC_KEY = "eb9687e11cf67ac81fcc78028f7fc79e517ac77f23de1f46a3c5d38ab0870458"
-BOT_ID = "872385644595388436"
+PUBLIC_KEY = "5269d57e6b613f971d014eec141054d1c67f3276d8e80f2f65340327c5164f13"
+BOT_ID = "879920109798428704"
 BOT_ICON = "https://i.maid.gay/lite.png"
 BOT_COLOR = "0xA7A4AA"
+REDIRECT_URI = "https://api.maid.gay/links/invite/done-lite"
 
 [build]
 command = "npm install && npm run build"
