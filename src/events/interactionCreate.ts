@@ -1,10 +1,10 @@
 import config from "../config";
+import CommandHandler from "../util/cmd/CommandHandler";
 import db from "@db";
 import ClientEvent from "@util/ClientEvent";
 import Logger from "@util/Logger";
 import Eris, { CommandInteraction } from "eris";
 import util from "util";
-import CommandHandler from "../util/cmd/CommandHandler";
 
 export default new ClientEvent("interactionCreate", async function(interaction) {
 	if (interaction instanceof Eris.UnknownInteraction) {
@@ -26,7 +26,7 @@ export default new ClientEvent("interactionCreate", async function(interaction) 
 			// eslint-disable-next-line no-inner-declarations
 			function formatArg(option: Eris.InteractionDataOptions): string {
 				// console.log("o", option);
-				if (option.value === undefined && option.type !== Eris.Constants.ApplicationCommandOptionTypes.SUB_COMMAND) return "";
+				if (!("value" in option) && option.type !== Eris.Constants.ApplicationCommandOptionTypes.SUB_COMMAND) return "";
 				switch (option.type) {
 					// we only need to reconstruct user & role mentions, because channelMentions
 					// are done by Eris
@@ -36,7 +36,7 @@ export default new ClientEvent("interactionCreate", async function(interaction) 
 					case Eris.Constants.ApplicationCommandOptionTypes.CHANNEL: return `<#${String(option.value)}>`;
 					case Eris.Constants.ApplicationCommandOptionTypes.ROLE: roleMentions.push(String(option.value)); return `<@&${String(option.value)}>`;
 					case Eris.Constants.ApplicationCommandOptionTypes.MENTIONABLE: {
-						const isUser = (interaction as CommandInteraction).data.resolved?.users?.[String(option.value)] !== undefined;
+						const isUser = (interaction as CommandInteraction).data.resolved?.users?.get(option.value) !== undefined;
 						if (isUser) {
 							userMentions.push(String(option.value));
 							return `<@!${String(option.value)}>`;
@@ -50,28 +50,27 @@ export default new ClientEvent("interactionCreate", async function(interaction) 
 			}
 
 			const gConfig = await db.getGuild(interaction.guildID);
-			switch(type) {
+			switch (type) {
 				case Eris.Constants.ApplicationCommandTypes.CHAT_INPUT: {
 					content = `${gConfig.getFormattedPrefix()}${(interaction as Eris.CommandInteraction).data.name} ${((interaction as Eris.CommandInteraction).data.options ?? []).map(o => formatArg(o)).join(" ")}`.trim();
 					break;
 				}
 
 				case Eris.Constants.ApplicationCommandTypes.USER: {
-					// @ts-ignore -- waiting on pr updates
-					const target = interaction.data.target_id as string;
-					const cmd = CommandHandler.commands.find(cmd => !!cmd.applicationCommands.find(a => a.name === (interaction as Eris.CommandInteraction).data.name))
-					if(cmd === undefined) return interaction.createMessage({
+					const target = (interaction as Eris.CommandInteraction).data.target_id as string;
+					const cmd = CommandHandler.commands.find(d => !!d.applicationCommands.find(a => a.name === (interaction as Eris.CommandInteraction).data.name));
+					if (cmd === undefined) return interaction.createMessage({
 						content: "We couldn't figure out how to execute that command.",
 						flags: 64
 					});
-					content = `${gConfig.getFormattedPrefix()}${cmd.triggers[0]} ${target}`.trim()
+					content = `${gConfig.getFormattedPrefix()}${cmd.triggers[0]} ${target}`.trim();
 					break;
 				}
 			}
 			const msg = new Eris.Message({
 				// @ts-ignore fake messages don't have ids
 				id: null,
-				channel_id: interaction.channelID,
+				channel_id: interaction.channel.id,
 				guild_id: interaction.guildID,
 				author: {
 					...interaction.member.user.toJSON(),
@@ -93,7 +92,7 @@ export default new ClientEvent("interactionCreate", async function(interaction) 
 				timestamp: new Date().toISOString(),
 				tts: false,
 				mention_everyone: false,
-				mentions: userMentions.map(id => (interaction as Eris.CommandInteraction).data.resolved?.users?.[id]).filter(Boolean),
+				mentions: userMentions.map(id => (interaction as Eris.CommandInteraction).data.resolved?.users?.get(id)).filter(Boolean),
 				mention_roles: roleMentions,
 				// mention_channels is normally absent
 				attachments: [],

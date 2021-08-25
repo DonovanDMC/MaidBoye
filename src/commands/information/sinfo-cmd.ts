@@ -204,7 +204,7 @@ export default new Command("sinfo", "serverinfo")
 			let m: Eris.Message<Eris.GuildTextableChannel> | undefined;
 			async function waitForEdit(this: MaidBoye): Promise<void> {
 				if (m === undefined) m = await msg.reply(sections[initialSection as keyof typeof sections]);
-				const c = await msg.channel.awaitComponentInteractions(6e4, (it) => it.channelID === msg.channel.id && it.message.id === m!.id && it.data.custom_id.startsWith("sinfo") && it.data.custom_id.endsWith(msg.author.id) && it.member!.user.id === msg.author.id);
+				const c = await msg.channel.awaitComponentInteractions(6e4, (it) => it.channel.id === msg.channel.id && it.message.id === m!.id && it.data.custom_id.startsWith("sinfo") && it.data.custom_id.endsWith(msg.author.id) && it.member!.user.id === msg.author.id);
 				if (c === null) {
 					await m.edit({
 						embeds: m.embeds,

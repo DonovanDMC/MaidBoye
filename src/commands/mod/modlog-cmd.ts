@@ -62,7 +62,7 @@ export default new Command("modlog")
 				});
 			}
 			if (skip === false) {
-				const section = await msg.channel.awaitComponentInteractions(6e4, (it) => it.channelID === msg.channel.id && it.message.id === m.id && it.data.custom_id.startsWith("modlog-section") && it.data.custom_id.endsWith(msg.author.id) && it.member!.user.id === msg.author.id);
+				const section = await msg.channel.awaitComponentInteractions(6e4, (it) => it.channel.id === msg.channel.id && it.message.id === m.id && it.data.custom_id.startsWith("modlog-section") && it.data.custom_id.endsWith(msg.author.id) && it.member!.user.id === msg.author.id);
 				if (section === null) return m.edit({
 					content: "Selection timed out..",
 					components: []
@@ -92,7 +92,7 @@ export default new Command("modlog")
 							.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `select-modlogsetup-3.${msg.author.id}`, false, ComponentHelper.emojiToPartial(config.emojis.default.three, "default"), "Three")
 							.toJSON()
 					});
-					const sel = await msg.channel.awaitComponentInteractions(6e4, (it) => it.channelID === msg.channel.id && it.message.id === m.id && it.data.custom_id.startsWith("select-modlogsetup") && it.data.custom_id.endsWith(msg.author.id) && it.member!.user.id === msg.author.id);
+					const sel = await msg.channel.awaitComponentInteractions(6e4, (it) => it.channel.id === msg.channel.id && it.message.id === m.id && it.data.custom_id.startsWith("select-modlogsetup") && it.data.custom_id.endsWith(msg.author.id) && it.member!.user.id === msg.author.id);
 					if (sel === null) return m.edit({
 						content: "Y-you took too long to respond..",
 						components: []
@@ -109,7 +109,7 @@ export default new Command("modlog")
 							enabled: true
 						} as GuildConfig["modlog"];
 						// ask defaults
-						const selC = await message.channel.awaitComponentInteractions(3e4, (it) => it.channelID === msg.channel.id && it.message.id === message.id && it.data.custom_id.startsWith("modlogconfig") && it.data.custom_id.endsWith(msg.author.id) &&  it.member!.user.id === msg.author.id);
+						const selC = await message.channel.awaitComponentInteractions(3e4, (it) => it.channel.id === msg.channel.id && it.message.id === message.id && it.data.custom_id.startsWith("modlogconfig") && it.data.custom_id.endsWith(msg.author.id) &&  it.member!.user.id === msg.author.id);
 						// defaults timeout
 						if (selC === null) {
 							await message.edit({
@@ -142,7 +142,7 @@ export default new Command("modlog")
 								.toJSON()
 						});
 						// case editing collector
-						const cnfCaseEditing = await ComponentInteractionCollector.awaitInteractions(msg.channel.id, 3e4, (it) => it.channelID === msg.channel.id && it.message.id === message.id && it.data.custom_id.startsWith("configCaseEditing") && it.data.custom_id.endsWith(msg.author.id) &&  it.member!.user.id === msg.author.id);
+						const cnfCaseEditing = await ComponentInteractionCollector.awaitInteractions(msg.channel.id, 3e4, (it) => it.channel.id === msg.channel.id && it.message.id === message.id && it.data.custom_id.startsWith("configCaseEditing") && it.data.custom_id.endsWith(msg.author.id) &&  it.member!.user.id === msg.author.id);
 
 						// buttons for case deletion, for less code duplication
 						const cnfCDComponents = new ComponentHelper()
@@ -179,7 +179,7 @@ export default new Command("modlog")
 							return v;
 						}
 						// case deletion collector
-						const cnfCaseDeletion = await ComponentInteractionCollector.awaitInteractions(msg.channel.id, 3e4, (it) => it.channelID === msg.channel.id && it.message.id === message.id && it.data.custom_id.startsWith("configCaseDeletion") && it.data.custom_id.endsWith(msg.author.id) &&  it.member!.user.id === msg.author.id);
+						const cnfCaseDeletion = await ComponentInteractionCollector.awaitInteractions(msg.channel.id, 3e4, (it) => it.channel.id === msg.channel.id && it.message.id === message.id && it.data.custom_id.startsWith("configCaseDeletion") && it.data.custom_id.endsWith(msg.author.id) &&  it.member!.user.id === msg.author.id);
 
 						// buttons for edit others cases, for less code duplication
 						const cnfEOCComponents = new ComponentHelper()
@@ -216,7 +216,7 @@ export default new Command("modlog")
 							return v;
 						}
 						// edit others cases collector
-						const cnfEditOthersCases = await ComponentInteractionCollector.awaitInteractions(msg.channel.id, 3e4, (it) => it.channelID === msg.channel.id && it.message.id === message.id && it.data.custom_id.startsWith("configEditOthersCases") && it.data.custom_id.endsWith(msg.author.id) &&  it.member!.user.id === msg.author.id);
+						const cnfEditOthersCases = await ComponentInteractionCollector.awaitInteractions(msg.channel.id, 3e4, (it) => it.channel.id === msg.channel.id && it.message.id === message.id && it.data.custom_id.startsWith("configEditOthersCases") && it.data.custom_id.endsWith(msg.author.id) &&  it.member!.user.id === msg.author.id);
 
 						// edit others cases timeout
 						if (cnfEditOthersCases === null) await message.edit({
@@ -268,7 +268,7 @@ export default new Command("modlog")
 								content: "Please select a webhook from the following.\n(if the button is disabled, we couldn't get all of the info we needed about the webhook)",
 								components: c.toJSON()
 							});
-							const selW = await ComponentInteractionCollector.awaitInteractions(msg.channel.id, 6e4, (it) => it.channelID === msg.channel.id && it.message.id === m.id && it.data.custom_id.startsWith("select-webhook") && it.data.custom_id.endsWith(msg.author.id) &&  it.member!.user.id === msg.author.id);
+							const selW = await ComponentInteractionCollector.awaitInteractions(msg.channel.id, 6e4, (it) => it.channel.id === msg.channel.id && it.message.id === m.id && it.data.custom_id.startsWith("select-webhook") && it.data.custom_id.endsWith(msg.author.id) &&  it.member!.user.id === msg.author.id);
 							if (selW === null) return m.edit({
 								content: "Y-you took too long to respond..",
 								components: []
@@ -381,7 +381,7 @@ export default new Command("modlog")
 									.addInteractionButton(ComponentHelper.BUTTON_SUCCESS, `delhook-cancel.${msg.author.id}`, false, undefined, "Cancel")
 									.toJSON()
 							});
-							const delHook = await msg.channel.awaitComponentInteractions(6e4, (it) => it.channelID === msg.channel.id && it.message.id === m.id && it.data.custom_id.startsWith("delhook") && it.data.custom_id.endsWith(msg.author.id) && it.member!.user.id === msg.author.id);
+							const delHook = await msg.channel.awaitComponentInteractions(6e4, (it) => it.channel.id === msg.channel.id && it.message.id === m.id && it.data.custom_id.startsWith("delhook") && it.data.custom_id.endsWith(msg.author.id) && it.member!.user.id === msg.author.id);
 
 							if (delHook === null) return m.edit({
 								content: "Timeout detected, modlog has not been reset.",
