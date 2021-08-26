@@ -10,7 +10,7 @@ import { RawLogEvent } from "./Models/Guild/LogEvent";
 import { RawDisableEntry } from "./Models/Guild/DisableEntry";
 import { RawLevelRole } from "./Models/Guild/LevelRole";
 import Logger from "@util/Logger";
-import config from "@config";
+import { beta, defaultPrefix, services } from "@config";
 import IORedis from "ioredis";
 import Timer from "@util/Timer";
 import mariadb, { Pool } from "mariadb";
@@ -59,19 +59,19 @@ export default class db {
 	}
 
 	static async initMariaDb() {
-		const uri = `mariadb://${config.services.mariadb.host}:${config.services.mariadb.port}`;
-		Logger.getLogger("Database[MariaDB]").debug(`Connecting to ${uri} (ssl: ${config.services.mariadb.ssl ? "Yes" : "No"})`);
+		const uri = `mariadb://${services.mariadb.host}:${services.mariadb.port}`;
+		Logger.getLogger("Database[MariaDB]").debug(`Connecting to ${uri} (ssl: ${services.mariadb.ssl ? "Yes" : "No"})`);
 		const start = Timer.start();
 		try {
 			this.pool = mariadb.createPool({
-				...config.services.mariadb,
-				database: config.services.mariadb.db[config.beta ? "beta" : "prod"]
+				...services.mariadb,
+				database: services.mariadb.db[beta ? "beta" : "prod"]
 			});
 			this.rootPool = mariadb.createPool({
-				...config.services.mariadb,
-				database: config.services.mariadb.db[config.beta ? "beta" : "prod"],
+				...services.mariadb,
+				database: services.mariadb.db[beta ? "beta" : "prod"],
 				user: "root",
-				password: config.services.mariadb.rootPass
+				password: services.mariadb.rootPass
 			});
 		} catch (err) {
 			Logger.getLogger("Database[MariaDB]").error("Error while connecting:", err);
@@ -83,14 +83,14 @@ export default class db {
 
 	static async initRedis() {
 		return new Promise<void>(resolve => {
-			this.redisDb = config.services.redis[config.beta ? "dbBeta" : "db"];
+			this.redisDb = services.redis[beta ? "dbBeta" : "db"];
 			const start = Timer.start();
-			Logger.getLogger("Database[Redis]").debug(`Connecting to redis://${config.services.redis.host}:${config.services.redis.port} using user "${config.services.redis.username ?? "default"}", and db ${this.redisDb}`);
-			this.r = new IORedis(config.services.redis.port, config.services.redis.host, {
-				username: config.services.redis.username,
-				password: config.services.redis.password,
+			Logger.getLogger("Database[Redis]").debug(`Connecting to redis://${services.redis.host}:${services.redis.port} using user "${services.redis.username ?? "default"}", and db ${this.redisDb}`);
+			this.r = new IORedis(services.redis.port, services.redis.host, {
+				username: services.redis.username,
+				password: services.redis.password,
 				db: this.redisDb,
-				connectionName: `MaidBoye${config.beta ? "Beta" : ""}`
+				connectionName: `MaidBoye${beta ? "Beta" : ""}`
 			});
 
 			this.r.on("connect", () => {
@@ -102,7 +102,7 @@ export default class db {
 	}
 
 	static async getStats() {
-		return (this.rootQuery("SELECT * FROM INFORMATION_SCHEMA.USER_STATISTICS WHERE USER=?", [config.services.mariadb.user]) as Promise<[MariaDBUserStats?]>).then(v => v[0]);
+		return (this.rootQuery("SELECT * FROM INFORMATION_SCHEMA.USER_STATISTICS WHERE USER=?", [services.mariadb.user]) as Promise<[MariaDBUserStats?]>).then(v => v[0]);
 	}
 
 	static get query() { return this.pool.query.bind(this.pool); }
@@ -139,7 +139,7 @@ export default class db {
 		// if we somehow get another undefined
 		if (res === undefined) throw new TypeError("Unexpected undefined user in db#getUser");
 
-		if (config.beta) Logger.getLogger("Database[MariaDB]").debug(`Query for the user "${id}" took ${Timer.calc(start, end, 0, false)}`);
+		if (beta) Logger.getLogger("Database[MariaDB]").debug(`Query for the user "${id}" took ${Timer.calc(start, end, 0, false)}`);
 
 		await this.r.setex(`cache:users:${id}`, 300, JSON.stringify({ user: res, selfRolesJoined }, (k, v: unknown) => typeof v === "bigint" ? String(v) : v));
 
@@ -188,7 +188,7 @@ export default class db {
 		const disable = await this.pool.query("SELECT * FROM disable WHERE guild_id=?", [id]).then(v => (v as Array<RawDisableEntry>));
 		if (res === undefined) {
 			await this.pool.query("INSERT INTO guilds (id) VALUES (?)", [id]);
-			await this.pool.query("INSERT INTO prefix (id, guild_id, value, space) VALUES (?, ?, ?, ?)", [crypto.randomBytes(6).toString("hex"), id, config.defaults.prefix, true]);
+			await this.pool.query("INSERT INTO prefix (id, guild_id, value, space) VALUES (?, ?, ?, ?)", [crypto.randomBytes(6).toString("hex"), id, defaultPrefix, true]);
 			Logger.getLogger("Database[MariaDB]").debug(`Created the guild entry "${id}".`);
 			res = await this.pool.query("SELECT * FROM guilds WHERE id=? LIMIT 1", [id]).then(v => (v as Array<RawGuildConfig>)[0]);
 			prefix = await this.pool.query("SELECT * FROM prefix WHERE guild_id=?", [id]).then(v => (v as Array<RawPrefix>));
@@ -197,7 +197,7 @@ export default class db {
 
 		if (prefix.length === 0) {
 			Logger.getLogger("Database[MariaDB]").warn(`Found guild "${id}" with zero prefixes, fixing..`);
-			await this.pool.query("INSERT INTO prefix (id, guild_id, value, space) VALUES (?, ?, ?, ?)", [crypto.randomBytes(6).toString("hex"), id, config.defaults.prefix, true]);
+			await this.pool.query("INSERT INTO prefix (id, guild_id, value, space) VALUES (?, ?, ?, ?)", [crypto.randomBytes(6).toString("hex"), id, defaultPrefix, true]);
 			prefix = await this.pool.query("SELECT * FROM prefix WHERE guild_id=?", [id]).then(v => (v as Array<RawPrefix>));
 		}
 
@@ -205,7 +205,7 @@ export default class db {
 		// if we somehow get another null
 		if (res === undefined) throw new TypeError("Unexpected undefined guild in db#getGuild");
 
-		if (config.beta) Logger.getLogger("Database[MariaDB]").debug(`Query for the guild "${id}" took ${Timer.calc(start, end, 0, false)}`);
+		if (beta) Logger.getLogger("Database[MariaDB]").debug(`Query for the guild "${id}" took ${Timer.calc(start, end, 0, false)}`);
 
 		await this.r.setex(`cache:guilds:${id}`, 300, JSON.stringify({ guild: res, prefix, selfRoles, levelRoles, tags, logEvents, disable }, (k, v: unknown) => typeof v === "bigint" ? String(v) : v));
 

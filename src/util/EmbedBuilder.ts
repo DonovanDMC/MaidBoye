@@ -1,5 +1,5 @@
 import { Colors } from "./Constants";
-import config from "@config";
+import { botIcon } from "@config";
 import { User, EmbedField, EmbedOptions } from "eris";
 
 export default class EmbedBuilder {
@@ -7,7 +7,7 @@ export default class EmbedBuilder {
 	constructor(defaults = true, user?: User | null, json: EmbedOptions = {}) {
 		this.json = json ?? {};
 		if (defaults) {
-			this.setColor("bot").setTimestamp("now").setFooter("UwU", config.images.bot);
+			this.setColor("bot").setTimestamp("now").setFooter("UwU", botIcon);
 			if (user) this.setAuthor(user.tag, user.avatarURL);
 		}
 	}
@@ -44,7 +44,7 @@ export default class EmbedBuilder {
 	addFields(...args: Array<EmbedField>) { args.forEach(arg => this.addField(arg.name, arg.value, arg.inline)); return this; }
 	getFields() { return (this.json.fields ?? []); }
 
-	setFooter(text: string, icon_url = config.images.bot) { this.json.footer = { text, icon_url }; return this; }
+	setFooter(text: string, icon_url = botIcon) { this.json.footer = { text, icon_url }; return this; }
 	getFooter() { return this.json.footer; }
 	removeFooter() { this.json.footer = undefined; return this; }
 

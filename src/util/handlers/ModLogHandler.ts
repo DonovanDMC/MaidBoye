@@ -3,7 +3,7 @@ import GuildConfig from "../../db/Models/Guild/GuildConfig";
 import MaidBoye from "../../main";
 import Eris from "eris";
 import EmbedBuilder from "@util/EmbedBuilder";
-import config from "@config";
+import { botIcon } from "@config";
 import { Time } from "@uwu-codes/utils";
 import Logger from "@util/Logger";
 import { CountResponse, OkPacket } from "@util/@types/MariaDB";
@@ -92,7 +92,7 @@ export default class ModLogHandler {
 						`Time: **${time === 0 ? "Permanent" : Time.ms(time, true, true, false)}** (id: \`${timedId!}\`)`
 					)
 					.setColor("red")
-					.setFooter(`Action Performed ${blame === null ? "Automatically" : `By ${blame.tag}`}`, blame === null ? config.images.bot : blame.avatarURL)
+					.setFooter(`Action Performed ${blame === null ? "Automatically" : `By ${blame.tag}`}`, blame === null ? botIcon : blame.avatarURL)
 					.toJSON()
 			]
 		});
@@ -132,7 +132,7 @@ export default class ModLogHandler {
 						`Reason: **${reason ?? "None Provided"}**`
 					)
 					.setColor("red")
-					.setFooter(`Action Performed ${blame === null ? "Automatically" : `By ${blame.tag}`}`, blame === null ? config.images.bot : blame.avatarURL)
+					.setFooter(`Action Performed ${blame === null ? "Automatically" : `By ${blame.tag}`}`, blame === null ? botIcon : blame.avatarURL)
 					.toJSON()
 			]
 		});
@@ -169,7 +169,7 @@ export default class ModLogHandler {
 						`Reason: **${reason ?? "None Provided"}**`
 					)
 					.setColor("red")
-					.setFooter(`Action Performed ${blame === null ? "Automatically" : `By ${blame.tag}`}`, blame === null ? config.images.bot : blame.avatarURL)
+					.setFooter(`Action Performed ${blame === null ? "Automatically" : `By ${blame.tag}`}`, blame === null ? botIcon : blame.avatarURL)
 					.toJSON()
 			]
 		});
@@ -203,7 +203,7 @@ export default class ModLogHandler {
 						`Reason: **${reason ?? "None Provided"}**`
 					)
 					.setColor("red")
-					.setFooter(`Action Performed ${blame === null ? "Automatically" : `By ${blame.tag}`}`, blame === null ? config.images.bot : blame.avatarURL)
+					.setFooter(`Action Performed ${blame === null ? "Automatically" : `By ${blame.tag}`}`, blame === null ? botIcon : blame.avatarURL)
 					.toJSON()
 			]
 		});
@@ -239,7 +239,7 @@ export default class ModLogHandler {
 						`Time: **${time === 0 ? "Permanent" : Time.ms(time, true, true, false)}** (id: \`${timedId!}\`)`
 					)
 					.setColor("red")
-					.setFooter(`Action Performed ${blame === null ? "Automatically" : `By ${blame.tag}`}`, blame === null ? config.images.bot : blame.avatarURL)
+					.setFooter(`Action Performed ${blame === null ? "Automatically" : `By ${blame.tag}`}`, blame === null ? botIcon : blame.avatarURL)
 					.toJSON()
 			]
 		});
@@ -278,7 +278,7 @@ export default class ModLogHandler {
 						`Reason: **${reason ?? "None Provided"}**`
 					)
 					.setColor("red")
-					.setFooter(`Action Performed ${blame === null ? "Automatically" : `By ${blame.tag}`}`, blame === null ? config.images.bot : blame.avatarURL)
+					.setFooter(`Action Performed ${blame === null ? "Automatically" : `By ${blame.tag}`}`, blame === null ? botIcon : blame.avatarURL)
 					.toJSON()
 			]
 		});
@@ -317,7 +317,7 @@ export default class ModLogHandler {
 						`Reason: **${reason ?? "None Provided"}**`
 					)
 					.setColor("green")
-					.setFooter(`Action Performed ${blame === null ? "Automatically" : `By ${blame.tag}`}`, blame === null ? config.images.bot : blame.avatarURL)
+					.setFooter(`Action Performed ${blame === null ? "Automatically" : `By ${blame.tag}`}`, blame === null ? botIcon : blame.avatarURL)
 					.toJSON()
 			]
 		});
@@ -353,7 +353,7 @@ export default class ModLogHandler {
 						`Reason: **${reason ?? "None Provided"}**`
 					)
 					.setColor("green")
-					.setFooter(`Action Performed ${blame === null ? "Automatically" : `By ${blame.tag}`}`, blame === null ? config.images.bot : blame.avatarURL)
+					.setFooter(`Action Performed ${blame === null ? "Automatically" : `By ${blame.tag}`}`, blame === null ? botIcon : blame.avatarURL)
 					.toJSON()
 			]
 		});
@@ -387,7 +387,7 @@ export default class ModLogHandler {
 						`Reason: **${reason ?? "None Provided"}**`
 					)
 					.setColor("green")
-					.setFooter(`Action Performed ${blame === null ? "Automatically" : `By ${blame.tag}`}`, blame === null ? config.images.bot : blame.avatarURL)
+					.setFooter(`Action Performed ${blame === null ? "Automatically" : `By ${blame.tag}`}`, blame === null ? botIcon : blame.avatarURL)
 					.toJSON()
 			]
 		});
@@ -421,7 +421,7 @@ export default class ModLogHandler {
 						`Reason: **${reason ?? "None Provided"}**`
 					)
 					.setColor("green")
-					.setFooter(`Action Performed ${blame === null ? "Automatically" : `By ${blame.tag}`}`, blame === null ? config.images.bot : blame.avatarURL)
+					.setFooter(`Action Performed ${blame === null ? "Automatically" : `By ${blame.tag}`}`, blame === null ? botIcon : blame.avatarURL)
 					.toJSON()
 			]
 		});
@@ -457,7 +457,7 @@ export default class ModLogHandler {
 						`Warning Id: **${warningId}**`
 					)
 					.setColor("gold")
-					.setFooter(`Action Performed ${blame === null ? "Automatically" : `By ${blame.tag}`}`, blame === null ? config.images.bot : blame.avatarURL)
+					.setFooter(`Action Performed ${blame === null ? "Automatically" : `By ${blame.tag}`}`, blame === null ? botIcon : blame.avatarURL)
 					.toJSON()
 			]
 		});
@@ -498,7 +498,7 @@ export default class ModLogHandler {
 						`Warning Id: **${warningId}**`
 					)
 					.setColor("orange")
-					.setFooter(`Action Performed ${blame === null ? "Automatically" : `By ${blame.tag}`}`, blame === null ? config.images.bot : blame.avatarURL)
+					.setFooter(`Action Performed ${blame === null ? "Automatically" : `By ${blame.tag}`}`, blame === null ? botIcon : blame.avatarURL)
 					.toJSON()
 			]
 		});
@@ -535,7 +535,7 @@ export default class ModLogHandler {
 						`Total Removed: **${total}**`
 					)
 					.setColor("green")
-					.setFooter(`Action Performed ${blame === null ? "Automatically" : `By ${blame.tag}`}`, blame === null ? config.images.bot : blame.avatarURL)
+					.setFooter(`Action Performed ${blame === null ? "Automatically" : `By ${blame.tag}`}`, blame === null ? botIcon : blame.avatarURL)
 					.toJSON()
 			]
 		});
@@ -629,7 +629,7 @@ export class TimedModerationHandler {
 									.setAuthor(u.tag, u.avatarURL)
 									.setDescription(`I failed to automatically unban <@!${u.id}>.`)
 									.setColor("red")
-									.setFooter("Action Performed Automatically", config.images.bot)
+									.setFooter("Action Performed Automatically", botIcon)
 									.toJSON()
 							]
 						}); else await ModLogHandler.createUnBanEntry(g, u, null, "Timed Action");
@@ -649,7 +649,7 @@ export class TimedModerationHandler {
 									.setAuthor(u.tag, u.avatarURL)
 									.setDescription(`I failed to automatically unmute <@!${u.id}>, due to the mute role no longer being set.`)
 									.setColor("red")
-									.setFooter("Action Performed Automatically", config.images.bot)
+									.setFooter("Action Performed Automatically", botIcon)
 									.toJSON()
 							]
 						});
@@ -676,7 +676,7 @@ export class TimedModerationHandler {
 									.setAuthor(u.tag, u.avatarURL)
 									.setDescription(`I failed to automatically unmute <@!${u.id}>, as they are no longer in this server.`)
 									.setColor("red")
-									.setFooter("Action Performed Automatically", config.images.bot)
+									.setFooter("Action Performed Automatically", botIcon)
 									.toJSON()
 							]
 						});
@@ -692,7 +692,7 @@ export class TimedModerationHandler {
 									.setAuthor(u.tag, u.avatarURL)
 									.setDescription(`I failed to automatically unmute <@!${u.id}>.`)
 									.setColor("red")
-									.setFooter("Action Performed Automatically", config.images.bot)
+									.setFooter("Action Performed Automatically", botIcon)
 									.toJSON()
 							]
 						}); else await ModLogHandler.createUnMuteEntry(g, u, null, "Timed Action");

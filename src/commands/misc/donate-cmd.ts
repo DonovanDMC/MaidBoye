@@ -1,5 +1,5 @@
 import Command from "@cmd/Command";
-import config from "@config";
+import { botIcon, kofiLink } from "@config";
 import EmbedBuilder from "@util/EmbedBuilder";
 
 export default new Command("donate")
@@ -11,8 +11,8 @@ export default new Command("donate")
 			embeds: [
 				new EmbedBuilder(true, msg.author)
 					.setTitle("Donate")
-					.setAuthor("Maid Boye", config.images.bot, config.client.links.kofi)
-					.setDescription(`[Donate At Ko-Fi](${config.client.links.kofi})`)
+					.setAuthor("Maid Boye", botIcon, kofiLink)
+					.setDescription(`[Donate At Ko-Fi](${kofiLink})`)
 					.setImage("https://cdn.ko-fi.com/cdn/kofi1.png?v=2")
 					.toJSON()
 			]

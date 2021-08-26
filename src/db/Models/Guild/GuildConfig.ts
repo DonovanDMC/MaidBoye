@@ -18,7 +18,7 @@ import EmbedBuilder from "../../../util/EmbedBuilder";
 import { BooleanData, OkPacket } from "@util/@types/MariaDB";
 import { DataTypes, DeepPartial, SomePartial, Writeable } from "@uwu-codes/types";
 import BotFunctions from "@util/BotFunctions";
-import config from "@config";
+import { defaultPrefix, yiffTypes } from "@config";
 import db from "@db";
 import { Collection } from "@augu/collections";
 import * as crypto from "crypto";
@@ -58,7 +58,7 @@ export default class GuildConfig {
 		webhook: Record<"id" | "token" | "channelId", string> | null;
 	};
 	settings: {
-		defaultYiffType: typeof config["yiffTypes"][number];
+		defaultYiffType: typeof yiffTypes[number];
 		e621ThumbnailType: "gif" | "image" | "none";
 		muteRole: string | null;
 		commandImages: boolean;
@@ -212,7 +212,7 @@ export default class GuildConfig {
 
 	async resetPrefixes() {
 		const res = await db.query("DELETE FROM prefix WHERE guild_id=?", [this.id]).then((r: OkPacket) => r.affectedRows > 0);
-		await this.addPrefix(config.defaults.prefix, true);
+		await this.addPrefix(defaultPrefix, true);
 		if (res === false) return false;
 		await this.reload();
 		return true;

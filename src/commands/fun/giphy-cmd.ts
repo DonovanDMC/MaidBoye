@@ -1,5 +1,5 @@
 import Command from "@cmd/Command";
-import config from "@config";
+import { apiKeys, userAgent } from "@config";
 import EmbedBuilder from "@util/EmbedBuilder";
 import { Strings } from "@uwu-codes/utils";
 import fetch from "node-fetch";
@@ -12,10 +12,10 @@ export default new Command("giphy")
 	.setCooldown(3e3)
 	.setExecutor(async function(msg) {
 		if (msg.args.length < 1) return msg.reply("H-hey! You have to provide something to search..");
-		const { data } = await fetch(`https://api.giphy.com/v1/gifs/search?api_key=${config.apiKeys.giphy}&q=${msg.args.join("%20")}&limit=50&offset=7&rating=G&lang=en`, {
+		const { data } = await fetch(`https://api.giphy.com/v1/gifs/search?api_key=${apiKeys.giphy}&q=${msg.args.join("%20")}&limit=50&offset=7&rating=G&lang=en`, {
 			method: "GET",
 			headers: {
-				"User-Agent": config.userAgent
+				"User-Agent": userAgent
 			},
 			timeout: 5e3
 		}).then(v => v.json() as Promise<{

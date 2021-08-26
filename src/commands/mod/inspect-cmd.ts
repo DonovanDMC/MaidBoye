@@ -5,7 +5,7 @@ import ComponentHelper from "@util/ComponentHelper";
 import MaidBoye from "@MaidBoye";
 import Eris, { DiscordRESTError } from "eris";
 import chunk from "chunk";
-import config from "@config";
+import { emojis } from "@config";
 import BotFunctions from "@util/BotFunctions";
 import { Strings } from "@uwu-codes/utils";
 import WarnEntry from "@db/Models/Guild/ModLog/WarnEntry";
@@ -128,9 +128,9 @@ export default new Command("inspect")
 							.toJSON()
 					],
 					components: new ComponentHelper()
-						.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `inspect-prev.${msg.author.id}`, pStrike.length === 0 || page === 1, ComponentHelper.emojiToPartial(config.emojis.default.back, "default"), "Previous Page")
-						.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `inspect-home.${msg.author.id}`, false, ComponentHelper.emojiToPartial(config.emojis.default.home, "default"), "Home")
-						.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `inspect-next.${msg.author.id}`, pStrike.length === 0 || page === pStrike.length, ComponentHelper.emojiToPartial(config.emojis.default.next, "default"), "Next Page")
+						.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `inspect-prev.${msg.author.id}`, pStrike.length === 0 || page === 1, ComponentHelper.emojiToPartial(emojis.default.back, "default"), "Previous Page")
+						.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `inspect-home.${msg.author.id}`, false, ComponentHelper.emojiToPartial(emojis.default.home, "default"), "Home")
+						.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `inspect-next.${msg.author.id}`, pStrike.length === 0 || page === pStrike.length, ComponentHelper.emojiToPartial(emojis.default.next, "default"), "Next Page")
 						.toJSON()
 				});
 				const wait = await msg.channel.awaitComponentInteractions(3e5, (it) => it.data.custom_id.startsWith("inspect-") && it.message.id === m.id && it.member!.user.id === msg.author.id);
@@ -176,9 +176,9 @@ export default new Command("inspect")
 							.toJSON()
 					],
 					components: new ComponentHelper()
-						.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `inspect-prev.${msg.author.id}`, pMod.length === 0 || page === 1, ComponentHelper.emojiToPartial(config.emojis.default.back, "default"), "Previous Page")
-						.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `inspect-home.${msg.author.id}`, false, ComponentHelper.emojiToPartial(config.emojis.default.home, "default"), "Home")
-						.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `inspect-next.${msg.author.id}`, pMod.length === 0 || page === pMod.length, ComponentHelper.emojiToPartial(config.emojis.default.next, "default"), "Next Page")
+						.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `inspect-prev.${msg.author.id}`, pMod.length === 0 || page === 1, ComponentHelper.emojiToPartial(emojis.default.back, "default"), "Previous Page")
+						.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `inspect-home.${msg.author.id}`, false, ComponentHelper.emojiToPartial(emojis.default.home, "default"), "Home")
+						.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `inspect-next.${msg.author.id}`, pMod.length === 0 || page === pMod.length, ComponentHelper.emojiToPartial(emojis.default.next, "default"), "Next Page")
 						.toJSON()
 				});
 				const wait = await msg.channel.awaitComponentInteractions(3e5, (it) => it.data.custom_id.startsWith("inspect-") && it.message.id === m.id && it.member!.user.id === msg.author.id);
@@ -225,9 +225,9 @@ export default new Command("inspect")
 							.toJSON()
 					],
 					components: new ComponentHelper()
-						.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `inspect-prev.${msg.author.id}`, pWarnings.length === 0 || page === 1, ComponentHelper.emojiToPartial(config.emojis.default.back, "default"), "Previous Page")
-						.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `inspect-home.${msg.author.id}`, false, ComponentHelper.emojiToPartial(config.emojis.default.home, "default"), "Home")
-						.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `inspect-next.${msg.author.id}`, pWarnings.length === 0 || page === pWarnings.length, ComponentHelper.emojiToPartial(config.emojis.default.next, "default"), "Next Page")
+						.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `inspect-prev.${msg.author.id}`, pWarnings.length === 0 || page === 1, ComponentHelper.emojiToPartial(emojis.default.back, "default"), "Previous Page")
+						.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `inspect-home.${msg.author.id}`, false, ComponentHelper.emojiToPartial(emojis.default.home, "default"), "Home")
+						.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `inspect-next.${msg.author.id}`, pWarnings.length === 0 || page === pWarnings.length, ComponentHelper.emojiToPartial(emojis.default.next, "default"), "Next Page")
 						.toJSON()
 				});
 				const wait = await msg.channel.awaitComponentInteractions(3e5, (it) => it.data.custom_id.startsWith("inspect-") && it.message.id === m.id && it.member!.user.id === msg.author.id);

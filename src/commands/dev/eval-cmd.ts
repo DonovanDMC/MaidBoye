@@ -1,5 +1,4 @@
 import db from "@db";
-import config from "@config";
 import Command from "@cmd/Command";
 import Logger from "@util/Logger";
 import EmbedBuilder from "@util/EmbedBuilder";
@@ -12,6 +11,7 @@ import CommandHandler from "@util/cmd/CommandHandler";
 import UserConfig from "@db/Models/User/UserConfig";
 import GuildConfig from "@db/Models/Guild/GuildConfig";
 import MaidBoye from "@MaidBoye";
+import * as config from "@config";
 import util from "util";
 
 async function format(obj: unknown) {
@@ -58,9 +58,11 @@ export default new Command("eval", "ev")
 			CommandHandler,
 			UserConfig,
 			GuildConfig,
-			currentUser: this.user.tag
+			currentUser: this.user.tag,
+			config
 		};
-		// eslint-disable-next-line -- typescript messes with variable names so we have to remake them
+
+		// eslint-disable-next-line guard-for-in, @typescript-eslint/no-implied-eval, no-new-func -- typescript messes with variable names so we have to remake them
 		for (const k in evalVariables) new Function("value", `${k} = value`)(evalVariables[k]);
 		let res: unknown;
 		const start = Timer.start();

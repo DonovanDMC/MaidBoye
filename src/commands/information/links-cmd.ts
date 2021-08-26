@@ -1,5 +1,5 @@
 import Command from "@cmd/Command";
-import config from "@config";
+import { devLink, kofiLink, supportLink, twitterLink, websiteLink } from "@config";
 import EmbedBuilder from "@util/EmbedBuilder";
 import Eris from "eris";
 
@@ -14,11 +14,11 @@ export default new Command("links", "support", "invite", "inv")
 				new EmbedBuilder(true, msg.author)
 					.setTitle("Invite Info")
 					.setDescription(
-						`[Support Server](${config.client.links.support})`,
-						`[Twitter](${config.client.links.twitter})`,
-						`[Website](${config.client.links.website})`,
-						`[Developer](${config.client.links.dev})`,
-						`[Ko-Fi (Donate)](${config.client.links.kofi})`,
+						`[Support Server](${supportLink})`,
+						`[Twitter](${twitterLink})`,
+						`[Website](${websiteLink})`,
+						`[Developer](${devLink})`,
+						`[Ko-Fi (Donate)](${kofiLink})`,
 						"[Invite](https://api.maid.gay/links/invite)"
 					)
 					.toJSON()

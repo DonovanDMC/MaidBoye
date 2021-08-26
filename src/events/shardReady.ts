@@ -2,11 +2,11 @@ import ClientEvent from "@util/ClientEvent";
 import EmbedBuilder from "@util/EmbedBuilder";
 import Logger from "@util/Logger";
 import WebhookStore from "@util/WebhookStore";
-import config from "@config";
+import { beta, initialStatus } from "@config";
 
 export default new ClientEvent("shardReady", async function(id) {
 	Logger.debug(`Shard #${id} is ready.`);
-	this.shards.get(id)!.editStatus(config.client.initialStatus.status, config.client.initialStatus.game);
+	this.shards.get(id)!.editStatus(initialStatus.status, initialStatus.game);
 	return WebhookStore.execute("status", {
 		embeds: [
 			EmbedBuilder
@@ -17,6 +17,6 @@ export default new ClientEvent("shardReady", async function(id) {
 				.setDescription(`Shard #${id} is ready.`)
 				.toJSON()
 		],
-		username: `Maid Boye${config.beta ? " Beta" : ""} Shard Status`
+		username: `Maid Boye${beta ? " Beta" : ""} Shard Status`
 	});
 });

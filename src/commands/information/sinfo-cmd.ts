@@ -1,5 +1,5 @@
 import ErrorHandler from "@util/handlers/ErrorHandler";
-import config from "@config";
+import { emojis, names } from "@config";
 import Command from "@cmd/Command";
 import EmbedBuilder from "@util/EmbedBuilder";
 import Eris, { DiscordRESTError } from "eris";
@@ -58,20 +58,20 @@ export default new Command("sinfo", "serverinfo")
 							.setTitle(`Server Info - **${msg.channel.guild.name}**`)
 							.setDescription(
 								"**Server**:",
-								`${config.emojis.default.dot} Name: **${msg.channel.guild.name}**`,
-								`${config.emojis.default.dot} Id: **${msg.channel.guild.id}**`,
-								`${config.emojis.default.dot} Owner:** ${owner}**`,
-								`${config.emojis.default.dot} Creation Date: **${BotFunctions.formatDiscordTime(msg.channel.guild.createdAt, "long-datetime", true)}**`,
-								`${config.emojis.default.dot} Boosts: **${msg.channel.guild.premiumSubscriptionCount || "None"}**${!msg.channel.guild.premiumSubscriptionCount ? "" : ` (Tier: **${config.names.boostTier[msg.channel.guild.premiumTier]}**)`}`,
-								`${config.emojis.default.dot} Large: **${msg.channel.guild.large ? "Yes" : "No"}**`,
-								`${config.emojis.default.dot} Verification Level: **${config.names.verificationLevel[msg.channel.guild.verificationLevel]}**`,
-								`${config.emojis.default.dot} 2FA Requirement: **${msg.channel.guild.mfaLevel === 0 ? "Disabled" : "Enabled"}**`,
-								`${config.emojis.default.dot} Default Notifications: **${msg.channel.guild.defaultNotifications === 0 ? "All Messages" : "Only Mentions"}**`,
-								`${config.emojis.default.dot} Vanity URL: **${msg.channel.guild.features.includes("VANITY_URL") && msg.channel.guild.vanityURL !== null ? `[https://discord.gg/${msg.channel.guild.vanityURL}](https://discord.gg/${msg.channel.guild.vanityURL})` : "None"}**`,
-								`${config.emojis.default.dot} NSFW level: ${["Default", "Explicit", "Safe", "Age Restricted"][msg.channel.guild.nsfwLevel]}`,
+								`${emojis.default.dot} Name: **${msg.channel.guild.name}**`,
+								`${emojis.default.dot} Id: **${msg.channel.guild.id}**`,
+								`${emojis.default.dot} Owner:** ${owner}**`,
+								`${emojis.default.dot} Creation Date: **${BotFunctions.formatDiscordTime(msg.channel.guild.createdAt, "long-datetime", true)}**`,
+								`${emojis.default.dot} Boosts: **${msg.channel.guild.premiumSubscriptionCount || "None"}**${!msg.channel.guild.premiumSubscriptionCount ? "" : ` (Tier: **${names.boostTier[msg.channel.guild.premiumTier]}**)`}`,
+								`${emojis.default.dot} Large: **${msg.channel.guild.large ? "Yes" : "No"}**`,
+								`${emojis.default.dot} Verification Level: **${names.verificationLevel[msg.channel.guild.verificationLevel]}**`,
+								`${emojis.default.dot} 2FA Requirement: **${msg.channel.guild.mfaLevel === 0 ? "Disabled" : "Enabled"}**`,
+								`${emojis.default.dot} Default Notifications: **${msg.channel.guild.defaultNotifications === 0 ? "All Messages" : "Only Mentions"}**`,
+								`${emojis.default.dot} Vanity URL: **${msg.channel.guild.features.includes("VANITY_URL") && msg.channel.guild.vanityURL !== null ? `[https://discord.gg/${msg.channel.guild.vanityURL}](https://discord.gg/${msg.channel.guild.vanityURL})` : "None"}**`,
+								`${emojis.default.dot} NSFW level: ${["Default", "Explicit", "Safe", "Age Restricted"][msg.channel.guild.nsfwLevel]}`,
 								"",
 								"**Features**:",
-								msg.channel.guild.features.length === 0 ? `${config.emojis.default.dot} NONE` : msg.channel.guild.features.map(f => `${config.emojis.default.dot} ${config.names.serverFeatures[f as keyof typeof config["names"]["serverFeatures"]] ?? f}`)
+								msg.channel.guild.features.length === 0 ? `${emojis.default.dot} NONE` : msg.channel.guild.features.map(f => `${emojis.default.dot} ${names.serverFeatures[f as keyof typeof names["serverFeatures"]] ?? f}`)
 							)
 							.setThumbnail(msg.channel.guild.iconURL ?? "")
 							.toJSON()
@@ -92,19 +92,19 @@ export default new Command("sinfo", "serverinfo")
 								"(the below counts will almost certainly be inaccurate)",
 								"",
 								"**Members**:",
-								`${config.emojis.default .dot} Total: ${msg.channel.guild.memberCount}`,
-								`${config.emojis.default .dot} ${config.emojis.custom.online}: ${msg.channel.guild.members.filter(m => m.status === "online").length}`,
-								`${config.emojis.default .dot} ${config.emojis.custom.idle}: ${msg.channel.guild.members.filter(m => m.status === "idle").length}`,
-								`${config.emojis.default .dot} ${config.emojis.custom.dnd}: ${msg.channel.guild.members.filter(m => m.status === "dnd").length}`,
-								`${config.emojis.default .dot} ${config.emojis.custom.offline}: ${msg.channel.guild.members.filter(m => m.status === "offline").length}`,
-								`${config.emojis.default .dot} Non-Bots: ${msg.channel.guild.members.filter(m => !m.bot).length}`,
-								`${config.emojis.default .dot} Bots: ${msg.channel.guild.members.filter(m => m.bot).length}`
+								`${emojis.default.dot} Total: ${msg.channel.guild.memberCount}`,
+								`${emojis.default.dot} ${emojis.custom.online}: ${msg.channel.guild.members.filter(m => m.status === "online").length}`,
+								`${emojis.default.dot} ${emojis.custom.idle}: ${msg.channel.guild.members.filter(m => m.status === "idle").length}`,
+								`${emojis.default.dot} ${emojis.custom.dnd}: ${msg.channel.guild.members.filter(m => m.status === "dnd").length}`,
+								`${emojis.default.dot} ${emojis.custom.offline}: ${msg.channel.guild.members.filter(m => m.status === "offline").length}`,
+								`${emojis.default.dot} Non-Bots: ${msg.channel.guild.members.filter(m => !m.bot).length}`,
+								`${emojis.default.dot} Bots: ${msg.channel.guild.members.filter(m => m.bot).length}`
 							)
 							.setThumbnail(msg.channel.guild.iconURL ?? "")
 							.toJSON()
 					],
 					components: new ComponentHelper()
-						.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `sinfo-back.${msg.author.id}`, false, ComponentHelper.emojiToPartial(config.emojis.default.back, "default"), "Back")
+						.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `sinfo-back.${msg.author.id}`, false, ComponentHelper.emojiToPartial(emojis.default.back, "default"), "Back")
 						.toJSON()
 				} as Eris.AdvancedMessageContent,
 				channels: {
@@ -113,25 +113,25 @@ export default new Command("sinfo", "serverinfo")
 							.setTitle(`Server Info - **${msg.channel.guild.name}**`)
 							.setDescription(
 								"**Channels**:",
-								`${config.emojis.default .dot} Total: ${msg.channel.guild.channels.size}`,
-								`${config.emojis.default .dot} Text: ${msg.channel.guild.channels.filter(c => c.type === Eris.Constants.ChannelTypes.GUILD_TEXT).length}`,
-								`${config.emojis.default .dot} Voice: ${msg.channel.guild.channels.filter(c => c.type === Eris.Constants.ChannelTypes.GUILD_VOICE).length}`,
-								`${config.emojis.default .dot} Category: ${msg.channel.guild.channels.filter(c => c.type === Eris.Constants.ChannelTypes.GUILD_CATEGORY).length}`,
-								`${config.emojis.default .dot} News: ${msg.channel.guild.channels.filter(c => c.type === Eris.Constants.ChannelTypes.GUILD_NEWS).length}`,
-								`${config.emojis.default .dot} Store: ${msg.channel.guild.channels.filter(c => c.type === Eris.Constants.ChannelTypes.GUILD_STORE).length}`,
-								`${config.emojis.default .dot} Stage: ${msg.channel.guild.channels.filter(c => c.type === Eris.Constants.ChannelTypes.GUILD_STAGE).length}`,
+								`${emojis.default.dot} Total: ${msg.channel.guild.channels.size}`,
+								`${emojis.default.dot} Text: ${msg.channel.guild.channels.filter(c => c.type === Eris.Constants.ChannelTypes.GUILD_TEXT).length}`,
+								`${emojis.default.dot} Voice: ${msg.channel.guild.channels.filter(c => c.type === Eris.Constants.ChannelTypes.GUILD_VOICE).length}`,
+								`${emojis.default.dot} Category: ${msg.channel.guild.channels.filter(c => c.type === Eris.Constants.ChannelTypes.GUILD_CATEGORY).length}`,
+								`${emojis.default.dot} News: ${msg.channel.guild.channels.filter(c => c.type === Eris.Constants.ChannelTypes.GUILD_NEWS).length}`,
+								`${emojis.default.dot} Store: ${msg.channel.guild.channels.filter(c => c.type === Eris.Constants.ChannelTypes.GUILD_STORE).length}`,
+								`${emojis.default.dot} Stage: ${msg.channel.guild.channels.filter(c => c.type === Eris.Constants.ChannelTypes.GUILD_STAGE).length}`,
 								"",
-								`${config.emojis.default .dot} Hidden (For You): ${msg.channel.guild.channels.filter(c => !c.permissionsOf(msg.author.id).has("viewChannel")).length}`,
-								`${config.emojis.default .dot} Visible (For You): ${msg.channel.guild.channels.filter(c => c.permissionsOf(msg.author.id).has("viewChannel")).length}`,
+								`${emojis.default.dot} Hidden (For You): ${msg.channel.guild.channels.filter(c => !c.permissionsOf(msg.author.id).has("viewChannel")).length}`,
+								`${emojis.default.dot} Visible (For You): ${msg.channel.guild.channels.filter(c => c.permissionsOf(msg.author.id).has("viewChannel")).length}`,
 								"",
-								`${config.emojis.default .dot} Hidden (For Me): ${msg.channel.guild.channels.filter(c => !c.permissionsOf(this.user.id).has("viewChannel")).length}`,
-								`${config.emojis.default .dot} Visible (For Me): ${msg.channel.guild.channels.filter(c => c.permissionsOf(this.user.id).has("viewChannel")).length}`
+								`${emojis.default.dot} Hidden (For Me): ${msg.channel.guild.channels.filter(c => !c.permissionsOf(this.user.id).has("viewChannel")).length}`,
+								`${emojis.default.dot} Visible (For Me): ${msg.channel.guild.channels.filter(c => c.permissionsOf(this.user.id).has("viewChannel")).length}`
 							)
 							.setThumbnail(msg.channel.guild.iconURL ?? "")
 							.toJSON()
 					],
 					components: new ComponentHelper()
-						.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `sinfo-back.${msg.author.id}`, false, ComponentHelper.emojiToPartial(config.emojis.default.back, "default"), "Back")
+						.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `sinfo-back.${msg.author.id}`, false, ComponentHelper.emojiToPartial(emojis.default.back, "default"), "Back")
 						.toJSON()
 				} as Eris.AdvancedMessageContent,
 				icon: {
@@ -152,7 +152,7 @@ export default new Command("sinfo", "serverinfo")
 						).toJSON()
 					],
 					components: new ComponentHelper()
-						.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `sinfo-back.${msg.author.id}`, false, ComponentHelper.emojiToPartial(config.emojis.default.back, "default"), "Back")
+						.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `sinfo-back.${msg.author.id}`, false, ComponentHelper.emojiToPartial(emojis.default.back, "default"), "Back")
 						.toJSON()
 				} as Eris.AdvancedMessageContent,
 				splash: {
@@ -173,7 +173,7 @@ export default new Command("sinfo", "serverinfo")
 						).toJSON()
 					],
 					components: new ComponentHelper()
-						.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `sinfo-back.${msg.author.id}`, false, ComponentHelper.emojiToPartial(config.emojis.default.back, "default"), "Back")
+						.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `sinfo-back.${msg.author.id}`, false, ComponentHelper.emojiToPartial(emojis.default.back, "default"), "Back")
 						.toJSON()
 				} as Eris.AdvancedMessageContent,
 				banner: {
@@ -194,7 +194,7 @@ export default new Command("sinfo", "serverinfo")
 						).toJSON()
 					],
 					components: new ComponentHelper()
-						.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `sinfo-back.${msg.author.id}`, false, ComponentHelper.emojiToPartial(config.emojis.default.back, "default"), "Back")
+						.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `sinfo-back.${msg.author.id}`, false, ComponentHelper.emojiToPartial(emojis.default.back, "default"), "Back")
 						.toJSON()
 				} as Eris.AdvancedMessageContent
 			};

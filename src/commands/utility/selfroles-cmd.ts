@@ -1,4 +1,4 @@
-import config from "@config";
+import { emojis, permissionNames } from "@config";
 import Command from "@cmd/Command";
 import EmbedBuilder from "@util/EmbedBuilder";
 import ComponentHelper from "@util/ComponentHelper";
@@ -73,20 +73,20 @@ export default new Command("selfroles", "selfrole")
 						`Restrictions: ${cmd.restrictions.length === 0 ? "None" : ""}`,
 						...(cmd.restrictions.length === 0 ? [] : cmd.restrictions.map(r => `- **${Strings.ucwords(r)}**`)),
 						"Usage:",
-						`${config.emojis.default.dot} List Roles: \`${msg.gConfig.getFormattedPrefix()}selfroles list\``,
-						`${config.emojis.default.dot} Join Role: \`${msg.gConfig.getFormattedPrefix()}selfroles join <role or similar text>\``,
-						`${config.emojis.default.dot} Leave Role: \`${msg.gConfig.getFormattedPrefix()}selfroles leave\` (no args)`,
+						`${emojis.default.dot} List Roles: \`${msg.gConfig.getFormattedPrefix()}selfroles list\``,
+						`${emojis.default.dot} Join Role: \`${msg.gConfig.getFormattedPrefix()}selfroles join <role or similar text>\``,
+						`${emojis.default.dot} Leave Role: \`${msg.gConfig.getFormattedPrefix()}selfroles leave\` (no args)`,
 						...(msg.member.permissions.has("manageRoles") ? [
 							"Management Commands:",
-							`${config.emojis.default.dot} Add Role: \`${msg.gConfig.getFormattedPrefix()}selfroles add\``,
-							`${config.emojis.default.dot} Remove Role: \`${msg.gConfig.getFormattedPrefix()}selfroles remove\``,
-							`${config.emojis.default.dot} Remove All: \`${msg.gConfig.getFormattedPrefix()}selfroles clear\``
+							`${emojis.default.dot} Add Role: \`${msg.gConfig.getFormattedPrefix()}selfroles add\``,
+							`${emojis.default.dot} Remove Role: \`${msg.gConfig.getFormattedPrefix()}selfroles remove\``,
+							`${emojis.default.dot} Remove All: \`${msg.gConfig.getFormattedPrefix()}selfroles clear\``
 						] : []),
 						"",
 						`User Permissions: ${cmd.userPermissions.length === 0 ? "None" : ""}`,
-						...(cmd.userPermissions.length === 0 ? [] : ["```diff\n--- (red = optional)", ...cmd.userPermissions.map(([perm, optional]) => `${optional ? "-" : "+"} ${config.permissions[perm]}`), "\n```"]),
+						...(cmd.userPermissions.length === 0 ? [] : ["```diff\n--- (red = optional)", ...cmd.userPermissions.map(([perm, optional]) => `${optional ? "-" : "+"} ${permissionNames[perm]}`), "\n```"]),
 						`Bot Permissions: ${cmd.botPermissions.length === 0 ? "None" : ""}`,
-						...(cmd.botPermissions.length === 0 ? [] : ["```diff\n--- (red = optional)", ...cmd.botPermissions.map(([perm, optional]) => `${optional ? "-" : "+"} ${config.permissions[perm]}`), "\n```"])
+						...(cmd.botPermissions.length === 0 ? [] : ["```diff\n--- (red = optional)", ...cmd.botPermissions.map(([perm, optional]) => `${optional ? "-" : "+"} ${permissionNames[perm]}`), "\n```"])
 					].join("\n"))
 					.setAuthor(msg.author.tag, msg.author.avatarURL)
 					.toJSON()
@@ -146,7 +146,7 @@ export default new Command("selfroles", "selfrole")
 								label: r.name,
 								value: r.id
 							})), "Select A Role To Join", 1, 1)
-							.addInteractionButton(ComponentHelper.BUTTON_DANGER, `select-role.${msg.author.id}.cancel`, false, ComponentHelper.emojiToPartial(config.emojis.default.x, "default"), "Cancel")
+							.addInteractionButton(ComponentHelper.BUTTON_DANGER, `select-role.${msg.author.id}.cancel`, false, ComponentHelper.emojiToPartial(emojis.default.x, "default"), "Cancel")
 							.toJSON()
 					});
 					const choice = await ComponentInteractionCollector.awaitInteractions(msg.channel.id, 3e4, (i) => i.data.custom_id.startsWith(`select-role.${msg.author.id}`) && i.message.id === makeChoice.id && !!i.member?.user && i.member.user.id === msg.author.id);
@@ -212,7 +212,7 @@ export default new Command("selfroles", "selfrole")
 							label: msg.channel.guild.roles.get(r.role)?.name ?? `Unknown[${r.role}]`,
 							value: r.role
 						})), "Select A Role To Leave", 1, 1)
-						.addInteractionButton(ComponentHelper.BUTTON_DANGER, `select-role.${msg.author.id}.cancel`, false, ComponentHelper.emojiToPartial(config.emojis.default.x, "default"), "Cancel")
+						.addInteractionButton(ComponentHelper.BUTTON_DANGER, `select-role.${msg.author.id}.cancel`, false, ComponentHelper.emojiToPartial(emojis.default.x, "default"), "Cancel")
 						.toJSON()
 				});
 				const choice = await ComponentInteractionCollector.awaitInteractions(msg.channel.id, 3e4, (i) => i.data.custom_id.startsWith(`select-role.${msg.author.id}`) && i.message.id === makeChoice.id && !!i.member?.user && i.member.user.id === msg.author.id);

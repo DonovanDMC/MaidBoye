@@ -6,7 +6,7 @@ import GuildConfig from "../db/Models/Guild/GuildConfig";
 import UserConfig from "../db/Models/User/UserConfig";
 import MaidBoye from "../main";
 import db from "../db";
-import config from "@config";
+import { defaultPrefix } from "@config";
 import Eris, { Member, Message } from "eris";
 import { parse } from "discord-command-parser";
 
@@ -51,7 +51,7 @@ export default class ExtendedMessage extends Message<Eris.GuildTextableChannel> 
 		const p = parse(this, [
 			`<@${this.client.user.id}>`,
 			`<@!${this.client.user.id}>`,
-			...this.gConfig.prefix.map(({ value }) => value ?? config.defaults.prefix)
+			...this.gConfig.prefix.map(({ value }) => value ?? defaultPrefix)
 		], {
 			allowSpaceBeforeCommand: true,
 			ignorePrefixCase: true

@@ -1,6 +1,6 @@
 import Command from "@cmd/Command";
 import EmbedBuilder from "@util/EmbedBuilder";
-import config from "@config";
+import { apiKeys, developers, emojis, userAgent } from "@config";
 import Eris, { DiscordRESTError } from "eris";
 import ComponentHelper from "@util/ComponentHelper";
 import MaidBoye from "@MaidBoye";
@@ -76,7 +76,7 @@ export default new Command("e621", "e6")
 				const e = new EmbedBuilder()
 					.setTitle(`E621 | Tags: ${msg.rawArgs.length === 0 ? "None" : `"${msg.rawArgs.join(" ").slice(0, 500)}"`}`)
 					.setColor(post.rating === "s" ? "green" : post.rating === "q" ? "gold" : post.rating === "e" ? "red" : "bot")
-					.setFooter(`Post #${post.id} | ${i + 1}/${posts.length} | ${post.score.up} ${config.emojis.default.up} ${post.score.down} ${config.emojis.default.down} | ${post.fav_count} ${config.emojis.default.heart}`)
+					.setFooter(`Post #${post.id} | ${i + 1}/${posts.length} | ${post.score.up} ${emojis.default.up} ${post.score.down} ${emojis.default.down} | ${post.fav_count} ${emojis.default.heart}`)
 					.removeDescription();
 				if (id && token) await this.createInteractionResponse(id, token, { type: Eris.Constants.InteractionResponseTypes.DEFERRED_UPDATE_MESSAGE });
 
@@ -114,8 +114,8 @@ export default new Command("e621", "e6")
 					const b = await fetch("https://v2.yiff.rest/e621-thumb/create", {
 						method: "POST",
 						headers: {
-							"User-Agent": config.userAgent,
-							"Authorization": config.apiKeys.e621Thumb,
+							"User-Agent": userAgent,
+							"Authorization": apiKeys.e621Thumb,
 							"Content-Type": "application/json"
 						},
 						body: JSON.stringify({
@@ -128,7 +128,7 @@ export default new Command("e621", "e6")
 						data: Thumbnail;
 					}>);
 					url = b.data.url;
-					if (config.developers.includes(msg.author.id)) {
+					if (developers.includes(msg.author.id)) {
 						console.log("Start Time:", b.data.startTime || "Cached");
 						console.log("End Time:", b.data.endTime || "Cached");
 						if (b.data.createTime === null) console.log("Create Time: Cached");
@@ -170,11 +170,11 @@ export default new Command("e621", "e6")
 								post.rating === "e" ? ComponentHelper.BUTTON_DANGER :
 									ComponentHelper.BUTTON_SUCCESS, `e621-rating.${msg.author.id}`, true, undefined, `Rating: ${post.rating === "s" ? "Safe" : post.rating === "q" ? "Questionable" : post.rating === "e" ? "Explicit" : "Unknown"}`)
 					.addRow()
-					.addInteractionButton(ComponentHelper.BUTTON_SECONDARY, `e621-first.${msg.author.id}`, i === 0, ComponentHelper.emojiToPartial(config.emojis.default.first, "default"), "First")
-					.addInteractionButton(ComponentHelper.BUTTON_SECONDARY, `e621-back.${msg.author.id}`, false, ComponentHelper.emojiToPartial(config.emojis.default.back, "default"), "Back")
-					.addInteractionButton(ComponentHelper.BUTTON_SECONDARY, `e621-stop.${msg.author.id}`, false, ComponentHelper.emojiToPartial(config.emojis.default.stop, "default"), "Stop")
-					.addInteractionButton(ComponentHelper.BUTTON_SECONDARY, `e621-next.${msg.author.id}`, false, ComponentHelper.emojiToPartial(config.emojis.default.next, "default"), "Next")
-					.addInteractionButton(ComponentHelper.BUTTON_SECONDARY, `e621-last.${msg.author.id}`, i === (posts.length - 1), ComponentHelper.emojiToPartial(config.emojis.default.last, "default"), "Last")
+					.addInteractionButton(ComponentHelper.BUTTON_SECONDARY, `e621-first.${msg.author.id}`, i === 0, ComponentHelper.emojiToPartial(emojis.default.first, "default"), "First")
+					.addInteractionButton(ComponentHelper.BUTTON_SECONDARY, `e621-back.${msg.author.id}`, false, ComponentHelper.emojiToPartial(emojis.default.back, "default"), "Back")
+					.addInteractionButton(ComponentHelper.BUTTON_SECONDARY, `e621-stop.${msg.author.id}`, false, ComponentHelper.emojiToPartial(emojis.default.stop, "default"), "Stop")
+					.addInteractionButton(ComponentHelper.BUTTON_SECONDARY, `e621-next.${msg.author.id}`, false, ComponentHelper.emojiToPartial(emojis.default.next, "default"), "Next")
+					.addInteractionButton(ComponentHelper.BUTTON_SECONDARY, `e621-last.${msg.author.id}`, i === (posts.length - 1), ComponentHelper.emojiToPartial(emojis.default.last, "default"), "Last")
 					.toJSON();
 				if (m === undefined) m = await msg.reply({
 					embeds: [e.toJSON()],
@@ -193,7 +193,7 @@ export default new Command("e621", "e6")
 				if (wait === null) {
 					await m.edit({
 						embeds: m.embeds,
-						components:  m.components?.slice(0, 1)
+						components: m.components?.slice(0, 1)
 					});
 					return;
 				} else {
@@ -203,7 +203,7 @@ export default new Command("e621", "e6")
 						i = -1;
 						await m.edit({
 							embeds: m.embeds,
-							components:  m.components?.slice(0, 1)
+							components: m.components?.slice(0, 1)
 						});
 						return;
 					}

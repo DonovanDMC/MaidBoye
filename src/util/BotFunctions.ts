@@ -10,7 +10,7 @@ import GuildConfig from "../db/Models/Guild/GuildConfig";
 import Eris from "eris";
 import { Strings } from "@uwu-codes/utils";
 import MaidBoye from "@MaidBoye";
-import config from "@config";
+import { antiSpamDir, apiURL, beta, emojis, levelingFlatRate, levelingFlatRateStart, levelingStartRate } from "@config";
 import * as fs from "fs-extra";
 import crypto from "crypto";
 
@@ -260,7 +260,7 @@ export default class BotFunctions {
 
 		if (cmd.triggers.includes("bap")) embed.setImage("https://assets.maid.gay/bap.gif");
 		if (cmd.triggers.includes("bellyrub")) embed.setImage("https://assets.maid.gay/bellyrub.gif");
-		if (cmd.triggers.includes("spray")) embed.setDescription(`${embed.getDescription()!}\n${config.emojis.custom.spray.repeat(Math.floor(Math.random() * 3) + 2)}`);
+		if (cmd.triggers.includes("spray")) embed.setDescription(`${embed.getDescription()!}\n${emojis.custom.spray.repeat(Math.floor(Math.random() * 3) + 2)}`);
 
 		return msg.channel.createMessage({
 			embeds: [
@@ -328,7 +328,7 @@ export default class BotFunctions {
 	static generateReport(user: Eris.User, entries: Array<AntiSpamEntry>) {
 		const now = Date.now();
 		const nowD = new Date(now);
-		const dir = `${config.dir.antiSpam}/${user.id}`;
+		const dir = `${antiSpamDir}/${user.id}`;
 		fs.mkdirpSync(dir);
 		const oldFiles = fs.readdirSync(dir).filter(r => (fs.lstatSync(`${dir}/${r}`).birthtimeMs + 1.2e5) > now);
 		oldFiles.forEach(f => TempFiles.markForDeletion(`${dir}/${f}`, now + 1.8e+6));
@@ -336,7 +336,7 @@ export default class BotFunctions {
 		fs.writeFileSync(`${dir}/${id}.rpt`, [
 			"-- Maid Boye Spam Repot --",
 			`Generated Time: ${(nowD.getDate() + 1).toString().padStart(2, "0")}/${nowD.getMonth().toString().padStart(2, "0")}/${nowD.getFullYear().toString().padStart(4, "0")} ${nowD.getHours().toString().padStart(2, "0")}:${nowD.getMinutes().toString().padStart(2, "0")}:${nowD.getSeconds().toString().padStart(2, "0")}`,
-			`Beta: ${config.beta ? "Yes" : "No"}`,
+			`Beta: ${beta ? "Yes" : "No"}`,
 			`User: ${user.tag} (${user.id})`,
 			`Report Location: ${dir}/${id}.rpt`,
 			`Total VL: ${entries.length}`,
@@ -356,7 +356,7 @@ export default class BotFunctions {
 		return {
 			file: `${dir}/${id}.rpt`,
 			id,
-			url: `${config.api.url}/reports/${user.id}/${id}`
+			url: `${apiURL}/reports/${user.id}/${id}`
 		};
 	}
 
@@ -370,20 +370,20 @@ export default class BotFunctions {
 
 	static calcExp(lvl: number) {
 		const k = {
-			lvl: lvl < config.leveling.flatRateStart ? lvl * config.leveling.startRate : config.leveling.flatRate,
+			lvl: lvl < levelingFlatRateStart ? lvl * levelingStartRate : levelingFlatRate,
 			total: 0
 		};
-		if (lvl <= config.leveling.flatRateStart) for (let i = 0; i <= lvl; i++) k.total += i < config.leveling.flatRateStart ? i * 100 : config.leveling.flatRate;
+		if (lvl <= levelingFlatRateStart) for (let i = 0; i <= lvl; i++) k.total += i < levelingFlatRateStart ? i * 100 : levelingFlatRate;
 		else {
-			const { total: t } = this.calcExp(config.leveling.flatRateStart);
-			k.total = t + (lvl - config.leveling.flatRateStart) * config.leveling.flatRate;
+			const { total: t } = this.calcExp(levelingFlatRateStart);
+			k.total = t + (lvl - levelingFlatRateStart) * levelingFlatRate;
 		}
 		return k;
 	}
 
 	static calcLevel(exp: number) {
 		let e = Number(exp), lvl = 0, complete = false;
-		const { total: t } = this.calcExp(config.leveling.flatRateStart);
+		const { total: t } = this.calcExp(levelingFlatRateStart);
 		if (exp <= t) {
 			while (!complete) {
 				const l = this.calcExp(lvl + 1).lvl;
@@ -396,10 +396,10 @@ export default class BotFunctions {
 			// leftover exp after level 20
 			const l = exp - t;
 			// leftover exp
-			const a = l % config.leveling.flatRate;
+			const a = l % levelingFlatRate;
 			// levels above 20
-			const b = Math.floor(l / config.leveling.flatRate);
-			lvl = b + config.leveling.flatRateStart;
+			const b = Math.floor(l / levelingFlatRate);
+			lvl = b + levelingFlatRateStart;
 			e = a;
 		}
 

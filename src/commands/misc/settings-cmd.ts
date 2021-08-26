@@ -1,6 +1,6 @@
 import ErrorHandler from "@util/handlers/ErrorHandler";
 import Command from "@cmd/Command";
-import config from "@config";
+import { emojis } from "@config";
 import ComponentHelper from "@util/ComponentHelper";
 import EmbedBuilder from "@util/EmbedBuilder";
 import chunk from "chunk";
@@ -24,10 +24,10 @@ export default new Command("settings")
 					.setTitle("Server Settings")
 					.setDescription(
 						v.map(s => [
-							`${s.name === "Default Yiff Type" && msg.channel.nsfw ? config.emojis.custom.knot : s.emoji?.value ?? ""} **${s.name}**`,
-							`${config.emojis.default.dot} Current Value: ${s.displayFormat(msg.gConfig)}`,
-							`${config.emojis.default.dot} Valid Values: ${s.validValuesDescription}`,
-							`${config.emojis.default.dot} Description: ${s.description}`,
+							`${s.name === "Default Yiff Type" && msg.channel.nsfw ? emojis.custom.knot : s.emoji?.value ?? ""} **${s.name}**`,
+							`${emojis.default.dot} Current Value: ${s.displayFormat(msg.gConfig)}`,
+							`${emojis.default.dot} Valid Values: ${s.validValuesDescription}`,
+							`${emojis.default.dot} Description: ${s.description}`,
 							""
 						].join("\n")).join("\n")
 					)
@@ -44,10 +44,10 @@ export default new Command("settings")
 						formatEmbed(pages[page - 1])
 					],
 					components: new ComponentHelper()
-						.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-back.${msg.author.id}`, page === 1, ComponentHelper.emojiToPartial(config.emojis.default.back, "default"), "Back")
-						.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-configure.${msg.author.id}`, false, ComponentHelper.emojiToPartial(config.emojis.custom.settings, "custom"), "Configure")
-						.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-exit.${msg.author.id}`, false, ComponentHelper.emojiToPartial(config.emojis.default.x, "default"), "Exit")
-						.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-next.${msg.author.id}`, page  === pages.length, ComponentHelper.emojiToPartial(config.emojis.default.next, "default"), "Next")
+						.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-back.${msg.author.id}`, page === 1, ComponentHelper.emojiToPartial(emojis.default.back, "default"), "Back")
+						.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-configure.${msg.author.id}`, false, ComponentHelper.emojiToPartial(emojis.custom.settings, "custom"), "Configure")
+						.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-exit.${msg.author.id}`, false, ComponentHelper.emojiToPartial(emojis.default.x, "default"), "Exit")
+						.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-next.${msg.author.id}`, page  === pages.length, ComponentHelper.emojiToPartial(emojis.default.next, "default"), "Next")
 						.toJSON()
 				// string (MessageContent) isn't assignable to InteractionPayload
 				} as Eris.AdvancedMessageContent;
@@ -109,10 +109,10 @@ export default new Command("settings")
 								value: s.name.replace(/\s/g, "-").toLowerCase(),
 								// thanks Discord
 								description: Strings.truncate(s.shortDescription ?? s.description, 50),
-								emoji: s.emoji === null ? undefined : ComponentHelper.emojiToPartial(s.name === "Default Yiff Type" && msg.channel.nsfw ? config.emojis.custom.knot : s.emoji.value, s.emoji.type)
+								emoji: s.emoji === null ? undefined : ComponentHelper.emojiToPartial(s.name === "Default Yiff Type" && msg.channel.nsfw ? emojis.custom.knot : s.emoji.value, s.emoji.type)
 							})), "Select A Setting To Configure", 1, 1)
-							.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-back.${msg.author.id}`, false, ComponentHelper.emojiToPartial(config.emojis.default.back, "default"), "Back")
-							.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-exit.${msg.author.id}`, false, ComponentHelper.emojiToPartial(config.emojis.default.x, "default"), "Exit")
+							.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-back.${msg.author.id}`, false, ComponentHelper.emojiToPartial(emojis.default.back, "default"), "Back")
+							.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-exit.${msg.author.id}`, false, ComponentHelper.emojiToPartial(emojis.default.x, "default"), "Exit")
 							.toJSON()
 					}
 				});

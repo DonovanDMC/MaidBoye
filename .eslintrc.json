@@ -2,6 +2,30 @@
 	"extends": "@uwu-codes/eslint-config",
 	"rules": {
 		"import/no-extraneous-dependencies": "off",
-		"no-inner-declarations": "off"
+		"no-inner-declarations": "off",
+		"key-spacing": [
+			"error",
+			{
+				"mode": "strict"
+			}
+		],
+		"@typescript-eslint/consistent-indexed-object-style": [
+			"error",
+			"record"
+		],
+		"@typescript-eslint/consistent-type-definitions": [
+			"error",
+			"interface"
+		],
+		"@typescript-eslint/consistent-type-assertions": [
+			"error",
+			{
+				"assertionStyle": "as"
+			}
+		],
+		"@typescript-eslint/method-signature-style": [
+			"error",
+			"method"
+		]
 	}
 }

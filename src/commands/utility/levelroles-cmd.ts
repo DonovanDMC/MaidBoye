@@ -2,7 +2,7 @@ import BotFunctions from "../../util/BotFunctions";
 import MaidBoye from "../../main";
 import EmbedBuilder from "../../util/EmbedBuilder";
 import ComponentHelper from "../../util/ComponentHelper";
-import config from "@config";
+import { emojis } from "@config";
 import chunk from "chunk";
 import Command from "@cmd/Command";
 import Eris, { DiscordRESTError } from "eris";
@@ -98,9 +98,9 @@ export default new Command("levelroles")
 									.toJSON()
 							],
 							components: new ComponentHelper()
-								.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `levelroles-back.${msg.author.id}`, page === 0, ComponentHelper.emojiToPartial(config.emojis.default.last, "default"))
-								.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `levelroles-stop.${msg.author.id}`, page === 0, ComponentHelper.emojiToPartial(config.emojis.default.stop, "default"))
-								.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `levelroles-next.${msg.author.id}`, page === 0, ComponentHelper.emojiToPartial(config.emojis.default.next, "default"))
+								.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `levelroles-back.${msg.author.id}`, page === 0, ComponentHelper.emojiToPartial(emojis.default.last, "default"))
+								.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `levelroles-stop.${msg.author.id}`, page === 0, ComponentHelper.emojiToPartial(emojis.default.stop, "default"))
+								.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `levelroles-next.${msg.author.id}`, page === 0, ComponentHelper.emojiToPartial(emojis.default.next, "default"))
 								.toJSON()
 						});
 						const wait = await msg.channel.awaitComponentInteractions(6e4, (it) => it.message.id === m.id && it.member!.user.id === msg.author.id && it.data.custom_id.startsWith("diable-"));

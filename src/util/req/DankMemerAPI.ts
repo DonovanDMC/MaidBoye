@@ -1,8 +1,8 @@
-import config from "@config";
+import { apiKeys, userAgent } from "@config";
 import DMAPI from "dankmemerapi";
 const DankMemerAPI = new DMAPI({
-	apiKey: config.apiKeys.dankMemer,
-	userAgent: config.userAgent,
+	apiKey: apiKeys.dankMemer,
+	userAgent,
 	cacheRequests: false,
 	timeout: 6e4
 });

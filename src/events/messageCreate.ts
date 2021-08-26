@@ -10,16 +10,16 @@ import ExtendedMessage from "@util/ExtendedMessage";
 import { Permissions } from "@cmd/Command";
 import ErrorHandler from "@util/handlers/ErrorHandler";
 import CommandError from "@cmd/CommandError";
-import config from "@config";
 import { Strings, Timers } from "@uwu-codes/utils";
 import Eris from "eris";
 import StatsHandler from "@util/handlers/StatsHandler";
 import EventsASecondHandler from "@util/handlers/EventsASecondHandler";
 import db from "@db";
+import { antiSpamMaxVL, antiSpamWarnThreshold, beta, defaultPrefix, developers, permissionNames, supportLink } from "@config";
 const Redis = db.r;
 
 export default new ClientEvent("messageCreate", async function (message) {
-	const t = new Timers((config.developers.includes(message.author.id) || config.beta) === true ? (label, info) => Logger.getLogger(label).debug(info) : false);
+	const t = new Timers((developers.includes(message.author.id) || beta) === true ? (label, info) => Logger.getLogger(label).debug(info) : false);
 	if (message.author.bot === true || !("type" in message.channel) || message.channel.type === Eris.Constants.ChannelTypes.GROUP_DM) return;
 
 	t.start("userBl");
@@ -46,7 +46,7 @@ export default new ClientEvent("messageCreate", async function (message) {
 			embeds: [
 				new EmbedBuilder()
 					.setTitle("Hi!")
-					.setDescription(`H-hey... I see you direct messaged me.. If you need some help, y-you can join my support server.. <${config.client.links.support}>\nMy default prefix is \`${config.defaults.prefix.trim()}\`, and you can list my commands b-by using \`${config.defaults.prefix}help\` in a server.\n\nI-if you don't want this response, run \`${config.defaults.prefix}toggledmresponse\` in a server..`)
+					.setDescription(`H-hey... I see you direct messaged me.. If you need some help, y-you can join my support server.. <${supportLink}>\nMy default prefix is \`${defaultPrefix.trim()}\`, and you can list my commands b-by using \`${defaultPrefix}help\` in a server.\n\nI-if you don't want this response, run \`${defaultPrefix}toggledmresponse\` in a server..`)
 					.setAuthor(message.author.tag, message.author.avatarURL)
 					.setFooter(">w<")
 					.toJSON()
@@ -155,7 +155,7 @@ export default new ClientEvent("messageCreate", async function (message) {
 	if (/^user-report-([a-z\d]+)$/i.exec(msg.channel.name) && !cmd.triggers.includes("report")) return;
 
 
-	if (!config.developers.includes(msg.author.id)) {
+	if (!developers.includes(msg.author.id)) {
 		t.start("disable");
 		if (msg.gConfig.disable.length > 0 && !msg.member.permissions.has("manageGuild")) {
 			const server = msg.gConfig.disable.filter(d => d.filterType === "server" && ((d.type === "all" && d.value === null) || ("command" && cmd.triggers[0] === d.value) || (d.type === "category" && cmd.category === d.value)));
@@ -170,7 +170,7 @@ export default new ClientEvent("messageCreate", async function (message) {
 		t.start("antispam");
 		AntiSpam.add(msg.author.id, cmd);
 		const anti = AntiSpam.get(msg.author.id);
-		if ((anti.length % config.antiSpam.warnThreshold) === 0) {
+		if ((anti.length % antiSpamWarnThreshold) === 0) {
 			const report = BotFunctions.generateReport(msg.author, anti);
 			await WebhookStore.execute("antispam", {
 				embeds: [
@@ -180,7 +180,7 @@ export default new ClientEvent("messageCreate", async function (message) {
 						.toJSON()
 				]
 			});
-			if (anti.length > config.antiSpam.maxVL) await msg.uConfig.addBlacklist("antispam", this.user.id, "Command Spam", Date.now() + 2.592e+8, report.id);
+			if (anti.length > antiSpamMaxVL) await msg.uConfig.addBlacklist("antispam", this.user.id, "Command Spam", Date.now() + 2.592e+8, report.id);
 		}
 		t.end("antispam");
 
@@ -199,7 +199,7 @@ export default new ClientEvent("messageCreate", async function (message) {
 			);
 			return msg.reply("H-hey! You have to use that in an nsfw channel!");
 		}
-		if (cmd.restrictions.includes("beta") && !config.beta) {
+		if (cmd.restrictions.includes("beta") && !beta) {
 			StatsHandler.trackBulkNoResponse(
 				"stats:restrictionFail:beta",
 				`stats:users:${msg.author.id}:restrictionFail:beta`
@@ -225,7 +225,7 @@ export default new ClientEvent("messageCreate", async function (message) {
 				//                                 typescript™️
 				]).reduce((a,b) => a.concat(b), []) as [first: string, ...other: Array<string>])
 			);
-			return msg.reply(`H-hey! You're missing the ${Strings.plural("permission", missingUser)} **${Strings.joinAnd(missingUser.map(p => config.permissions[p] || p), "**, **")}**.. You must have these to use this command!`);
+			return msg.reply(`H-hey! You're missing the ${Strings.plural("permission", missingUser)} **${Strings.joinAnd(missingUser.map(p => permissionNames[p] || p), "**, **")}**.. You must have these to use this command!`);
 		}
 		// needs to be started either way or end will error
 	} else t.start("restrictions");
@@ -249,7 +249,7 @@ export default new ClientEvent("messageCreate", async function (message) {
 				//                                 typescript™️
 			]).reduce((a,b) => a.concat(b), []) as [first: string, ...other: Array<string>])
 		);
-		return msg.reply(`H-hey! I'm missing the ${Strings.plural("permission", missingBot)} **${Strings.joinAnd(missingBot.map(p => config.permissions[p] || p), "**, **")}**.. I must have these for this command to function!`);
+		return msg.reply(`H-hey! I'm missing the ${Strings.plural("permission", missingBot)} **${Strings.joinAnd(missingBot.map(p => permissionNames[p] || p), "**, **")}**.. I must have these for this command to function!`);
 	}
 	t.end("restrictions");
 
@@ -280,14 +280,14 @@ export default new ClientEvent("messageCreate", async function (message) {
 			}
 
 			// ignore errors from eval command
-			if(cmd.triggers.includes("eval")) return;
+			if (cmd.triggers.includes("eval")) return;
 
 			StatsHandler.trackNoResponse(`stats:commands:${cmd.triggers[0]}:error`);
 
 			const code = await ErrorHandler.handleError(err, msg);
 
 			if (code === null) return msg.reply("S-sorry! There was an error while running that.. Our internal error reporting service didn't return any further info.");
-			else return msg.reply(`S-sorry! There was an error while running that.. I-if you want, you can report it to my developers, or try again later..\nCode: \`${code}\`\nSupport: ${config.client.links.support}`);
+			else return msg.reply(`S-sorry! There was an error while running that.. I-if you want, you can report it to my developers, or try again later..\nCode: \`${code}\`\nSupport: ${supportLink}`);
 		}
 		);
 });

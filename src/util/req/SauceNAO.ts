@@ -1,6 +1,6 @@
-import config from "@config";
+import { apiKeys } from "@config";
 import Sagiri from "sagiri";
-const SauceNAO = Sagiri(config.apiKeys.saucenao, {
+const SauceNAO = Sagiri(apiKeys.saucenao, {
 	mask: [28],
 	results: 4
 });

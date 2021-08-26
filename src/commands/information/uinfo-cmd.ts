@@ -1,4 +1,4 @@
-import config from "@config";
+import { apiKeys, developers, emojis, names, userAgent } from "@config";
 import Command from "@cmd/Command";
 import EmbedBuilder from "@util/EmbedBuilder";
 import BotFunctions from "@util/BotFunctions";
@@ -29,22 +29,22 @@ export default new Command("uinfo", "userinfo")
 		try {
 			dRep = await fetch(`https://discordrep.com/api/v3/rep/${user.id}`, {
 				headers: {
-					"User-Agent": config.userAgent,
-					"Authorization": config.apiKeys["discord-rep"]
+					"User-Agent": userAgent,
+					"Authorization": apiKeys["discord-rep"]
 				}
 			}).then(v => v.json() as unknown as typeof dRep);
 			infr = await fetch(`https://discordrep.com/api/v3/infractions/${user.id}`, {
 				headers: {
-					"User-Agent": config.userAgent,
-					"Authorization": config.apiKeys["discord-rep"]
+					"User-Agent": userAgent,
+					"Authorization": apiKeys["discord-rep"]
 				}
 			}).then(v => v.json() as unknown as typeof infr);
 		} catch {
 			//
 		}
 
-		const badges: Array<keyof typeof config["names"]["badges"]> = BotFunctions.getUserFlagsArray(user);
-		if (config.developers.includes(user.id)) badges.push("DEVELOPER");
+		const badges: Array<keyof typeof names["badges"]> = BotFunctions.getUserFlagsArray(user);
+		if (developers.includes(user.id)) badges.push("DEVELOPER");
 		if (badges.length === 0) badges.push("NONE");
 
 		// this is legacy code but more importantly, IT WORKS
@@ -78,26 +78,26 @@ export default new Command("uinfo", "userinfo")
 					.setThumbnail(user.avatarURL)
 					.setDescription(
 						"**General User**:",
-						`${config.emojis.default.dot} Tag: **${user.tag}**`,
-						`${config.emojis.default.dot} ID: **${user.id}**`,
-						`${config.emojis.default.dot} Avatar: [[Link](${user.avatarURL})]`,
-						`${config.emojis.default.dot} Banner: ${user.banner === null ? "[None]" : `[[Link](${user.bannerURL!})] ${user.accentColor === null ? "" : `(#${user.accentColor.toString(16)})`}`}`,
-						`${config.emojis.default.dot} Creation Date: ${BotFunctions.formatDiscordTime(user.createdAt, "long-datetime", true)}`,
+						`${emojis.default.dot} Tag: **${user.tag}**`,
+						`${emojis.default.dot} ID: **${user.id}**`,
+						`${emojis.default.dot} Avatar: [[Link](${user.avatarURL})]`,
+						`${emojis.default.dot} Banner: ${user.banner === null ? "[None]" : `[[Link](${user.bannerURL!})] ${user.accentColor === null ? "" : `(#${user.accentColor.toString(16)})`}`}`,
+						`${emojis.default.dot} Creation Date: ${BotFunctions.formatDiscordTime(user.createdAt, "long-datetime", true)}`,
 						member === undefined ? "" : [
 							"",
 							"**Server Member**:",
-							`${config.emojis.default.dot} Join Date: ${member.joinedAt === null ? "Unknown" : BotFunctions.formatDiscordTime(member.joinedAt, "long-datetime", true)}`,
-							`${config.emojis.default.dot} Roles: ${member.roles.length === 0 ? "**None**" : member.roles.reduce((a,b) => a + b.length + 4 /* <@&> */, 0) > 1500 ? "**Unable To Display Roles.**" : member.roles.map(r => `<@&${r}>`).join(" ")}`,
-							`${config.emojis.default.dot} Join Info:`,
+							`${emojis.default.dot} Join Date: ${member.joinedAt === null ? "Unknown" : BotFunctions.formatDiscordTime(member.joinedAt, "long-datetime", true)}`,
+							`${emojis.default.dot} Roles: ${member.roles.length === 0 ? "**None**" : member.roles.reduce((a,b) => a + b.length + 4 /* <@&> */, 0) > 1500 ? "**Unable To Display Roles.**" : member.roles.map(r => `<@&${r}>`).join(" ")}`,
+							`${emojis.default.dot} Join Info:`,
 							...around.map(a => `${a === user!.id ? `- **[#${m.indexOf(a) + 1}]**` : `- [#${m.indexOf(a) + 1}]`} <@!${a}> (${BotFunctions.formatDiscordTime(msg.channel.guild.members.get(a)!.joinedAt!, "short-datetime", true)})`)
 						],
 						"",
 						`[**DiscordRep**](https://discordrep.com/u/${user.id}):`,
-						`${config.emojis.default.dot} Rep: ${!dRep? "Unable to fetch data." : `${config.emojis.custom[(dRep.upvotes - dRep.downvotes) > 0 ? "upvote" : (dRep.upvotes - dRep.downvotes) < 0 ? "downvote" : "neutral"]} ${dRep.upvotes - dRep.downvotes}`}`,
-						`${config.emojis.default.dot} Infractions: ${!infr ? "Unable to fetch data." : `${infr.type === "CLEAN" ? "None" : `**${infr.type}**, Reason: ${infr.reason}, Timestamp: ${new Date(infr.date).toISOString()}`}`}`,
+						`${emojis.default.dot} Rep: ${!dRep? "Unable to fetch data." : `${emojis.custom[(dRep.upvotes - dRep.downvotes) > 0 ? "upvote" : (dRep.upvotes - dRep.downvotes) < 0 ? "downvote" : "neutral"]} ${dRep.upvotes - dRep.downvotes}`}`,
+						`${emojis.default.dot} Infractions: ${!infr ? "Unable to fetch data." : `${infr.type === "CLEAN" ? "None" : `**${infr.type}**, Reason: ${infr.reason}, Timestamp: ${new Date(infr.date).toISOString()}`}`}`,
 						"",
 						"**Badges**:",
-						badges.map(f => `${config.emojis.default.dot} ${config.names.badges[f]}`)
+						badges.map(f => `${emojis.default.dot} ${names.badges[f]}`)
 					)
 					.setImage(user.bannerURL ?? "")
 					.toJSON()

@@ -1,10 +1,4 @@
 import Command/* , { Permissions } */ from "@cmd/Command";
-/* import MessageCollector from "@util/MessageCollector";
-import EmbedBuilder from "@util/EmbedBuilder";
-import ExtendedMessage from "@util/ExtendedMessage";
-import MaidBoye from "../../main";
-import config from "@config";
-import Eris from "eris"; */
 
 export default new Command("report")
 	.setPermissions("bot", "manageMessages", "manageChannels")

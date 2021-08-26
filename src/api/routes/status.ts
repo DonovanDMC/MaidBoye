@@ -1,6 +1,6 @@
-import MaidBoye from "../../main";
 import Route from "../Route";
-import config from "@config";
+import MaidBoye from "@MaidBoye";
+import { beta } from "@config";
 
 export default class StatusRoute extends Route {
 	constructor(client: MaidBoye) {
@@ -23,7 +23,7 @@ export default class StatusRoute extends Route {
 						}
 					})),
 					latency: onlineShards.reduce((a,b) => a + b.latency, 0) / onlineShards.length,
-					mode: config.beta ? "BETA" : "PROD"
+					mode: beta ? "BETA" : "PROD"
 				}
 			});
 		});

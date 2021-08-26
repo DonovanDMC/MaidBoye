@@ -1,4 +1,4 @@
-import config from "@config";
+import { beta, developers, emojis, permissionNames } from "@config";
 import Command from "@cmd/Command";
 import CommandHandler from "@cmd/CommandHandler";
 import ComponentHelper from "@util/ComponentHelper";
@@ -31,7 +31,7 @@ export default new Command("help")
 			const hasUseExternal = msg.channel.permissionsOf(this.user.id).has("useExternalEmojis");
 			const categories = {} as Record<string, Eris.AdvancedMessageContent>;
 			CommandHandler.categories.forEach((cat, i) => {
-				if (cat.restrictions.includes("disabled") || (cat.restrictions.includes("beta") && !config.beta) || (cat.restrictions.includes("developer") && !config.developers.includes(msg.author.id))) return;
+				if (cat.restrictions.includes("disabled") || (cat.restrictions.includes("beta") && !beta) || (cat.restrictions.includes("developer") && !developers.includes(msg.author.id))) return;
 				eHome.addField(`${hasUseExternal && cat.displayName.emojiCustom ? `${cat.displayName.emojiCustom} ` : cat.displayName.emojiDefault ? `${cat.displayName.emojiDefault} ` : ""}${cat.displayName.text}`, `${cat.description || "No Description."}\nTotal Commands: **${cat.commands.length}**`, true);
 				if ((i % 2) === 0) eHome.addBlankField(true);
 				let emoji: Partial<Eris.PartialEmoji> | undefined;
@@ -54,7 +54,7 @@ export default new Command("help")
 					content: "",
 					embeds: [ eCat.toJSON() ],
 					components: new ComponentHelper()
-						.addInteractionButton(ComponentHelper.BUTTON_SECONDARY, `help-home.${msg.author.id}`, false, ComponentHelper.emojiToPartial(config.emojis.default.home, "default"), "Home")
+						.addInteractionButton(ComponentHelper.BUTTON_SECONDARY, `help-home.${msg.author.id}`, false, ComponentHelper.emojiToPartial(emojis.default.home, "default"), "Home")
 						.toJSON()
 				};
 			});
@@ -126,15 +126,15 @@ export default new Command("help")
 							...(d.restrictions.length === 0 ? [] : d.restrictions.map(r => `- **${Strings.ucwords(r)}**`)),
 							"",
 							`User Permissions: ${d.userPermissions.length === 0 ? "None" : ""}`,
-							...(d.userPermissions.length === 0 ? [] : ["```diff\n--- (red = optional)", ...d.userPermissions.map(([perm, optional]) => `${optional ? "-" : "+"} ${config.permissions[perm]}`), "\n```"]),
+							...(d.userPermissions.length === 0 ? [] : ["```diff\n--- (red = optional)", ...d.userPermissions.map(([perm, optional]) => `${optional ? "-" : "+"} ${permissionNames[perm]}`), "\n```"]),
 							`Bot Permissions: ${d.botPermissions.length === 0 ? "None" : ""}`,
-							...(d.botPermissions.length === 0 ? [] : ["```diff\n--- (red = optional)", ...d.botPermissions.map(([perm, optional]) => `${optional ? "-" : "+"} ${config.permissions[perm]}`), "\n```"])
+							...(d.botPermissions.length === 0 ? [] : ["```diff\n--- (red = optional)", ...d.botPermissions.map(([perm, optional]) => `${optional ? "-" : "+"} ${permissionNames[perm]}`), "\n```"])
 						].join("\n"))
 						.setAuthor(msg.author.tag, msg.author.avatarURL);
 					await m.edit({
 						embeds: [ e.toJSON() ],
 						components: new ComponentHelper()
-							.addInteractionButton(ComponentHelper.BUTTON_SECONDARY, `help-home.${msg.author.id}`, false, ComponentHelper.emojiToPartial(config.emojis.default.home, "default"), "Home")
+							.addInteractionButton(ComponentHelper.BUTTON_SECONDARY, `help-home.${msg.author.id}`, false, ComponentHelper.emojiToPartial(emojis.default.home, "default"), "Home")
 							.toJSON()
 					});
 				}

@@ -1,10 +1,10 @@
 import Command from "@cmd/Command";
-import config from "@config";
 import MaidBoye from "@MaidBoye";
 import ComponentHelper from "@util/ComponentHelper";
 import EmbedBuilder from "@util/EmbedBuilder";
 import Eris, { DiscordRESTError } from "eris";
 import ErrorHandler from "@util/handlers/ErrorHandler";
+import { emojis } from "@config";
 
 const answers = [
 	// Neutral
@@ -55,7 +55,7 @@ export default new Command("8ball")
 					],
 					components: new ComponentHelper()
 						.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `8ball-new.${msg.author.id}`, undefined, undefined, "New Answer")
-						.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `8ball-exit.${msg.author.id}`, undefined, ComponentHelper.emojiToPartial(config.emojis.default.x, "default"), "Exit")
+						.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `8ball-exit.${msg.author.id}`, undefined, ComponentHelper.emojiToPartial(emojis.default.x, "default"), "Exit")
 						.toJSON()
 				});
 				const wait = await msg.channel.awaitComponentInteractions(3e5, (it) => it.data.custom_id.startsWith("8ball-") && it.message.id === m.id && it.member!.id === msg.author.id);

@@ -1,5 +1,5 @@
 import Command from "@cmd/Command";
-import config from "@config";
+import { developers, emojis } from "@config";
 import EmbedBuilder from "@util/EmbedBuilder";
 import Logger from "@util/Logger";
 import FluxPoint from "@util/req/FluxPoint";
@@ -28,7 +28,7 @@ export default new Command("ship")
 	.setExecutor(async function(msg) {
 		let member1: Eris.Member | null = msg.member, member2: Eris.Member | null, amount = Math.floor(Math.random() * 100) + 1;
 		if (Object.keys(msg.dashedArgs.keyValue).includes("percent")) {
-			if (!config.developers.includes(msg.author.id)) return msg.reply("H-hey! That option is limited to developers only..");
+			if (!developers.includes(msg.author.id)) return msg.reply("H-hey! That option is limited to developers only..");
 			amount = Number(msg.dashedArgs.keyValue.percent);
 		}
 
@@ -115,7 +115,7 @@ export default new Command("ship")
 			embed: new EmbedBuilder(true, msg.author)
 				.setTitle("Shipping")
 				.setDescription(`Shipping <@!${member1.id}> and <@!${member2.id}>\n**${ship.amount}%** - ${ship.name}`)
-				.setFooter(config.emojis.default.blueHeart)
+				.setFooter(emojis.default.blueHeart)
 				.setImage("attachment://ship.png")
 				.toJSON()
 		}, {

@@ -1,10 +1,10 @@
 import Command from "@cmd/Command";
-import config from "@config";
 import Eris, { DiscordRESTError } from "eris";
 import EmbedBuilder from "@util/EmbedBuilder";
 import ComponentHelper from "@util/ComponentHelper";
 import MaidBoye from "@MaidBoye";
 import ErrorHandler from "@util/handlers/ErrorHandler";
+import { emojis } from "@config";
 
 export default new Command("conga")
 	.setPermissions("bot", "embedLinks", "useExternalEmojis")
@@ -27,13 +27,13 @@ export default new Command("conga")
 
 			const e = new EmbedBuilder(true, msg.author)
 				.setTitle("Active Conga")
-				.setDescription(`Conga Started By: <@!${msg.author.id}> with <@!${member.id}>\n${config.emojis.custom.furdancing}\nCurrent Furs: **2**`);
+				.setDescription(`Conga Started By: <@!${msg.author.id}> with <@!${member.id}>\n${emojis.custom.furdancing}\nCurrent Furs: **2**`);
 			const m = await msg.reply({
 				embeds: [
 					e.toJSON()
 				],
 				components: new ComponentHelper()
-					.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, "conga-join", false, ComponentHelper.emojiToPartial(config.emojis.custom.furdancing, "custom"), "Join Conga")
+					.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, "conga-join", false, ComponentHelper.emojiToPartial(emojis.custom.furdancing, "custom"), "Join Conga")
 					.toJSON()
 			});
 
@@ -62,7 +62,7 @@ export default new Command("conga")
 						void m.edit({
 							embeds: [
 								e
-									.setDescription(`Conga Started By: <@!${msg.author.id}> with <@!${member!.id}>\nCurrent Furs: **${current.length + 1}**\n${config.emojis.custom.furdancing.repeat(current.length + 1)}\n${current.slice(1).map((c, i) => `<@!${c}> joined a conga with **${i + 2}** furs`).join("\n")}`)
+									.setDescription(`Conga Started By: <@!${msg.author.id}> with <@!${member!.id}>\nCurrent Furs: **${current.length + 1}**\n${emojis.custom.furdancing.repeat(current.length + 1)}\n${current.slice(1).map((c, i) => `<@!${c}> joined a conga with **${i + 2}** furs`).join("\n")}`)
 									.toJSON()
 							]
 						});

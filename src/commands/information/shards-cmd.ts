@@ -1,4 +1,4 @@
-import config from "@config";
+import { botIcon, emojis } from "@config";
 import Command from "@cmd/Command";
 import EmbedBuilder from "@util/EmbedBuilder";
 
@@ -15,13 +15,13 @@ export default new Command("shards")
 					.addFields(...this.shards.map(s => ({
 						name: `Shard #${s.id}`,
 						value: [
-							`Latency: ${config.emojis.default[s.latency <= 75 ? "green" : s.latency <= 150 ? "yellow" : s.latency <= 250 ? "orange" : "red"]} ${s.latency}ms`,
+							`Latency: ${emojis.default[s.latency <= 75 ? "green" : s.latency <= 150 ? "yellow" : s.latency <= 250 ? "orange" : "red"]} ${s.latency}ms`,
 							`Guilds: ${this.guilds.filter(g => g.shard.id === s.id).length}`,
 							`Status: **${s.status}**`
 						].join("\n"),
 						inline: true
 					})))
-					.setFooter(`UwU | Average Latency: ${Math.floor(this.shards.reduce((a,b) => a + b.latency, 0) / this.shards.size)}ms`, config.images.bot)
+					.setFooter(`UwU | Average Latency: ${Math.floor(this.shards.reduce((a,b) => a + b.latency, 0) / this.shards.size)}ms`, botIcon)
 					.toJSON()
 			]
 		});

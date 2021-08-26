@@ -1,8 +1,8 @@
-import config from "@config";
+import { botIcon } from "@config";
 import Command from "@cmd/Command";
 import EmbedBuilder from "@util/EmbedBuilder";
-import { performance } from "perf_hooks";
 import Eris from "eris";
+import { performance } from "perf_hooks";
 
 export default new Command("ping")
 	.setPermissions("bot", "embedLinks")
@@ -20,7 +20,7 @@ export default new Command("ping")
 				.setAuthor(msg.author.tag, msg.author.avatarURL)
 				.setTitle("Pong!")
 				.setDescription(`\ud83c\udfd3 Gateway: **${msg.channel.guild.shard.latency}ms** | REST: **${(end - start).toFixed(0)}ms**`)
-				.setFooter(`UwU | Shard: ${msg.channel.guild.shard.id + 1}/${this.shards.size}`, config.images.bot)
+				.setFooter(`UwU | Shard: ${msg.channel.guild.shard.id + 1}/${this.shards.size}`, botIcon)
 				.toJSON()
 			]
 		});

@@ -1,8 +1,8 @@
 import Command from "@cmd/Command";
-import config from "@config";
 import EmbedBuilder from "@util/EmbedBuilder";
 import fetch from "node-fetch";
 import Eris from "eris";
+import { userAgent } from "@config";
 
 export default new Command("dadjoke", "joke")
 	.setPermissions("bot", "embedLinks")
@@ -14,7 +14,7 @@ export default new Command("dadjoke", "joke")
 			method: "GET",
 			headers: {
 				"Accept": "application/json",
-				"User-Agent": config.userAgent
+				"User-Agent": userAgent
 			},
 			timeout: 5e3
 		}).then(v => v.json() as Promise<{ joke: string; }>);

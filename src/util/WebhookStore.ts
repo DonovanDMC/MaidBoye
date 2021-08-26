@@ -1,4 +1,4 @@
-import config from "@config";
+import { botIcon, webhooks } from "@config";
 import MaidBoye from "@MaidBoye";
 import { GuildTextableChannel, Message, WebhookPayload } from "eris";
 
@@ -23,7 +23,7 @@ class Webhook {
 		if (!payload.username && this.info.name) payload.username = this.info.name;
 		if (!payload.avatarURL) {
 			if (this.info.avatar) payload.avatarURL = this.info.avatar;
-			else payload.avatarURL = config.images.bot;
+			else payload.avatarURL = botIcon;
 		}
 		payload.wait = wait;
 		return this.client.executeWebhook(this.info.id, this.info.token, payload);
@@ -37,11 +37,11 @@ export default class WebhookStore {
 	// this is now public for random client usage
 	static client: MaidBoye;
 	static setClient(client: MaidBoye) { this.client = client; }
-	static get(name: keyof typeof config["webhooks"]) { return (this.list.get(name) ?? this.list.set(name, new Webhook(config.webhooks[name], this.client)).get(name))!; }
+	static get(name: keyof typeof webhooks) { return (this.list.get(name) ?? this.list.set(name, new Webhook(webhooks[name], this.client)).get(name))!; }
 
-	static async execute(name: keyof typeof config["webhooks"], payload: WebhookPayload, wait: true): Promise<Message<GuildTextableChannel>>;
-	static async execute(name: keyof typeof config["webhooks"], payload: WebhookPayload, wait?: false): Promise<void>;
-	static async execute(name: keyof typeof config["webhooks"], payload: WebhookPayload, wait = false): Promise<void | Message<GuildTextableChannel>> { return this.get(name).execute(payload, wait as true); }
+	static async execute(name: keyof typeof webhooks, payload: WebhookPayload, wait: true): Promise<Message<GuildTextableChannel>>;
+	static async execute(name: keyof typeof webhooks, payload: WebhookPayload, wait?: false): Promise<void>;
+	static async execute(name: keyof typeof webhooks, payload: WebhookPayload, wait = false): Promise<void | Message<GuildTextableChannel>> { return this.get(name).execute(payload, wait as true); }
 
-	static async delete(name: keyof typeof config["webhooks"], reason?: string) { return this.get(name).delete(reason); }
+	static async delete(name: keyof typeof webhooks, reason?: string) { return this.get(name).delete(reason); }
 }

@@ -1,7 +1,18 @@
 import Route from "./Route";
 import Logger from "../util/Logger";
 import MaidBoye from "../main";
-import config from "@config";
+import {
+	antiSpamDir,
+	apiCookieSecrets,
+	apiIP,
+	apiOptions,
+	apiPort,
+	apiSecure,
+	apiURL,
+	assetsDir,
+	errorsDir,
+	srcDir
+} from "@config";
 import express from "express";
 import session from "express-session";
 import morgan from "morgan";
@@ -15,22 +26,22 @@ export default class API {
 	static async launch(client: MaidBoye) {
 		this.app = express()
 			.set("trust proxy", true)
-			.set("views", [`${config.dir.base}/src/api/templates`])
+			.set("views", [`${srcDir}/api/templates`])
 			.set("view engine", "ejs")
 			.use("/errors/:id", async(req, res) => {
-				if (!fs.existsSync(`${config.dir.logs.errors}/${req.params.id}`)) return res.status(404).end("not found");
-				else return res.status(200).header("Content-Type", "text/plain").sendFile(`${config.dir.logs.errors}/${req.params.id}`);
+				if (!fs.existsSync(`${errorsDir}/${req.params.id}`)) return res.status(404).end("not found");
+				else return res.status(200).header("Content-Type", "text/plain").sendFile(`${errorsDir}/${req.params.id}`);
 			})
 			.use("/reports/:user/:id", async(req, res) => {
-				if (!fs.existsSync(`${config.dir.antiSpam}/${req.params.user}/${req.params.id}`)) return res.status(404).end("not found");
-				else return res.status(200).header("Content-Type", "text/plain").sendFile(`${config.dir.antiSpam}/${req.params.user}/${req.params.id}`);
+				if (!fs.existsSync(`${antiSpamDir}/${req.params.user}/${req.params.id}`)) return res.status(404).end("not found");
+				else return res.status(200).header("Content-Type", "text/plain").sendFile(`${antiSpamDir}/${req.params.user}/${req.params.id}`);
 			})
-			.use("/assets", express.static(config.dir.assets))
+			.use("/assets", express.static(assetsDir))
 			.use(morgan("combined"))
 			.use(express.json())
 			.use(express.urlencoded({ extended: true }))
 			.use(session({
-				secret: config.api.cookieSecret,
+				secret: apiCookieSecrets,
 				name: "maid-boye",
 				resave: true,
 				saveUninitialized: false,
@@ -51,7 +62,7 @@ export default class API {
 		});
 
 		// @TODO listener tests & retries
-		(config.api.listener.secure ? https : http).createServer(config.api.listener.options, this.app).listen(config.api.listener.port, config.api.listener.ip);
-		Logger.getLogger("API").info(`Now Listening on ${config.api.url} (${config.api.listener.ip}:${config.api.listener.port})`);
+		(apiSecure ? https : http).createServer(apiOptions, this.app).listen(apiPort, apiIP);
+		Logger.getLogger("API").info(`Now Listening on ${apiURL} (${apiIP}:${apiPort})`);
 	}
 }

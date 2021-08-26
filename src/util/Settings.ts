@@ -2,7 +2,7 @@
 import ExtendedMessage from "./ExtendedMessage";
 import EmbedBuilder from "./EmbedBuilder";
 import ComponentHelper from "./ComponentHelper";
-import config from "@config";
+import { emojis, yiffTypes } from "@config";
 import Eris from "eris";
 import GuildConfig from "@db/Models/Guild/GuildConfig";
 import { Strings } from "@uwu-codes/utils";
@@ -18,8 +18,8 @@ async function duplicate(originalMessage: ExtendedMessage, botMessage: Eris.Mess
 				.toJSON()
 		],
 		components: new ComponentHelper()
-			.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-back.${originalMessage.author.id}`, false, ComponentHelper.emojiToPartial(config.emojis.default.back, "default"), "Back")
-			.addInteractionButton(ComponentHelper.BUTTON_DANGER, `settings-exit.${originalMessage.author.id}`, false, ComponentHelper.emojiToPartial(config.emojis.default.x, "default"), "Exit")
+			.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-back.${originalMessage.author.id}`, false, ComponentHelper.emojiToPartial(emojis.default.back, "default"), "Back")
+			.addInteractionButton(ComponentHelper.BUTTON_DANGER, `settings-exit.${originalMessage.author.id}`, false, ComponentHelper.emojiToPartial(emojis.default.x, "default"), "Exit")
 			.toJSON()
 	});
 	const wait = await originalMessage.channel.awaitComponentInteractions(6e4, (it) => it.data.custom_id.startsWith("settings-") && it.member!.user.id === originalMessage.author.id && it.message.id === botMessage.id);
@@ -44,15 +44,15 @@ const Settings = [
 		name: "Default Yiff Type",
 		description: "The default yiff type in the `yiff` command.",
 		shortDescription: null,
-		validValuesDescription: config.yiffTypes.map(v => `\`${v}\``).join(", "),
+		validValuesDescription: yiffTypes.map(v => `\`${v}\``).join(", "),
 		emoji: {
 			// sauce: https://e621.net/posts/270632
 			// sauce[nsfw]: https://e621.net/posts/2808962
-			value: config.emojis.custom.yiff,
+			value: emojis.custom.yiff,
 			type: "custom" as const
 		},
 		displayFormat(guild: GuildConfig) { return `\`${guild.settings.defaultYiffType}\``; },
-		validator(val: string, message: ExtendedMessage) { return config.yiffTypes.includes(val.toLowerCase() as "gay"); },
+		validator(val: string, message: ExtendedMessage) { return yiffTypes.includes(val.toLowerCase() as "gay"); },
 		async exec(originalMessage: ExtendedMessage, botMessage: Eris.Message<Eris.GuildTextableChannel>): Promise<ExecReturn> {
 			const b = JSON.parse<Eris.AdvancedMessageContent>(JSON.stringify({ embeds: botMessage.embeds, components: botMessage.components }));
 			await botMessage.edit({
@@ -63,12 +63,12 @@ const Settings = [
 						.toJSON()
 				],
 				components: new ComponentHelper()
-					.addInteractionButton(ComponentHelper.BUTTON_SECONDARY, `settings-back.${originalMessage.author.id}`, false, ComponentHelper.emojiToPartial(config.emojis.default.back, "default"), "Back")
-					.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-exit.${originalMessage.author.id}`, false, ComponentHelper.emojiToPartial(config.emojis.default.x, "default"), "Exit")
-					.addSelectMenu(`settings-select.${originalMessage.author.id}`, config.yiffTypes.map(t => ({
+					.addInteractionButton(ComponentHelper.BUTTON_SECONDARY, `settings-back.${originalMessage.author.id}`, false, ComponentHelper.emojiToPartial(emojis.default.back, "default"), "Back")
+					.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-exit.${originalMessage.author.id}`, false, ComponentHelper.emojiToPartial(emojis.default.x, "default"), "Exit")
+					.addSelectMenu(`settings-select.${originalMessage.author.id}`, yiffTypes.map(t => ({
 						label: Strings.ucwords(t),
 						value: t,
-						emoji: config.emojis.custom[t as "gay"] === undefined ? ComponentHelper.emojiToPartial(config.emojis.default.question, "default") : ComponentHelper.emojiToPartial(config.emojis.custom[t as "gay"], "custom")
+						emoji: emojis.custom[t as "gay"] === undefined ? ComponentHelper.emojiToPartial(emojis.default.question, "default") : ComponentHelper.emojiToPartial(emojis.custom[t as "gay"], "custom")
 					})), "Select An Option", 1, 1)
 					.toJSON()
 			});
@@ -138,7 +138,7 @@ const Settings = [
 		shortDescription: "The thumbnail type for e621 webm posts.",
 		validValuesDescription: "`gif`, `image`, `none`",
 		emoji: {
-			value: config.emojis.custom.thumb,
+			value: emojis.custom.thumb,
 			type: "custom" as const
 		},
 		displayFormat(guild: GuildConfig) { return `\`${guild.settings.e621ThumbnailType}\``; },
@@ -152,23 +152,23 @@ const Settings = [
 						.toJSON()
 				],
 				components: new ComponentHelper()
-					.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-back.${originalMessage.author.id}`, false, ComponentHelper.emojiToPartial(config.emojis.default.back, "default"), "Back")
-					.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-exit.${originalMessage.author.id}`, false, ComponentHelper.emojiToPartial(config.emojis.default.x, "default"), "Exit")
+					.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-back.${originalMessage.author.id}`, false, ComponentHelper.emojiToPartial(emojis.default.back, "default"), "Back")
+					.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-exit.${originalMessage.author.id}`, false, ComponentHelper.emojiToPartial(emojis.default.x, "default"), "Exit")
 					.addSelectMenu(`settings-select.${originalMessage.author.id}`, [
 						{
 							label: "Gif",
 							value: "gif",
-							emoji: ComponentHelper.emojiToPartial(config.emojis.custom.gif, "custom")
+							emoji: ComponentHelper.emojiToPartial(emojis.custom.gif, "custom")
 						},
 						{
 							label: "Image",
 							value: "image",
-							emoji: ComponentHelper.emojiToPartial(config.emojis.custom.thumb, "custom")
+							emoji: ComponentHelper.emojiToPartial(emojis.custom.thumb, "custom")
 						},
 						{
 							label: "None",
 							value: "none",
-							emoji: ComponentHelper.emojiToPartial(config.emojis.default.none, "default")
+							emoji: ComponentHelper.emojiToPartial(emojis.default.none, "default")
 						}
 					], "Select An Option", 1, 1)
 					.toJSON()
@@ -236,7 +236,7 @@ const Settings = [
 		shortDescription: null,
 		validValuesDescription: "any role lower than me",
 		emoji: {
-			value: config.emojis.default.mute,
+			value: emojis.default.mute,
 			type: "default" as const
 		},
 		displayFormat(guild: GuildConfig) { return guild.settings.muteRole === null ? "`None`" : `<@&${guild.settings.muteRole}>`; },
@@ -256,9 +256,9 @@ const Settings = [
 						.toJSON()
 				],
 				components: new ComponentHelper()
-					.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-back.${originalMessage.author.id}`, false, ComponentHelper.emojiToPartial(config.emojis.default.back, "default"), "Back")
-					.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-reset.${originalMessage.author.id}`, false, ComponentHelper.emojiToPartial(config.emojis.default.x, "default"), "Reset (No Mute Role)")
-					.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-exit.${originalMessage.author.id}`, false, ComponentHelper.emojiToPartial(config.emojis.default.x, "default"), "Exit")
+					.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-back.${originalMessage.author.id}`, false, ComponentHelper.emojiToPartial(emojis.default.back, "default"), "Back")
+					.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-reset.${originalMessage.author.id}`, false, ComponentHelper.emojiToPartial(emojis.default.x, "default"), "Reset (No Mute Role)")
+					.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-exit.${originalMessage.author.id}`, false, ComponentHelper.emojiToPartial(emojis.default.x, "default"), "Exit")
 					.toJSON()
 			});
 
@@ -376,7 +376,7 @@ const Settings = [
 		shortDescription: null,
 		validValuesDescription: "`enabled` or `disabled`",
 		emoji: {
-			value: config.emojis.custom.thumb,
+			value: emojis.custom.thumb,
 			type: "custom" as const
 		},
 		displayFormat(guild: GuildConfig) { return `\`${guild.settings.commandImages ? "Enabled" : "Disabled"}\``; },
@@ -390,11 +390,11 @@ const Settings = [
 						.toJSON()
 				],
 				components: new ComponentHelper()
-					.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-back.${originalMessage.author.id}`, false, ComponentHelper.emojiToPartial(config.emojis.default.back, "default"), "Back")
-					.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-exit.${originalMessage.author.id}`, false, ComponentHelper.emojiToPartial(config.emojis.default.x, "default"), "Exit")
+					.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-back.${originalMessage.author.id}`, false, ComponentHelper.emojiToPartial(emojis.default.back, "default"), "Back")
+					.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-exit.${originalMessage.author.id}`, false, ComponentHelper.emojiToPartial(emojis.default.x, "default"), "Exit")
 					.addRow()
-					.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-enabled.${originalMessage.author.id}`, false, ComponentHelper.emojiToPartial(config.emojis.custom.greenTick, "custom"), "Enabled")
-					.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-disabled.${originalMessage.author.id}`, false, ComponentHelper.emojiToPartial(config.emojis.custom.redTick, "custom"), "Disabled")
+					.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-enabled.${originalMessage.author.id}`, false, ComponentHelper.emojiToPartial(emojis.custom.greenTick, "custom"), "Enabled")
+					.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-disabled.${originalMessage.author.id}`, false, ComponentHelper.emojiToPartial(emojis.custom.redTick, "custom"), "Disabled")
 					.toJSON()
 			});
 			const wait = await originalMessage.channel.awaitComponentInteractions(6e4, (it) => it.data.custom_id.startsWith("settings-") && it.member!.user.id === originalMessage.author.id && it.message.id === botMessage.id);
@@ -460,7 +460,7 @@ const Settings = [
 		shortDescription: null,
 		validValuesDescription: "`yes` or `no`",
 		emoji: {
-			value: config.emojis.default.pencil,
+			value: emojis.default.pencil,
 			type: "default" as const
 		},
 		displayFormat(guild: GuildConfig) { return `\`${guild.settings.deleteModCommands ? "Yes" : "No"}\``; },
@@ -474,11 +474,11 @@ const Settings = [
 						.toJSON()
 				],
 				components: new ComponentHelper()
-					.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-back.${originalMessage.author.id}`, false, ComponentHelper.emojiToPartial(config.emojis.default.back, "default"), "Back")
-					.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-exit.${originalMessage.author.id}`, false, ComponentHelper.emojiToPartial(config.emojis.default.x, "default"), "Exit")
+					.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-back.${originalMessage.author.id}`, false, ComponentHelper.emojiToPartial(emojis.default.back, "default"), "Back")
+					.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-exit.${originalMessage.author.id}`, false, ComponentHelper.emojiToPartial(emojis.default.x, "default"), "Exit")
 					.addRow()
-					.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-yes.${originalMessage.author.id}`, false, ComponentHelper.emojiToPartial(config.emojis.custom.greenTick, "custom"), "Yes")
-					.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-no.${originalMessage.author.id}`, false, ComponentHelper.emojiToPartial(config.emojis.custom.redTick, "custom"), "No")
+					.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-yes.${originalMessage.author.id}`, false, ComponentHelper.emojiToPartial(emojis.custom.greenTick, "custom"), "Yes")
+					.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-no.${originalMessage.author.id}`, false, ComponentHelper.emojiToPartial(emojis.custom.redTick, "custom"), "No")
 					.toJSON()
 			});
 			const wait = await originalMessage.channel.awaitComponentInteractions(6e4, (it) => it.data.custom_id.startsWith("settings-") && it.member!.user.id === originalMessage.author.id && it.message.id === botMessage.id);
@@ -559,7 +559,7 @@ const Settings = [
 		shortDescription: null,
 		validValuesDescription: "`yes` or `no`",
 		emoji: {
-			value: config.emojis.default.pencil,
+			value: emojis.default.pencil,
 			type: "default" as const
 		},
 		displayFormat(guild: GuildConfig) { return `\`${guild.settings.snipeDisabled ? "Yes" : "No"}\``; },
@@ -573,11 +573,11 @@ const Settings = [
 						.toJSON()
 				],
 				components: new ComponentHelper()
-					.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-back.${originalMessage.author.id}`, false, ComponentHelper.emojiToPartial(config.emojis.default.back, "default"), "Back")
-					.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-exit.${originalMessage.author.id}`, false, ComponentHelper.emojiToPartial(config.emojis.default.x, "default"), "Exit")
+					.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-back.${originalMessage.author.id}`, false, ComponentHelper.emojiToPartial(emojis.default.back, "default"), "Back")
+					.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-exit.${originalMessage.author.id}`, false, ComponentHelper.emojiToPartial(emojis.default.x, "default"), "Exit")
 					.addRow()
-					.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-yes.${originalMessage.author.id}`, false, ComponentHelper.emojiToPartial(config.emojis.custom.greenTick, "custom"), "Yes")
-					.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-no.${originalMessage.author.id}`, false, ComponentHelper.emojiToPartial(config.emojis.custom.redTick, "custom"), "No")
+					.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-yes.${originalMessage.author.id}`, false, ComponentHelper.emojiToPartial(emojis.custom.greenTick, "custom"), "Yes")
+					.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-no.${originalMessage.author.id}`, false, ComponentHelper.emojiToPartial(emojis.custom.redTick, "custom"), "No")
 					.toJSON()
 			});
 			const wait = await originalMessage.channel.awaitComponentInteractions(6e4, (it) => it.data.custom_id.startsWith("settings-") && it.member!.user.id === originalMessage.author.id && it.message.id === botMessage.id);
@@ -643,7 +643,7 @@ const Settings = [
 		shortDescription: null,
 		validValuesDescription: "`yes` or `no`",
 		emoji: {
-			value: config.emojis.default.pencil,
+			value: emojis.default.pencil,
 			type: "default" as const
 		},
 		displayFormat(guild: GuildConfig) { return `\`${guild.settings.announceLevelUp ? "Yes" : "No"}\``; },
@@ -657,11 +657,11 @@ const Settings = [
 						.toJSON()
 				],
 				components: new ComponentHelper()
-					.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-back.${originalMessage.author.id}`, false, ComponentHelper.emojiToPartial(config.emojis.default.back, "default"), "Back")
-					.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-exit.${originalMessage.author.id}`, false, ComponentHelper.emojiToPartial(config.emojis.default.x, "default"), "Exit")
+					.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-back.${originalMessage.author.id}`, false, ComponentHelper.emojiToPartial(emojis.default.back, "default"), "Back")
+					.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-exit.${originalMessage.author.id}`, false, ComponentHelper.emojiToPartial(emojis.default.x, "default"), "Exit")
 					.addRow()
-					.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-yes.${originalMessage.author.id}`, false, ComponentHelper.emojiToPartial(config.emojis.custom.greenTick, "custom"), "Yes")
-					.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-no.${originalMessage.author.id}`, false, ComponentHelper.emojiToPartial(config.emojis.custom.redTick, "custom"), "No")
+					.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-yes.${originalMessage.author.id}`, false, ComponentHelper.emojiToPartial(emojis.custom.greenTick, "custom"), "Yes")
+					.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-no.${originalMessage.author.id}`, false, ComponentHelper.emojiToPartial(emojis.custom.redTick, "custom"), "No")
 					.toJSON()
 			});
 			const wait = await originalMessage.channel.awaitComponentInteractions(6e4, (it) => it.data.custom_id.startsWith("settings-") && it.member!.user.id === originalMessage.author.id && it.message.id === botMessage.id);

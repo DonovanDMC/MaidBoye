@@ -1,6 +1,11 @@
-import MaidBoye from "../../main";
+
 import Route from "../Route";
-import config from "@config";
+import {
+	apiKeys,
+	emojis,
+	botIcon
+} from "@config";
+import MaidBoye from "@MaidBoye";
 import WebhookStore from "@util/WebhookStore";
 import EmbedBuilder from "@util/EmbedBuilder";
 import db from "@db";
@@ -21,13 +26,14 @@ interface KoFiDonation {
 	is_first_payment: boolean;
 	kofi_transaction_id: string;
 }
+
 export default class DonateRoute extends Route {
 	constructor(client: MaidBoye) {
 		super("/donate");
 
 		this.app
 			.post("/ko-fi", async(req, res) => {
-				if (req.query.code !== config.apiKeys["ko-fi"]) return res.status(401).end();
+				if (req.query.code !== apiKeys["ko-fi"]) return res.status(401).end();
 				const d = JSON.parse<KoFiDonation>((req.body as { data: string; }).data);
 				const [user = null] = await db.query("SELECT * FROM users WHERE premium_kofi_email = ?", [d.email]) as Array<RawUserConfig>;
 				if (user !== null) {
@@ -53,9 +59,9 @@ export default class DonateRoute extends Route {
 				void WebhookStore.execute("donations", {
 					embeds: [
 						new EmbedBuilder()
-							.setTitle(`${d.type === "Donation" ? "One Time Donation" : d.is_first_payment ? `New Subscription ${config.emojis.default.tada}` : "Renewed Subscription"} | Amount: ${Number(d.amount)} ${d.currency}`)
+							.setTitle(`${d.type === "Donation" ? "One Time Donation" : d.is_first_payment ? `New Subscription ${emojis.default.tada}` : "Renewed Subscription"} | Amount: ${Number(d.amount)} ${d.currency}`)
 							.setDescription(d.is_public ? d.message : "User Has Chosen To Keep Their Donation Private.")
-							.setFooter(`Name: ${d.is_public ? d.from_name : "[Private]"}${user === null ? " | This Donation Is Unclaimed" : ""}`, config.images.bot)
+							.setFooter(`Name: ${d.is_public ? d.from_name : "[Private]"}${user === null ? " | This Donation Is Unclaimed" : ""}`, botIcon)
 							.toJSON()
 					]
 				}, false);

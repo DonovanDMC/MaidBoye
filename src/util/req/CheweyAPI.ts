@@ -1,6 +1,6 @@
-import config from "../../config";
+import { apiKeys, userAgent } from "../../config";
 import CheweyBotAPI from "cheweyapi";
 
-const CheweyAPI = new CheweyBotAPI(config.apiKeys.cheweyBot, config.userAgent);
+const CheweyAPI = new CheweyBotAPI(apiKeys.cheweyBot, userAgent);
 
 export default CheweyAPI;

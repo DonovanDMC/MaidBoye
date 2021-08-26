@@ -1,5 +1,5 @@
 import Command from "./Command";
-import config from "../../config";
+import { antiSpamEntryExpiry } from "../../config";
 
 export interface AntiSpamEntry {
 	addedAt: number;
@@ -23,7 +23,7 @@ export default class AntiSpam {
 
 	static process() {
 		const d = Date.now();
-		this.entries = this.entries.filter(e => (e.addedAt + config.antiSpam.entryExpiry) > d);
+		this.entries = this.entries.filter(e => (e.addedAt + antiSpamEntryExpiry) > d);
 	}
 	static init() { this.interval = setInterval(this.process.bind(this), .5e3); }
 }

@@ -1,4 +1,4 @@
-import config from "@config";
+import { defaultPrefix } from "@config";
 import BotFunctions from "@util/BotFunctions";
 import Command from "@cmd/Command";
 import EmbedBuilder from "@util/EmbedBuilder";
@@ -90,7 +90,7 @@ export default new Command("prefix")
 			case "reset": {
 				if (msg.gConfig.prefix.length === 1 && msg.gConfig.prefix[0].value === "maid") return msg.reply("There isn't anything to reset?");
 				await msg.gConfig.resetPrefixes();
-				return msg.reply(`Successfully reset this servers prefixes, you can use \`${config.defaults.prefix}\`.`);
+				return msg.reply(`Successfully reset this servers prefixes, you can use \`${defaultPrefix}\`.`);
 				break;
 			}
 

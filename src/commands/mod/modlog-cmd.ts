@@ -1,7 +1,7 @@
 import EmbedBuilder from "../../util/EmbedBuilder";
 import MaidBoye from "@MaidBoye";
 import Command from "@cmd/Command";
-import config from "@config";
+import { botIcon, emojis, guildDefaults, names } from "@config";
 import CommandError from "@cmd/CommandError";
 import ModLogUtil from "@util/handlers/ModLogHandler";
 import ComponentHelper from "@util/ComponentHelper";
@@ -22,7 +22,7 @@ export default new Command("modlog")
 			type: Eris.Constants.ApplicationCommandOptionTypes.STRING,
 			name: "section",
 			description: "the section of modlog configuration to open",
-			choices:[
+			choices: [
 				{
 					name: "Setup",
 					value: "setup"
@@ -42,7 +42,7 @@ export default new Command("modlog")
 	.setExecutor(async function(msg, cmd) {
 		try {
 			if (msg.gConfig.modlog.enabled === true && msg.gConfig.modlog.webhook === null) await msg.gConfig.edit({
-				modlog: config.defaults.guild.modlog
+				modlog: guildDefaults.modlog
 			});
 			const m = await msg.reply({
 				content: "Please select a section from below.\n\nIf you want to change a setting, you must use reset, then run setup again.",
@@ -87,9 +87,9 @@ export default new Command("modlog")
 					await m.edit({
 						content: `Please select one of the following to proceed.\n1.) Select an existing webhook (on <#${ch.id}>) to use for the modlog\n2.) Provide a direct url to a webhook\n3.) Create a new webhook (with me)`,
 						components: new ComponentHelper()
-							.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `select-modlogsetup-1.${msg.author.id}`, false, ComponentHelper.emojiToPartial(config.emojis.default.one, "default"), "One")
-							.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `select-modlogsetup-2.${msg.author.id}`, false, ComponentHelper.emojiToPartial(config.emojis.default.two, "default"), "Two")
-							.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `select-modlogsetup-3.${msg.author.id}`, false, ComponentHelper.emojiToPartial(config.emojis.default.three, "default"), "Three")
+							.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `select-modlogsetup-1.${msg.author.id}`, false, ComponentHelper.emojiToPartial(emojis.default.one, "default"), "One")
+							.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `select-modlogsetup-2.${msg.author.id}`, false, ComponentHelper.emojiToPartial(emojis.default.two, "default"), "Two")
+							.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `select-modlogsetup-3.${msg.author.id}`, false, ComponentHelper.emojiToPartial(emojis.default.three, "default"), "Three")
 							.toJSON()
 					});
 					const sel = await msg.channel.awaitComponentInteractions(6e4, (it) => it.channel.id === msg.channel.id && it.message.id === m.id && it.data.custom_id.startsWith("select-modlogsetup") && it.data.custom_id.endsWith(msg.author.id) && it.member!.user.id === msg.author.id);
@@ -105,7 +105,7 @@ export default new Command("modlog")
 					// eslint-disable-next-line no-inner-declarations
 					async function configureOptions(this: MaidBoye, message: Eris.Message<Eris.GuildTextableChannel>) {
 						const v = {
-							...config.defaults.guild.modlog,
+							...guildDefaults.modlog,
 							enabled: true
 						} as GuildConfig["modlog"];
 						// ask defaults
@@ -259,7 +259,7 @@ export default new Command("modlog")
 							let i = 0;
 							for (const w of hooks) {
 								i++;
-								c.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `select-webhook-${i - 1}.${msg.author.id}`, !w.token, ComponentHelper.emojiToPartial(config.emojis.default[config.names.number[i as unknown as "0"] as "zero"], "default"), w?.name || "Unknown");
+								c.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `select-webhook-${i - 1}.${msg.author.id}`, !w.token, ComponentHelper.emojiToPartial(emojis.default[names.number[i as unknown as "0"] as "zero"], "default"), w?.name || "Unknown");
 								if ((i % 2) === 0) c.addRow();
 							}
 							// we somehow end up with no usable components
@@ -310,7 +310,7 @@ export default new Command("modlog")
 						// create
 						case 3: {
 							if (!ch.permissionsOf(this.user.id).has("manageWebhooks")) return m.edit("I-I'm missing the **Manage Webhooks** permission..");
-							const img = await Request.getImageFromURL(config.images.bot);
+							const img = await Request.getImageFromURL(botIcon);
 							const { mime } = await FileType.fromBuffer(img) ?? { mime: null };
 							if (mime === null) throw new Error("Internal error.");
 							const b64 = Buffer.from(img).toString("base64");
@@ -391,7 +391,7 @@ export default new Command("modlog")
 								case "yes": {
 									await this.deleteWebhook(msg.gConfig.modlog.webhook.id, msg.gConfig.modlog.webhook.token, `ModLog Reset: ${msg.author.tag} (${msg.author.id})`).catch(() => null);
 									await msg.gConfig.edit({
-										modlog: config.defaults.guild.modlog
+										modlog: guildDefaults.modlog
 									});
 									return m.edit({
 										content: "The webhook has been deleted, and the modlog was reset.",
@@ -401,7 +401,7 @@ export default new Command("modlog")
 								}
 								case "no": {
 									await msg.gConfig.edit({
-										modlog: config.defaults.guild.modlog
+										modlog: guildDefaults.modlog
 									});
 									return m.edit({
 										content: "The webhook was not deleted, and the modlog was reset.",
@@ -418,7 +418,7 @@ export default new Command("modlog")
 					}
 
 					await msg.gConfig.edit({
-						modlog: config.defaults.guild.modlog
+						modlog: guildDefaults.modlog
 					});
 					await m.edit({
 						content: "The modlog has been reset.",
@@ -440,9 +440,9 @@ export default new Command("modlog")
 									`Channel: <#${msg.gConfig.modlog.webhook.channelId}>`,
 									"",
 									"Settings:",
-									`${config.emojis.default.dot} **Case Editing**: ${config.emojis.custom[msg.gConfig.modlog.caseEditingEnabled ? "greenTick" : "redTick"]} ${msg.gConfig.modlog.caseEditingEnabled ? "Enabled" : "Disabled"}`,
-									`${config.emojis.default.dot} **Case Deleting**: ${config.emojis.custom[msg.gConfig.modlog.caseDeletingEnabled ? "greenTick" : "redTick"]} ${msg.gConfig.modlog.caseDeletingEnabled ? "Enabled" : "Disabled"}`,
-									`${config.emojis.default.dot} **Edit Others Cases**: ${config.emojis.custom[msg.gConfig.modlog.editOthersCasesEnabled ? "greenTick" : "redTick"]} ${msg.gConfig.modlog.editOthersCasesEnabled ? "Enabled" : "Disabled"}`,
+									`${emojis.default.dot} **Case Editing**: ${emojis.custom[msg.gConfig.modlog.caseEditingEnabled ? "greenTick" : "redTick"]} ${msg.gConfig.modlog.caseEditingEnabled ? "Enabled" : "Disabled"}`,
+									`${emojis.default.dot} **Case Deleting**: ${emojis.custom[msg.gConfig.modlog.caseDeletingEnabled ? "greenTick" : "redTick"]} ${msg.gConfig.modlog.caseDeletingEnabled ? "Enabled" : "Disabled"}`,
+									`${emojis.default.dot} **Edit Others Cases**: ${emojis.custom[msg.gConfig.modlog.editOthersCasesEnabled ? "greenTick" : "redTick"]} ${msg.gConfig.modlog.editOthersCasesEnabled ? "Enabled" : "Disabled"}`,
 									"",
 									// eslint-disable-next-line @typescript-eslint/restrict-template-expressions
 									`Webhook: **${wh.name}** (\`${wh.id}\`, [[avatar](${Object.getOwnPropertyDescriptor(Eris.User.prototype, "avatarURL")!.get!.call({ _client: this, id: wh.id, avatar: wh.avatar })})])`

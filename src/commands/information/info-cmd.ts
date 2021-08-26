@@ -1,4 +1,4 @@
-import config from "@config";
+import { emojis, supportLink } from "@config";
 import { dependencies as shrinkDependencies } from "@root/package-lock.json";
 import pkg from "@root/package.json";
 import Command from "@cmd/Command";
@@ -20,28 +20,28 @@ export default new Command("info")
 					.setAuthor(msg.author.tag, msg.author.avatarURL)
 					.setDescription(
 						"**Stats/General**:",
-						`${config.emojis.default.dot} System Memory: **${Strings.formatBytes(os.totalmem() - os.freemem(), 2)}** / **${Strings.formatBytes(os.totalmem(), 2)}**`,
-						`${config.emojis.default.dot} Process Memory: **${Strings.formatBytes(process.memoryUsage().heapUsed, 2)}** / **${Strings.formatBytes(process.memoryUsage().heapTotal, 2)}**`,
-						`${config.emojis.default.dot} CPU Usage: **${this.cpuUsage}%**`,
-						`${config.emojis.default.dot} Uptime: ${Time.ms(process.uptime() * 1000, true)} (${Time.secondsToHMS(process.uptime())})`,
-						`${config.emojis.default.dot} Shard: **${msg.channel.guild.shard.id + 1}**/**${this.shards.size}**`,
-						`${config.emojis.default.dot} Guilds: **${this.guilds.size}**`,
-						`${config.emojis.default.dot} Large Guilds: **${this.guilds.filter(g => g.large).length}**`,
-						`${config.emojis.default.dot} Channels: **${Object.keys(this.channelGuildMap).length}**`,
-						`${config.emojis.default.dot} Users: **${this.users.size}**`,
-						`${config.emojis.default.dot} Commands: **${CommandHandler.commands.length}** (**${CommandHandler.categories.length}** categories)`,
+						`${emojis.default.dot} System Memory: **${Strings.formatBytes(os.totalmem() - os.freemem(), 2)}** / **${Strings.formatBytes(os.totalmem(), 2)}**`,
+						`${emojis.default.dot} Process Memory: **${Strings.formatBytes(process.memoryUsage().heapUsed, 2)}** / **${Strings.formatBytes(process.memoryUsage().heapTotal, 2)}**`,
+						`${emojis.default.dot} CPU Usage: **${this.cpuUsage}%**`,
+						`${emojis.default.dot} Uptime: ${Time.ms(process.uptime() * 1000, true)} (${Time.secondsToHMS(process.uptime())})`,
+						`${emojis.default.dot} Shard: **${msg.channel.guild.shard.id + 1}**/**${this.shards.size}**`,
+						`${emojis.default.dot} Guilds: **${this.guilds.size}**`,
+						`${emojis.default.dot} Large Guilds: **${this.guilds.filter(g => g.large).length}**`,
+						`${emojis.default.dot} Channels: **${Object.keys(this.channelGuildMap).length}**`,
+						`${emojis.default.dot} Users: **${this.users.size}**`,
+						`${emojis.default.dot} Commands: **${CommandHandler.commands.length}** (**${CommandHandler.categories.length}** categories)`,
 						"",
 						"**Developers**:",
-						`${config.emojis.default.dot} [Creator] [Donovan_DMC](https://donovan.is.gay)`,
+						`${emojis.default.dot} [Creator] [Donovan_DMC](https://donovan.is.gay)`,
 						"",
 						"**Other**:",
-						`${config.emojis.default.dot} Library: [Eris Custom](https://github.com/DonovanDMC/eris/tree/merge) (**${Eris.VERSION}**, \`${shrinkDependencies.eris.version.split("#")[1].slice(0, 7)}\`)`,
-						`${config.emojis.default.dot} API Version: **v${Eris.Constants.REST_VERSION}**`,
-						`${config.emojis.default.dot} Gateway Version: **v${Eris.Constants.GATEWAY_VERSION}**`,
-						`${config.emojis.default.dot} Version: **${pkg.version}** (Build Date: ${pkg.buildDate === null ? "Unknown" : `${String(pkg.buildDate).slice(0, 2)}/${String(pkg.buildDate).slice(2, 4)}/${String(pkg.buildDate).slice(4, 8)}`})`,
-						`${config.emojis.default.dot} Node Version: **${process.version}**`,
-						`${config.emojis.default.dot} Typescript Version: **${shrinkDependencies.typescript.version}**`,
-						`${config.emojis.default.dot} Support Server: [${config.client.links.support}](${config.client.links.support})`
+						`${emojis.default.dot} Library: [Eris Custom](https://github.com/DonovanDMC/eris/tree/merge) (**${Eris.VERSION}**, \`${shrinkDependencies.eris.version.split("#")[1].slice(0, 7)}\`)`,
+						`${emojis.default.dot} API Version: **v${Eris.Constants.REST_VERSION}**`,
+						`${emojis.default.dot} Gateway Version: **v${Eris.Constants.GATEWAY_VERSION}**`,
+						`${emojis.default.dot} Version: **${pkg.version}** (Build Date: ${pkg.buildDate === null ? "Unknown" : `${String(pkg.buildDate).slice(0, 2)}/${String(pkg.buildDate).slice(2, 4)}/${String(pkg.buildDate).slice(4, 8)}`})`,
+						`${emojis.default.dot} Node Version: **${process.version}**`,
+						`${emojis.default.dot} Typescript Version: **${shrinkDependencies.typescript.version}**`,
+						`${emojis.default.dot} Support Server: [${supportLink}](${supportLink})`
 					)
 					.toJSON()
 			]

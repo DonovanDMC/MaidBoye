@@ -1,5 +1,5 @@
 import Command from "@cmd/Command";
-import config from "@config";
+import { emojis } from "@config";
 import EmbedBuilder from "@util/EmbedBuilder";
 import EventsASecondHandler from "@util/handlers/EventsASecondHandler";
 import db from "@db";
@@ -43,7 +43,7 @@ export default new Command("stats")
 					.setTitle("Stats")
 					.addField("Events", await Promise.all(Object.entries(sec).filter(([key]) => !["GENERAL"].includes(key) && !key.startsWith("COMMANDS")).map(async([key, value]) => {
 						const v = await Redis.get(`stats:events:${key}`);
-						return `${config.emojis.default.dot} **${key}** ${value}/second (${(v ?? 0).toLocaleString("en-US")} total)`;
+						return `${emojis.default.dot} **${key}** ${value}/second (${(v ?? 0).toLocaleString("en-US")} total)`;
 					})).then(v => v.join("\n")), false)
 					.addField("MariaDB", sql === undefined ? "None" : [
 						`Ping: **${Timer.calc(sqlStart, sqlEnd, 2, false)}**`,

@@ -1,5 +1,4 @@
 import ClientEvent from "./util/ClientEvent";
-import config from "./config";
 import Logger from "./util/Logger";
 import WebhookStore from "./util/WebhookStore";
 import db from "./db";
@@ -18,6 +17,7 @@ import ComponentInteractionCollector from "@util/ComponentInteractionCollector";
 import Timer from "@util/Timer";
 import fetch from "node-fetch";
 import { RESTPostOAuth2ClientCredentialsResult } from "discord-api-types";
+import { antiSpamDir, assetsDir, beta, bulkDeleteDir, commandsDir, dataDir, errorsDir, eventsDir, liteClientInfo, mainLogsDir, notesDir, tempDir, userAgent } from "@config";
 import { performance } from "perf_hooks";
 import util from "util";
 
@@ -39,24 +39,29 @@ export default class MaidBoye extends Eris.Client {
 		MessageCollector.setClient(this);
 		ComponentInteractionCollector.setClient(this);
 		ModLogHandler.setClient(this);
-		if (!config.beta) CheweyAPI.analytics.initAutoPosting(this);
+		if (!beta) CheweyAPI.analytics.initAutoPosting(this);
 		AntiSpam.init();
-		YiffRocks.setUserAgent(config.userAgent);
+		YiffRocks.setUserAgent(userAgent);
 		await this.connect();
 	}
 
-	dirCheck(obj?: Record<string, string | Record<string, string>>) {
-		Object.entries(obj ?? config.dir).forEach(([key, dir]) => {
-			if (["src", "config", "commands", "events"].includes(key)) return;
-			if (typeof dir === "object") this.dirCheck(dir);
-			else fs.mkdirpSync(dir);
-		});
+	dirCheck() {
+		[
+			dataDir,
+			mainLogsDir,
+			errorsDir,
+			assetsDir,
+			bulkDeleteDir,
+			notesDir,
+			tempDir,
+			antiSpamDir
+		].forEach((dir) => fs.mkdirpSync(dir));
 	}
 
 	async loadEvents() {
 		const oStart = performance.now();
-		if (!fs.existsSync(config.dir.events)) throw new Error(`Events directory "${config.dir.events}" does not exist.`);
-		const list = await fs.readdir(config.dir.events).then(v => v.map(ev => `${config.dir.events}/${ev}`));
+		if (!fs.existsSync(eventsDir)) throw new Error(`Events directory "${eventsDir}" does not exist.`);
+		const list = await fs.readdir(eventsDir).then(v => v.map(ev => `${eventsDir}/${ev}`));
 		Logger.getLogger("EventManager").debug(`Got ${list.length} ${Strings.plural("event", list)} to load`);
 		for (const loc of list) {
 			const start = performance.now();
@@ -74,8 +79,8 @@ export default class MaidBoye extends Eris.Client {
 
 	async loadCommands() {
 		const start = performance.now();
-		if (!fs.existsSync(config.dir.commands)) throw new Error(`Commands directory "${config.dir.commands}" does not exist.`);
-		const list = await fs.readdir(config.dir.commands).then(v => v.map(ev => `${config.dir.commands}/${ev}`));
+		if (!fs.existsSync(commandsDir)) throw new Error(`Commands directory "${commandsDir}" does not exist.`);
+		const list = await fs.readdir(commandsDir).then(v => v.map(ev => `${commandsDir}/${ev}`));
 		for (const loc of list) {
 			const { default: cat } = (await import(loc)) as { default: Category; };
 			CommandHandler.registerCategory(cat);
@@ -119,7 +124,7 @@ export default class MaidBoye extends Eris.Client {
 
 		// due to not all categories being loaded before the help command
 		commands.find(cmd => cmd.name === "help")!.options![0].choices = CommandHandler.categories.map(cat => {
-			if (cat.restrictions.includes("disabled") || cat.restrictions.includes("developer") || (cat.restrictions.includes("beta") && !config.beta)) return;
+			if (cat.restrictions.includes("disabled") || cat.restrictions.includes("developer") || (cat.restrictions.includes("beta") && !beta)) return;
 			else return {
 				name: cat.displayName.text,
 				value: cat.name
@@ -128,13 +133,13 @@ export default class MaidBoye extends Eris.Client {
 
 		if (bypass !== true) {
 			// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
-			const v = (fs.existsSync(`${config.dir.temp}/slash.json`) ? JSON.parse(fs.readFileSync(`${config.dir.temp}/slash.json`).toString()) : []) as typeof commands;
+			const v = (fs.existsSync(`${tempDir}/slash.json`) ? JSON.parse(fs.readFileSync(`${tempDir}/slash.json`).toString()) : []) as typeof commands;
 			if (JSON.stringify(commands) === JSON.stringify(v)) {
 				Logger.getLogger("SlashCommandSync").debug("Skipping sync due to no changes");
 				return true;
 			}
 		}
-		fs.writeFileSync(`${config.dir.temp}/slash.json`, JSON.stringify(commands));
+		fs.writeFileSync(`${tempDir}/slash.json`, JSON.stringify(commands));
 
 		return (guild === undefined ? this.bulkEditCommands(commands) : this.bulkEditGuildCommands(guild, commands))
 			.then(
@@ -146,7 +151,7 @@ export default class MaidBoye extends Eris.Client {
 				(err: Error) => {
 					Logger.getLogger("SlashCommandSync").debug("Error detected, printing command index list");
 					commands.forEach((cmd, index) => {
-						Logger.getLogger("SlashCommandSync").debug(`Command at index "${index}": ${cmd.name} (type: ${Object.entries(Eris.Constants.ApplicationCommandTypes).find(([k, v]) => cmd.type === v)![0]})`);
+						Logger.getLogger("SlashCommandSync").debug(`Command at index "${index}": ${cmd.name} (type: ${Object.entries(Eris.Constants.ApplicationCommandTypes).find(([, v]) => cmd.type === v)![0]})`);
 					});
 					Logger.getLogger("SlashCommandSync").error(err);
 					return false;
@@ -168,31 +173,31 @@ export default class MaidBoye extends Eris.Client {
 
 		if (bypass !== true) {
 			// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
-			const v = (fs.existsSync(`${config.dir.temp}/slash-lite.json`) ? JSON.parse(fs.readFileSync(`${config.dir.temp}/slash-lite.json`).toString()) : []) as typeof commands;
+			const v = (fs.existsSync(`${tempDir}/slash-lite.json`) ? JSON.parse(fs.readFileSync(`${tempDir}/slash-lite.json`).toString()) : []) as typeof commands;
 			if (JSON.stringify(commands) === JSON.stringify(v)) {
 				Logger.getLogger("SlashCommandSync").debug("Skipping sync due to no changes");
 				return true;
 			}
 		}
-		fs.writeFileSync(`${config.dir.temp}/slash-lite.json`, JSON.stringify(commands));
+		fs.writeFileSync(`${tempDir}/slash-lite.json`, JSON.stringify(commands));
 
 		const grant = await fetch("https://discord.com/api/oauth2/token", {
 			method: "POST",
 			body: "grant_type=client_credentials&scope=applications.commands.update",
 			headers: {
-				"Authorization": `Basic ${Buffer.from(`${config.client.lite.id}:${config.client.lite.secret}`).toString("base64")}`,
-				"User-Agent": config.userAgent,
+				"Authorization": `Basic ${Buffer.from(`${liteClientInfo.id}:${liteClientInfo.secret}`).toString("base64")}`,
+				"User-Agent": userAgent,
 				"Content-Type": "application/x-www-form-urlencoded"
 			}
 		});
 		const token = await grant.json().then((v: RESTPostOAuth2ClientCredentialsResult) => v.access_token);
 
-		return fetch(`https://discord.com/api/v9/applications/${config.client.lite.id}${guild === undefined ? "/commands" : `/guilds/${guild}/commands`}`, {
+		return fetch(`https://discord.com/api/v9/applications/${liteClientInfo.id}${guild === undefined ? "/commands" : `/guilds/${guild}/commands`}`, {
 			method: "PUT",
 			body: JSON.stringify(commands),
 			headers: {
 				"Authorization": `Bearer ${token}`,
-				"User-Agent": config.userAgent,
+				"User-Agent": userAgent,
 				"Content-Type": "application/json"
 			}
 		})

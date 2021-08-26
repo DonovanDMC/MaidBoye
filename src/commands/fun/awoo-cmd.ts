@@ -1,10 +1,10 @@
 import Command from "@cmd/Command";
-import config from "@config";
 import MaidBoye from "@MaidBoye";
 import ComponentHelper from "@util/ComponentHelper";
 import EmbedBuilder from "@util/EmbedBuilder";
 import Eris, { DiscordRESTError } from "eris";
 import ErrorHandler from "@util/handlers/ErrorHandler";
+import { emojis } from "@config";
 
 export default new Command("awoo", "howl")
 	.setPermissions("bot", "embedLinks", "useExternalEmojis")
@@ -15,13 +15,13 @@ export default new Command("awoo", "howl")
 		try {
 			const e = new EmbedBuilder(true, msg.author)
 				.setTitle("Active Howl")
-				.setDescription(`Howl Started By: <@!${msg.author.id}>\n${config.emojis.custom.awoo}\nCurrent Furs: **1**`);
+				.setDescription(`Howl Started By: <@!${msg.author.id}>\n${emojis.custom.awoo}\nCurrent Furs: **1**`);
 			const m = await msg.reply({
 				embeds: [
 					e.toJSON()
 				],
 				components: new ComponentHelper()
-					.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, "awoo-join", false, ComponentHelper.emojiToPartial(config.emojis.custom.awoo, "custom"), "Join Howl")
+					.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, "awoo-join", false, ComponentHelper.emojiToPartial(emojis.custom.awoo, "custom"), "Join Howl")
 					.toJSON()
 			});
 
@@ -51,7 +51,7 @@ export default new Command("awoo", "howl")
 						void m.edit({
 							embeds: [
 								e
-									.setDescription(`Howl Started By: <@!${msg.author.id}>\nCurrent Furs: **${current.length + 1}**\n${config.emojis.custom.awoo.repeat(current.length + 1)}\n${current.map((c, i) => `<@!${c}> joined a howl with **${i + 1}** fur${(i + 1) !== 1 ? "s" : ""}`).join("\n")}`)
+									.setDescription(`Howl Started By: <@!${msg.author.id}>\nCurrent Furs: **${current.length + 1}**\n${emojis.custom.awoo.repeat(current.length + 1)}\n${current.map((c, i) => `<@!${c}> joined a howl with **${i + 1}** fur${(i + 1) !== 1 ? "s" : ""}`).join("\n")}`)
 									.toJSON()
 							]
 						});

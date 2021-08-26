@@ -1,4 +1,4 @@
-import config from "../config";
+import { emojis, noIcon } from "../config";
 import WebhookStore from "../util/WebhookStore";
 import EmbedBuilder from "../util/EmbedBuilder";
 import ClientEvent from "@util/ClientEvent";
@@ -16,7 +16,7 @@ export default new ClientEvent("guildDelete", async function(guild) {
 	}
 	let author = {
 		name: "Unknown#0000",
-		icon_url: config.images.noIcon
+		icon_url: noIcon
 	};
 	let owner = "Unknown#0000 (000000000000000000)";
 	if (guild.ownerID) {
@@ -24,7 +24,7 @@ export default new ClientEvent("guildDelete", async function(guild) {
 		if (u !== null) {
 			author = {
 				name: `${u.username}#${u.discriminator}`,
-				icon_url: u.avatarURL ? u.avatarURL : config.images.noIcon
+				icon_url: u.avatarURL ? u.avatarURL : noIcon
 			};
 			owner = `${u.username}#${u.discriminator} (${u.id})`;
 		}
@@ -40,19 +40,19 @@ export default new ClientEvent("guildDelete", async function(guild) {
 					`Current Total: ${this.guilds.size}`,
 					"",
 					"**Guild Info**:",
-					`${config.emojis.default.dot} Name: ${guild.name}`,
-					`${config.emojis.default.dot} ID: ${guild.id}`,
-					`${config.emojis.default.dot} **Members**:`,
-					`\t${config.emojis.custom.online}: ${guild.members.filter(m => m.status === "online").length}`,
-					`\t${config.emojis.custom.idle}: ${guild.members.filter(m => m.status === "idle").length}`,
-					`\t${config.emojis.custom.dnd}: ${guild.members.filter(m => m.status === "dnd").length}`,
-					`\t${config.emojis.custom.offline}: ${guild.members.filter(m => m.status === "offline").length}`,
-					`\t${config.emojis.custom.bot}: ${guild.members.filter(m => m.user.bot).length}`,
-					`\t${config.emojis.default.human}: ${guild.members.filter(m => !m.user.bot).length}`,
-					`${config.emojis.default.dot} Large: ${guild.large ? "Yes" : "No"} (${guild.memberCount})`,
-					`${config.emojis.default.dot} Owner: ${owner}`
+					`${emojis.default.dot} Name: ${guild.name}`,
+					`${emojis.default.dot} ID: ${guild.id}`,
+					`${emojis.default.dot} **Members**:`,
+					`\t${emojis.custom.online}: ${guild.members.filter(m => m.status === "online").length}`,
+					`\t${emojis.custom.idle}: ${guild.members.filter(m => m.status === "idle").length}`,
+					`\t${emojis.custom.dnd}: ${guild.members.filter(m => m.status === "dnd").length}`,
+					`\t${emojis.custom.offline}: ${guild.members.filter(m => m.status === "offline").length}`,
+					`\t${emojis.custom.bot}: ${guild.members.filter(m => m.user.bot).length}`,
+					`\t${emojis.default.human}: ${guild.members.filter(m => !m.user.bot).length}`,
+					`${emojis.default.dot} Large: ${guild.large ? "Yes" : "No"} (${guild.memberCount})`,
+					`${emojis.default.dot} Owner: ${owner}`
 				])
-				.setImage(guild.iconURL ?? config.images.noIcon)
+				.setImage(guild.iconURL ?? noIcon)
 				.setThumbnail(author.icon_url)
 				.setColor("red")
 				.setFooter(`Shard ${guild.shard.id + 1}/${this.shards.size}`)

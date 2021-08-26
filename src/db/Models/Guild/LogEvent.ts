@@ -17,14 +17,13 @@ export default class LogEvent {
 		"channelDelete",
 		"channelUpdate",
 
-		// ban
-		"banAdd",
-		"banRemove",
-
 		// member
 		"memberAdd",
 		"memberRemove",
+		"memberKick",
 		"memberUpdate",
+		"banAdd",
+		"banRemove",
 
 		// role
 		"roleCreate",

@@ -1,4 +1,4 @@
-import config from "@config";
+import { dataDir } from "@config";
 import Logger from "@util/Logger";
 import { Time } from "@uwu-codes/utils";
 import * as fs from "fs-extra";
@@ -13,7 +13,7 @@ export default class TempFiles {
 				return;
 		}
 		this.list.set(loc, time);
-		fs.writeFileSync(`${config.dir.data}/temp.json`, JSON.stringify(Array.from(this.list.entries())));
+		fs.writeFileSync(`${dataDir}/temp.json`, JSON.stringify(Array.from(this.list.entries())));
 	}
 	static interval: NodeJS.Timeout;
 	static process() {
@@ -40,12 +40,12 @@ export default class TempFiles {
 			}
 		}
 		if (JSON.stringify(Array.from(e)) !== old)
-			fs.writeFileSync(`${config.dir.data}/temp.json`, JSON.stringify(Array.from(e)));
+			fs.writeFileSync(`${dataDir}/temp.json`, JSON.stringify(Array.from(e)));
 	}
 	static init() {
 		this.interval = setInterval(TempFiles.process.bind(TempFiles), 1e3);
-		if (fs.existsSync(`${config.dir.data}/temp.json`)) {
-			const t = JSON.parse<Array<[string, number]>>(fs.readFileSync(`${config.dir.data}/temp.json`).toString());
+		if (fs.existsSync(`${dataDir}/temp.json`)) {
+			const t = JSON.parse<Array<[string, number]>>(fs.readFileSync(`${dataDir}/temp.json`).toString());
 			t.forEach(([k, v]) => this.list.set(k, v));
 			Logger.getLogger("TempFiles").debug(`Loaded ${t.length} entries from disk`);
 		}

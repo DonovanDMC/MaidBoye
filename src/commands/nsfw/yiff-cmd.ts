@@ -2,7 +2,7 @@ import GuildConfig from "@db/Models/Guild/GuildConfig";
 import ErrorHandler from "@util/handlers/ErrorHandler";
 import Command from "@cmd/Command";
 import EmbedBuilder from "@util/EmbedBuilder";
-import config from "@config";
+import { yiffTypes } from "@config";
 import Logger from "@util/Logger";
 import Yiffy from "@util/req/Yiffy";
 import { Strings } from "@uwu-codes/utils";
@@ -13,14 +13,14 @@ import MaidBoye from "@MaidBoye";
 export default new Command("yiff", "thegoodstuff")
 	.setPermissions("bot", "embedLinks", "attachFiles")
 	.setDescription("Y-you know what this is..")
-	.setUsage(`<${config.yiffTypes.join("/")}>`)
+	.setUsage(`<${yiffTypes.join("/")}>`)
 	.addApplicationCommand(Eris.Constants.ApplicationCommandTypes.CHAT_INPUT, [
 		{
 			type: Eris.Constants.ApplicationCommandOptionTypes.STRING,
 			name: "type",
 			description: "The type of yiff to fetch",
 			required: false,
-			choices: config.yiffTypes.map(y => ({
+			choices: yiffTypes.map(y => ({
 				name: Strings.ucwords(y),
 				value: y
 			}))
@@ -32,21 +32,21 @@ export default new Command("yiff", "thegoodstuff")
 		try {
 			let type: Exclude<GuildConfig["settings"]["defaultYiffType"], null>;
 			if (msg.args.length === 0) {
-				if (msg.gConfig.settings.defaultYiffType === null) type = config.yiffTypes[0];
+				if (msg.gConfig.settings.defaultYiffType === null) type = yiffTypes[0];
 				else {
-					if (!config.yiffTypes.includes(msg.gConfig.settings.defaultYiffType)) {
+					if (!yiffTypes.includes(msg.gConfig.settings.defaultYiffType)) {
 						Logger.getLogger("YiffCommand").warn(`Unknown Default Yiff Type "${msg.gConfig.settings.defaultYiffType}" on guild ${msg.channel.guild.id}`);
 						await msg.gConfig.edit({
 							settings: {
-								defaultYiffType: config.yiffTypes[0]
+								defaultYiffType: yiffTypes[0]
 							}
 						});
-						type = config.yiffTypes[0];
+						type = yiffTypes[0];
 					} else type = msg.gConfig.settings.defaultYiffType;
 				}
 			} else {
 				type = msg.args[0].toLowerCase() as typeof type;
-				if (!config.yiffTypes.includes(type)) return msg.reply(`Th-that wasn't a valid yiff type! You can use \`${msg.gConfig.getFormattedPrefix()}help yiff\` to see them..`);
+				if (!yiffTypes.includes(type)) return msg.reply(`Th-that wasn't a valid yiff type! You can use \`${msg.gConfig.getFormattedPrefix()}help yiff\` to see them..`);
 			}
 
 
@@ -93,7 +93,7 @@ export default new Command("yiff", "thegoodstuff")
 					await m.edit({
 						content: m.content,
 						embeds: m.embeds,
-						components:  m.components?.slice(0, 1)
+						components: m.components?.slice(0, 1)
 					});
 					return;
 				} else return refreshImage.call(this, wait.id, wait.token);

@@ -1,4 +1,4 @@
-import config from "../config";
+import { beta } from "../config";
 import CommandHandler from "../util/cmd/CommandHandler";
 import db from "@db";
 import ClientEvent from "@util/ClientEvent";
@@ -19,7 +19,7 @@ export default new ClientEvent("interactionCreate", async function(interaction) 
 				content: "Application Commands cannot be used in direct messages.",
 				flags: 64
 			});
-			if (config.beta) Logger.getLogger("InteractionCreate").debug("new command interaction recieved:", util.inspect(interaction.data, { depth: 3, colors: true }));
+			if (beta) Logger.getLogger("InteractionCreate").debug("new command interaction recieved:", util.inspect(interaction.data, { depth: 3, colors: true }));
 			await interaction.acknowledge();
 			const userMentions = [] as Array<string>, roleMentions = [] as Array<string>;
 			let content = "";

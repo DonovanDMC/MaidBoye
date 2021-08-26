@@ -1,6 +1,6 @@
 import MaidBoye from "../../main";
 import Route from "../Route";
-import config from "@config";
+import { beta } from "@config";
 import CommandHandler from "@util/cmd/CommandHandler";
 
 export default class StatusRoute extends Route {
@@ -34,7 +34,7 @@ export default class StatusRoute extends Route {
 					channels: client.guilds.reduce((a,b) => a + b.channels.size, 0),
 					voiceConnections: client.voiceConnections.size,
 					commands: CommandHandler.commands.length,
-					mode: config.beta ? "BETA" : "PROD"
+					mode: beta ? "BETA" : "PROD"
 				}
 			});
 		});

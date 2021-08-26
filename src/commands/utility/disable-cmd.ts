@@ -5,7 +5,7 @@ import ComponentHelper from "../../util/ComponentHelper";
 import Command from "@cmd/Command";
 import EmbedBuilder from "@util/EmbedBuilder";
 import { Strings } from "@uwu-codes/utils";
-import config from "@config";
+import { emojis, permissionNames } from "@config";
 import CommandHandler from "@util/cmd/CommandHandler";
 import DisableEntry, { RawDisableEntry } from "@db/Models/Guild/DisableEntry";
 import chunk from "chunk";
@@ -26,16 +26,16 @@ export default new Command("disable")
 						`Restrictions: ${cmd.restrictions.length === 0 ? "None" : ""}`,
 						...(cmd.restrictions.length === 0 ? [] : cmd.restrictions.map(r => `- **${Strings.ucwords(r)}**`)),
 						"Usage:",
-						`${config.emojis.default.dot} Add Entry: \`${msg.gConfig.getFormattedPrefix()}disable add all <channel/user/role>\``,
-						`${config.emojis.default.dot} Add Entry: \`${msg.gConfig.getFormattedPrefix()}disable add <command/category> [channel/user/role]\``,
-						`${config.emojis.default.dot} Remove Entry: \`${msg.gConfig.getFormattedPrefix()}disable remove <id>\` (see list)`,
-						`${config.emojis.default.dot} List Entries: \`${msg.gConfig.getFormattedPrefix()}disable list\``,
+						`${emojis.default.dot} Add Entry: \`${msg.gConfig.getFormattedPrefix()}disable add all <channel/user/role>\``,
+						`${emojis.default.dot} Add Entry: \`${msg.gConfig.getFormattedPrefix()}disable add <command/category> [channel/user/role]\``,
+						`${emojis.default.dot} Remove Entry: \`${msg.gConfig.getFormattedPrefix()}disable remove <id>\` (see list)`,
+						`${emojis.default.dot} List Entries: \`${msg.gConfig.getFormattedPrefix()}disable list\``,
 						"If the last argument is not provided to add, the entry applies server wide",
 						"",
 						`User Permissions: ${cmd.userPermissions.length === 0 ? "None" : ""}`,
-						...(cmd.userPermissions.length === 0 ? [] : ["```diff\n--- (red = optional)", ...cmd.userPermissions.map(([perm, optional]) => `${optional ? "-" : "+"} ${config.permissions[perm]}`), "\n```"]),
+						...(cmd.userPermissions.length === 0 ? [] : ["```diff\n--- (red = optional)", ...cmd.userPermissions.map(([perm, optional]) => `${optional ? "-" : "+"} ${permissionNames[perm]}`), "\n```"]),
 						`Bot Permissions: ${cmd.botPermissions.length === 0 ? "None" : ""}`,
-						...(cmd.botPermissions.length === 0 ? [] : ["```diff\n--- (red = optional)", ...cmd.botPermissions.map(([perm, optional]) => `${optional ? "-" : "+"} ${config.permissions[perm]}`), "\n```"])
+						...(cmd.botPermissions.length === 0 ? [] : ["```diff\n--- (red = optional)", ...cmd.botPermissions.map(([perm, optional]) => `${optional ? "-" : "+"} ${permissionNames[perm]}`), "\n```"])
 					].join("\n"))
 					.setAuthor(msg.author.tag, msg.author.avatarURL)
 					.toJSON()
@@ -258,9 +258,9 @@ export default new Command("disable")
 								.toJSON()
 						],
 						components: new ComponentHelper()
-							.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `disable-back.${msg.author.id}`, page === 0, ComponentHelper.emojiToPartial(config.emojis.default.last, "default"))
-							.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `disable-stop.${msg.author.id}`, page === 0, ComponentHelper.emojiToPartial(config.emojis.default.stop, "default"))
-							.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `disable-next.${msg.author.id}`, page === 0, ComponentHelper.emojiToPartial(config.emojis.default.next, "default"))
+							.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `disable-back.${msg.author.id}`, page === 0, ComponentHelper.emojiToPartial(emojis.default.last, "default"))
+							.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `disable-stop.${msg.author.id}`, page === 0, ComponentHelper.emojiToPartial(emojis.default.stop, "default"))
+							.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `disable-next.${msg.author.id}`, page === 0, ComponentHelper.emojiToPartial(emojis.default.next, "default"))
 							.toJSON()
 					});
 					const wait = await msg.channel.awaitComponentInteractions(6e4, (it) => it.message.id === m.id && it.member!.user.id === msg.author.id && it.data.custom_id.startsWith("diable-"));

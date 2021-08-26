@@ -1,7 +1,7 @@
 import Command from "@cmd/Command";
 import UserConfig from "@db/Models/User/UserConfig";
 import db from "@db";
-import config from "@config";
+import { developers } from "@config";
 import Eris from "eris";
 
 export default new Command("strike")
@@ -32,7 +32,7 @@ export default new Command("strike")
 		const c = msg.member.compareToMember(member);
 		if (c !== "lower") return msg.reply("H-hey! You can't strike people higher than you!");
 		if (amount < 1) return msg.reply("Y-you have to add at least one strike..");
-		if (amount > 10 && !config.developers.includes(msg.author.id)) return msg.reply("Y-you cannot add more than 10 strikes at a time..");
+		if (amount > 10 && !developers.includes(msg.author.id)) return msg.reply("Y-you cannot add more than 10 strikes at a time..");
 		await db.createUserIfNotExists(member.id);
 		await UserConfig.prototype.addStrikes.call({
 			id: member.id

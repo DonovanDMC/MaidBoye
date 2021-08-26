@@ -1,6 +1,6 @@
-import config from "@config";
+import { emojis } from "@config";
 import Category from "@cmd/Category";
 
 export default new Category("utility", __filename)
-	.setDisplayName("Utility", config.emojis.default.utility)
+	.setDisplayName("Utility", emojis.default.utility)
 	.setDescription("Some utilities for your server");

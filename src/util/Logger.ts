@@ -1,14 +1,14 @@
-import config from "@config";
+import { clientInfo, mainLogsDir } from "@config";
 import { ILogObject, Logger as TSLog } from "tslog";
 import * as fs from "fs-extra";
 
 export default class Logger {
 	private static log = new TSLog();
 	private static saveToFile(obj: ILogObject) {
-		fs.mkdirpSync(config.dir.logs.client);
+		fs.mkdirpSync(mainLogsDir);
 		const d = new Date();
 		const current = `${d.getMonth() + 1}-${d.getDate()}-${d.getFullYear()}`;
-		fs.appendFileSync(`${config.dir.logs.client}/${current}.log`, `${JSON.stringify(obj)}\n`);
+		fs.appendFileSync(`${mainLogsDir}/${current}.log`, `${JSON.stringify(obj)}\n`);
 	}
 	static initFileLogging() {
 		this.log.attachTransport({
@@ -25,8 +25,8 @@ export default class Logger {
 		return this.log.getChildLogger({
 			name,
 			maskValuesOfKeys: [
-				config.client.token,
-				config.client.secret
+				clientInfo.token,
+				clientInfo.secret
 			],
 			dateTimeTimezone: "America/Chicago",
 			// Levels: https://github.com/fullstack-build/tslog/blob/2760b4144691a354126059a9d100a8c3c4879895/src/interfaces.ts#L8-L16

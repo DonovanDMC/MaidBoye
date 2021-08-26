@@ -1,5 +1,5 @@
 import "./util/MonkeyPatch";
-import config, { isPterodactyl, isWSL, wslVersion } from "./config";
+import { isPterodactyl, isWSL, wslVersion, clientInfo, clientOptions, beta } from "./config";
 import MaidBoye from "./main";
 import Logger from "@util/Logger";
 import { Time } from "@uwu-codes/utils";
@@ -17,9 +17,9 @@ process
 	})
 	.on("SIGINT", () => process.kill(process.pid));
 
-const bot = new MaidBoye(config.client.token, config.client.options);
+const bot = new MaidBoye(clientInfo.token, clientOptions);
 void bot.getBotGateway().then(function preLaunchInfo({ session_start_limit: { remaining, total, reset_after }, shards }) {
-	Logger.getLogger("Launch").info(`Mode: ${config.beta ? "BETA" : "PROD"} | CWD: ${process.cwd()} | PID: ${process.pid}`);
+	Logger.getLogger("Launch").info(`Mode: ${beta ? "BETA" : "PROD"} | CWD: ${process.cwd()} | PID: ${process.pid}`);
 	Logger.getLogger("Launch").info(`Session Limits: ${remaining}/${total} - Reset: ${Time.dateToReadable(new Date(Date.now() + reset_after))} | Recommended Shards: ${shards}`);
 	Logger.getLogger("Launch").info("Node Version:", process.version);
 	Logger.getLogger("Launch").info(`Platform: ${process.platform} (Manager: ${isWSL ? `WSLv${wslVersion}` : isPterodactyl ? "Pterodactyl" : "None"})`);
@@ -70,12 +70,12 @@ if (process.env.PTR === "1") {
 				await g!.leave();
 				process.stdout.write(`Left the guild "${cmd}".\n`);
 				break;
-			}/* 
+			}/*
 
 			default: {
 				if (!cmd) process.stderr.write("No command provided.\n");
 				else process.stderr.write(`Invalid command "${cmd}".\n`);
 			} */
 		}
-	}).bind(bot));
+	}));
 }

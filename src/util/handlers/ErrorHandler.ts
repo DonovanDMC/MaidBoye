@@ -4,12 +4,12 @@ import EmbedBuilder from "../EmbedBuilder";
 import ExtendedMessage from "../ExtendedMessage";
 import { dependencies } from "@root/package.json";
 import { dependencies as shrinkDependencies } from "@root/package-lock.json";
-import config from "@config";
+import { apiURL, beta, errorsDir } from "@config";
 import * as fs from "fs-extra";
 import Eris, { DiscordRESTError } from "eris";
+import { Strings } from "@uwu-codes/utils";
 import * as os from "os";
 import crypto from "crypto";
-import { Strings } from "@uwu-codes/utils";
 
 export default class ErrorHandler {
 	static getId() { return crypto.randomBytes(6).toString("hex"); }
@@ -24,11 +24,11 @@ export default class ErrorHandler {
 		}
 
 		const id = this.getId();
-		const code = `err.${config.beta ? "beta" : "prod"}.${id}`;
-		fs.mkdirpSync(config.dir.logs.errors);
-		fs.writeFileSync(`${config.dir.logs.errors}/${id}`, [
+		const code = `err.${beta ? "beta" : "prod"}.${id}`;
+		fs.mkdirpSync(errorsDir);
+		fs.writeFileSync(`${errorsDir}/${id}`, [
 			"-- System --",
-			`Mode: ${config.beta ? "BETA" : "PROD"}`,
+			`Mode: ${beta ? "BETA" : "PROD"}`,
 			`Server Hostname: ${os.hostname()}`,
 			`CWD: ${process.cwd()}`,
 			`PID: ${process.pid}`,
@@ -74,7 +74,7 @@ export default class ErrorHandler {
 						"",
 						`Code: \`${code}\``,
 						`ID: \`${id}\``,
-						`Report: [${config.api.url}/errors/${id}](${config.api.url}/errors/${id})`
+						`Report: [${apiURL}/errors/${id}](${apiURL}/errors/${id})`
 					].join("\n"))
 					.setColor("red")
 					.toJSON()
