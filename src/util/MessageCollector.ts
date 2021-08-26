@@ -5,8 +5,8 @@ export default class MessageCollector {
 	static client: MaidBoye;
 	static collectors = [] as Array<{
 		channel: string;
-		filter: (msg: Eris.Message<Eris.TextableChannel>) => boolean;
-		resolve: (value: Array<Eris.Message<Eris.TextableChannel>> | Eris.Message<Eris.TextableChannel>) => void;
+		filter(msg: Eris.Message<Eris.TextableChannel>): boolean;
+		resolve(value: Array<Eris.Message<Eris.TextableChannel>> | Eris.Message<Eris.TextableChannel>): void;
 		limit: number;
 		messages: Array<Eris.Message<Eris.TextableChannel>>;
 		timeout: number;

@@ -151,7 +151,7 @@ export default class BotFunctions {
 			reactions: Object.entries(message.reactions).map(([k, v]) => ({
 				count: v.count,
 				me: v.me,
-				emoji: k.indexOf(":") !== -1 ? {
+				emoji: k.includes(":") ? {
 					id: null,
 					name: k
 				} : {

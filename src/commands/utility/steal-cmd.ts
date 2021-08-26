@@ -85,8 +85,8 @@ export default new Command("steal")
 			if ("code" in err) switch (err.code) {
 				case 30008: return msg.reply(`th-this server already has the maximum amount of emojis (${((/\((\d+)\)/.exec(err.message)) ?? [0])[1]}), so I cannot add any more.`);
 				case 50035: {
-					if (err.message.indexOf("File cannot be larger than 256.0 kb") !== -1) return msg.reply("I-I wasn't able to resize the provided file under 256kb.. Please manually do this yourself.");
-					if (err.message.indexOf("name: String value did not match validation regex.") !== -1) return msg.reply("D-discord didn't like something about the name you provided.. Try again with something else.");
+					if (err.message.includes("File cannot be larger than 256.0 kb")) return msg.reply("I-I wasn't able to resize the provided file under 256kb.. Please manually do this yourself.");
+					if (err.message.includes("name: String value did not match validation regex.")) return msg.reply("D-discord didn't like something about the name you provided.. Try again with something else.");
 					break;
 				}
 			}

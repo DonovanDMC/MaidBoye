@@ -93,7 +93,7 @@ export default new Command("uinfo", "userinfo")
 						],
 						"",
 						`[**DiscordRep**](https://discordrep.com/u/${user.id}):`,
-						`${emojis.default.dot} Rep: ${!dRep? "Unable to fetch data." : `${emojis.custom[(dRep.upvotes - dRep.downvotes) > 0 ? "upvote" : (dRep.upvotes - dRep.downvotes) < 0 ? "downvote" : "neutral"]} ${dRep.upvotes - dRep.downvotes}`}`,
+						`${emojis.default.dot} Rep: ${!dRep ? "Unable to fetch data." : `${emojis.custom[(dRep.upvotes - dRep.downvotes) > 0 ? "upvote" : (dRep.upvotes - dRep.downvotes) < 0 ? "downvote" : "neutral"]} ${dRep.upvotes - dRep.downvotes}`}`,
 						`${emojis.default.dot} Infractions: ${!infr ? "Unable to fetch data." : `${infr.type === "CLEAN" ? "None" : `**${infr.type}**, Reason: ${infr.reason}, Timestamp: ${new Date(infr.date).toISOString()}`}`}`,
 						"",
 						"**Badges**:",

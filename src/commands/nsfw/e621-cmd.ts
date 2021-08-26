@@ -165,7 +165,7 @@ export default new Command("e621", "e6")
 					.addURLButton(post.sources[0] || `https://e621.net/${post.id}`, post.sources.length === 0, undefined, "Source")
 					.addURLButton(`https://e621.net/artists/show_or_new?name=${a}`, false, undefined, `Artist: ${a}`)
 					.addInteractionButton(
-						post.rating === "s"? ComponentHelper.BUTTON_SECONDARY :
+						post.rating === "s" ? ComponentHelper.BUTTON_SECONDARY :
 							post.rating === "q" ? ComponentHelper.BUTTON_PRIMARY :
 								post.rating === "e" ? ComponentHelper.BUTTON_DANGER :
 									ComponentHelper.BUTTON_SUCCESS, `e621-rating.${msg.author.id}`, true, undefined, `Rating: ${post.rating === "s" ? "Safe" : post.rating === "q" ? "Questionable" : post.rating === "e" ? "Explicit" : "Unknown"}`)

@@ -4,8 +4,8 @@ export default class ComponentInteractionCollector {
 	static client: MaidBoye;
 	static collectors = [] as Array<{
 		channel: string;
-		filter: (interaction: Eris.ComponentInteraction) => boolean;
-		resolve: (value: (Eris.ComponentInteraction) | Array<Eris.ComponentInteraction>) => void;
+		filter(interaction: Eris.ComponentInteraction): boolean;
+		resolve(value: (Eris.ComponentInteraction) | Array<Eris.ComponentInteraction>): void;
 		limit: number;
 		interactions: Array<Eris.ComponentInteraction>;
 		timeout: number;

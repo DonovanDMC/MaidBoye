@@ -21,10 +21,10 @@ declare namespace ModLog {
 	}
 
 	type AnyEntry = BanEntry | KickEntry | LockEntry |
-		LockDownEntry | MuteEntry | SoftBanEntry |
-		UnBanEntry | UnLockEntry | UnLockDownEntry |
-		UnMuteEntry | WarnEntry | DeleteWarningEntry |
-		ClearWarningsEntry;
+	LockDownEntry | MuteEntry | SoftBanEntry |
+	UnBanEntry | UnLockEntry | UnLockDownEntry |
+	UnMuteEntry | WarnEntry | DeleteWarningEntry |
+	ClearWarningsEntry;
 
 	interface BanEntry extends GenericEntry {
 		type: "ban";
@@ -48,7 +48,7 @@ declare namespace ModLog {
 	interface MuteEntry extends GenericEntry {
 		type: "mute";
 		timedId: string | null;
-	}/* 
+	}/*
 
 	interface CleanEntry extends GenericEntry {
 		type: "clean";

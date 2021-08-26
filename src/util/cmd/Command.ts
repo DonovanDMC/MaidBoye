@@ -67,7 +67,7 @@ export default class Command {
 			type,
 			options: type === Eris.Constants.ApplicationCommandTypes.CHAT_INPUT ? Array.isArray(nameOrOptions) ? nameOrOptions : [] : [],
 			defaultPermission: true
-		})
+		});
 		return this;
 	}
 
@@ -78,7 +78,7 @@ export default class Command {
 			type,
 			options,
 			defaultPermission: true
-		})
+		});
 		return this;
 	}
 

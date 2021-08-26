@@ -256,7 +256,7 @@ export default new Command("clean", "clear", "prune", "purge")
 					case "bots": return m.author.bot;
 					case "role": return m.member && m.member.roles.includes((target as Eris.Role).id);
 					case "commands": return msg.gConfig.prefix.some(p => m.content.toLowerCase().startsWith(p.value));
-					case "text": return m.content.toLowerCase().indexOf((target as string).toLowerCase()) !== -1;
+					case "text": return m.content.toLowerCase().includes((target as string).toLowerCase());
 					default: return true;
 				}
 			}

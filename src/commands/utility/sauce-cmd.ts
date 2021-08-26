@@ -14,7 +14,7 @@ async function sauce(url: string, msg: ExtendedMessage) {
 		s = await SauceNAO(url);
 	} catch (er) {
 		const err = er as Error;
-		if (err.message.indexOf("file no longer exists") !== -1) {
+		if (err.message.includes("file no longer exists")) {
 			await msg.reply("H-hey! The file doesn't exist on the remote server..");
 			return null;
 		}

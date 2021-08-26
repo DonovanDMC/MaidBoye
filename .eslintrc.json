@@ -26,6 +26,9 @@
 		"@typescript-eslint/method-signature-style": [
 			"error",
 			"method"
-		]
+		],
+		"@typescript-eslint/prefer-includes": "error",
+		"@typescript-eslint/prefer-function-type": "error",
+		"space-infix-ops": "error"
 	}
 }

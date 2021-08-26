@@ -69,7 +69,7 @@ export default new Command("eval", "ev")
 		try {
 			const ev = msg.rawArgs.join(" ");
 			// eslint-disable-next-line no-eval
-			res = await eval(`(async()=>{${ev.indexOf("return") === -1 ? "return " : ""}${ev}})()`);
+			res = await eval(`(async()=>{${!ev.includes("return") ? "return " : ""}${ev}})()`);
 		} catch (err) {
 			res = err;
 		}

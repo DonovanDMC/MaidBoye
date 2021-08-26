@@ -55,7 +55,7 @@ export default new Command("bulge")
 					await m.edit({
 						content: m.content,
 						embeds: m.embeds,
-						components:  m.components?.slice(0, 1)
+						components: m.components?.slice(0, 1)
 					});
 				} else return refreshImage.call(this, wait.id, wait.token);
 			}

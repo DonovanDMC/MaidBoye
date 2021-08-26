@@ -118,13 +118,13 @@ export default new Command("modlog")
 							});
 							return v;
 							// defaults no
-						} else if (selC.data.custom_id.indexOf("no") !== -1) {
+						} else if (selC.data.custom_id.includes("no")) {
 							await selC.editParent({
 								content: "Using default configuration options. Setup complete!",
 								components: []
 							});
 							return v;
-						} else if (selC.data.custom_id.indexOf("cancel") !== -1) {
+						} else if (selC.data.custom_id.includes("cancel")) {
 							await selC.editParent({
 								content: "Setup has been cancelled.",
 								components: []
@@ -157,21 +157,21 @@ export default new Command("modlog")
 							components: cnfCDComponents
 						});
 						// case editing no
-						else if (cnfCaseEditing.data.custom_id.indexOf("no") !== -1) {
+						else if (cnfCaseEditing.data.custom_id.includes("no")) {
 							await cnfCaseEditing.editParent({
 								content: `**Case Editing** has been set to disabled.\n\nNext: Do you want to enable **Case Deletion**? (default: **${v.caseDeletingEnabled ? "yes" : "no"}**)`,
 								components: cnfCDComponents
 							});
 							v.caseEditingEnabled = false;
 							// case editing yes
-						} else if (cnfCaseEditing.data.custom_id.indexOf("yes") !== -1) {
+						} else if (cnfCaseEditing.data.custom_id.includes("yes")) {
 							await cnfCaseEditing.editParent({
 								content: `**Case Editing** has been set to enabled.\n\nNext: Do you want to enable **Case Deletion**? (default: **${v.caseDeletingEnabled ? "yes" : "no"}**)`,
 								components: cnfCDComponents
 							});
 							v.caseEditingEnabled = true;
 							// case editing exit
-						} else if (cnfCaseEditing.data.custom_id.indexOf("exit") !== -1) {
+						} else if (cnfCaseEditing.data.custom_id.includes("exit")) {
 							await cnfCaseEditing.editParent({
 								content: "Exiting.",
 								components: []
@@ -194,21 +194,21 @@ export default new Command("modlog")
 							components: cnfEOCComponents
 						});
 						// case deletion no
-						else if (cnfCaseDeletion.data.custom_id.indexOf("no") !== -1) {
+						else if (cnfCaseDeletion.data.custom_id.includes("no")) {
 							await cnfCaseDeletion.editParent({
 								content: `**Case Deletion** has been set to disabled.\n\nNext: Do you want to enable **Editing Others Cases**? (default: **${v.editOthersCasesEnabled ? "yes" : "no"}**)`,
 								components: cnfEOCComponents
 							});
 							v.caseDeletingEnabled = false;
 							// case deletion yes
-						} else if (cnfCaseDeletion.data.custom_id.indexOf("yes") !== -1) {
+						} else if (cnfCaseDeletion.data.custom_id.includes("yes")) {
 							await cnfCaseDeletion.editParent({
 								content: `**Case Deletion** has been set to enabled.\n\nNext: Do you want to enable **Editing Others Cases**? (default: **${v.editOthersCasesEnabled ? "yes" : "no"}**)`,
 								components: cnfEOCComponents
 							});
 							v.caseDeletingEnabled = true;
 							// case deletion exit
-						} else if (cnfCaseDeletion.data.custom_id.indexOf("exit") !== -1) {
+						} else if (cnfCaseDeletion.data.custom_id.includes("exit")) {
 							await cnfCaseDeletion.editParent({
 								content: "Exiting.",
 								components: []
@@ -224,21 +224,21 @@ export default new Command("modlog")
 							components: []
 						});
 						// edit others cases no
-						else if (cnfEditOthersCases.data.custom_id.indexOf("no") !== -1) {
+						else if (cnfEditOthersCases.data.custom_id.includes("no")) {
 							await cnfEditOthersCases.editParent({
 								content: "**Edit Others Cases** has been set to disabled.\n\nSetup is complete.",
 								components: []
 							});
 							v.editOthersCasesEnabled = false;
 							// edit others cases yes
-						} else if (cnfEditOthersCases.data.custom_id.indexOf("yes") !== -1) {
+						} else if (cnfEditOthersCases.data.custom_id.includes("yes")) {
 							await cnfEditOthersCases.editParent({
 								content: "**Edit Others Cases** has been set to enabled.\n\nSetup is complete.",
 								components: []
 							});
 							v.editOthersCasesEnabled = true;
 							// edit others cases exit
-						} else if (cnfEditOthersCases.data.custom_id.indexOf("exit") !== -1) {
+						} else if (cnfEditOthersCases.data.custom_id.includes("exit")) {
 							await cnfEditOthersCases.editParent({
 								content: "Exiting.",
 								components: []
