@@ -25,7 +25,6 @@ export default new ClientEvent("interactionCreate", async function(interaction) 
 			let content = "";
 			// eslint-disable-next-line no-inner-declarations
 			function formatArg(option: Eris.InteractionDataOptions): string {
-				// console.log("o", option);
 				if (!("value" in option) && option.type !== Eris.Constants.ApplicationCommandOptionTypes.SUB_COMMAND) return "";
 				switch (option.type) {
 					// we only need to reconstruct user & role mentions, because channelMentions

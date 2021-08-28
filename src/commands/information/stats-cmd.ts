@@ -36,7 +36,7 @@ export default new Command("stats")
 		const redisEnd = Timer.getTime();
 
 		const sec = EventsASecondHandler.get();
-		console.log(r);
+
 		return msg.reply({
 			embeds: [
 				new EmbedBuilder(true, msg.author)
