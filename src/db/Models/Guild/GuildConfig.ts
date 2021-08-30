@@ -170,24 +170,41 @@ export default class GuildConfig {
 			tag.modifiedAt ?? null,
 			tag.modifiedBy ?? null
 		]);
+		this.tags.set(tag.name, new Tag({
+			id,
+			guild_id: this.id,
+			name: tag.name,
+			content: tag.content,
+			created_at: BigInt(tag.createdAt),
+			created_by: tag.createdBy,
+			modified_at: !tag.modifiedAt ? null : BigInt(tag.modifiedAt),
+			modified_by: tag.modifiedBy ?? null
+		}, this));
 		return id;
 	}
 
 	async editTag(value: string, column: "id" | "name", content: string, blame?: string) {
-		const res = await db.query(`UPDATE tags SET content=?, modified_at=?, modified_by=? WHERE ${column}=?`, [content, Date.now(), blame ?? null, value]).then((r: OkPacket) => r.affectedRows > 0);
+		const d = Date.now();
+		const res = await db.query(`UPDATE tags SET content=?, modified_at=?, modified_by=? WHERE ${column}=?`, [content, d, blame ?? null, value]).then((r: OkPacket) => r.affectedRows > 0);
 		if (res === false) return false;
-		await this.reload();
+		const tag = this.tags.get(column === "name" ? value : this.tags.find(t => t.id === value)!.name)!;
+		tag.content = content;
+		tag.modifiedAt = d;
+		tag.modifiedBy = blame ?? null;
 		return true;
 	}
 
 	async removeTag(value: string, column: "id" | "name") {
-		return db.query(`DELETE FROM tags WHERE ${column}=? AND guild_id=?`, [value, this.id]).then((r: OkPacket) => r.affectedRows > 0);
+		const res = await db.query(`DELETE FROM tags WHERE ${column}=? AND guild_id=?`, [value, this.id]).then((r: OkPacket) => r.affectedRows > 0);
+		if (res === false) return false;
+		this.tags.delete(column === "name" ? value : this.tags.find(t => t.id === value)!.name);
+		return true;
 	}
 
 	async resetTags() {
 		const res = await db.query("DELETE FROM tags WHERE guild_id=?", [this.id]).then((r: OkPacket) => r.affectedRows > 0);
 		if (res === false) return false;
-		await this.reload();
+		this.tags.clear();
 		return true;
 	}
 
@@ -199,14 +216,19 @@ export default class GuildConfig {
 			value,
 			space
 		]);
-		await this.reload();
+		this.prefix.push(new Prefix({
+			id,
+			guild_id: this.id,
+			value,
+			space
+		}, this));
 		return id;
 	}
 
 	async removePrefix(value: string, column: "id" | "value") {
 		const res = await db.query(`DELETE FROM prefix WHERE ${column}=? AND guild_id=?`, [value, this.id]).then((r: OkPacket) => r.affectedRows > 0);
 		if (res === false) return false;
-		await this.reload();
+		this.prefix.splice(this.prefix.findIndex(p => (column === "id" && p.id === value) || (column === "value" && p.value === value)), 1);
 		return true;
 	}
 
@@ -214,53 +236,81 @@ export default class GuildConfig {
 		const res = await db.query("DELETE FROM prefix WHERE guild_id=?", [this.id]).then((r: OkPacket) => r.affectedRows > 0);
 		await this.addPrefix(defaultPrefix, true);
 		if (res === false) return false;
-		await this.reload();
+		this.prefix = [];
 		return true;
 	}
 
-	async addLogEvent(event: string, channel: string) {
+	async addLogEvent(event: typeof LogEvent["EVENTS"][number], webhookId: string, webhookToken: string, webhookChannelId: string) {
 		const id = crypto.randomBytes(6).toString("hex");
-		await db.query("INSERT INTO logevents (id, guild_id, event, channel) VALUES (?, ?, ?, ?)", [
+		await db.query("INSERT INTO logevents (id, guild_id, event, webhook_id, webhook_token, webhook_channel_id) VALUES (?, ?, ?, ?, ?, ?)", [
 			id,
 			this.id,
 			event,
-			channel
+			webhookId,
+			webhookToken,
+			webhookChannelId
 		]);
-		await this.reload();
+		this.logEvents.push(new LogEvent({
+			id,
+			event,
+			guild_id: this.id,
+			webhook_id: webhookId,
+			webhook_token: webhookToken,
+			webhook_channel_id: webhookChannelId
+		}, this));
 		return id;
 	}
 
 	async removeLogEvent(event: string, channel: string) {
-		const res = await db.query("DELETE FROM logevents WHERE event=? AND channel=? AND guild_id=?", [event, channel, this.id]).then((r: OkPacket) => r.affectedRows > 0);
+		const res = await db.query("DELETE FROM logevents WHERE event=? AND webhook_channel_id=? AND guild_id=?", [event, channel, this.id]).then((r: OkPacket) => r.affectedRows > 0);
 		if (res === false) return false;
-		await this.reload();
+		this.logEvents.splice(this.logEvents.findIndex((ev) => ev.event === event && ev.webhook.channel === channel), 1);
 		return true;
 	}
 
 	async resetLogEvents() {
 		const res = await db.query("DELETE FROM logevents WHERE guild_id=?", [this.id]).then((r: OkPacket) => r.affectedRows > 0);
 		if (res === false) return false;
-		await this.reload();
+		this.logEvents = [];
 		return true;
+	}
+
+	static async getLogEvents(id: string, type?: LogEvent["event"]) {
+		// @ts-ignore this saves several db queries (getting the full guild info)
+		return db.query(`SELECT * FROM logevents WHERE guild_id=?${type !== undefined ? " AND type = ?" : ""}`, type === undefined ? [id] : [id, type]).then((d: Array<RawLogEvent>) => d.map(l => new LogEvent(l, null)));
 	}
 
 	async addSelfRole(role: string, blame: string) {
 		const id = crypto.randomBytes(6).toString("hex");
+		const d = Date.now();
 		await db.query("INSERT INTO selfroles (id, guild_id, role, added_at, added_by) VALUES (?, ?, ?, ?, ?)", [
 			id,
 			this.id,
 			role,
-			Date.now(),
+			d,
 			blame
 		]);
-		await this.reload();
+		this.selfRoles.set(role, new SelfRole({
+			id,
+			guild_id: this.id,
+			role,
+			added_at: BigInt(d),
+			added_by: blame
+		}, this));
 		return id;
 	}
 
 	async removeSelfRole(value: string, column: "id" | "role") {
 		const res = await db.query(`DELETE FROM selfroles WHERE ${column}=? AND guild_id=?`, [value, this.id]).then((r: OkPacket) => r.affectedRows > 0);
 		if (res === false) return false;
-		await this.reload();
+		this.selfRoles.delete(column === "role" ? value : this.selfRoles.find(r => r.id === value)!.role);
+		return true;
+	}
+
+	async resetSelfRoles() {
+		const res = await db.query("DELETE FROM selfroles guild_id=?", [this.id]).then((r: OkPacket) => r.affectedRows > 0);
+		if (res === false) return false;
+		this.selfRoles.clear();
 		return true;
 	}
 
@@ -272,21 +322,26 @@ export default class GuildConfig {
 			role,
 			xpRequired
 		]);
-		await this.reload();
+		this.levelRoles.push(new LevelRole({
+			id,
+			guild_id: this.id,
+			role,
+			xp_required: xpRequired
+		}, this));
 		return id;
 	}
 
 	async removeLevelRole(value: string, column: "id" | "role") {
 		const res = await db.query(`DELETE FROM levelroles WHERE ${column}=? AND guild_id=?`, [value, this.id]).then((r: OkPacket) => r.affectedRows > 0);
 		if (res === false) return false;
-		await this.reload();
+		this.levelRoles.splice(this.levelRoles.findIndex(r => (column === "id" && r.id === value) || (column === "role" && r.role === value)), 1);
 		return true;
 	}
 
-	async resetSelfRoles() {
-		const res = await db.query("DELETE FROM selfroles guild_id=?", [this.id]).then((r: OkPacket) => r.affectedRows > 0);
+	async resetLevelRoles() {
+		const res = await db.query("DELETE FROM levelroles guild_id=?", [this.id]).then((r: OkPacket) => r.affectedRows > 0);
 		if (res === false) return false;
-		await this.reload();
+		this.levelRoles = [];
 		return true;
 	}
 
@@ -300,6 +355,8 @@ export default class GuildConfig {
 			filterType,
 			filterValue
 		]);
+		// this one is too complicated to manually construct, and
+		// I hate myself for the way I did it
 		await this.reload();
 		return id;
 	}
@@ -307,28 +364,26 @@ export default class GuildConfig {
 	async removeDisableEntry(id: string) {
 		const res = await db.query("DELETE FROM disable WHERE id=? AND guild_id=?", [id, this.id]).then((r: OkPacket) => r.affectedRows > 0);
 		if (res === false) return false;
-		await this.reload();
+		this.disable.splice(this.disable.findIndex(d => d.id === id), 1);
 		return true;
 	}
 
 	async resetDisableEntries() {
 		const res = await db.query("DELETE FROM disable guild_id=?", [this.id]).then((r: OkPacket) => r.affectedRows > 0);
 		if (res === false) return false;
-		await this.reload();
+		this.disable = [];
 		return true;
 	}
 
 	async editModlog(entryId: number, reason: string, blame?: string) {
 		const res = await db.query("UPDATE modlog SET reason=?, last_edited_at=?, last_edited_by=? WHERE guild_id=? AND entry_id=?", [reason, Date.now(), blame ?? null, this.id, entryId]).then((r: OkPacket) => r.affectedRows > 0);
 		if (res === false) return false;
-		await this.reload();
 		return true;
 	}
 
 	async removeModlog(id: string) {
 		const res = await db.query("DELETE FROM modlog WHERE id=?", [id]).then((r: OkPacket) => r.affectedRows > 0);
 		if (res === false) return false;
-		await this.reload();
 		return true;
 	}
 
