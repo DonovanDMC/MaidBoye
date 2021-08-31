@@ -1,3 +1,5 @@
+import Eris from "eris";
+
 export const Colors = {
 	bot: 0xA7A4AA,
 	get random() { return Math.floor(Math.random() * 0xFFFFFF); },
@@ -30,3 +32,25 @@ export const GameType = {
 	CUSTOM: 4,
 	COMPETING: 5
 } as const;
+
+export const deprecatedPermissions = [
+	"viewAuditLogs",
+	"stream",
+	"readMessages",
+	"externalEmojis",
+	"manageEmojis",
+	"useSlashCommands"
+] as const;
+export type DeprecatedPermissions = (typeof deprecatedPermissions)[number];
+
+export const fakePermissions = [
+	"allGuild",
+	"allText",
+	"allVoice",
+	"all"
+] as const;
+export type FakePermissions = (typeof fakePermissions)[number];
+
+export type Permissions = Exclude<keyof typeof Eris["Constants"]["Permissions"], DeprecatedPermissions | FakePermissions>;
+export type PermissionsWithDeprecated = Exclude<keyof typeof Eris["Constants"]["Permissions"], FakePermissions>;
+export type AllPermissions = keyof typeof Eris["Constants"]["Permissions"];

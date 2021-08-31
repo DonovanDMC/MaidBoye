@@ -3,11 +3,9 @@ import MaidBoye from "../../main";
 import ExtendedMessage from "../ExtendedMessage";
 import { ArrayOneOrMore } from "@uwu-codes/types";
 import Eris from "eris";
+import { Permissions } from "@util/Constants";
 
 export type CommandRestrictions = "beta" | "developer" | "nsfw";
-export type DeprecatedPermissions = "viewAuditLogs" | "stream" | "readMessages" | "externalEmojis" | "manageEmojis" | "useSlashCommands";
-export type FakePermissions = "allGuild" | "allText" | "allVoice" | "all";
-export type Permissions = Exclude<keyof typeof Eris["Constants"]["Permissions"], DeprecatedPermissions | FakePermissions>;
 export default class Command {
 	triggers: ArrayOneOrMore<string>;
 	restrictions = [] as Array<CommandRestrictions>;
@@ -63,7 +61,7 @@ export default class Command {
 	addApplicationCommand(type: 1 | 2 | 3, nameOrOptions: Array<Eris.ApplicationCommandOptions> | string) {
 		this.applicationCommands.push({
 			name: type === Eris.Constants.ApplicationCommandTypes.CHAT_INPUT ? this.triggers[0] : String(nameOrOptions),
-			description: type === Eris.Constants.ApplicationCommandTypes.CHAT_INPUT ? this.description : undefined,
+			description: type === Eris.Constants.ApplicationCommandTypes.CHAT_INPUT ? this.description : undefined as never,
 			type,
 			options: type === Eris.Constants.ApplicationCommandTypes.CHAT_INPUT ? Array.isArray(nameOrOptions) ? nameOrOptions : [] : [],
 			defaultPermission: true
