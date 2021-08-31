@@ -1,13 +1,12 @@
 import ClientEvent from "./util/ClientEvent";
 import Logger from "./util/Logger";
-import WebhookStore from "./util/WebhookStore";
 import db from "./db";
 import Category from "./util/cmd/Category";
 import CommandHandler from "./util/cmd/CommandHandler";
 import MessageCollector from "./util/MessageCollector";
 import CheweyAPI from "./util/req/CheweyAPI";
 import { Strings, Utility } from "@uwu-codes/utils";
-import Eris from "eris";
+import Eris, { ChatInputApplicationCommandStructure } from "eris";
 import * as fs from "fs-extra";
 import { Node } from "lavalink";
 import ModLogHandler from "@util/handlers/ModLogHandler";
@@ -32,7 +31,6 @@ export default class MaidBoye extends Eris.Client {
 
 	async launch() {
 		this.dirCheck();
-		WebhookStore.setClient(this);
 		await db.init(true, true);
 		await this.loadEvents();
 		await this.loadCommands();
@@ -80,8 +78,10 @@ export default class MaidBoye extends Eris.Client {
 	async loadCommands() {
 		const start = performance.now();
 		if (!fs.existsSync(commandsDir)) throw new Error(`Commands directory "${commandsDir}" does not exist.`);
+		const loadWhitelist: Array<string> | null = ["dev", "utility"];
 		const list = await fs.readdir(commandsDir).then(v => v.map(ev => `${commandsDir}/${ev}`));
 		for (const loc of list) {
+			if (loadWhitelist !== null && !loadWhitelist.includes(loc.split("/").slice(-1)[0])) continue;
 			const { default: cat } = (await import(loc)) as { default: Category; };
 			CommandHandler.registerCategory(cat);
 			CommandHandler.loadCategoryCommands(cat.name, cat.dir);
@@ -90,23 +90,23 @@ export default class MaidBoye extends Eris.Client {
 		Logger.getLogger("CommandManager").debug(`Loaded ${CommandHandler.commands.length} commands in ${(end - start).toFixed(3)}ms`);
 	}
 
-	async getUser(id: string, force = false) {
+	async getUser(id: string, forceRest = false) {
 		const cur = this.users.get(id);
-		if (cur && force === false) return cur;
+		if (cur && forceRest === false) return cur;
 		const u = await this.getRESTUser(id).catch(() => null);
 		if (u !== null) {
-			if (force && cur) this.users.remove(cur);
+			if (forceRest && cur) this.users.remove(cur);
 			this.users.add(u);
 			return u;
 		} else return null;
 	}
 
-	async getMember(guildId: string, userId: string, force = false) {
+	async getMember(guildId: string, userId: string, forceRest = false) {
 		if (!this.guilds.has(guildId)) return this.getRESTGuildMember(guildId, userId).catch(() => null);
 		else {
 			const g = this.guilds.get(guildId)!;
 			const cur = g.members.get(userId);
-			if (cur && force === false) return cur;
+			if (cur && forceRest === false) return cur;
 			else {
 				const m = await g.getRESTMember(userId).catch(() => null);
 				if (m !== null) {
@@ -123,13 +123,13 @@ export default class MaidBoye extends Eris.Client {
 		const commands = CommandHandler.commands.reduce<Array<Eris.ApplicationCommandStructure>>((a, b) => a.concat(...b.applicationCommands), []);
 
 		// due to not all categories being loaded before the help command
-		commands.find(cmd => cmd.name === "help")!.options![0].choices = CommandHandler.categories.map(cat => {
+		((commands.find(cmd => cmd.name === "help")! as ChatInputApplicationCommandStructure).options![0] as Eris.ApplicationCommandOptionsString).choices = CommandHandler.categories.map(cat => {
 			if (cat.restrictions.includes("disabled") || cat.restrictions.includes("developer") || (cat.restrictions.includes("beta") && !beta)) return;
 			else return {
 				name: cat.displayName.text,
 				value: cat.name
 			};
-		}).filter(Boolean) as Eris.ApplicationCommandOptions["choices"];
+		}).filter(Boolean) as Eris.ApplicationCommandOptionWithChoices<never>["choices"];
 
 		if (bypass !== true) {
 			// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion

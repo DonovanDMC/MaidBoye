@@ -1,6 +1,7 @@
+import DebugEvent from "../events/debug";
 import { botIcon, webhooks } from "@config";
+import Eris, { GuildTextableChannel, Message, WebhookPayload } from "eris";
 import MaidBoye from "@MaidBoye";
-import { GuildTextableChannel, Message, WebhookPayload } from "eris";
 
 interface WebhookInfo {
 	id: string;
@@ -11,8 +12,8 @@ interface WebhookInfo {
 
 class Webhook {
 	private info: WebhookInfo;
-	private client: MaidBoye;
-	constructor(info: WebhookInfo, client: MaidBoye) {
+	private client: Eris.Client;
+	constructor(info: WebhookInfo, client: Eris.Client) {
 		this.info = info;
 		this.client = client;
 	}
@@ -35,8 +36,7 @@ class Webhook {
 export default class WebhookStore {
 	private static list = new Map<string, Webhook>();
 	// this is now public for random client usage
-	static client: MaidBoye;
-	static setClient(client: MaidBoye) { this.client = client; }
+	static client = new Eris.Client("NO_GATEWAY_CONNECTION", { intents: [] }).on("debug", (info, id) => DebugEvent.listener.call(undefined as unknown as MaidBoye, info, id));
 	static get(name: keyof typeof webhooks) { return (this.list.get(name) ?? this.list.set(name, new Webhook(webhooks[name], this.client)).get(name))!; }
 
 	static async execute(name: keyof typeof webhooks, payload: WebhookPayload, wait: true): Promise<Message<GuildTextableChannel>>;

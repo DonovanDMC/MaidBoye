@@ -57,7 +57,7 @@ export default new Command("setup-mutes")
 					.toJSON()
 			],
 			components: new ComponentHelper()
-				.addInteractionButton(ComponentHelper.BUTTON_SECONDARY, `confirmmutes-yes.${msg.author.id}`, false, undefined, "Yes")
+				.addInteractionButton(ComponentHelper.BUTTON_SUCCESS, `confirmmutes-yes.${msg.author.id}`, false, undefined, "Yes")
 				.addInteractionButton(ComponentHelper.BUTTON_DANGER, `confirmmutes-no.${msg.author.id}`, false, undefined, "No")
 				.toJSON()
 		});
@@ -99,7 +99,7 @@ export default new Command("setup-mutes")
 						errorCount++;
 						continue;
 					}
-					await ch.editPermission(id, allow, deny, 0, `Setup-Mutes: ${msg.author.tag} (${msg.author.id})`).catch((err) => {
+					await ch.editPermission(id, allow, deny, Eris.Constants.PermissionOverwriteType.ROLE, `Setup-Mutes: ${msg.author.tag} (${msg.author.id})`).catch((err) => {
 						Logger.getLogger("SetupMutesCommand").error(err);
 						errorCount++;
 					});

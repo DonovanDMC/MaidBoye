@@ -8,6 +8,7 @@ import Command from "@cmd/Command";
 import Eris, { DiscordRESTError } from "eris";
 import ErrorHandler from "@util/handlers/ErrorHandler";
 
+
 export default new Command("levelroles")
 	.setPermissions("bot", "manageRoles")
 	.setPermissions("user")

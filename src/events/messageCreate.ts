@@ -7,7 +7,7 @@ import ClientEvent from "@util/ClientEvent";
 import EmbedBuilder from "@util/EmbedBuilder";
 import Logger from "@util/Logger";
 import ExtendedMessage from "@util/ExtendedMessage";
-import { Permissions } from "@cmd/Command";
+import { Permissions } from "@util/Constants";
 import ErrorHandler from "@util/handlers/ErrorHandler";
 import CommandError from "@cmd/CommandError";
 import { Strings, Timers } from "@uwu-codes/utils";

@@ -7,7 +7,7 @@ import { AntiSpamEntry } from "./cmd/AntiSpam";
 import TempFiles from "./handlers/TempFiles";
 import { BitData } from "./@types/MariaDB";
 import GuildConfig from "../db/Models/Guild/GuildConfig";
-import Eris from "eris";
+import Eris, { GuildAuditLogEntry } from "eris";
 import { Strings } from "@uwu-codes/utils";
 import MaidBoye from "@MaidBoye";
 import { antiSpamDir, apiURL, beta, emojis, levelingFlatRate, levelingFlatRateStart, levelingStartRate } from "@config";
@@ -203,11 +203,19 @@ export default class BotFunctions {
 		return Object.entries(this.getUserFlags(user)).filter(([, b]) => b === true).map(([a]) => a) as Array<keyof ReturnType<typeof BotFunctions["getUserFlags"]>>;
 	}
 
-	static getMessageFlags(msg: Eris.Message) {
+	static getMessageFlags(msg: Eris.Message | number) {
 		return Object.entries(Eris.Constants.MessageFlags).map(([f, v]) => ({
-			[f]: ((msg.flags ?? 0) & v) === v
+			[f]: (((typeof msg === "number" ? msg : msg.flags) ?? 0) & v) === v
 		})).reduce((a, b) => ({ ...a, ...b }), {}) as {
 			[K in keyof typeof Eris.Constants.MessageFlags]: boolean;
+		};
+	}
+
+	static getSystemChannelFlags(flags: number) {
+		return Object.entries(Eris.Constants.SystemChannelFlags).map(([f, v]) => ({
+			[f]: ((flags ?? 0) & v) === v
+		})).reduce((a, b) => ({ ...a, ...b }), {}) as {
+			[K in keyof typeof Eris.Constants.SystemChannelFlags]: boolean;
 		};
 	}
 
@@ -362,7 +370,7 @@ export default class BotFunctions {
 
 	static parseBit(d: BitData) {
 		// @ts-ignore -- mariadb bit types suck
-		return Object.keys(d).includes(0) ? Number(d) :
+		return Object.keys(d).includes("0") ? Number(d) :
 			"toJSON" in d ? d.toJSON().data[0] :
 				"data" in d ? d.data[0] :
 					-1;
@@ -409,5 +417,26 @@ export default class BotFunctions {
 			leftover: e,
 			needed: this.calcExp(lvl + 1).lvl - e
 		};
+	}
+
+	/**
+	 * Replaces all normally provided things with empty versions
+	 *
+	 * @param {Eris.MessageContent} newContent - the new content
+	 * @returns {Eris.AdvancedMessageContent}
+	 */
+	static replaceContent(newContent: Eris.MessageContent) {
+		return {
+			components: [],
+			content: "",
+			embeds: [],
+			stickerIDs: [],
+			...(typeof newContent === "string" ? { content: newContent } : newContent)
+		} as Eris.AdvancedMessageContent;
+	}
+
+	static async getAuditLogEntry(guild: Eris.Guild, type: keyof typeof Eris["Constants"]["AuditLogActions"], filter: (log: GuildAuditLogEntry) => boolean = () => true) {
+		const log = await guild.getAuditLog({ actionType: Eris.Constants.AuditLogActions[type] });
+		return log.entries.find(filter) ?? null;
 	}
 }

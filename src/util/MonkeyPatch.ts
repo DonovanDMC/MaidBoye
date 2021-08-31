@@ -17,6 +17,7 @@ import ComponentInteractionCollector from "./ComponentInteractionCollector";
 import Eris from "eris";
 import sauce from "source-map-support";
 import MaidBoye from "@MaidBoye";
+import BotFunctions from "@util/BotFunctions";
 sauce.install({ hookRequire: true });
 
 Object.defineProperties(Eris.User.prototype, {
@@ -219,6 +220,11 @@ Object.defineProperties(Eris.Message.prototype, {
 			if (byName === null) return this.channel.guild.roles.get(this.roleMentions[mentionPosition]) ?? null;
 			else return byName;
 		}
+	},
+	replaceContent: {
+		async value(this: Eris.Message, content: Eris.MessageContent) {
+			return this.edit(BotFunctions.replaceContent(content));
+		}
 	}
 });
 
@@ -231,6 +237,11 @@ Object.defineProperties(Eris.GuildChannel.prototype, {
 	awaitComponentInteractions: {
 		async value(this: Eris.GuildTextableChannel, timeout: number, filter: (interaction: Eris.ComponentInteraction) => boolean = (() => true), limit?: number) {
 			return ComponentInteractionCollector.awaitInteractions(this.id, timeout, filter, limit as 1);
+		}
+	},
+	awaitComponentInteractionsGeneric: {
+		async value(this: Eris.GuildTextableChannel, timeout: number, messageId: string, userId: string, limit?: number) {
+			return ComponentInteractionCollector.awaitInteractions(this.id, timeout, (it) => it.message.id === messageId && ((!!it.user && it.user.id === userId) || (!!it.member && it.member.id === userId)), limit as 1);
 		}
 	},
 	typeString: {

@@ -82,7 +82,7 @@ export default new Command("eval", "ev")
 			const wait = await msg.channel.awaitComponentInteractions(3e5, (it) => it.message.id === msg.author.id && it.message.id === m.id && it.data.custom_id.startsWith("eval-"));
 			if (wait === null) return m.edit({
 				components: []
-			});
+			}).catch(() => null);
 			if (wait.data.custom_id.includes("trash")) return m.delete();
 			else {
 				await msg.delete();
@@ -119,7 +119,7 @@ export default new Command("eval", "ev")
 					// delete result
 					.addInteractionButton(ComponentHelper.BUTTON_DANGER, `eval-trash.${msg.author.id}`, false, ComponentHelper.emojiToPartial(config.emojis.default.trash, "default"))
 					// delete invocation
-					.addInteractionButton(ComponentHelper.BUTTON_SECONDARY, `eval-delete.${msg.author.id}`, false, ComponentHelper.emojiToPartial(config.emojis.default.x, "default"))
+					.addInteractionButton(ComponentHelper.BUTTON_SUCCESS, `eval-delete.${msg.author.id}`, false, ComponentHelper.emojiToPartial(config.emojis.default.x, "default"))
 					.toJSON()
 			}, file === undefined ? undefined : {
 				file,

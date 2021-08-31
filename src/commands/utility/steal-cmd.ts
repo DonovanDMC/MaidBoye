@@ -12,6 +12,7 @@ export default new Command("steal")
 	.setPermissions("user", "manageEmojisAndStickers")
 	.setDescription("Steal an emoji for this server, or create one from a url")
 	.setUsage("<emoji/url>")
+	.setParsedFlags("sticker")
 	.addApplicationCommand(Eris.Constants.ApplicationCommandTypes.CHAT_INPUT, [
 		{
 			type: Eris.Constants.ApplicationCommandOptionTypes.STRING,

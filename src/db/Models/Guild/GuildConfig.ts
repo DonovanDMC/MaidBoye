@@ -180,6 +180,7 @@ export default class GuildConfig {
 			modified_at: !tag.modifiedAt ? null : BigInt(tag.modifiedAt),
 			modified_by: tag.modifiedBy ?? null
 		}, this));
+		await db.removeGuildFromCache(this.id);
 		return id;
 	}
 
@@ -191,6 +192,7 @@ export default class GuildConfig {
 		tag.content = content;
 		tag.modifiedAt = d;
 		tag.modifiedBy = blame ?? null;
+		await db.removeGuildFromCache(this.id);
 		return true;
 	}
 
@@ -198,6 +200,7 @@ export default class GuildConfig {
 		const res = await db.query(`DELETE FROM tags WHERE ${column}=? AND guild_id=?`, [value, this.id]).then((r: OkPacket) => r.affectedRows > 0);
 		if (res === false) return false;
 		this.tags.delete(column === "name" ? value : this.tags.find(t => t.id === value)!.name);
+		await db.removeGuildFromCache(this.id);
 		return true;
 	}
 
@@ -205,6 +208,7 @@ export default class GuildConfig {
 		const res = await db.query("DELETE FROM tags WHERE guild_id=?", [this.id]).then((r: OkPacket) => r.affectedRows > 0);
 		if (res === false) return false;
 		this.tags.clear();
+		await db.removeGuildFromCache(this.id);
 		return true;
 	}
 
@@ -222,6 +226,7 @@ export default class GuildConfig {
 			value,
 			space
 		}, this));
+		await db.removeGuildFromCache(this.id);
 		return id;
 	}
 
@@ -229,6 +234,7 @@ export default class GuildConfig {
 		const res = await db.query(`DELETE FROM prefix WHERE ${column}=? AND guild_id=?`, [value, this.id]).then((r: OkPacket) => r.affectedRows > 0);
 		if (res === false) return false;
 		this.prefix.splice(this.prefix.findIndex(p => (column === "id" && p.id === value) || (column === "value" && p.value === value)), 1);
+		await db.removeGuildFromCache(this.id);
 		return true;
 	}
 
@@ -237,6 +243,7 @@ export default class GuildConfig {
 		await this.addPrefix(defaultPrefix, true);
 		if (res === false) return false;
 		this.prefix = [];
+		await db.removeGuildFromCache(this.id);
 		return true;
 	}
 
@@ -258,6 +265,7 @@ export default class GuildConfig {
 			webhook_token: webhookToken,
 			webhook_channel_id: webhookChannelId
 		}, this));
+		await db.removeGuildFromCache(this.id);
 		return id;
 	}
 
@@ -265,6 +273,7 @@ export default class GuildConfig {
 		const res = await db.query("DELETE FROM logevents WHERE event=? AND webhook_channel_id=? AND guild_id=?", [event, channel, this.id]).then((r: OkPacket) => r.affectedRows > 0);
 		if (res === false) return false;
 		this.logEvents.splice(this.logEvents.findIndex((ev) => ev.event === event && ev.webhook.channel === channel), 1);
+		await db.removeGuildFromCache(this.id);
 		return true;
 	}
 
@@ -272,12 +281,22 @@ export default class GuildConfig {
 		const res = await db.query("DELETE FROM logevents WHERE guild_id=?", [this.id]).then((r: OkPacket) => r.affectedRows > 0);
 		if (res === false) return false;
 		this.logEvents = [];
+		await db.removeGuildFromCache(this.id);
 		return true;
 	}
 
-	static async getLogEvents(id: string, type?: LogEvent["event"]) {
-		// @ts-ignore this saves several db queries (getting the full guild info)
-		return db.query(`SELECT * FROM logevents WHERE guild_id=?${type !== undefined ? " AND type = ?" : ""}`, type === undefined ? [id] : [id, type]).then((d: Array<RawLogEvent>) => d.map(l => new LogEvent(l, null)));
+	static async getLogEvents(id: string, type?: LogEvent["event"], includeAll = true) {
+		return db.query(`SELECT * FROM logevents WHERE guild_id=?${type !== undefined ? ` AND (event = ?${includeAll === true ? " OR event = \"all\"" : ""}` : ""})`, type === undefined ? [id] : [id, type]).then((d: Array<RawLogEvent>) => d.map(l => {
+			// @ts-ignore this saves several db queries (getting the full guild info)
+			const v = new LogEvent(l, null);
+			// we have to override delete because of the way this function works
+			Object.defineProperty(v, "delete", {
+				get() {
+					return GuildConfig.prototype.removeLogEvent.bind({ id, logEvents: [] }, l.event, l.webhook_channel_id);
+				}
+			});
+			return v;
+		}));
 	}
 
 	async addSelfRole(role: string, blame: string) {
@@ -297,6 +316,7 @@ export default class GuildConfig {
 			added_at: BigInt(d),
 			added_by: blame
 		}, this));
+		await db.removeGuildFromCache(this.id);
 		return id;
 	}
 
@@ -311,6 +331,7 @@ export default class GuildConfig {
 		const res = await db.query("DELETE FROM selfroles guild_id=?", [this.id]).then((r: OkPacket) => r.affectedRows > 0);
 		if (res === false) return false;
 		this.selfRoles.clear();
+		await db.removeGuildFromCache(this.id);
 		return true;
 	}
 
@@ -328,6 +349,7 @@ export default class GuildConfig {
 			role,
 			xp_required: xpRequired
 		}, this));
+		await db.removeGuildFromCache(this.id);
 		return id;
 	}
 
@@ -335,6 +357,7 @@ export default class GuildConfig {
 		const res = await db.query(`DELETE FROM levelroles WHERE ${column}=? AND guild_id=?`, [value, this.id]).then((r: OkPacket) => r.affectedRows > 0);
 		if (res === false) return false;
 		this.levelRoles.splice(this.levelRoles.findIndex(r => (column === "id" && r.id === value) || (column === "role" && r.role === value)), 1);
+		await db.removeGuildFromCache(this.id);
 		return true;
 	}
 
@@ -342,6 +365,7 @@ export default class GuildConfig {
 		const res = await db.query("DELETE FROM levelroles guild_id=?", [this.id]).then((r: OkPacket) => r.affectedRows > 0);
 		if (res === false) return false;
 		this.levelRoles = [];
+		await db.removeGuildFromCache(this.id);
 		return true;
 	}
 
@@ -365,6 +389,7 @@ export default class GuildConfig {
 		const res = await db.query("DELETE FROM disable WHERE id=? AND guild_id=?", [id, this.id]).then((r: OkPacket) => r.affectedRows > 0);
 		if (res === false) return false;
 		this.disable.splice(this.disable.findIndex(d => d.id === id), 1);
+		await db.removeGuildFromCache(this.id);
 		return true;
 	}
 
@@ -372,6 +397,7 @@ export default class GuildConfig {
 		const res = await db.query("DELETE FROM disable guild_id=?", [this.id]).then((r: OkPacket) => r.affectedRows > 0);
 		if (res === false) return false;
 		this.disable = [];
+		await db.removeGuildFromCache(this.id);
 		return true;
 	}
 

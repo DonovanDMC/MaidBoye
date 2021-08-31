@@ -161,7 +161,8 @@ export default new Command("selfroles", "selfrole")
 						],
 						components: []
 					});
-					const [made] = choice.data.values!;
+					// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+					const [made] = (choice.data as Eris.ComponentInteractionSelectMenuData).values!;
 					if (!roles.map(r => r.id).includes(made)) return choice.editOriginalMessage({
 						embeds: [
 							new EmbedBuilder(true, msg.author)
@@ -227,7 +228,8 @@ export default new Command("selfroles", "selfrole")
 					],
 					components: []
 				});
-				const [made] = choice.data.values!;
+				// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+				const [made] = (choice.data as Eris.ComponentInteractionSelectMenuData).values!;
 				if (!selfList.map(r => r.role).includes(made)) return choice.editOriginalMessage({
 					embeds: [
 						new EmbedBuilder(true, msg.author)

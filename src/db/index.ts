@@ -113,12 +113,16 @@ export default class db {
 		await this.query(`INSERT INTO ${table} (${keys.join(", ")}) VALUES (${values.map(() => "?").join(", ")})`, values);
 	}
 
+	static async removeUserFromCache(id: string) {
+		await this.r.del(`cache:users:${id}`);
+	}
+
 	// because of foreign key restraints
 	static async createUserIfNotExists(id: string) { await this.query("INSERT IGNORE INTO users (id) VALUES (?)", [id]); }
 	static async getUser(id: string, raw: true, bypassCache?: boolean): Promise<{ user: RawUserConfig; selfRolesJoined: Array<RawSelfRoleJoined>; }>;
 	static async getUser(id: string, raw?: false, bypassCache?: boolean): Promise<UserConfig>;
 	static async getUser(id: string, raw = false, bypassCache = false) {
-		if (bypassCache === true) await this.r.del(`cache:users:${id}`);
+		if (bypassCache === true) await this.removeUserFromCache(id);
 		const cache = await this.r.get(`cache:users:${id}`);
 		if (cache !== null && bypassCache !== true) {
 			const v = JSON.parse<{ user: RawUserConfig; selfRolesJoined: Array<RawSelfRoleJoined>; }>(cache);
@@ -150,6 +154,10 @@ export default class db {
 		else return new UserConfig(id, res, selfRolesJoined);
 	}
 
+	static async removeGuildFromCache(id: string) {
+		await this.r.del(`cache:guilds:${id}`);
+	}
+
 	static async createGuildIfNotExists(id: string) { await this.query("INSERT IGNORE INTO guilds (id) VALUES (?)", [id]); }
 	static async getGuild(id: string, raw: true, bypassCache?: boolean): Promise<{
 		guild: RawGuildConfig;
@@ -162,7 +170,7 @@ export default class db {
 	}>;
 	static async getGuild(id: string, raw?: false, bypassCache?: boolean): Promise<GuildConfig>;
 	static async getGuild(id: string, raw = false, bypassCache = false) {
-		if (bypassCache === true) await this.r.del(`cache:guilds:${id}`);
+		if (bypassCache === true) await this.removeGuildFromCache(id);
 		const cache = await this.r.get(`cache:guilds:${id}`);
 		if (cache !== null && bypassCache !== true) {
 			const v = JSON.parse<{

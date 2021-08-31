@@ -11,10 +11,9 @@ export default new ClientEvent("interactionCreate", async function(interaction) 
 		Logger.getLogger("Unknown Interaction").warn("Type:", interaction.type);
 		return;
 	}
+
 	switch (interaction.type) {
 		case Eris.Constants.InteractionTypes.APPLICATION_COMMAND: {
-			// @ts-ignore -- waiting on pr updates
-			const type = interaction.data.type as 1 | 2 | 3;
 			if (interaction.guildID === undefined || interaction.member === undefined) return interaction.createMessage({
 				content: "Application Commands cannot be used in direct messages.",
 				flags: 64
@@ -49,15 +48,15 @@ export default new ClientEvent("interactionCreate", async function(interaction) 
 			}
 
 			const gConfig = await db.getGuild(interaction.guildID);
-			switch (type) {
+			switch (interaction.data.type) {
 				case Eris.Constants.ApplicationCommandTypes.CHAT_INPUT: {
-					content = `${gConfig.getFormattedPrefix()}${(interaction as Eris.CommandInteraction).data.name} ${((interaction as Eris.CommandInteraction).data.options ?? []).map(o => formatArg(o)).join(" ")}`.trim();
+					content = `${gConfig.getFormattedPrefix()}${(interaction).data.name} ${((interaction).data.options ?? []).map(o => formatArg(o)).join(" ")}`.trim();
 					break;
 				}
 
 				case Eris.Constants.ApplicationCommandTypes.USER: {
-					const target = (interaction as Eris.CommandInteraction).data.target_id as string;
-					const cmd = CommandHandler.commands.find(d => !!d.applicationCommands.find(a => a.name === (interaction as Eris.CommandInteraction).data.name));
+					const target = (interaction).data.target_id as string;
+					const cmd = CommandHandler.commands.find(d => !!d.applicationCommands.find(a => a.name === (interaction).data.name));
 					if (cmd === undefined) return interaction.createMessage({
 						content: "We couldn't figure out how to execute that command.",
 						flags: 64
@@ -91,7 +90,7 @@ export default new ClientEvent("interactionCreate", async function(interaction) 
 				timestamp: new Date().toISOString(),
 				tts: false,
 				mention_everyone: false,
-				mentions: userMentions.map(id => (interaction as Eris.CommandInteraction).data.resolved?.users?.get(id)).filter(Boolean),
+				mentions: userMentions.map(id => (interaction).data.resolved?.users?.get(id)).filter(Boolean),
 				mention_roles: roleMentions,
 				// mention_channels is normally absent
 				attachments: [],
@@ -112,6 +111,11 @@ export default new ClientEvent("interactionCreate", async function(interaction) 
 
 		case Eris.Constants.InteractionTypes.MESSAGE_COMPONENT: {
 			Logger.getLogger("ComponentInteraction").info(`Recieved interaction from ${!interaction.member ? "Unknown" : `${interaction.member.tag} (${interaction.member.id})`}, interaction id: "${interaction.data.custom_id}"`);
+			const user = interaction.data.custom_id.split(".").slice(-1)[0];
+			if (interaction.member && user !== interaction.member.id) return interaction.createMessage({
+				content: "H-hey! That isn't your button to click..",
+				flags: Eris.Constants.MessageFlags.EPHEMERAL
+			});
 			break;
 		}
 	}

@@ -70,7 +70,7 @@
     "@uwu-codes/types": "^1.0.5",
     "discord-api-types": "^0.22.0",
     "ts-node": "^10.2.0",
-    "typescript": "^4.3.5"
+    "typescript": "^4.4.2"
   },
   "engine": {
     "node": ">=16.x",

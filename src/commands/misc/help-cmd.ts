@@ -37,7 +37,7 @@ export default new Command("help")
 				let emoji: Partial<Eris.PartialEmoji> | undefined;
 				if (cat.displayName.emojiDefault !== null) emoji = ComponentHelper.emojiToPartial(cat.displayName.emojiDefault, "default");
 				if (hasUseExternal && cat.displayName.emojiCustom !== null) emoji = ComponentHelper.emojiToPartial(cat.displayName.emojiCustom, "custom");
-				cHome.addInteractionButton(ComponentHelper.BUTTON_SECONDARY, `help-${cat.name}.${msg.author.id}`, false, emoji);
+				cHome.addInteractionButton(ComponentHelper.BUTTON_SUCCESS, `help-${cat.name}.${msg.author.id}`, false, emoji);
 
 				const eCat = new EmbedBuilder()
 					.setTitle(`${cat.displayName.emojiCustom ?? cat.displayName.emojiDefault ?? ""} ${cat.displayName.text}`)
@@ -54,7 +54,7 @@ export default new Command("help")
 					content: "",
 					embeds: [ eCat.toJSON() ],
 					components: new ComponentHelper()
-						.addInteractionButton(ComponentHelper.BUTTON_SECONDARY, `help-home.${msg.author.id}`, false, ComponentHelper.emojiToPartial(emojis.default.home, "default"), "Home")
+						.addInteractionButton(ComponentHelper.BUTTON_SUCCESS, `help-home.${msg.author.id}`, false, ComponentHelper.emojiToPartial(emojis.default.home, "default"), "Home")
 						.toJSON()
 				};
 			});
@@ -134,7 +134,7 @@ export default new Command("help")
 					await m.edit({
 						embeds: [ e.toJSON() ],
 						components: new ComponentHelper()
-							.addInteractionButton(ComponentHelper.BUTTON_SECONDARY, `help-home.${msg.author.id}`, false, ComponentHelper.emojiToPartial(emojis.default.home, "default"), "Home")
+							.addInteractionButton(ComponentHelper.BUTTON_SUCCESS, `help-home.${msg.author.id}`, false, ComponentHelper.emojiToPartial(emojis.default.home, "default"), "Home")
 							.toJSON()
 					});
 				}

@@ -30,7 +30,7 @@ export default new Command("marry")
 					.toJSON()
 			],
 			components: new ComponentHelper()
-				.addInteractionButton(ComponentHelper.BUTTON_SECONDARY, `marry-yes.${member.id}`, false, undefined, "Yes")
+				.addInteractionButton(ComponentHelper.BUTTON_SUCCESS, `marry-yes.${member.id}`, false, undefined, "Yes")
 				.addInteractionButton(ComponentHelper.BUTTON_DANGER, `marry-no.${member.id}`, false, undefined, "No")
 				.toJSON()
 		});

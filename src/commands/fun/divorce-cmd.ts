@@ -18,7 +18,7 @@ export default new Command("divorce")
 					.toJSON()
 			],
 			components: new ComponentHelper()
-				.addInteractionButton(ComponentHelper.BUTTON_SECONDARY, `divorce-yes.${msg.author.id}`, false, undefined, "Yes")
+				.addInteractionButton(ComponentHelper.BUTTON_SUCCESS, `divorce-yes.${msg.author.id}`, false, undefined, "Yes")
 				.addInteractionButton(ComponentHelper.BUTTON_DANGER, `divorce-no.${msg.author.id}`, false, undefined, "No")
 				.toJSON()
 		});

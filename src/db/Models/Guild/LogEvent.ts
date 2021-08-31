@@ -4,20 +4,21 @@ import { DataTypes } from "@uwu-codes/types";
 export interface RawLogEvent {
 	id: string;
 	guild_id: string;
-	event: string;
+	event: typeof LogEvent["EVENTS"][number];
 	webhook_id: string;
 	webhook_token: string;
 	webhook_channel_id: string;
 }
 export type LogEventKV = DataTypes<LogEvent>;
 export default class LogEvent {
+	static MAX_EVENTS = 40;
 	static EVENTS = [
-		// channel
+		// Channels
 		"channelCreate",
 		"channelDelete",
 		"channelUpdate",
 
-		// member
+		// Members
 		"memberAdd",
 		"memberRemove",
 		"memberKick",
@@ -25,33 +26,40 @@ export default class LogEvent {
 		"banAdd",
 		"banRemove",
 
-		// role
+		// Roles
 		"roleCreate",
 		"roleDelete",
 		"roleUpdate",
 
-		// guild
+		// Misc
 		"update",
+		"all",
 
-		// invite
+		// Invites
 		"inviteCreate",
 		"inviteDelete",
 
-		// message
+		// Messages
 		"messageDelete",
 		"bulkDelete",
 		"messageUpdate",
 
-		// thread
+		// Threads
 		"threadCreate",
 		"threadDelete",
 		"threadUpdate",
-		"threadMembersUpdate",
-		"threadMemberUpdate"
+		"threadJoin",
+		"threadLeave",
+		"threadMemberUpdate",
+
+		// Voice
+		"voiceJoin",
+		"voiceLeave",
+		"voiceStateUpdate"
 	] as const;
 	private guild: GuildConfig;
 	id: string;
-	event: string;
+	event: typeof LogEvent["EVENTS"][number];
 	webhook: {
 		id: string;
 		token: string;

@@ -39,7 +39,7 @@ export default new Command("unlockdown")
 			if (!o || !p) continue;
 			i++;
 			if (p.allow & Eris.Constants.Permissions.sendMessages) p.allow -= Eris.Constants.Permissions.sendMessages;
-			await ch.editPermission(msg.channel.guild.id, BigInt(o[1]), BigInt(o[2]), 0, `Unlockdown: ${msg.author.tag} (${msg.author.id}) -> ${reason ?? "None Provided"}`);
+			await ch.editPermission(msg.channel.guild.id, BigInt(o[1]), BigInt(o[2]), Eris.Constants.PermissionOverwriteType.ROLE, `Unlockdown: ${msg.author.tag} (${msg.author.id}) -> ${reason ?? "None Provided"}`);
 		}
 
 		await Redis.del(`lockdown:${msg.channel.guild.id}`);

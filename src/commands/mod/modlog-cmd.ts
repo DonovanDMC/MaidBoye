@@ -78,9 +78,10 @@ export default new Command("modlog")
 					const check = await ModLogUtil.check(msg.gConfig);
 					if (check === true) return msg.reply(`Th-this server's modlog has already been set up.. if you want to reset it, run \`${msg.gConfig.getFormattedPrefix()}modlog reset\``);
 
-					await m.edit("Please respond with a channel to use. (default: this channel)");
+					await m.edit("Please respond with a channel to use.");
 					const j = await msg.channel.awaitMessages(3e4, (mg) => mg.author.id === msg.author.id);
-					const ch = (!j ? msg.channel : await j.getChannelFromArgs(undefined, undefined, undefined, undefined, false)) as Exclude<Eris.GuildTextableChannel, Eris.AnyThreadChannel>;
+					if (j === null) return m.edit("You took too long to respond.");
+					const ch = await j.getChannelFromArgs(undefined, undefined, undefined, undefined, false) as Exclude<Eris.GuildTextableChannel, Eris.AnyThreadChannel>;
 					if (ch === null) return msg.reply("Th-that wasn't a valid channel!");
 					if (j && msg.channel.permissionsOf(this.user.id).has("manageMessages")) await j.delete().catch(() => null);
 
@@ -255,12 +256,11 @@ export default new Command("modlog")
 						case 1: {
 							const hooks = await ch.getWebhooks();
 							if (hooks.length === 0) return m.edit("Th-that channel doesn't have any webhooks to use..");
-							const c = new ComponentHelper();
+							const c = new ComponentHelper(2);
 							let i = 0;
 							for (const w of hooks) {
 								i++;
 								c.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `select-webhook-${i - 1}.${msg.author.id}`, !w.token, ComponentHelper.emojiToPartial(emojis.default[names.number[i as unknown as "0"] as "zero"], "default"), w?.name || "Unknown");
-								if ((i % 2) === 0) c.addRow();
 							}
 							// we somehow end up with no usable components
 							if (c.toJSON().length === 0 || c.toJSON()[0].components.length === 0) return m.edit("Th-that channel doesn't have any webhooks to use..");
@@ -376,7 +376,7 @@ export default new Command("modlog")
 							await m.edit({
 								content: `Do you want to delete the associated modlog webhook **${wh.name}** (${wh.id})?`,
 								components: new ComponentHelper()
-									.addInteractionButton(ComponentHelper.BUTTON_SECONDARY, `delhook-yes.${msg.author.id}`, false, undefined, "Yes")
+									.addInteractionButton(ComponentHelper.BUTTON_SUCCESS, `delhook-yes.${msg.author.id}`, false, undefined, "Yes")
 									.addInteractionButton(ComponentHelper.BUTTON_DANGER, `delhook-no.${msg.author.id}`, false, undefined, "No")
 									.addInteractionButton(ComponentHelper.BUTTON_SUCCESS, `delhook-cancel.${msg.author.id}`, false, undefined, "Cancel")
 									.toJSON()

@@ -2,12 +2,14 @@ import Eris from "eris";
 
 export default class ComponentHelper {
 	static BUTTON_PRIMARY = 1 as const; // blurple
-	static BUTTON_SUCCESS = 2 as const; // green
-	static BUTTON_SECONDARY = 3 as const; // grey
+	static BUTTON_SECONDARY = 2 as const; // grey
+	static BUTTON_SUCCESS = 3 as const; // green
 	static BUTTON_DANGER = 4 as const; // red
 	static BUTTON_LINK = 5 as const; // grey url
 	private rows = [] as Array<Eris.ActionRow>;
-	addRow(type: Eris.ActionRow["type"] = 1, components: Array<Eris.ActionRowComponents> = []) {
+	rowMax: 1 | 2 | 3 | 4 | 5;
+	constructor(rowMax: ComponentHelper["rowMax"] = 5) { this.rowMax = rowMax; }
+	addRow(type = Eris.Constants.ComponentTypes.ACTION_ROW, components: Array<Eris.ActionRowComponents> = []) {
 		this.rows.push({
 			components,
 			type
@@ -23,9 +25,9 @@ export default class ComponentHelper {
 	// 5 = url
 	addInteractionButton(style: 1 | 2 | 3 | 4, custom_id: string, disabled?: boolean, emoji?: Eris.ButtonBase["emoji"], label?: string) {
 		//                                                             either up to 5 buttons or a select menu per row
-		if (this.rows.length === 0 || this.rows[this.rows.length - 1].components.length >= 5 || this.rows[this.rows.length - 1].components[0]?.type === 3) this.addRow();
+		if (this.rows.length === 0 || this.rows[this.rows.length - 1].components.length >= this.rowMax || this.rows[this.rows.length - 1].components[0]?.type === 3) this.addRow();
 		this.rows[this.rows.length - 1].components.push({
-			type: 2,
+			type: Eris.Constants.ComponentTypes.BUTTON,
 			style,
 			custom_id,
 			disabled,
@@ -37,9 +39,9 @@ export default class ComponentHelper {
 
 	addURLButton(url: string, disabled?: boolean, emoji?: Eris.ButtonBase["emoji"], label?: string) {
 		//                                                             either up to 5 buttons or a select menu per row
-		if (this.rows.length === 0 || this.rows[this.rows.length - 1].components.length >= 5 || this.rows[this.rows.length - 1].components[0]?.type === 3) this.addRow();
+		if (this.rows.length === 0 || this.rows[this.rows.length - 1].components.length >= this.rowMax || this.rows[this.rows.length - 1].components[0]?.type === 3) this.addRow();
 		this.rows[this.rows.length - 1].components.push({
-			type: 2,
+			type: Eris.Constants.ComponentTypes.BUTTON,
 			style: ComponentHelper.BUTTON_LINK,
 			disabled,
 			emoji,
@@ -53,7 +55,7 @@ export default class ComponentHelper {
 		// select menus have to be on their own row
 		this.addRow();
 		this.rows[this.rows.length - 1].components.push({
-			type: 3,
+			type: Eris.Constants.ComponentTypes.SELECT_MENU,
 			options,
 			placeholder,
 			min_values,
@@ -63,7 +65,15 @@ export default class ComponentHelper {
 		return this;
 	}
 
-	toJSON() { return this.rows; }
+	removeEmptyRows() {
+		this.rows.forEach((row, index) => {
+			if (row.components.length === 0) this.rows.splice(index, 1);
+		});
+
+		return this;
+	}
+
+	toJSON() { return this.removeEmptyRows().rows; }
 
 	static emojiToPartial(e: string, type: "default" | "custom"): Eris.ButtonBase["emoji"] {
 		if (type === "default") return {
@@ -82,11 +92,3 @@ export default class ComponentHelper {
 		}
 	}
 }
-
-export const InteractionCallbackType = {
-	PONG: 1,
-	CHANNEL_MESSAGE_WITH_SOURCE: 4,
-	DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE: 5,
-	DEFERRED_UPDATE_MESSAGE: 6,
-	UPDATE_MESSAGE: 7
-};

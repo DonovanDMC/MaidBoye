@@ -35,6 +35,7 @@ declare module "eris" {
 		cmdInteracton: CommandInteraction | null;
 		private client: Client;
 		reply(content: MessageContent, file?: MessageFile | Array<MessageFile>): Promise<Message<T>>;
+		replaceContent(content: MessageContent): Promise<Message<T>>;
 		setInteractionInfo(interaction:  PingInteraction | CommandInteraction | ComponentInteraction | UnknownInteraction): this;
 		getUserFromArgs(argPosition?: number, mentionPosition?: number, parsed?: boolean): Promise<User | null>;
 		getMemberFromArgs(argPosition?: number, mentionPosition?: number, parsed?: boolean, nick?: boolean): Promise<Member | null>;
@@ -58,6 +59,9 @@ declare module "eris" {
 
 		async awaitComponentInteractions(timeout: number, filter: (interaction: ComponentInteraction) => boolean, limit: number): Promise<Array<ComponentInteraction>>;
 		async awaitComponentInteractions(timeout: number, filter?: (interaction: ComponentInteraction) => boolean, limit?: 1): Promise<ComponentInteraction | null>;
+
+		async awaitComponentInteractionsGeneric(timeout: number, messageId: string, userId: string, limit: number): Promise<Array<ComponentInteraction>>;
+		async awaitComponentInteractionsGeneric(timeout: number, messageId: string, userId: string, limit?: 1): Promise<ComponentInteraction | null>;
 	}
 
 	type GuildTextableChannelWithoutThreads = Exclude<GuildTextableChannel, AnyThreadChannel>;
