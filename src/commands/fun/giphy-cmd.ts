@@ -16,8 +16,7 @@ export default new Command("giphy")
 			method: "GET",
 			headers: {
 				"User-Agent": userAgent
-			},
-			timeout: 5e3
+			}
 		}).then(v => v.json() as Promise<{
 			data: Array<{ // there's more but I dont' care
 				images: {

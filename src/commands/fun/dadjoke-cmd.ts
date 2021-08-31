@@ -15,8 +15,7 @@ export default new Command("dadjoke", "joke")
 			headers: {
 				"Accept": "application/json",
 				"User-Agent": userAgent
-			},
-			timeout: 5e3
+			}
 		}).then(v => v.json() as Promise<{ joke: string; }>);
 
 		// sauce: https://e926.net/posts/1535420

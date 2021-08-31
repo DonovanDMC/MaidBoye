@@ -190,7 +190,7 @@ export default class MaidBoye extends Eris.Client {
 				"Content-Type": "application/x-www-form-urlencoded"
 			}
 		});
-		const token = await grant.json().then((v: RESTPostOAuth2ClientCredentialsResult) => v.access_token);
+		const token = await grant.json().then((v) => (v as RESTPostOAuth2ClientCredentialsResult).access_token);
 
 		return fetch(`https://discord.com/api/v9/applications/${liteClientInfo.id}${guild === undefined ? "/commands" : `/guilds/${guild}/commands`}`, {
 			method: "PUT",
