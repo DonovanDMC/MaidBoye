@@ -204,7 +204,7 @@ export default class MaidBoye extends Eris.Client {
 			.then(async(res) => {
 				const end = process.hrtime.bigint();
 				Logger.getLogger("LiteSlashCommandSync").debug(`Synced ${commands.length} commands in ${Timer.calc(start, end, 2, false)}`);
-				const body = await res.json() as unknown;
+				const body = await res.json();
 				if (res.status >= 400) Logger.getLogger("LiteSlashCommandSync").error(util.inspect(body, { depth: null, colors: true }));
 				return true;
 			},
