@@ -52,13 +52,13 @@ export default new ClientEvent("guildMemberUpdate", async function(guild, member
 			.toJSON()
 		);
 
-		const removedRoles = [] as Array<string>;
-		const addedRoles = [] as Array<string>;
+		const removedRoles = [] as Array<Eris.Role>;
+		const addedRoles = [] as Array<Eris.Role>;
 		oldMember.roles.forEach(r => {
-			if (!member.roles.includes(r)) removedRoles.push(r);
+			if (!member.roles.includes(r)) removedRoles.push(guild.roles.get(r)!);
 		});
 		member.roles.forEach(r => {
-			if (!oldMember.roles.includes(r)) addedRoles.push(r);
+			if (!oldMember.roles.includes(r)) addedRoles.push(guild.roles.get(r)!);
 		});
 
 		if (removedRoles.length > 0 || addedRoles.length > 0) embeds.push(new EmbedBuilder(true, member.user)
@@ -71,8 +71,8 @@ export default new ClientEvent("guildMemberUpdate", async function(guild, member
 				"",
 				"**Changes**:",
 				"```diff",
-				...addedRoles.map(r => `+ <@&${r}>`),
-				...removedRoles.map(r => `- <@&${r}>`),
+				...addedRoles.map(r => `+ ${r.name}`),
+				...removedRoles.map(r => `- ${r.name}`),
 				"```"
 			])
 			.toJSON()
