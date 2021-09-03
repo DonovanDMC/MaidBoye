@@ -112,8 +112,8 @@ export default new ClientEvent("channelUpdate", async function(channel, oldChann
 					`Channel: <#${channel.id}>`,
 					"This channel's video quality mode was updated."
 				])
-				.addField("Old Video Quality Mode", `${!(oldChannel as Eris.OldGuildVoiceChannel).videoQualityMode ? "[NONE]" : (oldChannel as Eris.OldGuildVoiceChannel).videoQualityMode === Eris.Constants.VideoQualityMode.AUTO ? "Auto" : "Full"}`, false)
-				.addField("New Video Quality Mode", channel.videoQualityMode === Eris.Constants.VideoQualityMode.AUTO ? "Auto" : "Full", false)
+				.addField("Old Video Quality Mode", `${!(oldChannel as Eris.OldGuildVoiceChannel).videoQualityMode ? "[NONE]" : (oldChannel as Eris.OldGuildVoiceChannel).videoQualityMode === Eris.Constants.VideoQualityModes.AUTO ? "Auto" : "Full"}`, false)
+				.addField("New Video Quality Mode", channel.videoQualityMode === Eris.Constants.VideoQualityModes.AUTO ? "Auto" : "Full", false)
 				.toJSON()
 			);
 		}
