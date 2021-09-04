@@ -1,14 +1,16 @@
 import ClientEvent from "@util/ClientEvent";
-import GuildConfig from "@db/Models/Guild/GuildConfig";
 import EmbedBuilder from "@util/EmbedBuilder";
 import { Time } from "@uwu-codes/utils";
 import Eris from "eris";
 import BotFunctions from "@util/BotFunctions";
+import db from "@db";
 
 export default new ClientEvent("threadUpdate", async function(thread, oldThread) {
 	if (!("guild" in thread) || oldThread === null) return;
 
-	const logEvents = await GuildConfig.getLogEvents(thread.guild.id, "threadUpdate");
+	// easier to just get the full entry
+	const gConfig = await db.getGuild(thread.guild.id);
+	const logEvents = gConfig.logEvents.filter(l => l.event === "threadUpdate" || l.event === "all");
 	for (const log of logEvents) {
 		const hook = await this.getWebhook(log.webhook.id, log.webhook.token).catch(() => null);
 		if (hook === null || !hook.token) {
@@ -86,5 +88,15 @@ export default new ClientEvent("threadUpdate", async function(thread, oldThread)
 		}
 
 		await this.executeWebhook(hook.id, hook.token, { embeds });
+	}
+
+	// eslint-disable-next-line no-constant-condition
+	if (
+		oldThread.threadMetadata.archived === false &&
+		thread.threadMetadata.archived === true &&
+		thread.threadMetadata.locked === false &&
+		gConfig.autoUnarchive.find(a => a.threadId === thread.id)
+	) {
+		await thread.edit({ archived: false }, "Auto UnArchive");
 	}
 });

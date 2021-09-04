@@ -13,14 +13,15 @@ import LogEvent, { RawLogEvent } from "./LogEvent";
 import DisableEntry, { AnyDisableEntry, RawDisableEntry } from "./DisableEntry";
 import LevelRole, { RawLevelRole } from "./LevelRole";
 import Blacklist, { GuildBlacklist, RawGuildBlacklist } from "../Blacklist";
-import WebhookStore from "../../../util/WebhookStore";
-import EmbedBuilder from "../../../util/EmbedBuilder";
+import WebhookStore from "@util/WebhookStore";
+import EmbedBuilder from "@util/EmbedBuilder";
 import { BooleanData, OkPacket } from "@util/@types/MariaDB";
 import { DataTypes, DeepPartial, SomePartial, Writeable } from "@uwu-codes/types";
 import BotFunctions from "@util/BotFunctions";
 import { defaultPrefix, yiffTypes } from "@config";
 import db from "@db";
 import { Collection } from "@augu/collections";
+import AutoUnarchiveEntry, { RawAutoUnarchiveEntry } from "@db/Models/Guild/AutoUnarchiveEntry";
 import * as crypto from "crypto";
 
 export interface RawGuildConfig {
@@ -44,6 +45,7 @@ export interface RawGuildConfig {
 export type GuildConfigKV = DataTypes<GuildConfig>;
 export default class GuildConfig {
 	id: string;
+	autoUnarchive: Array<AutoUnarchiveEntry>;
 	prefix: Array<Prefix>;
 	tags = new Collection<string, Tag>();
 	selfRoles = new Collection<string, SelfRole>();
@@ -66,13 +68,14 @@ export default class GuildConfig {
 		deleteModCommands: boolean;
 		announceLevelUp: boolean;
 	};
-	constructor(id: string, data: RawGuildConfig, prefixData: Array<RawPrefix>, selfRolesData: Array<RawSelfRole>, levelRolesData: Array<RawLevelRole>, tagsData: Array<RawTag>, logEventsData: Array<RawLogEvent>, disabeData: Array<RawDisableEntry>) {
+	constructor(id: string, data: RawGuildConfig, prefixData: Array<RawPrefix>, selfRolesData: Array<RawSelfRole>, levelRolesData: Array<RawLevelRole>, tagsData: Array<RawTag>, logEventsData: Array<RawLogEvent>, disabeData: Array<RawDisableEntry>, autoUnarchiveEntryData: Array<RawAutoUnarchiveEntry>) {
 		this.id = id;
-		this.load(data, prefixData, selfRolesData, levelRolesData, tagsData, logEventsData, disabeData);
+		this.load(data, prefixData, selfRolesData, levelRolesData, tagsData, logEventsData, disabeData, autoUnarchiveEntryData);
 	}
 
-	private load(data: RawGuildConfig, prefixData: Array<RawPrefix>, selfRolesData: Array<RawSelfRole>, levelRolesData: Array<RawLevelRole>, tagsData: Array<RawTag>, logEventsData: Array<RawLogEvent>, disableData: Array<RawDisableEntry>) {
+	private load(data: RawGuildConfig, prefixData: Array<RawPrefix>, selfRolesData: Array<RawSelfRole>, levelRolesData: Array<RawLevelRole>, tagsData: Array<RawTag>, logEventsData: Array<RawLogEvent>, disableData: Array<RawDisableEntry>, autoUnarchiveEntryData: Array<RawAutoUnarchiveEntry>) {
 		this.id = data.id;
+		this.autoUnarchive = autoUnarchiveEntryData.map(a => new AutoUnarchiveEntry(a, this));
 		this.prefix = prefixData.map(d => new Prefix(d, this));
 		this.tags.clear();
 		tagsData.forEach(d => this.tags.set(d.name, new Tag(d, this)));
@@ -107,7 +110,7 @@ export default class GuildConfig {
 	async reload() {
 		const v = await db.getGuild(this.id, true, true);
 		if (!v) throw new Error(`Unexpected undefined on GuildConfig#reload (id: ${this.id})`);
-		this.load(v.guild, v.prefix, v.selfRoles, v.levelRoles, v.tags, v.logEvents, v.disable);
+		this.load(v.guild, v.prefix, v.selfRoles, v.levelRoles, v.tags, v.logEvents, v.disable, v.autoUnarchiveEntry);
 		return this;
 	}
 
@@ -397,6 +400,37 @@ export default class GuildConfig {
 		const res = await db.query("DELETE FROM disable guild_id=?", [this.id]).then((r: OkPacket) => r.affectedRows > 0);
 		if (res === false) return false;
 		this.disable = [];
+		await db.removeGuildFromCache(this.id);
+		return true;
+	}
+
+	async addAutoUnarchiveEntry(thread: string) {
+		const id = crypto.randomBytes(6).toString("hex");
+		await db.query("INSERT INTO disable (id, guild_id, thread_id) VALUES (?, ?, ?)", [
+			id,
+			this.id,
+			thread
+		]);
+		this.autoUnarchive.push(new AutoUnarchiveEntry({
+			id,
+			guild_id: this.id,
+			thread_id: thread
+		}, this));
+		return id;
+	}
+
+	async removeAutoUnarchiveEntry(thread: string) {
+		const res = await db.query("DELETE FROM autounarchive WHERE guild_id=? AND thread_id = ?", [this.id, thread]).then((r: OkPacket) => r.affectedRows > 0);
+		if (res === false) return false;
+		this.autoUnarchive.splice(this.autoUnarchive.findIndex(a => a.threadId === thread), 1);
+		await db.removeGuildFromCache(this.id);
+		return true;
+	}
+
+	async resetAutoUnarchiveEntries() {
+		const res = await db.query("DELETE FROM autounarchive guild_id=?", [this.id]).then((r: OkPacket) => r.affectedRows > 0);
+		if (res === false) return false;
+		this.autoUnarchive = [];
 		await db.removeGuildFromCache(this.id);
 		return true;
 	}
