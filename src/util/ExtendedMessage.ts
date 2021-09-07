@@ -30,6 +30,7 @@ export default class ExtendedMessage extends Message<Eris.GuildTextableChannel> 
 		if (!this.client) this.client = client;
 		// for interactions
 		const self = this;
+		// eslint-disable-next-line deprecation/deprecation
 		this.channel.createMessage = async function createMessage(content: Eris.MessageContent, file?: Eris.FileContent | Array<Eris.FileContent> | undefined) {
 			if (self.cmdInteracton !== null) {
 				// interaction message isn't a real message
@@ -38,8 +39,10 @@ export default class ExtendedMessage extends Message<Eris.GuildTextableChannel> 
 					...(typeof content === "string" ? { content } : content),
 					file
 				}) as Promise<Eris.Message<Eris.TextChannel>>;
+				// eslint-disable-next-line deprecation/deprecation
 			} else return self.client.createMessage.call(self.client, this.id, content, file) as Promise<Eris.Message<Eris.TextChannel>>;
 		};
+
 	}
 
 	async load() {

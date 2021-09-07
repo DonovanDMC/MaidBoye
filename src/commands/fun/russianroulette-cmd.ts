@@ -7,7 +7,7 @@ export default new Command("russianroulette", "rr")
 	.setCooldown(3e3)
 	.setExecutor(async function(msg) {
 		const val = Math.floor(Math.random() * 6);
-		const bullets = typeof msg.args[0] !== "undefined" ? parseInt(msg.args[0], 10) : 3;
+		const bullets = typeof msg.args[0] !== "undefined" ? Number(msg.args[0]) : 3;
 
 		return msg.reply(`You ${val <= bullets - 1 ? "died.." : "lived!"}`);
 	});

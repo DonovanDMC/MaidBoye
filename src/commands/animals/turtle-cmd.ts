@@ -1,9 +1,10 @@
 import Command from "@cmd/Command";
+import ComponentHelper from "@util/ComponentHelper";
 import EmbedBuilder from "@util/EmbedBuilder";
 import CheweyAPI from "@util/req/CheweyAPI";
 import Eris from "eris";
 
-export default new Command("turtle")
+export default new Command("turtle", "tortle")
 	.setPermissions("bot", "embedLinks")
 	.setDescription("Get an image of a turtle!")
 	.addApplicationCommand(Eris.Constants.ApplicationCommandTypes.CHAT_INPUT, [])
@@ -14,9 +15,13 @@ export default new Command("turtle")
 		return msg.reply({
 			embeds: [
 				new EmbedBuilder(true, msg.author)
-					.setTitle("Turtle!")
+					.setTitle("Tortle!")
 					.setImage(img)
 					.toJSON()
-			]
+			],
+			components: new ComponentHelper()
+				.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `turtle-newimg.${msg.author.id}`, false, undefined, "New Image")
+				.addInteractionButton(ComponentHelper.BUTTON_DANGER, `general-exit.${msg.author.id}`, false, undefined, "Exit")
+				.toJSON()
 		});
 	});

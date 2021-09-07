@@ -34,7 +34,7 @@ export default new Command("lock")
 		}
 		const reason = msg.args.length < 2 ? null : msg.args.slice(1).join(" ");
 		if (reason && reason.length > 500) return msg.reply("Th-that reason is too long!");
-		await ch.editPermission(msg.channel.guild.id, o?.allow ?? 0n, (o?.deny ?? 0n) | Eris.Constants.Permissions.sendMessages, Eris.Constants.PermissionOverwriteType.ROLE, `Lock: ${msg.author.tag} (${msg.author.id}) -> ${reason ?? "None Provided"}`);
+		await ch.editPermission(msg.channel.guild.id, o?.allow ?? 0n, (o?.deny ?? 0n) | Eris.Constants.Permissions.sendMessages, Eris.Constants.PermissionOverwriteTypes.ROLE, `Lock: ${msg.author.tag} (${msg.author.id}) -> ${reason ?? "None Provided"}`);
 		const mdl = await ModLogHandler.createLockEntry(msg.gConfig, ch, msg.member, reason);
 		await msg.reply(`Done.${mdl.check === false ? "" : ` (case #${mdl.entryId})`}`);
 		await ch.createMessage({

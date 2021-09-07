@@ -5,6 +5,7 @@ import Category from "./util/cmd/Category";
 import CommandHandler from "./util/cmd/CommandHandler";
 import MessageCollector from "./util/MessageCollector";
 import CheweyAPI from "./util/req/CheweyAPI";
+import ComponentInteractionHandler from "./events/components/main";
 import { Strings, Utility } from "@uwu-codes/utils";
 import Eris, { ChatInputApplicationCommandStructure } from "eris";
 import * as fs from "fs-extra";
@@ -40,6 +41,7 @@ export default class MaidBoye extends Eris.Client {
 		if (!beta) CheweyAPI.analytics.initAutoPosting(this);
 		AntiSpam.init();
 		YiffRocks.setUserAgent(userAgent);
+		ComponentInteractionHandler.init();
 		await this.connect();
 	}
 
@@ -59,7 +61,7 @@ export default class MaidBoye extends Eris.Client {
 	async loadEvents() {
 		const oStart = performance.now();
 		if (!fs.existsSync(eventsDir)) throw new Error(`Events directory "${eventsDir}" does not exist.`);
-		const list = await fs.readdir(eventsDir).then(v => v.map(ev => `${eventsDir}/${ev}`));
+		const list = await fs.readdir(eventsDir).then(v => v.filter(f => fs.lstatSync(`${eventsDir}/${f}`).isFile()).map(ev => `${eventsDir}/${ev}`));
 		Logger.getLogger("EventManager").debug(`Got ${list.length} ${Strings.plural("event", list)} to load`);
 		for (const loc of list) {
 			const start = performance.now();
@@ -78,10 +80,12 @@ export default class MaidBoye extends Eris.Client {
 	async loadCommands() {
 		const start = performance.now();
 		if (!fs.existsSync(commandsDir)) throw new Error(`Commands directory "${commandsDir}" does not exist.`);
-		const loadWhitelist: Array<string> | null = ["dev", "utility"];
+		const loadWhitelist: Array<string> | null = null;
 		const list = await fs.readdir(commandsDir).then(v => v.map(ev => `${commandsDir}/${ev}`));
 		for (const loc of list) {
-			if (loadWhitelist !== null && !loadWhitelist.includes(loc.split("/").slice(-1)[0])) continue;
+			// @ts-ignore -- fuck off
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-call
+			if (beta && (Array.isArray(loadWhitelist) && !loadWhitelist.includes(loc.split("/").slice(-1)[0]))) continue;
 			const { default: cat } = (await import(loc)) as { default: Category; };
 			CommandHandler.registerCategory(cat);
 			CommandHandler.loadCategoryCommands(cat.name, cat.dir);
@@ -204,7 +208,7 @@ export default class MaidBoye extends Eris.Client {
 			.then(async(res) => {
 				const end = process.hrtime.bigint();
 				Logger.getLogger("LiteSlashCommandSync").debug(`Synced ${commands.length} commands in ${Timer.calc(start, end, 2, false)}`);
-				const body = await res.json();
+				const body = await res.json() as unknown;
 				if (res.status >= 400) Logger.getLogger("LiteSlashCommandSync").error(util.inspect(body, { depth: null, colors: true }));
 				return true;
 			},

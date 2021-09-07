@@ -4,7 +4,7 @@ import Eris from "eris";
 
 export default new Command("cuddle")
 	.setPermissions("bot", "embedLinks")
-	.setDescription("cuddle someone")
+	.setDescription("Cuddle someone")
 	.setUsage("<@user/text>")
 	.addLiteApplicationCommand(Eris.Constants.ApplicationCommandTypes.CHAT_INPUT, [
 		{

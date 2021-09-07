@@ -1,5 +1,6 @@
 import { beta } from "../config";
 import CommandHandler from "../util/cmd/CommandHandler";
+import ComponentInteractionHandler, { ComponentInteractionType } from "../events/components/main";
 import db from "@db";
 import ClientEvent from "@util/ClientEvent";
 import Logger from "@util/Logger";
@@ -116,6 +117,8 @@ export default new ClientEvent("interactionCreate", async function(interaction) 
 				content: "H-hey! That isn't your button to click..",
 				flags: Eris.Constants.MessageFlags.EPHEMERAL
 			});
+			if (!("member" in interaction) || interaction.member === undefined) return;
+			void ComponentInteractionHandler.handle(interaction as ComponentInteractionType, this);
 			break;
 		}
 	}

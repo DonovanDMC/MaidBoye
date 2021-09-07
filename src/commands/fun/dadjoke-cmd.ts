@@ -3,6 +3,7 @@ import EmbedBuilder from "@util/EmbedBuilder";
 import fetch from "node-fetch";
 import Eris from "eris";
 import { userAgent } from "@config";
+import ComponentHelper from "@util/ComponentHelper";
 
 export default new Command("dadjoke", "joke")
 	.setPermissions("bot", "embedLinks")
@@ -26,6 +27,10 @@ export default new Command("dadjoke", "joke")
 					.setThumbnail("https://assets.maid.gay/dadjoke.png")
 					.setColor("gold")
 					.toJSON()
-			]
+			],
+			components: new ComponentHelper()
+				.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `dadjoke-new.${msg.author.id}`, false, undefined, "New Joke")
+				.addInteractionButton(ComponentHelper.BUTTON_DANGER, `general-exit.${msg.author.id}`, false, undefined, "Exit")
+				.toJSON()
 		});
 	});

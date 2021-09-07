@@ -1,4 +1,5 @@
 import Command from "@cmd/Command";
+import ComponentHelper from "@util/ComponentHelper";
 import EmbedBuilder from "@util/EmbedBuilder";
 import CheweyAPI from "@util/req/CheweyAPI";
 import Yiffy from "@util/req/Yiffy";
@@ -18,6 +19,10 @@ export default new Command("birb")
 					.setTitle("Birb!")
 					.setImage(img)
 					.toJSON()
-			]
+			],
+			components: new ComponentHelper()
+				.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `birb-newimg.${msg.author.id}`, false, undefined, "New Image")
+				.addInteractionButton(ComponentHelper.BUTTON_DANGER, `general-exit.${msg.author.id}`, false, undefined, "Exit")
+				.toJSON()
 		});
 	});

@@ -33,7 +33,7 @@ export default new Command("unlock")
 		}
 		const reason = msg.args.length < 2 ? null : msg.args.slice(1).join(" ");
 		if (reason && reason.length > 500) return msg.reply("Th-that reason is too long!");
-		await ch.editPermission(msg.channel.guild.id, o?.allow ?? 0n, o?.deny ?? 0n, Eris.Constants.PermissionOverwriteType.ROLE, `Unlock: ${msg.author.tag} (${msg.author.id}) -> ${reason ?? "None Provided"}`);
+		await ch.editPermission(msg.channel.guild.id, o?.allow ?? 0n, o?.deny ?? 0n, Eris.Constants.PermissionOverwriteTypes.ROLE, `Unlock: ${msg.author.tag} (${msg.author.id}) -> ${reason ?? "None Provided"}`);
 		const mdl = await ModLogHandler.createUnLockEntry(msg.gConfig, ch, msg.member, reason);
 		if (msg.gConfig.settings.deleteModCommands && msg.channel.guild.permissionsOf(this.user.id)) await msg.delete().catch(() => null);
 		await msg.reply(`Done.${mdl.check === false ? "" : ` (case #${mdl.entryId})`}`);

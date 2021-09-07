@@ -7,7 +7,7 @@ import Eris from "eris";
 
 export default new Command("gay")
 	.setPermissions("bot", "embedLinks")
-	.setDescription("Make someone gay")
+	.setDescription("Gayify someone")
 	.setUsage("[@user/text]")
 	.addApplicationCommand(Eris.Constants.ApplicationCommandTypes.CHAT_INPUT, [
 		{

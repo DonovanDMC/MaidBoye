@@ -35,7 +35,7 @@ export default new Command("info")
 						`${emojis.default.dot} [Creator] [Donovan_DMC](https://donovan.is.gay)`,
 						"",
 						"**Other**:",
-						`${emojis.default.dot} Library: [Eris Custom](https://github.com/DonovanDMC/eris/tree/merge) (**${Eris.VERSION}**, \`${shrinkDependencies.eris.version.split("#")[1].slice(0, 7)}\`)`,
+						`${emojis.default.dot} Library: [Eris Custom](https://github.com/DonovanDMC/eris/tree/everything) (**${Eris.VERSION}**, \`${shrinkDependencies.eris.version.split("#")[1].slice(0, 7)}\`)`,
 						`${emojis.default.dot} API Version: **v${Eris.Constants.REST_VERSION}**`,
 						`${emojis.default.dot} Gateway Version: **v${Eris.Constants.GATEWAY_VERSION}**`,
 						`${emojis.default.dot} Version: **${pkg.version}** (Build Date: ${pkg.buildDate === null ? "Unknown" : `${String(pkg.buildDate).slice(0, 2)}/${String(pkg.buildDate).slice(2, 4)}/${String(pkg.buildDate).slice(4, 8)}`})`,

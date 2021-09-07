@@ -1,4 +1,5 @@
 import Command from "@cmd/Command";
+import ComponentHelper from "@util/ComponentHelper";
 import EmbedBuilder from "@util/EmbedBuilder";
 import CheweyAPI from "@util/req/CheweyAPI";
 import Eris from "eris";
@@ -17,6 +18,10 @@ export default new Command("koala")
 					.setTitle("Koala!")
 					.setImage(img)
 					.toJSON()
-			]
+			],
+			components: new ComponentHelper()
+				.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `koala-newimg.${msg.author.id}`, false, undefined, "New Image")
+				.addInteractionButton(ComponentHelper.BUTTON_DANGER, `general-exit.${msg.author.id}`, false, undefined, "Exit")
+				.toJSON()
 		});
 	});

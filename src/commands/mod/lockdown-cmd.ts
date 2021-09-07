@@ -36,7 +36,7 @@ export default new Command("lockdown")
 			else {
 				ovr.push([ch.id, p.allow.toString(), p.deny.toString()]);
 				if (p.allow & Eris.Constants.Permissions.sendMessages) p.allow -= Eris.Constants.Permissions.sendMessages;
-				await ch.editPermission(msg.channel.guild.id, p.allow, p.deny | Eris.Constants.Permissions.sendMessages, Eris.Constants.PermissionOverwriteType.ROLE, `Lockdown: ${msg.author.tag} (${msg.author.id}) -> ${reason ?? "None Provided"}`);
+				await ch.editPermission(msg.channel.guild.id, p.allow, p.deny | Eris.Constants.Permissions.sendMessages, Eris.Constants.PermissionOverwriteTypes.ROLE, `Lockdown: ${msg.author.tag} (${msg.author.id}) -> ${reason ?? "None Provided"}`);
 			}
 		}
 		if (ovr.length === 0) return m.edit("No channels were locked.");

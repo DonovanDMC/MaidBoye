@@ -19,13 +19,13 @@ export default new Command("furpile")
 	.setCooldown(3e3)
 	.setExecutor(async function(msg) {
 		try {
-			if (msg.args.length === 0) return msg.reply("H-hey! A user is required to start a conga..");
+			if (msg.args.length === 0) return msg.reply("H-hey! A user is required to start a furpile..");
 			const member = await msg.getMemberFromArgs();
 			if (member === null) return msg.reply("H-hey! That wasn't a valid member..");
-			if (member.id === msg.author.id) return msg.reply("H-hey! You can't start a conga with yourself..");
+			if (member.id === msg.author.id) return msg.reply("H-hey! You can't start a furpile on yourself..");
 
 			const e = new EmbedBuilder(true, msg.author)
-				.setTitle("Active FurPile")
+				.setTitle("Active Furpile")
 				.setDescription(`Furpile Started By: <@!${msg.author.id}> on <@!${member.id}>\n\nCurrent Furs: **2**`);
 			const m = await msg.reply({
 				embeds: [
@@ -61,7 +61,7 @@ export default new Command("furpile")
 						void m.edit({
 							embeds: [
 								e
-									.setDescription(`Furpile Started By: <@!${msg.author.id}> on <@!${member!.id}>\n\n${current.slice(1).map((c, i) => `<@!${c}> joined a conga with **${i + 2}** furs`).join("\n")}`)
+									.setDescription(`Furpile Started By: <@!${msg.author.id}> on <@!${member!.id}>\n\n${current.slice(1).map((c, i) => `<@!${c}> joined a furpile with **${i + 2}** furs`).join("\n")}`)
 									.toJSON()
 							]
 						});

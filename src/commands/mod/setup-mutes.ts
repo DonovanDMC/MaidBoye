@@ -99,7 +99,7 @@ export default new Command("setup-mutes")
 						errorCount++;
 						continue;
 					}
-					await ch.editPermission(id, allow, deny, Eris.Constants.PermissionOverwriteType.ROLE, `Setup-Mutes: ${msg.author.tag} (${msg.author.id})`).catch((err) => {
+					await ch.editPermission(id, allow, deny, Eris.Constants.PermissionOverwriteTypes.ROLE, `Setup-Mutes: ${msg.author.tag} (${msg.author.id})`).catch((err) => {
 						Logger.getLogger("SetupMutesCommand").error(err);
 						errorCount++;
 					});

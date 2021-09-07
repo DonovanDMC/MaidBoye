@@ -9,6 +9,7 @@ import { emojis } from "@config";
 export default new Command("conga")
 	.setPermissions("bot", "embedLinks", "useExternalEmojis")
 	.setDescription("Start a conga, or join one")
+	.setUsage("<@user/text>")
 	.addApplicationCommand(Eris.Constants.ApplicationCommandTypes.CHAT_INPUT, [
 		{
 			type: Eris.Constants.ApplicationCommandOptionTypes.USER,

@@ -18,12 +18,15 @@ export default new Command("fursuitbutt")
 				new EmbedBuilder(true, msg.author)
 					.setTitle("Fursuit Butt")
 					.setImage(img.url)
+					.setColor("gold")
 					.toJSON()
 			],
-			components: new ComponentHelper()
+			components: new ComponentHelper(3)
 				.addURLButton(img.shortURL, false, undefined, "Full Image")
 				.addURLButton(img.sources[0] || "https://yiff.rest", img.sources.length === 0, undefined, "Source")
 				.addURLButton(img.reportURL, false, undefined, "Report")
+				.addInteractionButton(ComponentHelper.BUTTON_SECONDARY, `fursuitbutt-newimg.${msg.author.id}`, false, undefined, "New Image")
+				.addInteractionButton(ComponentHelper.BUTTON_DANGER, `general-exit.${msg.author.id}`, false, undefined, "Exit")
 				.toJSON()
 		});
 	});
