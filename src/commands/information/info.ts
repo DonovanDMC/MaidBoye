@@ -1,4 +1,4 @@
-import { emojis, supportLink } from "@config";
+import { emojis, kofiLink, supportLink, websiteLink } from "@config";
 import { dependencies as shrinkDependencies } from "@root/package-lock.json";
 import pkg from "@root/package.json";
 import Command from "@cmd/Command";
@@ -6,6 +6,7 @@ import EmbedBuilder from "@util/EmbedBuilder";
 import CommandHandler from "@cmd/CommandHandler";
 import { Strings, Time } from "@uwu-codes/utils";
 import Eris from "eris";
+import ComponentHelper from "@util/ComponentHelper";
 import * as os from "os";
 
 export default new Command("info")
@@ -41,9 +42,16 @@ export default new Command("info")
 						`${emojis.default.dot} Version: **${pkg.version}** (Build Date: ${pkg.buildDate === null ? "Unknown" : `${String(pkg.buildDate).slice(0, 2)}/${String(pkg.buildDate).slice(2, 4)}/${String(pkg.buildDate).slice(4, 8)}`})`,
 						`${emojis.default.dot} Node Version: **${process.version}**`,
 						`${emojis.default.dot} Typescript Version: **${shrinkDependencies.typescript.version}**`,
-						`${emojis.default.dot} Support Server: [${supportLink}](${supportLink})`
+						`${emojis.default.dot} Support Server: [${supportLink}](${supportLink})`,
+						`${emojis.default.dot} Website: [${websiteLink}](${websiteLink})`,
+						`${emojis.default.dot} Donate: [${kofiLink}](${kofiLink})`
 					)
 					.toJSON()
-			]
+			],
+			components: new ComponentHelper()
+				.addURLButton(supportLink, false, undefined, "Support Server")
+				.addURLButton(websiteLink, false, undefined, "Website")
+				.addURLButton(kofiLink, false, undefined, "Donate")
+				.toJSON()
 		});
 	});

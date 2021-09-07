@@ -1,3 +1,4 @@
+/* eslint-disable deprecation/deprecation */
 // eslint-disable-next-line @typescript-eslint/triple-slash-reference
 /// <reference path="./@types/Eris.d.ts" />
 /* eslint-disable import/order */
