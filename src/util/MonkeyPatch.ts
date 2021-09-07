@@ -10,6 +10,7 @@ moduleAlias.addAliases({
 	"@util": `${d}/src/util`,
 	"@cmd": `${d}/src/util/cmd`,
 	"@db": `${d}/src/db`,
+	"@commands": `${d}/src/commands`,
 	"@MaidBoye": `${d}/src/main`
 });
 import MessageCollector from "./MessageCollector";

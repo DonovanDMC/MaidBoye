@@ -1,5 +1,5 @@
 import ComponentInteractionHandler from "../main";
-import { getInfo } from "../../../commands/misc/help-cmd";
+import { getInfo } from "@commands/misc/help";
 import BotFunctions from "@util/BotFunctions";
 
 ComponentInteractionHandler

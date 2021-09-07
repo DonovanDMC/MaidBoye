@@ -1,5 +1,5 @@
 import ComponentInteractionHandler from "../main";
-import { answers } from "../../../commands/fun/8ball-cmd";
+import { answers } from "@commands/fun/8ball";
 import EmbedBuilder from "@util/EmbedBuilder";
 
 ComponentInteractionHandler

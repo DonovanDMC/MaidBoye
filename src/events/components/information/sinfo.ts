@@ -1,5 +1,5 @@
 import ComponentInteractionHandler from "../main";
-import { generateSections } from "../../../commands/information/sinfo-cmd";
+import { generateSections } from "@commands/information/sinfo";
 
 ComponentInteractionHandler
 	.registerHandler("sinfo-members", false, async function handler(interaction) {

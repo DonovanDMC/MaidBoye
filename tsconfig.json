@@ -28,6 +28,9 @@
 			"@db/*": [
 				"db/*"
 			],
+			"@commands/*": [
+				"commands/*"
+			],
 			"@MaidBoye": [
 				"main.ts"
 			]
