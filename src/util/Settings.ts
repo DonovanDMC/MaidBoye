@@ -77,12 +77,6 @@ const Settings = [
 			if (wait === null) {
 				await botMessage.edit({
 					content: "",
-					embeds: [
-						new EmbedBuilder(true, originalMessage.author)
-							.setTitle(`Server Settings: ${this.name}`)
-							.setDescription("Menu closed due to time out.")
-							.toJSON()
-					],
 					components: []
 				});
 				return [false, false];
@@ -96,12 +90,6 @@ const Settings = [
 					} else {
 						await botMessage.edit({
 							content: "",
-							embeds: [
-								new EmbedBuilder(true, originalMessage.author)
-									.setTitle("Server Settings")
-									.setDescription("Exited.")
-									.toJSON()
-							],
 							components: []
 						});
 						return [false, false];
@@ -177,12 +165,6 @@ const Settings = [
 			if (wait === null) {
 				await botMessage.edit({
 					content: "",
-					embeds: [
-						new EmbedBuilder(true, originalMessage.author)
-							.setTitle(`Server Settings: ${this.name}`)
-							.setDescription("Menu closed due to time out.")
-							.toJSON()
-					],
 					components: []
 				});
 				return [false, false];
@@ -196,12 +178,6 @@ const Settings = [
 					} else {
 						await botMessage.edit({
 							content: "",
-							embeds: [
-								new EmbedBuilder(true, originalMessage.author)
-									.setTitle("Server Settings")
-									.setDescription("Exited.")
-									.toJSON()
-							],
 							components: []
 						});
 						return [false, false];
@@ -283,12 +259,6 @@ const Settings = [
 							} else {
 								await botMessage.edit({
 									content: "",
-									embeds: [
-										new EmbedBuilder(true, originalMessage.author)
-											.setTitle("Server Settings")
-											.setDescription("Exited.")
-											.toJSON()
-									],
 									components: []
 								});
 								resolve([false, false]);
@@ -401,12 +371,6 @@ const Settings = [
 			if (wait === null) {
 				await botMessage.edit({
 					content: "",
-					embeds: [
-						new EmbedBuilder(true, originalMessage.author)
-							.setTitle(`Server Settings: ${this.name}`)
-							.setDescription("Menu closed due to time out.")
-							.toJSON()
-					],
 					components: []
 				});
 				return [false, false];
@@ -420,12 +384,6 @@ const Settings = [
 					} else {
 						await botMessage.edit({
 							content: "",
-							embeds: [
-								new EmbedBuilder(true, originalMessage.author)
-									.setTitle("Server Settings")
-									.setDescription("Exited.")
-									.toJSON()
-							],
 							components: []
 						});
 						return [false, false];
@@ -467,6 +425,7 @@ const Settings = [
 		async exec(originalMessage: ExtendedMessage, botMessage: Eris.Message<Eris.GuildTextableChannel>): Promise<ExecReturn> {
 			const b = JSON.parse<Eris.AdvancedMessageContent>(JSON.stringify({ embeds: botMessage.embeds, components: botMessage.components }));
 			await botMessage.edit({
+				content: "",
 				embeds: [
 					new EmbedBuilder(true, originalMessage.author)
 						.setTitle(`Server Settings: ${this.name}`)
@@ -485,12 +444,6 @@ const Settings = [
 			if (wait === null) {
 				await botMessage.edit({
 					content: "",
-					embeds: [
-						new EmbedBuilder(true, originalMessage.author)
-							.setTitle(`Server Settings: ${this.name}`)
-							.setDescription("Menu closed due to time out.")
-							.toJSON()
-					],
 					components: []
 				});
 				return [false, false];
@@ -504,12 +457,6 @@ const Settings = [
 					} else {
 						await botMessage.edit({
 							content: "",
-							embeds: [
-								new EmbedBuilder(true, originalMessage.author)
-									.setTitle("Server Settings")
-									.setDescription("Exited.")
-									.toJSON()
-							],
 							components: []
 						});
 						return [false, false];
@@ -584,12 +531,6 @@ const Settings = [
 			if (wait === null) {
 				await botMessage.edit({
 					content: "",
-					embeds: [
-						new EmbedBuilder(true, originalMessage.author)
-							.setTitle(`Server Settings: ${this.name}`)
-							.setDescription("Menu closed due to time out.")
-							.toJSON()
-					],
 					components: []
 				});
 				return [false, false];
@@ -603,12 +544,6 @@ const Settings = [
 					} else {
 						await botMessage.edit({
 							content: "",
-							embeds: [
-								new EmbedBuilder(true, originalMessage.author)
-									.setTitle("Server Settings")
-									.setDescription("Exited.")
-									.toJSON()
-							],
 							components: []
 						});
 						return [false, false];
@@ -668,12 +603,6 @@ const Settings = [
 			if (wait === null) {
 				await botMessage.edit({
 					content: "",
-					embeds: [
-						new EmbedBuilder(true, originalMessage.author)
-							.setTitle(`Server Settings: ${this.name}`)
-							.setDescription("Menu closed due to time out.")
-							.toJSON()
-					],
 					components: []
 				});
 				return [false, false];
@@ -687,12 +616,6 @@ const Settings = [
 					} else {
 						await botMessage.edit({
 							content: "",
-							embeds: [
-								new EmbedBuilder(true, originalMessage.author)
-									.setTitle("Server Settings")
-									.setDescription("Exited.")
-									.toJSON()
-							],
 							components: []
 						});
 						return [false, false];
