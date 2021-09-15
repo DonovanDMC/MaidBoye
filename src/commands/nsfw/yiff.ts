@@ -64,7 +64,7 @@ export default new Command("yiff", "thegoodstuff")
 				.addURLButton(img.sources[0] || "https://yiff.rest", img.sources.length === 0, undefined, "Source")
 				.addURLButton(img.reportURL, false, undefined, "Report")
 				.addRow()
-				.addInteractionButton(ComponentHelper.BUTTON_SECONDARY, `yiff-newimg.${type}.${msg.author.id}`, false, undefined, "New Image")
+				.addInteractionButton(ComponentHelper.BUTTON_SECONDARY, `yiff-newimg-${type}.${msg.author.id}`, false, undefined, "New Image")
 				.toJSON()
 		});
 	});
