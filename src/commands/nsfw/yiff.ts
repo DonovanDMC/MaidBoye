@@ -65,6 +65,7 @@ export default new Command("yiff", "thegoodstuff")
 				.addURLButton(img.reportURL, false, undefined, "Report")
 				.addRow()
 				.addInteractionButton(ComponentHelper.BUTTON_SECONDARY, `yiff-newimg-${type}.${msg.author.id}`, false, undefined, "New Image")
+				.addInteractionButton(ComponentHelper.BUTTON_DANGER, `general-exit-2.${msg.author.id}`, false, undefined, "Exit")
 				.toJSON()
 		});
 	});
