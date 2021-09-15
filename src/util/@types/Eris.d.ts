@@ -6,7 +6,9 @@ declare module "eris" {
 		readonly realRoles: Array<Role>;
 		createMessage(content: MessageContent, file: MessageFile | Array<MessageFile>): Message<PrivateChannel>;
 		readonly topRole: Role | null;
+		// higher = compared member is higher than current member
 		compareToMember(to: Member | string): CompareResult;
+		// higher = compared member is higher than current member
 		compareToRole(to: Role | string): CompareResult;
 	}
 
