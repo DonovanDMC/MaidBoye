@@ -81,7 +81,7 @@ export default new Command("uinfo", "userinfo")
 						`${emojis.default.dot} Tag: **${user.tag}**`,
 						`${emojis.default.dot} ID: **${user.id}**`,
 						`${emojis.default.dot} Avatar: [[Link](${user.avatarURL})]`,
-						`${emojis.default.dot} Banner: ${user.banner === null ? "[None]" : `[[Link](${user.bannerURL!})] ${user.accentColor === null ? "" : `(#${user.accentColor.toString(16)})`}`}`,
+						`${emojis.default.dot} Banner: ${user.banner === null ? "[None]" : `[[Link](${user.bannerURL!})] ${!user.accentColor ? "" : `(#${user.accentColor.toString(16)})`}`}`,
 						`${emojis.default.dot} Creation Date: ${BotFunctions.formatDiscordTime(user.createdAt, "long-datetime", true)}`,
 						member === undefined ? "" : [
 							"",
