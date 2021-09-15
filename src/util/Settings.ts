@@ -87,7 +87,7 @@ const Settings = [
 				});
 				return [false, false];
 			} else {
-				const v = !wait.data || !("values" in wait.data) ? null : wait.data.values![0];
+				const v = !wait.data || !("values" in wait.data) ? null : wait.data.values[0];
 				await wait.acknowledge();
 				if (v === null) {
 					if (wait.data.custom_id.includes("back")) {
@@ -187,7 +187,7 @@ const Settings = [
 				});
 				return [false, false];
 			} else {
-				const v = !wait.data || !("values" in wait.data) ? null : wait.data.values![0];
+				const v = !wait.data || !("values" in wait.data) ? null : wait.data.values[0];
 				await wait.acknowledge();
 				if (v === null) {
 					if (wait.data.custom_id.includes("back")) {
@@ -335,7 +335,7 @@ const Settings = [
 			});
 
 			if (Array.isArray(role)) return role;
-			if (role.compareToMember(originalMessage.channel.guild.me) !== "higher") {
+			if (role.compareToMember(originalMessage.channel.guild.me) !== "lower") {
 				await botMessage.edit({
 					content: "",
 					embeds: [
