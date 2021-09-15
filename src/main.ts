@@ -137,13 +137,13 @@ export default class MaidBoye extends Eris.Client {
 
 		if (bypass !== true) {
 			// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
-			const v = (fs.existsSync(`${tempDir}/slash.json`) ? JSON.parse(fs.readFileSync(`${tempDir}/slash.json`).toString()) : []) as typeof commands;
+			const v = (fs.existsSync(`${dataDir}/slash.json`) ? JSON.parse(fs.readFileSync(`${dataDir}/slash.json`).toString()) : []) as typeof commands;
 			if (JSON.stringify(commands) === JSON.stringify(v)) {
 				Logger.getLogger("SlashCommandSync").debug("Skipping sync due to no changes");
 				return true;
 			}
 		}
-		fs.writeFileSync(`${tempDir}/slash.json`, JSON.stringify(commands));
+		fs.writeFileSync(`${dataDir}/slash.json`, JSON.stringify(commands));
 
 		return (guild === undefined ? this.bulkEditCommands(commands) : this.bulkEditGuildCommands(guild, commands))
 			.then(
@@ -177,13 +177,13 @@ export default class MaidBoye extends Eris.Client {
 
 		if (bypass !== true) {
 			// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
-			const v = (fs.existsSync(`${tempDir}/slash-lite.json`) ? JSON.parse(fs.readFileSync(`${tempDir}/slash-lite.json`).toString()) : []) as typeof commands;
+			const v = (fs.existsSync(`${dataDir}/slash-lite.json`) ? JSON.parse(fs.readFileSync(`${dataDir}/slash-lite.json`).toString()) : []) as typeof commands;
 			if (JSON.stringify(commands) === JSON.stringify(v)) {
 				Logger.getLogger("SlashCommandSync").debug("Skipping sync due to no changes");
 				return true;
 			}
 		}
-		fs.writeFileSync(`${tempDir}/slash-lite.json`, JSON.stringify(commands));
+		fs.writeFileSync(`${dataDir}/slash-lite.json`, JSON.stringify(commands));
 
 		const grant = await fetch("https://discord.com/api/oauth2/token", {
 			method: "POST",
