@@ -8,7 +8,7 @@ import { Strings } from "@uwu-codes/utils";
 import GuildConfig from "@db/Models/Guild/GuildConfig";
 
 ComponentInteractionHandler
-	.registerHandler("yiff-newimg-", false, async function handler(interaction) {
+	.registerHandler("yiff-newimg.", false, async function handler(interaction) {
 		const type = interaction.data.custom_id.split(".")[0].split("-")[2] as Exclude<GuildConfig["settings"]["defaultYiffType"], null>;
 		let img: JSONResponse;
 		try {
