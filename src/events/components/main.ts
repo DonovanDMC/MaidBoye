@@ -9,18 +9,36 @@ export type ComponentInteractionType = Omit<Eris.ComponentInteraction<Eris.Guild
 	message: Eris.Message<Eris.GuildTextableChannel>;
 	channel: Eris.GuildTextableChannel;
 };
+export type HandlerFunction = (this: MaidBoye, interaction: ComponentInteractionType) => Promise<unknown>;
+export interface Handler {
+	handler: HandlerFunction;
+	idExact: boolean;
+}
 export default class ComponentInteractionHandler {
-	static handlers = new Map<string, {
-		handler(this: MaidBoye, interaction: ComponentInteractionType): Promise<unknown>;
-		idExact: boolean;
-	}>();
+	static handlers = new Map<string, Handler>();
 	static handle(interaction: ComponentInteractionType, client: MaidBoye) {
 		if (!("id" in interaction)) return;
-		const [, { handler } = { handler: null } ] = Array.from(this.handlers.entries()).find(([d, opt]) => {
-			if (opt.idExact) return interaction.data.custom_id === d;
-			else return interaction.data.custom_id.startsWith(d);
-		}) ?? [];
-		if (handler === null) return;
+		let handler: HandlerFunction | undefined;
+		let handlerId: string | undefined;
+		const handlers = Array.from(this.handlers.entries());
+		for (const [d, { idExact, handler: func }] of handlers) {
+			if (idExact && interaction.data.custom_id === d) {
+				handler = func;
+				break;
+			} else if (interaction.data.custom_id.startsWith(d)) {
+				if (!handlerId) {
+					handler = func;
+					handlerId = d;
+				} else {
+					// replace if we find one that matches more closely
+					if (d > handlerId) {
+						handler = func;
+						handlerId = d;
+					} else continue;
+				}
+			}
+		}
+		if (handler === undefined) return;
 		void handler.call(client, interaction);
 	}
 
