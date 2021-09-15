@@ -32,10 +32,32 @@ export default new Command("setup-mutes")
 			const v = {} as Record<string, [allow: bigint, deny: bigint]>;
 			// text
 			if (ch.type === Eris.Constants.ChannelTypes.GUILD_TEXT || ch.type === Eris.Constants.ChannelTypes.GUILD_NEWS) {
-				if (everyone && everyone.allow & Eris.Constants.Permissions.sendMessages) t[everyone.id] = [everyone.allow - Eris.Constants.Permissions.sendMessages, everyone.deny];
+				let everyoneAllow = everyone?.allow;
+
+
+				// sendMessages
+				if (everyoneAllow && everyoneAllow & Eris.Constants.Permissions.sendMessages) everyoneAllow -= Eris.Constants.Permissions.sendMessages;
 				if (role && role.allow & Eris.Constants.Permissions.sendMessages) t[role.id] = [role.allow - Eris.Constants.Permissions.sendMessages, role.deny];
 				if (role && !(role.deny & Eris.Constants.Permissions.sendMessages)) t[role.id] = [!t[role.id] ? role.allow : t[role.id][0], role.deny | Eris.Constants.Permissions.sendMessages];
-				if (!role || role?.deny === 0n) t[msg.gConfig.settings.muteRole!] = [!t[msg.gConfig.settings.muteRole!] ? 0n : t[msg.gConfig.settings.muteRole!][0], Eris.Constants.Permissions.sendMessages];
+
+				// createPublicThreads
+				if (everyoneAllow && everyoneAllow & Eris.Constants.Permissions.createPublicThreads) everyoneAllow -= Eris.Constants.Permissions.createPublicThreads;
+				if (role && role.allow & Eris.Constants.Permissions.createPublicThreads) t[role.id] = [role.allow - Eris.Constants.Permissions.createPublicThreads, role.deny];
+				if (role && !(role.deny & Eris.Constants.Permissions.createPublicThreads)) t[role.id] = [!t[role.id] ? role.allow : t[role.id][0], role.deny | Eris.Constants.Permissions.createPublicThreads];
+
+				// createPrivateThreads
+				if (everyoneAllow && everyoneAllow & Eris.Constants.Permissions.createPrivateThreads) everyoneAllow -= Eris.Constants.Permissions.createPrivateThreads;
+				if (role && role.allow & Eris.Constants.Permissions.createPrivateThreads) t[role.id] = [role.allow - Eris.Constants.Permissions.createPrivateThreads, role.deny];
+				if (role && !(role.deny & Eris.Constants.Permissions.createPrivateThreads)) t[role.id] = [!t[role.id] ? role.allow : t[role.id][0], role.deny | Eris.Constants.Permissions.createPrivateThreads];
+
+				// sendMessagesInThreads
+				if (everyoneAllow && everyoneAllow & Eris.Constants.Permissions.sendMessagesInThreads) everyoneAllow -= Eris.Constants.Permissions.sendMessagesInThreads;
+				if (role && role.allow & Eris.Constants.Permissions.sendMessagesInThreads) t[role.id] = [role.allow - Eris.Constants.Permissions.sendMessagesInThreads, role.deny];
+				if (role && !(role.deny & Eris.Constants.Permissions.sendMessagesInThreads)) t[role.id] = [!t[role.id] ? role.allow : t[role.id][0], role.deny | Eris.Constants.Permissions.sendMessagesInThreads];
+
+				if (role && !(role.deny & Eris.Constants.Permissions.sendMessages)) t[role.id] = [!t[role.id] ? role.allow : t[role.id][0], role.deny | Eris.Constants.Permissions.sendMessages | Eris.Constants.Permissions.createPublicThreads | Eris.Constants.Permissions.createPrivateThreads | Eris.Constants.Permissions.sendMessagesInThreads];
+				if (everyone && everyoneAllow !== everyone.allow) t[everyone.id] = [everyone.allow - Eris.Constants.Permissions.sendMessages, everyone.deny];
+
 				if (Object.keys(t).length !== 0) permsText[ch.id] = t;
 			// voice
 			} else if (ch.type === Eris.Constants.ChannelTypes.GUILD_VOICE) {
