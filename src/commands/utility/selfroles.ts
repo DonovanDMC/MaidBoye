@@ -123,7 +123,8 @@ export default new Command("selfroles", "selfrole")
 				if (msg.gConfig.selfRoles.size === 0) return msg.reply("Th-this server doesnt't have any self roles..");
 				const roles = msg.gConfig.selfRoles.map(({ role }) => msg.channel.guild.roles.get(role)!).filter(r => r.name.toLowerCase().includes(msg.args.slice(1).join(" ").toLowerCase()));
 				let role: Eris.Role;
-				if (roles.length === 1) {
+				if (roles.length === 0) return msg.reply("No roles were found with what you provided..");
+				else if (roles.length === 1) {
 					role = roles[0];
 					if (msg.member.roles.includes(role.id)) return msg.reply("Y-you already have that role!");
 					else {
