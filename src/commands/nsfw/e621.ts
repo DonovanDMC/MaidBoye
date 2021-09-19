@@ -192,7 +192,6 @@ export default new Command("e621", "e6")
 				const wait = await msg.channel.awaitComponentInteractions(3e5, (it) => it.channel.id === msg.channel.id && it.message.id === m!.id && it.data.custom_id.startsWith("e621-") && it.data.custom_id.endsWith(msg.author.id) && it.member!.user.id === msg.author.id);
 				if (wait === null) {
 					await m.edit({
-						embeds: m.embeds,
 						components: m.components?.slice(0, 1)
 					}).catch(() => null);
 					return;
