@@ -121,7 +121,7 @@ export default new ClientEvent("interactionCreate", async function(interaction) 
 			Logger.getLogger("ComponentInteraction").info(`Recieved interaction from ${!interaction.member ? "Unknown" : `${interaction.member.tag} (${interaction.member.id})`}, interaction id: "${interaction.data.custom_id}"`);
 			const user = interaction.data.custom_id.split(".").slice(-1)[0];
 			if (interaction.member && user !== interaction.member.id) return interaction.createMessage({
-				content: `H-hey <@!${interaction.member.tag}>! That isn't your button to click..`,
+				content: `H-hey <@!${interaction.member.id}>! That isn't your button to click..`,
 				flags: Eris.Constants.MessageFlags.EPHEMERAL
 			});
 			if (!("member" in interaction) || interaction.member === undefined) return;
