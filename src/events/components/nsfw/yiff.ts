@@ -28,7 +28,7 @@ ComponentInteractionHandler
 				.addURLButton(img.shortURL, false, undefined, "Full Image")
 				.addURLButton(img.sources[0] || "https://yiff.rest", img.sources.length === 0, undefined, "Source")
 				.addURLButton(img.reportURL, false, undefined, "Report")
-				.addInteractionButton(ComponentHelper.BUTTON_SECONDARY, `yiff-newimg.${type}.${interaction.member.id}`, false, undefined, "New Image")
+				.addInteractionButton(ComponentHelper.BUTTON_SECONDARY, `yiff-newimg-${type}.${interaction.member.id}`, false, undefined, "New Image")
 				.addInteractionButton(ComponentHelper.BUTTON_DANGER, `general-exit-2.${interaction.member.id}`, false, undefined, "Exit")
 				.toJSON()
 		});
