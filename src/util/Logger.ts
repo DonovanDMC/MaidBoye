@@ -1,14 +1,16 @@
 import { clientInfo, mainLogsDir } from "@config";
 import { ILogObject, Logger as TSLog } from "tslog";
 import * as fs from "fs-extra";
+import { Time } from "@uwu-codes/utils";
 
 export default class Logger {
 	private static log = new TSLog();
 	private static saveToFile(obj: ILogObject) {
+		console.log(obj);
 		fs.mkdirpSync(mainLogsDir);
 		const d = new Date();
 		const current = `${d.getMonth() + 1}-${d.getDate()}-${d.getFullYear()}`;
-		fs.appendFileSync(`${mainLogsDir}/${current}.log`, `${JSON.stringify(obj)}\n`);
+		fs.appendFileSync(`${mainLogsDir}/${current}.log`, `${Time.formatDateWithPadding(d, true, true, false).replace(/\//g, "/")} ${obj.logLevel.toUpperCase()} [${obj.loggerName ?? "Unknown"}${!obj.filePath ? "" : ` ${obj.filePath}`}${!obj.typeName || !obj.functionName ? "" : ` ${obj.typeName}.${obj.functionName}`}] ${obj.argumentsArray.join(" ")}\n`);
 	}
 	static initFileLogging() {
 		this.log.attachTransport({
