@@ -1,7 +1,7 @@
 import Command from "@cmd/Command";
 import db from "@db";
 import BotFunctions from "@util/BotFunctions";
-import ComponentHelper from "@util/ComponentHelper";
+import ComponentHelper from "@util/components/ComponentHelper";
 import EmbedBuilder from "@util/EmbedBuilder";
 import Yiffy from "@util/req/Yiffy";
 

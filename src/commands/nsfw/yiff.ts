@@ -6,7 +6,7 @@ import Logger from "@util/Logger";
 import Yiffy from "@util/req/Yiffy";
 import { Strings } from "@uwu-codes/utils";
 import Eris from "eris";
-import ComponentHelper from "@util/ComponentHelper";
+import ComponentHelper from "@util/components/ComponentHelper";
 
 export default new Command("yiff", "thegoodstuff")
 	.setPermissions("bot", "embedLinks", "attachFiles")

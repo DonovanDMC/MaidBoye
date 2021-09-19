@@ -2,7 +2,7 @@ import { botSauce } from "@config";
 import Command from "@cmd/Command";
 import EmbedBuilder from "@util/EmbedBuilder";
 import Eris from "eris";
-import ComponentHelper from "@util/ComponentHelper";
+import ComponentHelper from "@util/components/ComponentHelper";
 
 export default new Command("avatar")
 	.setPermissions("bot", "embedLinks", "attachFiles")

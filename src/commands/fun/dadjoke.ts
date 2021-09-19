@@ -3,7 +3,7 @@ import EmbedBuilder from "@util/EmbedBuilder";
 import fetch from "node-fetch";
 import Eris from "eris";
 import { userAgent } from "@config";
-import ComponentHelper from "@util/ComponentHelper";
+import ComponentHelper from "@util/components/ComponentHelper";
 
 export default new Command("dadjoke", "joke")
 	.setPermissions("bot", "embedLinks")

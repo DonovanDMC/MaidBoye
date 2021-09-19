@@ -1,6 +1,6 @@
 import Command from "@cmd/Command";
 import MaidBoye from "@MaidBoye";
-import ComponentHelper from "@util/ComponentHelper";
+import ComponentHelper from "@util/components/ComponentHelper";
 import EmbedBuilder from "@util/EmbedBuilder";
 import Eris, { DiscordRESTError } from "eris";
 import ErrorHandler from "@util/handlers/ErrorHandler";

@@ -1,7 +1,7 @@
 import Command from "@cmd/Command";
 import Eris from "eris";
 import EmbedBuilder from "@util/EmbedBuilder";
-import ComponentHelper from "@util/ComponentHelper";
+import ComponentHelper from "@util/components/ComponentHelper";
 import Logger from "@util/Logger";
 
 export default new Command("setup-mutes")

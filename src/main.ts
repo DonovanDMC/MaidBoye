@@ -13,7 +13,7 @@ import { Node } from "lavalink";
 import ModLogHandler from "@util/handlers/ModLogHandler";
 import YiffRocks from "yiff-rocks";
 import AntiSpam from "@util/cmd/AntiSpam";
-import ComponentInteractionCollector from "@util/ComponentInteractionCollector";
+import ComponentInteractionCollector from "@util/components/ComponentInteractionCollector";
 import Timer from "@util/Timer";
 import fetch from "node-fetch";
 import { RESTPostOAuth2ClientCredentialsResult } from "discord-api-types";

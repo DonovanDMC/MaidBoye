@@ -44,14 +44,21 @@ export default new ClientEvent("interactionCreate", async function(interaction) 
 							return `<@&${String(option.value)}>`;
 						}
 					}
-					default: return String(option.value);
+					default: {
+						if ((interaction as Eris.CommandInteraction).data.name === "suggest") {
+							if (option.name === "title") return `--title="${String(option.value)}"`;
+							else if (option.name === "description") return `--description="${String(option.value)}"`;
+							else return String(option.value);
+						}
+						return String(option.value);
+					}
 				}
 			}
 
 			const gConfig = await db.getGuild(interaction.guildID);
 			switch (interaction.data.type) {
 				case Eris.Constants.ApplicationCommandTypes.CHAT_INPUT: {
-					content = `${gConfig.getFormattedPrefix()}${(interaction).data.name} ${((interaction).data.options ?? []).map(o => formatArg(o)).join(" ")}`.trim();
+					content = `${gConfig.getFormattedPrefix()}${interaction.data.name} ${(interaction.data.options ?? []).map(o => formatArg(o)).join(" ")}`.trim();
 					break;
 				}
 

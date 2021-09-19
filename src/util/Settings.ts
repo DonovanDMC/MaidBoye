@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import ExtendedMessage from "./ExtendedMessage";
 import EmbedBuilder from "./EmbedBuilder";
-import ComponentHelper from "./ComponentHelper";
+import ComponentHelper from "./components/ComponentHelper";
 import { emojis, yiffTypes } from "@config";
 import Eris from "eris";
 import GuildConfig from "@db/Models/Guild/GuildConfig";

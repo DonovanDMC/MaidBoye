@@ -1,7 +1,7 @@
 import { beta, developers, emojis, permissionNames } from "@config";
 import Command from "@cmd/Command";
 import CommandHandler from "@cmd/CommandHandler";
-import ComponentHelper from "@util/ComponentHelper";
+import ComponentHelper from "@util/components/ComponentHelper";
 import EmbedBuilder from "@util/EmbedBuilder";
 import BotFunctions from "@util/BotFunctions";
 import Eris from "eris";

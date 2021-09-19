@@ -1,7 +1,7 @@
 import ErrorHandler from "@util/handlers/ErrorHandler";
 import Command from "@cmd/Command";
 import { emojis } from "@config";
-import ComponentHelper from "@util/ComponentHelper";
+import ComponentHelper from "@util/components/ComponentHelper";
 import EmbedBuilder from "@util/EmbedBuilder";
 import chunk from "chunk";
 import Settings, { ExecReturn } from "@util/Settings";

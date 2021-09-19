@@ -1,7 +1,7 @@
 import Command from "@cmd/Command";
 import { apiKeys, emojis, userAgent } from "@config";
 import MaidBoye from "@MaidBoye";
-import ComponentHelper from "@util/ComponentHelper";
+import ComponentHelper from "@util/components/ComponentHelper";
 import EmbedBuilder from "@util/EmbedBuilder";
 import { Strings } from "@uwu-codes/utils";
 import fetch from "node-fetch";

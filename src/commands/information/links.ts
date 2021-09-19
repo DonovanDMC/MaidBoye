@@ -1,6 +1,6 @@
 import Command from "@cmd/Command";
 import { devLink, kofiLink, supportLink, twitterLink, websiteLink } from "@config";
-import ComponentHelper from "@util/ComponentHelper";
+import ComponentHelper from "@util/components/ComponentHelper";
 import EmbedBuilder from "@util/EmbedBuilder";
 import Eris from "eris";
 

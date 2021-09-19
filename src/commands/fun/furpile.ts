@@ -1,7 +1,7 @@
 import Command from "@cmd/Command";
 import Eris, { DiscordRESTError } from "eris";
 import EmbedBuilder from "@util/EmbedBuilder";
-import ComponentHelper from "@util/ComponentHelper";
+import ComponentHelper from "@util/components/ComponentHelper";
 import MaidBoye from "@MaidBoye";
 import ErrorHandler from "@util/handlers/ErrorHandler";
 

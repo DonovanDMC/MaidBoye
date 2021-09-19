@@ -1,5 +1,5 @@
 import Command from "@cmd/Command";
-import ComponentHelper from "@util/ComponentHelper";
+import ComponentHelper from "@util/components/ComponentHelper";
 import EmbedBuilder from "@util/EmbedBuilder";
 import CheweyAPI from "@util/req/CheweyAPI";
 import Yiffy from "@util/req/Yiffy";

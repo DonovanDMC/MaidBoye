@@ -1,6 +1,6 @@
 import Command from "@cmd/Command";
 import EmbedBuilder from "@util/EmbedBuilder";
-import ComponentHelper from "@util/ComponentHelper";
+import ComponentHelper from "@util/components/ComponentHelper";
 import MaidBoye from "@MaidBoye";
 import { botIcon, emojis, logEvents, names } from "@config";
 import Eris, { DiscordRESTError } from "eris";

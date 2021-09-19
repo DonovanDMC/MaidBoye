@@ -1,6 +1,6 @@
 import Command from "@cmd/Command";
 import UserConfig from "@db/Models/User/UserConfig";
-import ComponentHelper from "@util/ComponentHelper";
+import ComponentHelper from "@util/components/ComponentHelper";
 import EmbedBuilder from "@util/EmbedBuilder";
 
 export default new Command("divorce")

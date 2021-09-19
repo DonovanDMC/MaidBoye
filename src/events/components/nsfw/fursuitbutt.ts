@@ -1,7 +1,7 @@
 import ComponentInteractionHandler from "../main";
 import Yiffy from "@util/req/Yiffy";
 import EmbedBuilder from "@util/EmbedBuilder";
-import ComponentHelper from "@util/ComponentHelper";
+import ComponentHelper from "@util/components/ComponentHelper";
 
 ComponentInteractionHandler
 	.registerHandler("fursuitbutt-newimg", false, async function handler(interaction) {

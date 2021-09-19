@@ -2,7 +2,7 @@ import Command from "@cmd/Command";
 import EmbedBuilder from "@util/EmbedBuilder";
 import { apiKeys, developers, emojis, userAgent } from "@config";
 import Eris, { DiscordRESTError } from "eris";
-import ComponentHelper from "@util/ComponentHelper";
+import ComponentHelper from "@util/components/ComponentHelper";
 import MaidBoye from "@MaidBoye";
 import E621 from "@util/req/E621";
 import fetch from "node-fetch";

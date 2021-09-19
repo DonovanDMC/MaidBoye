@@ -1,4 +1,8 @@
-[submodule "src/config"]
+[submodule "Config"]
 	path = src/config
 	url = https://github.com/DonovanDMC/MaidBoyeConfig
 	branch = master
+[submodule "Locale"]
+	path = src/locale
+	url = https://github.com/DonovanDMC/MaidBoye
+	branch = locale

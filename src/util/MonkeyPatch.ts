@@ -15,7 +15,7 @@ moduleAlias.addAliases({
 	"@MaidBoye": `${d}/src/main`
 });
 import MessageCollector from "./MessageCollector";
-import ComponentInteractionCollector from "./ComponentInteractionCollector";
+import ComponentInteractionCollector from "./components/ComponentInteractionCollector";
 import Eris from "eris";
 import sauce from "source-map-support";
 import MaidBoye from "@MaidBoye";

@@ -1,7 +1,7 @@
 import Command from "@cmd/Command";
 import db from "@db";
 import EmbedBuilder from "@util/EmbedBuilder";
-import ComponentHelper from "@util/ComponentHelper";
+import ComponentHelper from "@util/components/ComponentHelper";
 import MaidBoye from "@MaidBoye";
 import Eris, { DiscordRESTError } from "eris";
 import chunk from "chunk";

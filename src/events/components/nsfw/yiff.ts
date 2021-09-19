@@ -1,7 +1,7 @@
 import ComponentInteractionHandler from "../main";
 import Yiffy from "@util/req/Yiffy";
 import EmbedBuilder from "@util/EmbedBuilder";
-import ComponentHelper from "@util/ComponentHelper";
+import ComponentHelper from "@util/components/ComponentHelper";
 import { JSONResponse } from "yiffy";
 import BotFunctions from "@util/BotFunctions";
 import { Strings } from "@uwu-codes/utils";

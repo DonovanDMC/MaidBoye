@@ -2,7 +2,7 @@ import db from "@db";
 import Command from "@cmd/Command";
 import Logger from "@util/Logger";
 import EmbedBuilder from "@util/EmbedBuilder";
-import ComponentHelper from "@util/ComponentHelper";
+import ComponentHelper from "@util/components/ComponentHelper";
 import Eris from "eris";
 import { Internal, Request, Strings, Time, Utility } from "@uwu-codes/utils";
 import Timer from "@util/Timer";

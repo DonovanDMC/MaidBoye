@@ -9,6 +9,7 @@ import db from "../db";
 import { defaultPrefix } from "@config";
 import Eris, { Member, Message } from "eris";
 import { parse } from "discord-command-parser";
+import { Strings } from "@uwu-codes/utils";
 
 export default class ExtendedMessage extends Message<Eris.GuildTextableChannel> {
 	gConfig: GuildConfig;
@@ -69,25 +70,12 @@ export default class ExtendedMessage extends Message<Eris.GuildTextableChannel> 
 		// if the used prefix was a mention, replace it with the server's first prefix
 		if (this.prefix.replace(/!/g, "") === `<@${this.client.user.id}`) this.prefix = this.gConfig.prefix[0].value;
 		this.cmd = CommandHandler.getCommand(p.command);
-		if (this.cmd !== null) Array.from(this.args).forEach(arg => {
-			if (/^(-[a-z\d]|--[a-z\d-_]+(=.+)?)$/.test(arg)) {
-				const [, name] = /^--?([a-z\d-]+)(?:=.*)?$/.exec(arg) ?? [];
-				if (!name || !this.cmd!.parsedFlags.includes(name)) return;
-				const indexArg = this.args.indexOf(arg);
-				const indexArgRaw = this.rawArgs.indexOf(arg);
-				// make sure we don't remove the last arg if what we're looking for isn't present
-				if (indexArg !== -1) this.args.splice(this.args.indexOf(arg), 1);
-				if (indexArgRaw !== -1) this.rawArgs.splice(indexArgRaw, 1);
-				// short arg, ex -d
-				if (arg.length === 2) return this.dashedArgs.value.push(arg.slice(1));
-				// long arg, e --key or --key=value
-				else if (arg.startsWith("--")) {
-					const [k, v] = arg.slice(2).split("=");
-					if (!v) this.dashedArgs.value.push(k);
-					else this.dashedArgs.keyValue[k] = v;
-				}
-			} else return;
-		});
+		if (this.cmd !== null) {
+			const flags = Strings.parseFlags(this.args.join(" "), (name) => this.cmd!.parsedFlags.includes(name));
+			this.dashedArgs.keyValue = flags.keyValue;
+			this.dashedArgs.value = flags.value;
+			this.args = flags.normalArgs;
+		}
 
 		return true;
 	}

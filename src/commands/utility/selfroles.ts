@@ -1,9 +1,9 @@
 import { emojis, permissionNames } from "@config";
 import Command from "@cmd/Command";
 import EmbedBuilder from "@util/EmbedBuilder";
-import ComponentHelper from "@util/ComponentHelper";
+import ComponentHelper from "@util/components/ComponentHelper";
 import CommandError from "@cmd/CommandError";
-import ComponentInteractionCollector from "@util/ComponentInteractionCollector";
+import ComponentInteractionCollector from "@util/components/ComponentInteractionCollector";
 import { Strings } from "@uwu-codes/utils";
 import Eris from "eris";
 

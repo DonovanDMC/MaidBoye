@@ -1,7 +1,7 @@
 import BotFunctions from "../../util/BotFunctions";
 import MaidBoye from "../../main";
 import EmbedBuilder from "../../util/EmbedBuilder";
-import ComponentHelper from "../../util/ComponentHelper";
+import ComponentHelper from "../../util/components/ComponentHelper";
 import { emojis } from "@config";
 import chunk from "chunk";
 import Command from "@cmd/Command";

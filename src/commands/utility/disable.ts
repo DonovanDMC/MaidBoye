@@ -1,7 +1,7 @@
 import db from "../../db";
 import BotFunctions from "../../util/BotFunctions";
 import MaidBoye from "../../main";
-import ComponentHelper from "../../util/ComponentHelper";
+import ComponentHelper from "../../util/components/ComponentHelper";
 import Command from "@cmd/Command";
 import EmbedBuilder from "@util/EmbedBuilder";
 import { Strings } from "@uwu-codes/utils";

@@ -259,7 +259,7 @@ export default new ClientEvent("messageCreate", async function (message) {
 	);
 	EventsASecondHandler.add("COMMANDS");
 	EventsASecondHandler.add(`COMMANDS.${cmd.triggers[0].toUpperCase()}`);
-	Logger.getLogger("CommandHandler").info(`Command ${cmd.triggers[0]} ran with ${msg.args.length === 0 ? "no arguments" : `the arguments "${msg.rawArgs.join(" ")}"`} by ${msg.author.tag} (${msg.author.id}) in the guild ${msg.channel.guild.name} (${msg.channel.guild.id})`);
+	Logger.getLogger("CommandHandler").info(`Command ${cmd.triggers[0]} ran with ${msg.args.length === 0 ? "no arguments" : `the arguments "${msg.args.join(" ")}"`} by ${msg.author.tag} (${msg.author.id}) in the guild ${msg.channel.guild.name} (${msg.channel.guild.id})`);
 
 	t.start("run");
 	void cmd.run.call(this, msg, cmd)
