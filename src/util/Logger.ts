@@ -6,7 +6,6 @@ import { Time } from "@uwu-codes/utils";
 export default class Logger {
 	private static log = new TSLog();
 	private static saveToFile(obj: ILogObject) {
-		console.log(obj);
 		fs.mkdirpSync(mainLogsDir);
 		const d = new Date();
 		const current = `${d.getMonth() + 1}-${d.getDate()}-${d.getFullYear()}`;
