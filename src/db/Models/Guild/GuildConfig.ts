@@ -406,7 +406,7 @@ export default class GuildConfig {
 
 	async addAutoUnarchiveEntry(thread: string) {
 		const id = crypto.randomBytes(6).toString("hex");
-		await db.query("INSERT INTO disable (id, guild_id, thread_id) VALUES (?, ?, ?)", [
+		await db.query("INSERT INTO autounarchive (id, guild_id, thread_id) VALUES (?, ?, ?)", [
 			id,
 			this.id,
 			thread
