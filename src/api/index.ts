@@ -10,8 +10,8 @@ import {
 	apiSecure,
 	apiURL,
 	assetsDir,
-	errorsDir,
-	srcDir
+	baseDir,
+	errorsDir
 } from "@config";
 import express from "express";
 import session from "express-session";
@@ -26,7 +26,7 @@ export default class API {
 	static async launch(client: MaidBoye) {
 		this.app = express()
 			.set("trust proxy", true)
-			.set("views", [`${srcDir}/api/templates`])
+			.set("views", [`${baseDir}/src/api/templates`])
 			.set("view engine", "ejs")
 			.use("/errors/:id", async(req, res) => {
 				if (!fs.existsSync(`${errorsDir}/${req.params.id}`)) return res.status(404).end("not found");
