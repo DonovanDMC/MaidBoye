@@ -132,8 +132,12 @@ export default class db {
 			else return new UserConfig(id, v.user, v.selfRolesJoined);
 		}
 		const start = Timer.start();
-		let res = await this.pool.query("SELECT * FROM users WHERE id=? LIMIT 1", [id]).then(v => (v as Array<RawUserConfig>)[0]);
-		const selfRolesJoined = await this.pool.query("SELECT * FROM selfrolesjoined WHERE user_id=?", [id]).then(v => (v as Array<RawSelfRoleJoined>));
+		let [res] = await Promise.all([
+			this.pool.query("SELECT * FROM users WHERE id=? LIMIT 1", [id]).then(v => (v as Array<RawUserConfig>)[0])
+		]);
+		const [selfRolesJoined] = await Promise.all([
+			this.pool.query("SELECT * FROM selfrolesjoined WHERE user_id=?", [id]).then<Array<RawSelfRoleJoined>>()
+		]);
 		if (res === undefined) {
 			await this.pool.query("INSERT INTO users (id) VALUES (?)", [id]);
 			Logger.getLogger("Database[MariaDB]").debug(`Created the user entry "${id}".`);
@@ -190,14 +194,18 @@ export default class db {
 			else return new GuildConfig(id, v.guild, v.prefix, v.selfRoles, v.levelRoles, v.tags, v.logEvents, v.disable, v.autoUnarchiveEntry);
 		}
 		const start = Timer.start();
-		let res = await this.pool.query("SELECT * FROM guilds WHERE id=? LIMIT 1", [id]).then(v => (v as Array<RawGuildConfig>)[0]);
-		let prefix = await this.pool.query("SELECT * FROM prefix WHERE guild_id=?", [id]).then(v => (v as Array<RawPrefix>));
-		const selfRoles = await this.pool.query("SELECT * FROM selfroles WHERE guild_id=?", [id]).then(v => (v as Array<RawSelfRole>));
-		const levelRoles = await this.pool.query("SELECT * FROM levelroles WHERE guild_id=?", [id]).then(v => (v as Array<RawLevelRole>));
-		const tags = await this.pool.query("SELECT * FROM tags WHERE guild_id=?", [id]).then(v => (v as Array<RawTag>));
-		const logEvents = await this.pool.query("SELECT * FROM logevents WHERE guild_id=?", [id]).then(v => (v as Array<RawLogEvent>));
-		const disable = await this.pool.query("SELECT * FROM disable WHERE guild_id=?", [id]).then(v => (v as Array<RawDisableEntry>));
-		const autoUnarchiveEntry = await this.pool.query("SELECT * FROM autounarchive WHERE guild_id=?", [id]).then(v => (v as Array<RawAutoUnarchiveEntry>));
+		let [res, prefix] = await Promise.all([
+			this.pool.query("SELECT * FROM guilds WHERE id=? LIMIT 1", [id]).then(v => (v as Array<RawGuildConfig>)[0]),
+			this.pool.query("SELECT * FROM prefix WHERE guild_id=?", [id]).then<Array<RawPrefix>>()
+		]);
+		const [selfRoles, levelRoles, tags, logEvents, disable, autoUnarchiveEntry] = await Promise.all([
+			this.pool.query("SELECT * FROM selfroles WHERE guild_id=?", [id]).then<Array<RawSelfRole>>(),
+			this.pool.query("SELECT * FROM levelroles WHERE guild_id=?", [id]).then<Array<RawLevelRole>>(),
+			this.pool.query("SELECT * FROM tags WHERE guild_id=?", [id]).then<Array<RawTag>>(),
+			this.pool.query("SELECT * FROM logevents WHERE guild_id=?", [id]).then<Array<RawLogEvent>>(),
+			this.pool.query("SELECT * FROM disable WHERE guild_id=?", [id]).then<Array<RawDisableEntry>>(),
+			this.pool.query("SELECT * FROM autounarchive WHERE guild_id=?", [id]).then<Array<RawAutoUnarchiveEntry>>()
+		]);
 		if (res === undefined) {
 			await this.pool.query("INSERT INTO guilds (id) VALUES (?)", [id]);
 			await this.pool.query("INSERT INTO prefix (id, guild_id, value, space) VALUES (?, ?, ?, ?)", [crypto.randomBytes(6).toString("hex"), id, defaultPrefix, true]);

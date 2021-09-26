@@ -127,7 +127,7 @@ export default class MaidBoye extends Eris.Client {
 		const commands = CommandHandler.commands.reduce<Array<Eris.ApplicationCommandStructure>>((a, b) => a.concat(...b.applicationCommands), []);
 
 		// due to not all categories being loaded before the help command
-		((commands.find(cmd => cmd.name === "help")! as ChatInputApplicationCommandStructure).options![0] as Eris.ApplicationCommandOptionsString).choices = CommandHandler.categories.map(cat => {
+		((commands.find(cmd => cmd.name === "help")! as ChatInputApplicationCommandStructure).options![0] as Eris.ApplicationCommandOptionsStringWithoutAutocomplete).choices = CommandHandler.categories.map(cat => {
 			if (cat.restrictions.includes("disabled") || cat.restrictions.includes("developer") || (cat.restrictions.includes("beta") && !beta)) return;
 			else return {
 				name: cat.displayName.text,
