@@ -6,6 +6,7 @@ import { emojis, yiffTypes } from "@config";
 import Eris from "eris";
 import GuildConfig from "@db/Models/Guild/GuildConfig";
 import { Strings } from "@uwu-codes/utils";
+import db from "@db";
 
 async function duplicate(originalMessage: ExtendedMessage, botMessage: Eris.Message<Eris.GuildTextableChannel>, name: string, value: string) {
 	await botMessage.edit({
@@ -38,6 +39,7 @@ async function duplicate(originalMessage: ExtendedMessage, botMessage: Eris.Mess
 }
 
 export type ExecReturn = [keepGoing: true, wait: boolean] | [keepGoing: false, wait: false];
+export const slashify = (str: string) => str.toLowerCase().replace(/\s/g, "-");
 
 const Settings = [
 	{
@@ -52,7 +54,21 @@ const Settings = [
 			type: "custom" as const
 		},
 		displayFormat(guild: GuildConfig) { return `\`${guild.settings.defaultYiffType}\``; },
-		validator(val: string, message: ExtendedMessage) { return yiffTypes.includes(val.toLowerCase() as "gay"); },
+		get slashCommandOptions() {
+			return [
+				{
+					type: Eris.Constants.ApplicationCommandOptionTypes.STRING,
+					name: "type",
+					description: "The default yiff type.",
+					choices: yiffTypes.map(t => ({
+						name: Strings.ucwords(t),
+						value: t
+					})),
+					required: true
+
+				}
+			] as Array<Eris.ApplicationCommandOptionsStringWithoutAutocomplete>;
+		},
 		async exec(originalMessage: ExtendedMessage, botMessage: Eris.Message<Eris.GuildTextableChannel>): Promise<ExecReturn> {
 			const b = JSON.parse<Eris.AdvancedMessageContent>(JSON.stringify({ embeds: botMessage.embeds, components: botMessage.components }));
 			await botMessage.edit({
@@ -117,6 +133,21 @@ const Settings = [
 				});
 				return [true, true];
 			}
+		},
+		async execSlash(interaction: Eris.CommandInteraction) {
+			if (!interaction.guildID || !interaction.member || interaction.data.options === undefined || interaction.data.options.length === 0) return;
+			const main = interaction.data.options.find(o => o.name === slashify(this.name)) as Eris.InteractionDataOptionsSubCommand;
+			if (!main || main.options === undefined || main.options.length === 0) return;
+			const type = main.options.find(o => o.name === "type");
+			if (!type || type.type !== Eris.Constants.ApplicationCommandOptionTypes.STRING) return;
+			const gConfig = await db.getGuild(interaction.guildID);
+			if (gConfig.settings.defaultYiffType === type.value) return interaction.createMessage(`H-hey! **${this.name}** is already set to \`${Strings.ucwords(type.value)}\`..`);
+			await gConfig.edit({
+				settings: {
+					defaultYiffType: type.value as GuildConfig["settings"]["defaultYiffType"]
+				}
+			});
+			return interaction.createMessage(`**${this.name}** was updated to \`${Strings.ucwords(type.value)}\`.`);
 		}
 	},
 	{
@@ -130,6 +161,30 @@ const Settings = [
 			type: "custom" as const
 		},
 		displayFormat(guild: GuildConfig) { return `\`${guild.settings.e621ThumbnailType}\``; },
+		get slashCommandOptions() {
+			return [
+				{
+					type: Eris.Constants.ApplicationCommandOptionTypes.STRING,
+					name: "type",
+					description: "The thumbnail type.",
+					choices: [
+						{
+							name: "Gif",
+							value: "gif"
+						},
+						{
+							name: "Image",
+							value: "image"
+						},
+						{
+							name: "None",
+							value: "none"
+						}
+					],
+					required: true
+				}
+			] as Array<Eris.ApplicationCommandOptionsStringWithoutAutocomplete>;
+		},
 		async exec(originalMessage: ExtendedMessage, botMessage: Eris.Message<Eris.GuildTextableChannel>): Promise<ExecReturn> {
 			const b = JSON.parse<Eris.AdvancedMessageContent>(JSON.stringify({ embeds: botMessage.embeds, components: botMessage.components }));
 			await botMessage.edit({
@@ -204,6 +259,21 @@ const Settings = [
 				});
 				return [true, true];
 			}
+		},
+		async execSlash(interaction: Eris.CommandInteraction) {
+			if (!interaction.guildID || !interaction.member || interaction.data.options === undefined || interaction.data.options.length === 0) return;
+			const main = interaction.data.options.find(o => o.name === slashify(this.name)) as Eris.InteractionDataOptionsSubCommand;
+			if (!main || main.options === undefined || main.options.length === 0) return;
+			const type = main.options.find(o => o.name === "type");
+			if (!type || type.type !== Eris.Constants.ApplicationCommandOptionTypes.STRING) return;
+			const gConfig = await db.getGuild(interaction.guildID);
+			if (gConfig.settings.e621ThumbnailType === type.value) return interaction.createMessage(`H-hey! **${this.name}** is already set to \`${Strings.ucwords(type.value)}\`..`);
+			await gConfig.edit({
+				settings: {
+					e621ThumbnailType: type.value as GuildConfig["settings"]["e621ThumbnailType"]
+				}
+			});
+			return interaction.createMessage(`**${this.name}** was updated to \`${Strings.ucwords(type.value)}\`.`);
 		}
 	},
 	{
@@ -216,10 +286,15 @@ const Settings = [
 			type: "default" as const
 		},
 		displayFormat(guild: GuildConfig) { return guild.settings.muteRole === null ? "`None`" : `<@&${guild.settings.muteRole}>`; },
-		validator(val: string, message: ExtendedMessage) {
-			if (val === "reset") return true;
-			const [id = null] = /^(?:<@&)?([\d]{15,21})>?$/.exec(val) ?? [];
-			return id === null ? false : message.channel.guild.roles.has(id);
+		get slashCommandOptions() {
+			return [
+				{
+					type: Eris.Constants.ApplicationCommandOptionTypes.ROLE,
+					name: "role",
+					description: "The role to use for mutes.",
+					required: true
+				}
+			] as Array<Eris.ApplicationCommandOptionsRole>;
 		},
 		async exec(originalMessage: ExtendedMessage, botMessage: Eris.Message<Eris.GuildTextableChannel>): Promise<ExecReturn> {
 			const b = JSON.parse<Eris.AdvancedMessageContent>(JSON.stringify({ embeds: botMessage.embeds, components: botMessage.components }));
@@ -338,18 +413,64 @@ const Settings = [
 				});
 				return [true, true];
 			}
+		},
+		async execSlash(interaction: Eris.CommandInteraction) {
+			if (!interaction.guildID || !interaction.member || interaction.data.options === undefined || interaction.data.options.length === 0) return;
+			const main = interaction.data.options.find(o => o.name === slashify(this.name)) as Eris.InteractionDataOptionsSubCommand;
+			if (!main || main.options === undefined || main.options.length === 0) return;
+			const type = main.options.find(o => o.name === "role");
+			if (!type || type.type !== Eris.Constants.ApplicationCommandOptionTypes.ROLE) return;
+			const gConfig = await db.getGuild(interaction.guildID);
+			if (gConfig.settings.muteRole === type.value) return interaction.createMessage({
+				content: `H-hey! **${this.name}** is already set to \`${type.value}\`..`,
+				allowedMentions: {
+					roles: false
+				}
+			});
+			await gConfig.edit({
+				settings: {
+					muteRole: type.value
+				}
+			});
+			return interaction.createMessage({
+				content: `**${this.name}** was updated to <@&${type.value}>.`,
+				allowedMentions: {
+					roles: false
+				}
+			});
 		}
 	},
 	{
 		name: "Command Images",
 		description: "if we should display images on some `fun` commands",
 		shortDescription: null,
-		validValuesDescription: "`enabled` or `disabled`",
+		validValuesDescription: "`yes` or `no`",
 		emoji: {
 			value: emojis.custom.thumb,
 			type: "custom" as const
 		},
 		displayFormat(guild: GuildConfig) { return `\`${guild.settings.commandImages ? "Enabled" : "Disabled"}\``; },
+		get slashCommandOptions() {
+			return [
+				{
+					type: Eris.Constants.ApplicationCommandOptionTypes.STRING,
+					name: "value",
+					description: "The option value.",
+					choices: [
+						{
+							name: "Enabled",
+							value: "enabled"
+						},
+						{
+							name: "Disabled",
+							value: "disabled"
+						}
+					],
+					required: true
+
+				}
+			] as Array<Eris.ApplicationCommandOptionsStringWithoutAutocomplete>;
+		},
 		async exec(originalMessage: ExtendedMessage, botMessage: Eris.Message<Eris.GuildTextableChannel>): Promise<ExecReturn> {
 			const b = JSON.parse<Eris.AdvancedMessageContent>(JSON.stringify({ embeds: botMessage.embeds, components: botMessage.components }));
 			await botMessage.edit({
@@ -400,7 +521,7 @@ const Settings = [
 				}
 				await originalMessage.gConfig.edit({
 					settings: {
-						commandImages: v === "enabled" ? true : false
+						commandImages: v === "enabled"
 					}
 				});
 				await botMessage.edit({
@@ -410,18 +531,53 @@ const Settings = [
 				});
 				return [true, true];
 			}
+		},
+		async execSlash(interaction: Eris.CommandInteraction) {
+			if (!interaction.guildID || !interaction.member || interaction.data.options === undefined || interaction.data.options.length === 0) return;
+			const main = interaction.data.options.find(o => o.name === slashify(this.name)) as Eris.InteractionDataOptionsSubCommand;
+			if (!main || main.options === undefined || main.options.length === 0) return;
+			const type = main.options.find(o => o.name === "value");
+			if (!type || type.type !== Eris.Constants.ApplicationCommandOptionTypes.STRING) return;
+			const gConfig = await db.getGuild(interaction.guildID);
+			if (gConfig.settings.commandImages === (type.value === "enabled")) return interaction.createMessage(`H-hey! **${this.name}** is already set to \`${Strings.ucwords(type.value)}\`..`);
+			await gConfig.edit({
+				settings: {
+					commandImages: type.value === "enabled"
+				}
+			});
+			return interaction.createMessage(`**${this.name}** was updated to \`${Strings.ucwords(type.value)}\`.`);
 		}
 	},
 	{
 		name: "Delete Mod Commands",
 		description: "if moderation invocations should be deleted",
 		shortDescription: null,
-		validValuesDescription: "`yes` or `no`",
+		validValuesDescription: "`enabled` or `disabled`",
 		emoji: {
 			value: emojis.default.pencil,
 			type: "default" as const
 		},
-		displayFormat(guild: GuildConfig) { return `\`${guild.settings.deleteModCommands ? "Yes" : "No"}\``; },
+		displayFormat(guild: GuildConfig) { return `\`${guild.settings.deleteModCommands ? "Enabled" : "Disabled"}\``; },
+		get slashCommandOptions() {
+			return [
+				{
+					type: Eris.Constants.ApplicationCommandOptionTypes.STRING,
+					name: "value",
+					description: "The option value.",
+					choices: [
+						{
+							name: "Enabled",
+							value: "enabled"
+						},
+						{
+							name: "Disabled",
+							value: "disabled"
+						}
+					],
+					required: true
+				}
+			] as Array<Eris.ApplicationCommandOptionsStringWithoutAutocomplete>;
+		},
 		async exec(originalMessage: ExtendedMessage, botMessage: Eris.Message<Eris.GuildTextableChannel>): Promise<ExecReturn> {
 			const b = JSON.parse<Eris.AdvancedMessageContent>(JSON.stringify({ embeds: botMessage.embeds, components: botMessage.components }));
 			await botMessage.edit({
@@ -436,8 +592,8 @@ const Settings = [
 					.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-back.${originalMessage.author.id}`, false, ComponentHelper.emojiToPartial(emojis.default.back, "default"), "Back")
 					.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-exit.${originalMessage.author.id}`, false, ComponentHelper.emojiToPartial(emojis.default.x, "default"), "Exit")
 					.addRow()
-					.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-yes.${originalMessage.author.id}`, false, ComponentHelper.emojiToPartial(emojis.custom.greenTick, "custom"), "Yes")
-					.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-no.${originalMessage.author.id}`, false, ComponentHelper.emojiToPartial(emojis.custom.redTick, "custom"), "No")
+					.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-enabled.${originalMessage.author.id}`, false, ComponentHelper.emojiToPartial(emojis.custom.greenTick, "custom"), "Enabled")
+					.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-disabled.${originalMessage.author.id}`, false, ComponentHelper.emojiToPartial(emojis.custom.redTick, "custom"), "Disabled")
 					.toJSON()
 			});
 			const wait = await originalMessage.channel.awaitComponentInteractions(6e4, (it) => it.data.custom_id.startsWith("settings-") && it.member!.user.id === originalMessage.author.id && it.message.id === botMessage.id);
@@ -463,8 +619,8 @@ const Settings = [
 					}
 				}
 
-				if ((originalMessage.gConfig.settings.deleteModCommands === false && v === "no") || (originalMessage.gConfig.settings.deleteModCommands === true && v === "yes")) {
-					const dup = await duplicate(originalMessage, botMessage, this.name, originalMessage.gConfig.settings.deleteModCommands ? "Yes" : "No");
+				if ((originalMessage.gConfig.settings.deleteModCommands === false && v === "disabled") || (originalMessage.gConfig.settings.deleteModCommands === true && v === "enabled")) {
+					const dup = await duplicate(originalMessage, botMessage, this.name, originalMessage.gConfig.settings.deleteModCommands ? "Enabled" : "Disabled");
 					if (dup === true) {
 						await botMessage.edit(b);
 						return [true, false];
@@ -472,13 +628,13 @@ const Settings = [
 					return [false, false];
 				}
 
-				if (v === "yes" && !originalMessage.channel.guild.permissionsOf(originalMessage.client.user.id).has("manageMessages")) {
+				if (v === "enabled" && !originalMessage.channel.guild.permissionsOf(originalMessage.client.user.id).has("manageMessages")) {
 					await botMessage.edit({
 						content: "",
 						embeds: [
 							new EmbedBuilder(true, originalMessage.author)
 								.setTitle("Server Settings")
-								.setDescription(`I need the **Manage Messages** permission to change **${this.name}** to **yes**.`)
+								.setDescription(`I need the **Manage Messages** permission to change **${this.name}** to **Enabled**.`)
 								.toJSON()
 						],
 						components: []
@@ -488,7 +644,7 @@ const Settings = [
 
 				await originalMessage.gConfig.edit({
 					settings: {
-						deleteModCommands: v === "yes" ? true : false
+						deleteModCommands: v === "enabled"
 					}
 				});
 				await botMessage.edit({
@@ -498,6 +654,21 @@ const Settings = [
 				});
 				return [true, true];
 			}
+		},
+		async execSlash(interaction: Eris.CommandInteraction) {
+			if (!interaction.guildID || !interaction.member || interaction.data.options === undefined || interaction.data.options.length === 0) return;
+			const main = interaction.data.options.find(o => o.name === slashify(this.name)) as Eris.InteractionDataOptionsSubCommand;
+			if (!main || main.options === undefined || main.options.length === 0) return;
+			const type = main.options.find(o => o.name === "value");
+			if (!type || type.type !== Eris.Constants.ApplicationCommandOptionTypes.STRING) return;
+			const gConfig = await db.getGuild(interaction.guildID);
+			if (gConfig.settings.deleteModCommands === (type.value === "enabled")) return interaction.createMessage(`H-hey! **${this.name}** is already set to \`${Strings.ucwords(type.value)}\`..`);
+			await gConfig.edit({
+				settings: {
+					deleteModCommands: type.value === "enabled"
+				}
+			});
+			return interaction.createMessage(`**${this.name}** was updated to \`${Strings.ucwords(type.value)}\`.`);
 		}
 	},
 	{
@@ -510,6 +681,26 @@ const Settings = [
 			type: "default" as const
 		},
 		displayFormat(guild: GuildConfig) { return `\`${guild.settings.snipeDisabled ? "Yes" : "No"}\``; },
+		get slashCommandOptions() {
+			return [
+				{
+					type: Eris.Constants.ApplicationCommandOptionTypes.STRING,
+					name: "value",
+					description: "The option value.",
+					choices: [
+						{
+							name: "Yes",
+							value: "yes"
+						},
+						{
+							name: "No",
+							value: "no"
+						}
+					],
+					required: true
+				}
+			] as Array<Eris.ApplicationCommandOptionsStringWithoutAutocomplete>;
+		},
 		async exec(originalMessage: ExtendedMessage, botMessage: Eris.Message<Eris.GuildTextableChannel>): Promise<ExecReturn> {
 			const b = JSON.parse<Eris.AdvancedMessageContent>(JSON.stringify({ embeds: botMessage.embeds, components: botMessage.components }));
 			await botMessage.edit({
@@ -560,7 +751,7 @@ const Settings = [
 				}
 				await originalMessage.gConfig.edit({
 					settings: {
-						snipeDisabled: v === "yes" ? true : false
+						snipeDisabled: v === "yes"
 					}
 				});
 				await botMessage.edit({
@@ -570,18 +761,53 @@ const Settings = [
 				});
 				return [true, true];
 			}
+		},
+		async execSlash(interaction: Eris.CommandInteraction) {
+			if (!interaction.guildID || !interaction.member || interaction.data.options === undefined || interaction.data.options.length === 0) return;
+			const main = interaction.data.options.find(o => o.name === slashify(this.name)) as Eris.InteractionDataOptionsSubCommand;
+			if (!main || main.options === undefined || main.options.length === 0) return;
+			const type = main.options.find(o => o.name === "value");
+			if (!type || type.type !== Eris.Constants.ApplicationCommandOptionTypes.STRING) return;
+			const gConfig = await db.getGuild(interaction.guildID);
+			if (gConfig.settings.snipeDisabled === (type.value === "yes")) return interaction.createMessage(`H-hey! **${this.name}** is already set to \`${Strings.ucwords(type.value)}\`..`);
+			await gConfig.edit({
+				settings: {
+					snipeDisabled: type.value === "yes"
+				}
+			});
+			return interaction.createMessage(`**${this.name}** was updated to \`${Strings.ucwords(type.value)}\`.`);
 		}
 	},
 	{
 		name: "Level Up Announcements",
 		description: "if level ups should be announced (in channel)",
 		shortDescription: null,
-		validValuesDescription: "`yes` or `no`",
+		validValuesDescription: "`enabled` or `disabled`",
 		emoji: {
 			value: emojis.default.pencil,
 			type: "default" as const
 		},
-		displayFormat(guild: GuildConfig) { return `\`${guild.settings.announceLevelUp ? "Yes" : "No"}\``; },
+		displayFormat(guild: GuildConfig) { return `\`${guild.settings.announceLevelUp ? "Enabled" : "Disabled"}\``; },
+		get slashCommandOptions() {
+			return [
+				{
+					type: Eris.Constants.ApplicationCommandOptionTypes.STRING,
+					name: "value",
+					description: "The option value.",
+					choices: [
+						{
+							name: "Enabled",
+							value: "enabled"
+						},
+						{
+							name: "Disabled",
+							value: "disabled"
+						}
+					],
+					required: true
+				}
+			] as Array<Eris.ApplicationCommandOptionsStringWithoutAutocomplete>;
+		},
 		async exec(originalMessage: ExtendedMessage, botMessage: Eris.Message<Eris.GuildTextableChannel>): Promise<ExecReturn> {
 			const b = JSON.parse<Eris.AdvancedMessageContent>(JSON.stringify({ embeds: botMessage.embeds, components: botMessage.components }));
 			await botMessage.edit({
@@ -595,8 +821,8 @@ const Settings = [
 					.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-back.${originalMessage.author.id}`, false, ComponentHelper.emojiToPartial(emojis.default.back, "default"), "Back")
 					.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-exit.${originalMessage.author.id}`, false, ComponentHelper.emojiToPartial(emojis.default.x, "default"), "Exit")
 					.addRow()
-					.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-yes.${originalMessage.author.id}`, false, ComponentHelper.emojiToPartial(emojis.custom.greenTick, "custom"), "Yes")
-					.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-no.${originalMessage.author.id}`, false, ComponentHelper.emojiToPartial(emojis.custom.redTick, "custom"), "No")
+					.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-enabled.${originalMessage.author.id}`, false, ComponentHelper.emojiToPartial(emojis.custom.greenTick, "custom"), "Enabled")
+					.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-disabled.${originalMessage.author.id}`, false, ComponentHelper.emojiToPartial(emojis.custom.redTick, "custom"), "Disabled")
 					.toJSON()
 			});
 			const wait = await originalMessage.channel.awaitComponentInteractions(6e4, (it) => it.data.custom_id.startsWith("settings-") && it.member!.user.id === originalMessage.author.id && it.message.id === botMessage.id);
@@ -622,8 +848,8 @@ const Settings = [
 					}
 				}
 
-				if ((originalMessage.gConfig.settings.announceLevelUp === false && v === "no") || (originalMessage.gConfig.settings.announceLevelUp === true && v === "yes")) {
-					const dup = await duplicate(originalMessage, botMessage, this.name, originalMessage.gConfig.settings.announceLevelUp ? "Yes" : "No");
+				if ((originalMessage.gConfig.settings.announceLevelUp === false && v === "disabled") || (originalMessage.gConfig.settings.announceLevelUp === true && v === "enabled")) {
+					const dup = await duplicate(originalMessage, botMessage, this.name, originalMessage.gConfig.settings.announceLevelUp ? "Enabled" : "Disabled");
 					if (dup === true) {
 						await botMessage.edit(b);
 						return [true, false];
@@ -632,7 +858,7 @@ const Settings = [
 				}
 				await originalMessage.gConfig.edit({
 					settings: {
-						announceLevelUp: v === "yes" ? true : false
+						announceLevelUp: v === "enabled"
 					}
 				});
 				await botMessage.edit({
@@ -642,6 +868,21 @@ const Settings = [
 				});
 				return [true, true];
 			}
+		},
+		async execSlash(interaction: Eris.CommandInteraction) {
+			if (!interaction.guildID || !interaction.member || interaction.data.options === undefined || interaction.data.options.length === 0) return;
+			const main = interaction.data.options.find(o => o.name === slashify(this.name)) as Eris.InteractionDataOptionsSubCommand;
+			if (!main || main.options === undefined || main.options.length === 0) return;
+			const type = main.options.find(o => o.name === "value");
+			if (!type || type.type !== Eris.Constants.ApplicationCommandOptionTypes.STRING) return;
+			const gConfig = await db.getGuild(interaction.guildID);
+			if (gConfig.settings.announceLevelUp === (type.value === "enabled")) return interaction.createMessage(`H-hey! **${this.name}** is already set to \`${Strings.ucwords(type.value)}\`..`);
+			await gConfig.edit({
+				settings: {
+					announceLevelUp: type.value === "enabled"
+				}
+			});
+			return interaction.createMessage(`**${this.name}** was updated to \`${Strings.ucwords(type.value)}\`.`);
 		}
 	}
 ];

@@ -5,6 +5,7 @@ import db from "@db";
 import ClientEvent from "@util/ClientEvent";
 import Logger from "@util/Logger";
 import Eris, { CommandInteraction } from "eris";
+import Settings, { slashify } from "@util/Settings";
 import util from "util";
 
 export default new ClientEvent("interactionCreate", async function(interaction) {
@@ -20,6 +21,16 @@ export default new ClientEvent("interactionCreate", async function(interaction) 
 				flags: 64
 			});
 			if (beta) Logger.getLogger("InteractionCreate").debug("new command interaction recieved:", util.inspect(interaction.data, { depth: 3, colors: true }));
+			if (interaction.data.name === "settings") {
+				if (interaction.data.options && interaction.data.options.length > 0) {
+					const setting = Settings.find(s => !!interaction.data.options!.find(o => slashify(s.name) === o.name));
+					if (setting) {
+						await interaction.acknowledge();
+						void setting.execSlash(interaction);
+					}
+					return;
+				}
+			}
 			await interaction.acknowledge();
 			const userMentions = [] as Array<string>, roleMentions = [] as Array<string>;
 			let content = "";

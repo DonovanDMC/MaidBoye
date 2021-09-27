@@ -4,16 +4,22 @@ import { emojis } from "@config";
 import ComponentHelper from "@util/components/ComponentHelper";
 import EmbedBuilder from "@util/EmbedBuilder";
 import chunk from "chunk";
-import Settings, { ExecReturn } from "@util/Settings";
+import Settings, { ExecReturn, slashify } from "@util/Settings";
 import MaidBoye from "@MaidBoye";
 import Eris, { DiscordRESTError } from "eris";
 import { Strings } from "@uwu-codes/utils";
+
 
 export default new Command("settings")
 	.setPermissions("bot", "embedLinks")
 	.setPermissions("user", "manageGuild")
 	.setDescription("manage this server's settings")
-	.addApplicationCommand(Eris.Constants.ApplicationCommandTypes.CHAT_INPUT, [])
+	.addApplicationCommand(Eris.Constants.ApplicationCommandTypes.CHAT_INPUT, Settings.map(set => ({
+		type: Eris.Constants.ApplicationCommandOptionTypes.SUB_COMMAND,
+		name: slashify(set.name),
+		description: set.description,
+		options: set.slashCommandOptions
+	})))
 	.setCooldown(3e3)
 	.setExecutor(async function(msg) {
 		try {
@@ -49,8 +55,7 @@ export default new Command("settings")
 						.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-exit.${msg.author.id}`, false, ComponentHelper.emojiToPartial(emojis.default.x, "default"), "Exit")
 						.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-next.${msg.author.id}`, page  === pages.length, ComponentHelper.emojiToPartial(emojis.default.next, "default"), "Next")
 						.toJSON()
-				// string (MessageContent) isn't assignable to InteractionPayload
-				} as Eris.AdvancedMessageContent;
+				} as Eris.InteractionContent;
 				if (id && token) await this.createInteractionResponse(id, token, { type: Eris.Constants.InteractionResponseTypes.UPDATE_MESSAGE, data: body });
 				else await m.edit(body);
 				const wait = await msg.channel.awaitComponentInteractions(6e4, (it) => it.data.custom_id.startsWith("settings-") && it.member!.user.id === msg.author.id && it.message.id === m.id);
@@ -147,7 +152,7 @@ export default new Command("settings")
 						return [false, false];
 					}
 					await wait.acknowledge();
-					const v = !wait.data || !("values" in wait.data) ? null : wait.data.values![0];
+					const v = !wait.data || !("values" in wait.data) ? null : wait.data.values[0];
 					if (wait.data.custom_id.includes("back")) return [true, false];
 					const n = Settings.find(s => s.name.replace(/\s/g, "-").toLowerCase() === v);
 					if (n === undefined) {

@@ -122,7 +122,7 @@ export default class MaidBoye extends Eris.Client {
 		}
 	}
 
-	async syncApplicationCommands(guild?: string, bypass = false) {
+	async syncApplicationCommands(guild?: string, bypass = false, filterNames?: Array<string>) {
 		const start = process.hrtime.bigint();
 		const commands = CommandHandler.commands.reduce<Array<Eris.ApplicationCommandStructure>>((a, b) => a.concat(...b.applicationCommands), []);
 
@@ -145,7 +145,7 @@ export default class MaidBoye extends Eris.Client {
 		}
 		fs.writeFileSync(`${dataDir}/slash.json`, JSON.stringify(commands));
 
-		return (guild === undefined ? this.bulkEditCommands(commands) : this.bulkEditGuildCommands(guild, commands))
+		return (guild === undefined ? this.bulkEditCommands(commands.filter(c => (!filterNames || filterNames.length === 0) || filterNames.includes(c.name))) : this.bulkEditGuildCommands(guild, commands.filter(c => (!filterNames || filterNames.length === 0) || filterNames.includes(c.name))))
 			.then(
 				({ length }) => {
 					const end = process.hrtime.bigint();
@@ -163,7 +163,7 @@ export default class MaidBoye extends Eris.Client {
 			);
 	}
 
-	async syncLiteApplicationCommands(guild?: string, bypass = false) {
+	async syncLiteApplicationCommands(guild?: string, bypass = false, filterNames?: Array<string>) {
 		const start = process.hrtime.bigint();
 		const commands = [
 			// since our help command is not stateless, we have to add a custom one
@@ -198,7 +198,7 @@ export default class MaidBoye extends Eris.Client {
 
 		return fetch(`https://discord.com/api/v9/applications/${liteClientInfo.id}${guild === undefined ? "/commands" : `/guilds/${guild}/commands`}`, {
 			method: "PUT",
-			body: JSON.stringify(commands),
+			body: JSON.stringify(commands.filter(c => (!filterNames || filterNames.length === 0) || filterNames.includes(c.name))),
 			headers: {
 				"Authorization": `Bearer ${token}`,
 				"User-Agent": userAgent,
