@@ -19,11 +19,17 @@ export default new Command("uinfo", "userinfo")
 	.addApplicationCommand(Eris.Constants.ApplicationCommandTypes.USER, "User Info")
 	.setCooldown(3e3)
 	.setExecutor(async function(msg) {
-		let user = msg.args.length === 0 ? msg.author : await msg.getUserFromArgs();
-		// @FIXME banners don't seem to be sent over gateway yet
-		if (user && (user.banner === undefined || user.accentColor === undefined)) user = await this.getUser(user.id, true);
+		const user = msg.args.length === 0 ? msg.author : await msg.getUserFromArgs();
 		if (user === null) return msg.reply("Th-that isn't a valid user..");
+		// @FIXME banners don't seem to be sent over gateway yet
+
+		let u = user;
+		if ((user.banner === undefined || user.accentColor === undefined)) u = await this.getUser(user.id, true).catch(() => null) as Eris.User;
+		const banner = user.banner ?? u.banner ?? null;
+		const accentColor = user.accentColor ?? u.accentColor ?? null;
+
 		const member = msg.channel.guild.members.get(user.id)!;
+		const target = member === undefined ? user : member;
 
 		let dRep: { id: string; upvotes: number; downvotes: number; xp: number; rank: string; staff: boolean; } | undefined, infr: { id: string; } & ({ type: "CLEAN";} | { type: "WARN" | "BAN"; reason: string; moderator: string; date: number; }) | undefined;
 		try {
@@ -55,7 +61,7 @@ export default new Command("uinfo", "userinfo")
 			amount++;
 			const k: Array<string> = [];
 			for (let i = 1; i < amount; i++) {
-				const d = n ? m.indexOf(user!.id) - i : m.indexOf(user!.id) + i;
+				const d = n ? m.indexOf(target.id) - i : m.indexOf(target.id) + i;
 				if (d < 0 || d > (m.length - 1)) continue;
 				else k.push(m[d]);
 			}
@@ -75,21 +81,22 @@ export default new Command("uinfo", "userinfo")
 				new EmbedBuilder()
 					.setAuthor(msg.author.tag, msg.author.avatarURL)
 					.setTitle(`User Info for ${user.tag}`)
-					.setThumbnail(user.avatarURL)
+					.setThumbnail(target.avatarURL)
 					.setDescription(
 						"**General User**:",
 						`${emojis.default.dot} Tag: **${user.tag}**`,
 						`${emojis.default.dot} ID: **${user.id}**`,
-						`${emojis.default.dot} Avatar: [[Link](${user.avatarURL})]`,
-						`${emojis.default.dot} Banner: ${user.banner === null ? "[None]" : `[[Link](${user.bannerURL!})] ${!user.accentColor ? "" : `(#${user.accentColor.toString(16)})`}`}`,
+						`${emojis.default.dot} Global Avatar: ${user.avatar === null ? "[None]" : `[[Link](${user.avatarURL})]`}`,
+						`${emojis.default.dot} Banner: ${banner === null ? "[None]" : `[[Link](${Object.getOwnPropertyDescriptor(Eris.User.prototype, "bannerURL")!.get!.call({ _client: this, id: target.id, banner }) as string}})] ${!accentColor ? "" : `(#${accentColor.toString(16)})`}`}`,
 						`${emojis.default.dot} Creation Date: ${BotFunctions.formatDiscordTime(user.createdAt, "long-datetime", true)}`,
 						member === undefined ? "" : [
 							"",
 							"**Server Member**:",
+							`${emojis.default.dot} Server Avatar: ${member.avatar === null ? "[None]" : `[[Link](${member.avatarURL})]`}`,
 							`${emojis.default.dot} Join Date: ${member.joinedAt === null ? "Unknown" : BotFunctions.formatDiscordTime(member.joinedAt, "long-datetime", true)}`,
 							`${emojis.default.dot} Roles: ${member.roles.length === 0 ? "**None**" : member.roles.reduce((a,b) => a + b.length + 4 /* <@&> */, 0) > 1500 ? "**Unable To Display Roles.**" : member.roles.map(r => `<@&${r}>`).join(" ")}`,
 							`${emojis.default.dot} Join Info:`,
-							...around.map(a => `${a === user!.id ? `- **[#${m.indexOf(a) + 1}]**` : `- [#${m.indexOf(a) + 1}]`} <@!${a}> (${BotFunctions.formatDiscordTime(msg.channel.guild.members.get(a)!.joinedAt!, "short-datetime", true)})`)
+							...around.map(a => `${a === target.id ? `- **[#${m.indexOf(a) + 1}]**` : `- [#${m.indexOf(a) + 1}]`} <@!${a}> (${BotFunctions.formatDiscordTime(msg.channel.guild.members.get(a)!.joinedAt!, "short-datetime", true)})`)
 						],
 						"",
 						`[**DiscordRep**](https://discordrep.com/u/${user.id}):`,

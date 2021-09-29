@@ -24,7 +24,7 @@ export default new ClientEvent("guildMemberUpdate", async function(guild, member
 				"This user changed their server specific avatar.",
 				"",
 				// eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-				`[Old Avatar](${Object.getOwnPropertyDescriptor(Eris.Member.prototype, "avatarURL")!.get!.call({ _client: this, id: member.id, avatar: oldMember.avatar })})`,
+				`${oldMember.avatar === null ? "[No Old Avatar]" : `[Old Avatar](${Object.getOwnPropertyDescriptor(Eris.Member.prototype, "avatarURL")!.get!.call({ _client: this, id: member.id, avatar: oldMember.avatar, guild: member.guild })})`}`,
 				`[New Avatar](${member.avatarURL})`
 			])
 			.toJSON()
