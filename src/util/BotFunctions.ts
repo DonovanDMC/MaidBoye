@@ -221,15 +221,14 @@ export default class BotFunctions {
 
 	static formatDiscordTime(time: number, flag: "short-time" | "long-time" | "short-date" | "long-date" | "short-datetime" | "long-datetime" | "relative" = "short-datetime", ms = false) {
 		if (ms) time = Math.floor(time / 1000);
-		return `<t:${time}:${
-			flag === "short-time" ? "t" :
-				flag === "long-time" ? "T" :
-					flag === "short-date" ? "d" :
-						flag === "long-date" ? "D" :
-							flag === "short-datetime" ? "f" :
-								flag === "long-datetime" ? "F" :
-									flag === "relative" ? "R" :
-										"f"}>`;
+		return `<t:${time}:${flag === "short-time" ? "t" :
+			flag === "long-time" ? "T" :
+				flag === "short-date" ? "d" :
+					flag === "long-date" ? "D" :
+						flag === "short-datetime" ? "f" :
+							flag === "long-datetime" ? "F" :
+								flag === "relative" ? "R" :
+									"f"}>`;
 	}
 
 	// @FIXME legacy code
@@ -278,7 +277,7 @@ export default class BotFunctions {
 	}
 
 	static async genericFunCommandWithImage(this: MaidBoye, msg: ExtendedMessage, cmd: Command, type: keyof typeof Yiffy["furry"] | "blep") {
-		if (![].some(v => cmd.triggers.includes(v)) && msg.args.length < 1)  return new CommandError("INVALID_USAGE", cmd);
+		if (![].some(v => cmd.triggers.includes(v)) && msg.args.length < 1) return new CommandError("INVALID_USAGE", cmd);
 		const r = funCommandResponses(msg)[cmd.triggers[0] as "hug"];
 
 		const embed = new EmbedBuilder(true, msg.author)
@@ -369,7 +368,6 @@ export default class BotFunctions {
 	}
 
 	static parseBit(d: BitData) {
-		// @ts-ignore -- mariadb bit types suck
 		return Object.keys(d).includes("0") ? Number(d) :
 			"toJSON" in d ? d.toJSON().data[0] :
 				"data" in d ? d.data[0] :

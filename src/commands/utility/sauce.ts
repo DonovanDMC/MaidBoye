@@ -100,7 +100,10 @@ export default new Command("sauce")
 						type = s.type;
 					} else {
 						try {
-							post = await E621.getPostByMD5(v);
+							const p = await E621.getPostByMD5(v).catch(err => err as Error);
+							console.log(p instanceof APIError);
+							if (p instanceof Error) throw p;
+							else post = p;
 						} catch (err) {
 							if (err instanceof APIError) {
 								Logger.getLogger(`SauceCommand[${msg.channel.guild.id}]`).error(err);

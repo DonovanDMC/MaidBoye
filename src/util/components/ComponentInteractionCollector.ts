@@ -42,7 +42,6 @@ export default class ComponentInteractionCollector {
 			this.collectors.push({
 				channel: channelId,
 				filter,
-				// @ts-ignore idk
 				resolve,
 				limit: limit || 1,
 				interactions: [],

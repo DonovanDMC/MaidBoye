@@ -4,6 +4,7 @@ import EmbedBuilder from "@util/EmbedBuilder";
 import BotFunctions from "@util/BotFunctions";
 import fetch from "node-fetch";
 import Eris from "eris";
+import ComponentHelper from "@util/components/ComponentHelper";
 
 export default new Command("uinfo", "userinfo")
 	.setPermissions("bot", "embedLinks", "attachFiles")
@@ -108,6 +109,9 @@ export default new Command("uinfo", "userinfo")
 					)
 					.setImage(user.bannerURL ?? "")
 					.toJSON()
-			]
+			],
+			components: new ComponentHelper()
+				.addURLButton(`discord://owowhatsthis/users/${user.id}`, false, undefined, "Open Profile")
+				.toJSON()
 		});
 	});
