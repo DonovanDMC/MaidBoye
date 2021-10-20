@@ -1,5 +1,5 @@
-import E621 from "../../util/req/E621";
-import Logger from "../../util/Logger";
+import E621 from "@util/req/E621";
+import Logger from "@util/Logger";
 import SauceNAO from "@util/req/SauceNAO";
 import Command from "@cmd/Command";
 import Eris from "eris";

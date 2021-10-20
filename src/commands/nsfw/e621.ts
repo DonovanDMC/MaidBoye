@@ -3,7 +3,7 @@ import EmbedBuilder from "@util/EmbedBuilder";
 import { apiKeys, developers, emojis, userAgent } from "@config";
 import Eris, { DiscordRESTError } from "eris";
 import ComponentHelper from "@util/components/ComponentHelper";
-import MaidBoye from "@MaidBoye";
+import type MaidBoye from "@MaidBoye";
 import E621 from "@util/req/E621";
 import fetch from "node-fetch";
 import Logger from "@util/Logger";
@@ -62,7 +62,7 @@ export default new Command("e621", "e6")
 			const tags = Array.from(msg.rawArgs).map(t => t.toLowerCase());
 			if (!tags.find(t => t.includes("order:"))) tags.push("order:favcount");
 			if (["cub", "young"].some(v => tags.includes(v))) return msg.reply("H-hey! You tried using a blacklisted tag, don't do that!");
-			const unfilteredPosts = await E621.getPosts(tags, 100);
+			const unfilteredPosts = await E621.posts.search({ tags, limit: 100 });
 			if (unfilteredPosts.length === 0) return msg.reply("H-hey! We didn't find any results with what you provided..");
 			const filterWebm = msg.dashedArgs.value.includes("no-video");
 			const filterFlash = msg.dashedArgs.value.includes("no-flash");
