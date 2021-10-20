@@ -26,7 +26,7 @@ async function sauce(url: string, msg: ExtendedMessage) {
 	}
 	let post: Post | null = null;
 	try {
-		post = await E621.getPostById(Number(s[0].raw.data.e621_id!)).catch(() => null);
+		post = await E621.posts.get(Number(s[0].raw.data.e621_id!)).catch(() => null);
 	} catch (err) {
 		if (err instanceof APIError) {
 			Logger.getLogger(`SauceCommand[${msg.channel.guild.id}]`).error(err);
@@ -100,10 +100,7 @@ export default new Command("sauce")
 						type = s.type;
 					} else {
 						try {
-							const p = await E621.getPostByMD5(v).catch(err => err as Error);
-							console.log(p instanceof APIError);
-							if (p instanceof Error) throw p;
-							else post = p;
+							post = await E621.posts.getByMD5(v);
 						} catch (err) {
 							if (err instanceof APIError) {
 								Logger.getLogger(`SauceCommand[${msg.channel.guild.id}]`).error(err);
