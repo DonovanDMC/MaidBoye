@@ -2,7 +2,7 @@ import ClientEvent from "@util/ClientEvent";
 import EmbedBuilder from "@util/EmbedBuilder";
 import GuildConfig from "@db/Models/Guild/GuildConfig";
 import BotFunctions from "@util/BotFunctions";
-import Eris from "eris";
+import type Eris from "eris";
 import * as fs from "fs-extra";
 import { apiURL, bulkDeleteDir } from "@config";
 import crypto from "crypto";

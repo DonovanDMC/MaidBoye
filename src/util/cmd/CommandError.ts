@@ -1,4 +1,4 @@
-import Command from "./Command";
+import type Command from "./Command";
 
 export default class CommandError extends Error {
 	cmd: Command;

@@ -4,13 +4,19 @@ import Logger from "@util/Logger";
 import EmbedBuilder from "@util/EmbedBuilder";
 import ComponentHelper from "@util/components/ComponentHelper";
 import Eris from "eris";
-import { Internal, Request, Strings, Time, Utility } from "@uwu-codes/utils";
+import {
+	Internal,
+	Request,
+	Strings,
+	Time,
+	Utility
+} from "@uwu-codes/utils";
 import Timer from "@util/Timer";
 import BotFunctions from "@util/BotFunctions";
 import CommandHandler from "@util/cmd/CommandHandler";
 import UserConfig from "@db/Models/User/UserConfig";
 import GuildConfig from "@db/Models/Guild/GuildConfig";
-import MaidBoye from "@MaidBoye";
+import type MaidBoye from "@MaidBoye";
 import * as config from "@config";
 import util from "util";
 

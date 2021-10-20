@@ -1,4 +1,4 @@
-import MaidBoye from "../../main";
+import type MaidBoye from "../../main";
 import Route from "../Route";
 import { beta } from "@config";
 import CommandHandler from "@util/cmd/CommandHandler";

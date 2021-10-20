@@ -18,7 +18,7 @@ import MessageCollector from "./MessageCollector";
 import ComponentInteractionCollector from "./components/ComponentInteractionCollector";
 import Eris from "eris";
 import sauce from "source-map-support";
-import MaidBoye from "@MaidBoye";
+import type MaidBoye from "@MaidBoye";
 import BotFunctions from "@util/BotFunctions";
 sauce.install({ hookRequire: true });
 

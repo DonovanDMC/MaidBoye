@@ -3,7 +3,7 @@ import db from "@db";
 import GuildConfig from "@db/Models/Guild/GuildConfig";
 import EmbedBuilder from "@util/EmbedBuilder";
 import { Strings } from "@uwu-codes/utils";
-import Eris from "eris";
+import type Eris from "eris";
 import BotFunctions from "@util/BotFunctions";
 const Redis = db.r;
 

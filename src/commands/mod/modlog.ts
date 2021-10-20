@@ -1,5 +1,5 @@
 import EmbedBuilder from "../../util/EmbedBuilder";
-import MaidBoye from "@MaidBoye";
+import type MaidBoye from "@MaidBoye";
 import Command from "@cmd/Command";
 import { botIcon, emojis, guildDefaults, names } from "@config";
 import CommandError from "@cmd/CommandError";
@@ -9,7 +9,7 @@ import ComponentInteractionCollector from "@util/components/ComponentInteraction
 import Eris, { DiscordRESTError } from "eris";
 import { Request } from "@uwu-codes/utils";
 import FileType from "file-type";
-import GuildConfig from "@db/Models/Guild/GuildConfig";
+import type GuildConfig from "@db/Models/Guild/GuildConfig";
 import ErrorHandler from "@util/handlers/ErrorHandler";
 
 export default new Command("modlog")

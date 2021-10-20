@@ -1,6 +1,7 @@
-import GenericEntry, { RawGenericEntry } from "./GenericEntry";
-import GuildConfig from "../GuildConfig";
-import { DataTypes } from "@uwu-codes/types";
+import type { RawGenericEntry } from "./GenericEntry";
+import GenericEntry from "./GenericEntry";
+import type GuildConfig from "../GuildConfig";
+import type { DataTypes } from "@uwu-codes/types";
 
 export interface RawUnLockDownEntry extends RawGenericEntry {
 	type: "unlockdown";

@@ -1,5 +1,5 @@
-import UserConfig from "./UserConfig";
-import { DataTypes } from "@uwu-codes/types";
+import type UserConfig from "./UserConfig";
+import type { DataTypes } from "@uwu-codes/types";
 
 export interface RawSelfRoleJoined {
 	id: string;

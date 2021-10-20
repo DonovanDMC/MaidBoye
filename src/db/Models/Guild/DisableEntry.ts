@@ -1,7 +1,7 @@
-import GuildConfig from "./GuildConfig";
-import { BitData } from "../../../util/@types/MariaDB";
+import type GuildConfig from "./GuildConfig";
+import type { BitData } from "../../../util/@types/MariaDB";
 import BotFunctions from "../../../util/BotFunctions";
-import { DataTypes } from "@uwu-codes/types";
+import type { DataTypes } from "@uwu-codes/types";
 
 export interface RawDisableEntry {
 	id: string;

@@ -1,10 +1,12 @@
-import GenericEntry, { RawGenericEntry } from "./GenericEntry";
-import GuildConfig from "../GuildConfig";
-import { DataTypes } from "@uwu-codes/types";
-import Eris from "eris";
-import MaidBoye from "@MaidBoye";
+import type { RawGenericEntry } from "./GenericEntry";
+import GenericEntry from "./GenericEntry";
+import type GuildConfig from "../GuildConfig";
+import type { DataTypes } from "@uwu-codes/types";
+import type Eris from "eris";
+import type MaidBoye from "@MaidBoye";
 import db from "@db";
-import TimedEntry, { RawTimedEntry } from "@db/Models/TimedEntry";
+import type { RawTimedEntry } from "@db/Models/TimedEntry";
+import TimedEntry from "@db/Models/TimedEntry";
 
 export interface RawBanEntry extends RawGenericEntry {
 	type: "ban";

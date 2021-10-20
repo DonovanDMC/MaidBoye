@@ -2,14 +2,14 @@ import Command from "@cmd/Command";
 import db from "@db";
 import EmbedBuilder from "@util/EmbedBuilder";
 import ComponentHelper from "@util/components/ComponentHelper";
-import MaidBoye from "@MaidBoye";
+import type MaidBoye from "@MaidBoye";
 import Eris, { DiscordRESTError } from "eris";
 import chunk from "chunk";
 import { emojis } from "@config";
 import BotFunctions from "@util/BotFunctions";
 import { Strings } from "@uwu-codes/utils";
 import WarnEntry from "@db/Models/Guild/ModLog/WarnEntry";
-import { AnyEntry } from "@db/Models/Guild/ModLog/All";
+import type { AnyEntry } from "@db/Models/Guild/ModLog/All";
 import ModLogHandler from "@util/handlers/ModLogHandler";
 import ErrorHandler from "@util/handlers/ErrorHandler";
 

@@ -1,6 +1,6 @@
 import { Colors } from "./Constants";
 import { botIcon } from "@config";
-import { User, EmbedField, EmbedOptions } from "eris";
+import type { User, EmbedField, EmbedOptions } from "eris";
 
 export default class EmbedBuilder {
 	private json: EmbedOptions;

@@ -1,5 +1,12 @@
 import "./util/MonkeyPatch";
-import { isPterodactyl, isWSL, wslVersion, clientInfo, clientOptions, beta } from "./config";
+import {
+	isPterodactyl,
+	isWSL,
+	wslVersion,
+	clientInfo,
+	clientOptions,
+	beta
+} from "./config";
 import MaidBoye from "./main";
 import Logger from "@util/Logger";
 import { Time } from "@uwu-codes/utils";

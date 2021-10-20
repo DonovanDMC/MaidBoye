@@ -1,5 +1,5 @@
-import MaidBoye from "../main";
-import Eris from "eris";
+import type MaidBoye from "../main";
+import type Eris from "eris";
 
 export default class MessageCollector {
 	static client: MaidBoye;
@@ -36,7 +36,7 @@ export default class MessageCollector {
 			this.collectors.push({
 				channel: channelId,
 				filter,
-				// @ts-ignore idk
+				// @ts-expect-error generics
 				resolve,
 				limit: limit || 1,
 				messages: [],

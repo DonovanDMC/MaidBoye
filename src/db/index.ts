@@ -1,20 +1,23 @@
 // eslint-disable-next-line @typescript-eslint/triple-slash-reference
 /// <reference path="../util/@types/Node.d.ts" />
-import GuildConfig, { RawGuildConfig } from "./Models/Guild/GuildConfig";
-import UserConfig, { RawUserConfig } from "./Models/User/UserConfig";
-import { RawSelfRole } from "./Models/Guild/SelfRole";
-import { RawSelfRoleJoined } from "./Models/User/SelfRoleJoined";
-import { RawPrefix } from "./Models/Guild/Prefix";
-import { RawTag } from "./Models/Guild/Tag";
-import { RawLogEvent } from "./Models/Guild/LogEvent";
-import { RawDisableEntry } from "./Models/Guild/DisableEntry";
-import { RawLevelRole } from "./Models/Guild/LevelRole";
-import { RawAutoUnarchiveEntry } from "./Models/Guild/AutoUnarchiveEntry";
+import type { RawGuildConfig } from "./Models/Guild/GuildConfig";
+import GuildConfig from "./Models/Guild/GuildConfig";
+import type { RawUserConfig } from "./Models/User/UserConfig";
+import UserConfig from "./Models/User/UserConfig";
+import type { RawSelfRole } from "./Models/Guild/SelfRole";
+import type { RawSelfRoleJoined } from "./Models/User/SelfRoleJoined";
+import type { RawPrefix } from "./Models/Guild/Prefix";
+import type { RawTag } from "./Models/Guild/Tag";
+import type { RawLogEvent } from "./Models/Guild/LogEvent";
+import type { RawDisableEntry } from "./Models/Guild/DisableEntry";
+import type { RawLevelRole } from "./Models/Guild/LevelRole";
+import type { RawAutoUnarchiveEntry } from "./Models/Guild/AutoUnarchiveEntry";
 import Logger from "@util/Logger";
 import { beta, defaultPrefix, services } from "@config";
 import IORedis from "ioredis";
 import Timer from "@util/Timer";
-import mariadb, { Pool } from "mariadb";
+import type { Pool } from "mariadb";
+import mariadb from "mariadb";
 import crypto from "crypto";
 
 export

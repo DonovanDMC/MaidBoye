@@ -1,9 +1,10 @@
-import GuildConfig from "../GuildConfig";
-import { DataTypes } from "@uwu-codes/types";
-import MaidBoye from "@MaidBoye";
-import Eris from "eris";
+import type GuildConfig from "../GuildConfig";
+import type { DataTypes } from "@uwu-codes/types";
+import type MaidBoye from "@MaidBoye";
+import type Eris from "eris";
 import db from "@db";
-import Strike, { RawStrike } from "@db/Models/Strike";
+import type { RawStrike } from "@db/Models/Strike";
+import Strike from "@db/Models/Strike";
 
 export interface RawGenericEntry {
 	id: string;

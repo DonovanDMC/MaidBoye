@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-import Category from "./Category";
-import Command from "./Command";
+import type Category from "./Category";
+import type Command from "./Command";
 import Logger from "../Logger";
 import * as fs from "fs-extra";
 import { Strings } from "@uwu-codes/utils";

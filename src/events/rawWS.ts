@@ -1,7 +1,8 @@
 import ClientEvent from "@util/ClientEvent";
 import Logger from "@util/Logger";
-import { GatewayDispatchEvents, GatewayGuildCreateDispatchData, GatewayOpcodes } from "discord-api-types";
-import { VoiceServerUpdate, VoiceStateUpdate } from "lavalink";
+import type { GatewayDispatchEvents, GatewayGuildCreateDispatchData } from "discord-api-types";
+import { GatewayOpcodes } from "discord-api-types";
+import type { VoiceServerUpdate, VoiceStateUpdate } from "lavalink";
 import StatsHandler from "@util/handlers/StatsHandler";
 import EventsASecondHandler from "@util/handlers/EventsASecondHandler";
 import db from "@db";

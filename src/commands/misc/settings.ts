@@ -4,8 +4,9 @@ import { emojis } from "@config";
 import ComponentHelper from "@util/components/ComponentHelper";
 import EmbedBuilder from "@util/EmbedBuilder";
 import chunk from "chunk";
-import Settings, { ExecReturn, slashify } from "@util/Settings";
-import MaidBoye from "@MaidBoye";
+import type { ExecReturn } from "@util/Settings";
+import Settings, { slashify } from "@util/Settings";
+import type MaidBoye from "@MaidBoye";
 import Eris, { DiscordRESTError } from "eris";
 import { Strings } from "@uwu-codes/utils";
 

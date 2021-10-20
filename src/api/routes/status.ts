@@ -1,5 +1,5 @@
 import Route from "../Route";
-import MaidBoye from "@MaidBoye";
+import type MaidBoye from "@MaidBoye";
 import { beta } from "@config";
 
 export default class StatusRoute extends Route {

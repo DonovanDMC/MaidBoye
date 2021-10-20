@@ -6,8 +6,8 @@ import EmbedBuilder from "@util/EmbedBuilder";
 import BotFunctions from "@util/BotFunctions";
 import Eris from "eris";
 import { Strings } from "@uwu-codes/utils";
-import MaidBoye from "@MaidBoye";
-import ExtendedMessage from "@util/ExtendedMessage";
+import type MaidBoye from "@MaidBoye";
+import type ExtendedMessage from "@util/ExtendedMessage";
 
 export function getInfo(this: MaidBoye, msg: Eris.Message<Eris.GuildTextableChannel>) {
 	const eHome = new EmbedBuilder().setAuthor(msg.author.tag, msg.author.avatarURL);

@@ -1,4 +1,4 @@
-import { DataTypes } from "@uwu-codes/types";
+import type { DataTypes } from "@uwu-codes/types";
 
 export interface RawStrike {
 	id: string;

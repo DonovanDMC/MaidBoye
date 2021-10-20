@@ -1,10 +1,12 @@
 import { beta } from "../config";
 import CommandHandler from "../util/cmd/CommandHandler";
-import ComponentInteractionHandler, { ComponentInteractionType } from "../events/components/main";
+import type { ComponentInteractionType } from "../events/components/main";
+import ComponentInteractionHandler from "../events/components/main";
 import db from "@db";
 import ClientEvent from "@util/ClientEvent";
 import Logger from "@util/Logger";
-import Eris, { CommandInteraction } from "eris";
+import type { CommandInteraction } from "eris";
+import Eris from "eris";
 import Settings, { slashify } from "@util/Settings";
 import util from "util";
 
@@ -85,7 +87,7 @@ export default new ClientEvent("interactionCreate", async function(interaction) 
 				}
 			}
 			const msg = new Eris.Message({
-				// @ts-ignore fake messages don't have ids
+				// @ts-expect-error fake messages don't have ids
 				id: null,
 				channel_id: interaction.channel.id,
 				guild_id: interaction.guildID,

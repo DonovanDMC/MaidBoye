@@ -1,16 +1,35 @@
-import SelfRoleJoined, { RawSelfRoleJoined } from "./SelfRoleJoined";
-import Strike, { RawStrike, StrikeGroup } from "../Strike";
-import { AnyRawEntry, BanEntry, ClearWarningsEntry, DeleteWarningEntry, KickEntry, LockDownEntry, LockEntry, MuteEntry, SoftBanEntry, UnBanEntry, UnLockDownEntry, UnLockEntry, UnMuteEntry, WarnEntry } from "../Guild/ModLog/All";
-import GuildConfig from "../Guild/GuildConfig";
-import Warning, { RawWarning } from "../Warning";
+import type { RawSelfRoleJoined } from "./SelfRoleJoined";
+import SelfRoleJoined from "./SelfRoleJoined";
+import type { RawStrike } from "../Strike";
+import Strike, { StrikeGroup } from "../Strike";
+import type { AnyRawEntry } from "../Guild/ModLog/All";
+import {
+	BanEntry,
+	ClearWarningsEntry,
+	DeleteWarningEntry,
+	KickEntry,
+	LockDownEntry,
+	LockEntry,
+	MuteEntry,
+	SoftBanEntry,
+	UnBanEntry,
+	UnLockDownEntry,
+	UnLockEntry,
+	UnMuteEntry,
+	WarnEntry
+} from "../Guild/ModLog/All";
+import type GuildConfig from "../Guild/GuildConfig";
+import type { RawWarning } from "../Warning";
+import Warning from "../Warning";
 import WebhookStore from "../../../util/WebhookStore";
 import EmbedBuilder from "../../../util/EmbedBuilder";
 import BotFunctions from "../../../util/BotFunctions";
-import Blacklist, { RawUserBlacklist, UserBlacklist } from "../Blacklist";
+import type { RawUserBlacklist } from "../Blacklist";
+import Blacklist, { UserBlacklist } from "../Blacklist";
 import db from "@db";
 import Logger from "@util/Logger";
-import { DataTypes, DeepPartial, Writeable } from "@uwu-codes/types";
-import { CountResponse, OkPacket } from "@util/@types/MariaDB";
+import type { DataTypes, DeepPartial, Writeable } from "@uwu-codes/types";
+import type { CountResponse, OkPacket } from "@util/@types/MariaDB";
 import crypto from "crypto";
 
 export interface RawUserConfig {

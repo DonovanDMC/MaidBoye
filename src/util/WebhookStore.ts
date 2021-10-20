@@ -1,7 +1,8 @@
 import DebugEvent from "../events/debug";
 import { botIcon, webhooks } from "@config";
-import Eris, { GuildTextableChannel, Message, WebhookPayload } from "eris";
-import MaidBoye from "@MaidBoye";
+import type { GuildTextableChannel, Message, WebhookPayload } from "eris";
+import Eris from "eris";
+import type MaidBoye from "@MaidBoye";
 
 interface WebhookInfo {
 	id: string;

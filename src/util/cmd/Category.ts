@@ -1,4 +1,4 @@
-import Command from "./Command";
+import type Command from "./Command";
 import CommandHandler from "./CommandHandler";
 import path from "path";
 

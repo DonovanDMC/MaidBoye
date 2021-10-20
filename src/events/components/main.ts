@@ -1,5 +1,5 @@
-import MaidBoye from "@MaidBoye";
-import Eris from "eris";
+import type MaidBoye from "@MaidBoye";
+import type Eris from "eris";
 import * as fs from "fs-extra";
 
 export type ComponentInteractionType = Omit<Eris.ComponentInteraction<Eris.GuildTextableChannel>, "member" | "user" | "message" | "channel">

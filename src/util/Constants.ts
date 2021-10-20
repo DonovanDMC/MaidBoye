@@ -1,4 +1,4 @@
-import Eris from "eris";
+import type Eris from "eris";
 
 export const Colors = {
 	bot: 0xA7A4AA,

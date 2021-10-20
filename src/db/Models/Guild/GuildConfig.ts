@@ -1,27 +1,44 @@
-import SelfRole, { RawSelfRole } from "./SelfRole";
-import Prefix, { RawPrefix } from "./Prefix";
-import Tag, { RawTag, TagKV } from "./Tag";
+import type { RawSelfRole } from "./SelfRole";
+import SelfRole from "./SelfRole";
+import type { RawPrefix } from "./Prefix";
+import Prefix from "./Prefix";
+import type { RawTag, TagKV } from "./Tag";
+import Tag from "./Tag";
+import type { AnyRawEntry } from "./ModLog/All";
 import {
-	AnyRawEntry,
-	BanEntry, ClearWarningsEntry, DeleteWarningEntry,
-	KickEntry, LockDownEntry, LockEntry,
-	MuteEntry, SoftBanEntry, UnBanEntry,
-	UnLockDownEntry, UnLockEntry, UnMuteEntry,
+	BanEntry,
+	ClearWarningsEntry,
+	DeleteWarningEntry,
+	KickEntry,
+	LockDownEntry,
+	LockEntry,
+	MuteEntry,
+	SoftBanEntry,
+	UnBanEntry,
+	UnLockDownEntry,
+	UnLockEntry,
+	UnMuteEntry,
 	WarnEntry
 } from "./ModLog/All";
-import LogEvent, { RawLogEvent } from "./LogEvent";
-import DisableEntry, { AnyDisableEntry, RawDisableEntry } from "./DisableEntry";
-import LevelRole, { RawLevelRole } from "./LevelRole";
-import Blacklist, { GuildBlacklist, RawGuildBlacklist } from "../Blacklist";
+import type { RawLogEvent } from "./LogEvent";
+import LogEvent from "./LogEvent";
+import type { AnyDisableEntry, RawDisableEntry } from "./DisableEntry";
+import DisableEntry from "./DisableEntry";
+import type { RawLevelRole } from "./LevelRole";
+import LevelRole from "./LevelRole";
+import type { RawGuildBlacklist } from "../Blacklist";
+import Blacklist, { GuildBlacklist } from "../Blacklist";
 import WebhookStore from "@util/WebhookStore";
 import EmbedBuilder from "@util/EmbedBuilder";
-import { BooleanData, OkPacket } from "@util/@types/MariaDB";
-import { DataTypes, DeepPartial, SomePartial, Writeable } from "@uwu-codes/types";
+import type { BooleanData, OkPacket } from "@util/@types/MariaDB";
+import type { DataTypes, DeepPartial, SomePartial, Writeable } from "@uwu-codes/types";
 import BotFunctions from "@util/BotFunctions";
-import { defaultPrefix, yiffTypes } from "@config";
+import type { yiffTypes } from "@config";
+import { defaultPrefix } from "@config";
 import db from "@db";
 import { Collection } from "@augu/collections";
-import AutoUnarchiveEntry, { RawAutoUnarchiveEntry } from "@db/Models/Guild/AutoUnarchiveEntry";
+import type { RawAutoUnarchiveEntry } from "@db/Models/Guild/AutoUnarchiveEntry";
+import AutoUnarchiveEntry from "@db/Models/Guild/AutoUnarchiveEntry";
 import * as crypto from "crypto";
 
 export interface RawGuildConfig {
@@ -290,7 +307,7 @@ export default class GuildConfig {
 
 	static async getLogEvents(id: string, type?: LogEvent["event"], includeAll = true) {
 		return db.query(`SELECT * FROM logevents WHERE guild_id=?${type !== undefined ? ` AND (event = ?${includeAll === true ? " OR event = \"all\"" : ""}` : ""})`, type === undefined ? [id] : [id, type]).then((d: Array<RawLogEvent>) => d.map(l => {
-			// @ts-ignore this saves several db queries (getting the full guild info)
+			// @ts-expect-error this saves several db queries (getting the full guild info)
 			const v = new LogEvent(l, null);
 			// we have to override delete because of the way this function works
 			Object.defineProperty(v, "delete", {

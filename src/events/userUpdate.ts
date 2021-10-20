@@ -14,8 +14,8 @@ export default new ClientEvent("userUpdate", async function(user, oldUser) {
 			`Member: ${user.tag} (<@!${user.id}>)`,
 			"This user changed their accent color."
 		])
-		.addField("Old Accent Color", `${oldUser.accentColor === null ? "[NONE]" : oldUser.accentColor}`, false)
-		.addField("New Accent Color", `${user.accentColor === null ? "[NONE]" : user.accentColor}`, false)
+		.addField("Old Accent Color", `${!oldUser.accentColor ? "[NONE]" : oldUser.accentColor}`, false)
+		.addField("New Accent Color", `${!user.accentColor ? "[NONE]" : user.accentColor}`, false)
 		.toJSON()
 	);
 

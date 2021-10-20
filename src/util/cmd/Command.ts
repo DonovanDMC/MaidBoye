@@ -1,9 +1,9 @@
 import CommandHandler from "./CommandHandler";
-import MaidBoye from "../../main";
-import ExtendedMessage from "../ExtendedMessage";
-import { ArrayOneOrMore } from "@uwu-codes/types";
+import type MaidBoye from "../../main";
+import type ExtendedMessage from "../ExtendedMessage";
+import type { ArrayOneOrMore } from "@uwu-codes/types";
 import Eris from "eris";
-import { Permissions } from "@util/Constants";
+import type { Permissions } from "@util/Constants";
 
 export type CommandRestrictions = "beta" | "developer" | "nsfw";
 export default class Command {

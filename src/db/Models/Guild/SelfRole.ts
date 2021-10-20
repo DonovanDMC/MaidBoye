@@ -1,5 +1,5 @@
-import GuildConfig from "./GuildConfig";
-import { DataTypes } from "@uwu-codes/types";
+import type GuildConfig from "./GuildConfig";
+import type { DataTypes } from "@uwu-codes/types";
 
 export interface RawSelfRole {
 	id: string;

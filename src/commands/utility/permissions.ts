@@ -1,7 +1,8 @@
 import Command from "@cmd/Command";
 import Eris from "eris";
 import EmbedBuilder from "@util/EmbedBuilder";
-import { DeprecatedPermissions, deprecatedPermissions, FakePermissions, fakePermissions, Permissions } from "@util/Constants";
+import type { DeprecatedPermissions, FakePermissions, Permissions } from "@util/Constants";
+import { deprecatedPermissions, fakePermissions } from "@util/Constants";
 import { permissionNames } from "@config";
 
 export default new Command("permissions", "perms")

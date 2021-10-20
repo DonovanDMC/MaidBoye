@@ -1,6 +1,6 @@
 import Command from "@cmd/Command";
 import { apiKeys, emojis, userAgent } from "@config";
-import MaidBoye from "@MaidBoye";
+import type MaidBoye from "@MaidBoye";
 import ComponentHelper from "@util/components/ComponentHelper";
 import EmbedBuilder from "@util/EmbedBuilder";
 import { Strings } from "@uwu-codes/utils";

@@ -1,4 +1,10 @@
-import { apiKeys, developers, emojis, names, userAgent } from "@config";
+import {
+	apiKeys,
+	developers,
+	emojis,
+	names,
+	userAgent
+} from "@config";
 import Command from "@cmd/Command";
 import EmbedBuilder from "@util/EmbedBuilder";
 import BotFunctions from "@util/BotFunctions";

@@ -1,7 +1,12 @@
 import Command from "@cmd/Command";
-import { devLink, kofiLink, supportLink, twitterLink, websiteLink } from "@config";
+import {
+	devLink,
+	kofiLink,
+	supportLink,
+	twitterLink,
+	websiteLink
+} from "@config";
 import ComponentHelper from "@util/components/ComponentHelper";
-import EmbedBuilder from "@util/EmbedBuilder";
 import Eris from "eris";
 
 export default new Command("links", "support", "invite", "inv")

@@ -1,7 +1,7 @@
 import ClientEvent from "@util/ClientEvent";
 import EmbedBuilder from "@util/EmbedBuilder";
 import { Time } from "@uwu-codes/utils";
-import Eris from "eris";
+import type Eris from "eris";
 import BotFunctions from "@util/BotFunctions";
 import db from "@db";
 

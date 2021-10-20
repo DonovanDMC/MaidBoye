@@ -2,10 +2,10 @@ import ComponentInteractionHandler from "../main";
 import Yiffy from "@util/req/Yiffy";
 import EmbedBuilder from "@util/EmbedBuilder";
 import ComponentHelper from "@util/components/ComponentHelper";
-import { JSONResponse } from "yiffy";
+import type { JSONResponse } from "yiffy";
 import BotFunctions from "@util/BotFunctions";
 import { Strings } from "@uwu-codes/utils";
-import GuildConfig from "@db/Models/Guild/GuildConfig";
+import type GuildConfig from "@db/Models/Guild/GuildConfig";
 
 ComponentInteractionHandler
 	.registerHandler("yiff-newimg-", false, async function handler(interaction) {

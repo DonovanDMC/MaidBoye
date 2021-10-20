@@ -3,7 +3,7 @@ import EmbedBuilder from "@util/EmbedBuilder";
 import { Time } from "@uwu-codes/utils";
 import GuildConfig from "@db/Models/Guild/GuildConfig";
 import BotFunctions from "@util/BotFunctions";
-import Eris from "eris";
+import type Eris from "eris";
 import { names } from "@config";
 
 export default new ClientEvent("channelCreate", async function(channel) {

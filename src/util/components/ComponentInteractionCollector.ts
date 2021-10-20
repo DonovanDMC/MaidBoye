@@ -1,4 +1,4 @@
-import MaidBoye from "@MaidBoye";
+import type MaidBoye from "@MaidBoye";
 import Eris from "eris";
 export default class ComponentInteractionCollector {
 	static client: MaidBoye;

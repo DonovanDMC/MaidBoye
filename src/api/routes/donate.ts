@@ -1,15 +1,12 @@
 
 import Route from "../Route";
-import {
-	apiKeys,
-	emojis,
-	botIcon
-} from "@config";
-import MaidBoye from "@MaidBoye";
+import { apiKeys, emojis, botIcon } from "@config";
+import type MaidBoye from "@MaidBoye";
 import WebhookStore from "@util/WebhookStore";
 import EmbedBuilder from "@util/EmbedBuilder";
 import db from "@db";
-import UserConfig, { RawUserConfig } from "@db/Models/User/UserConfig";
+import type { RawUserConfig } from "@db/Models/User/UserConfig";
+import UserConfig from "@db/Models/User/UserConfig";
 
 interface KoFiDonation {
 	message_id: string;

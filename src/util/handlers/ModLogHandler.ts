@@ -1,15 +1,17 @@
 import db from "../../db";
 import GuildConfig from "../../db/Models/Guild/GuildConfig";
-import MaidBoye from "../../main";
-import Eris from "eris";
+import type MaidBoye from "../../main";
+import type Eris from "eris";
 import EmbedBuilder from "@util/EmbedBuilder";
 import { botIcon } from "@config";
 import { Time } from "@uwu-codes/utils";
 import Logger from "@util/Logger";
-import { CountResponse, OkPacket } from "@util/@types/MariaDB";
-import TimedEntry, { RawTimedEntry } from "@db/Models/TimedEntry";
+import type { CountResponse, OkPacket } from "@util/@types/MariaDB";
+import type { RawTimedEntry } from "@db/Models/TimedEntry";
+import TimedEntry from "@db/Models/TimedEntry";
 import UserConfig from "@db/Models/User/UserConfig";
-import { AnyEntry, RawBanEntry, RawMuteEntry, UnBanEntry, UnLockDownEntry, UnLockEntry, UnMuteEntry } from "@db/Models/Guild/ModLog/All";
+import type { AnyEntry, RawBanEntry, RawMuteEntry } from "@db/Models/Guild/ModLog/All";
+import { UnBanEntry, UnLockDownEntry, UnLockEntry, UnMuteEntry } from "@db/Models/Guild/ModLog/All";
 import crypto from "crypto";
 
 export default class ModLogHandler {

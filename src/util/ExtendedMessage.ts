@@ -1,13 +1,15 @@
 
-import Command from "./cmd/Command";
+import type Command from "./cmd/Command";
 import CommandHandler from "./cmd/CommandHandler";
 import BotFunctions from "./BotFunctions";
-import GuildConfig from "../db/Models/Guild/GuildConfig";
-import UserConfig from "../db/Models/User/UserConfig";
-import MaidBoye from "../main";
+import type GuildConfig from "../db/Models/Guild/GuildConfig";
+import type UserConfig from "../db/Models/User/UserConfig";
+import type MaidBoye from "../main";
 import db from "../db";
 import { defaultPrefix } from "@config";
-import Eris, { Member, Message } from "eris";
+import type { Member } from "eris";
+import type Eris from "eris";
+import { Message } from "eris";
 import { parse } from "discord-command-parser";
 import { Strings } from "@uwu-codes/utils";
 

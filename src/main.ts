@@ -1,23 +1,38 @@
 import ClientEvent from "./util/ClientEvent";
 import Logger from "./util/Logger";
 import db from "./db";
-import Category from "./util/cmd/Category";
+import type Category from "./util/cmd/Category";
 import CommandHandler from "./util/cmd/CommandHandler";
 import MessageCollector from "./util/MessageCollector";
 import CheweyAPI from "./util/req/CheweyAPI";
 import ComponentInteractionHandler from "./events/components/main";
 import { Strings, Utility } from "@uwu-codes/utils";
-import Eris, { ChatInputApplicationCommandStructure } from "eris";
+import type { ChatInputApplicationCommandStructure } from "eris";
+import Eris from "eris";
 import * as fs from "fs-extra";
-import { Node } from "lavalink";
+import type { Node } from "lavalink";
 import ModLogHandler from "@util/handlers/ModLogHandler";
 import YiffRocks from "yiff-rocks";
 import AntiSpam from "@util/cmd/AntiSpam";
 import ComponentInteractionCollector from "@util/components/ComponentInteractionCollector";
 import Timer from "@util/Timer";
 import fetch from "node-fetch";
-import { RESTPostOAuth2ClientCredentialsResult } from "discord-api-types";
-import { antiSpamDir, assetsDir, beta, bulkDeleteDir, commandsDir, dataDir, errorsDir, eventsDir, liteClientInfo, mainLogsDir, notesDir, tempDir, userAgent } from "@config";
+import type { RESTPostOAuth2ClientCredentialsResult } from "discord-api-types";
+import {
+	antiSpamDir,
+	assetsDir,
+	beta,
+	bulkDeleteDir,
+	commandsDir,
+	dataDir,
+	errorsDir,
+	eventsDir,
+	liteClientInfo,
+	mainLogsDir,
+	notesDir,
+	tempDir,
+	userAgent
+} from "@config";
 import { performance } from "perf_hooks";
 import util from "util";
 
@@ -83,9 +98,8 @@ export default class MaidBoye extends Eris.Client {
 		const loadWhitelist: Array<string> | null = null;
 		const list = await fs.readdir(commandsDir).then(v => v.map(ev => `${commandsDir}/${ev}`));
 		for (const loc of list) {
-			// @ts-ignore -- fuck off
 			// eslint-disable-next-line @typescript-eslint/no-unsafe-call
-			if (beta && (Array.isArray(loadWhitelist) && !loadWhitelist.includes(loc.split("/").slice(-1)[0]))) continue;
+			if (beta && (Array.isArray(loadWhitelist) && !(loadWhitelist as Array<string>).includes(loc.split("/").slice(-1)[0]))) continue;
 			const { default: cat } = (await import(loc)) as { default: Category; };
 			CommandHandler.registerCategory(cat);
 			CommandHandler.loadCategoryCommands(cat.name, cat.dir);

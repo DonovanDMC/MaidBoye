@@ -1,5 +1,6 @@
 import { clientInfo, mainLogsDir } from "@config";
-import { ILogObject, Logger as TSLog } from "tslog";
+import type { ILogObject } from "tslog";
+import { Logger as TSLog } from "tslog";
 import * as fs from "fs-extra";
 import { Time } from "@uwu-codes/utils";
 

@@ -1,8 +1,9 @@
-import GenericEntry, { RawGenericEntry } from "./GenericEntry";
-import GuildConfig from "../GuildConfig";
-import { DataTypes } from "@uwu-codes/types";
-import MaidBoye from "@MaidBoye";
-import Eris from "eris";
+import type { RawGenericEntry } from "./GenericEntry";
+import GenericEntry from "./GenericEntry";
+import type GuildConfig from "../GuildConfig";
+import type { DataTypes } from "@uwu-codes/types";
+import type MaidBoye from "@MaidBoye";
+import type Eris from "eris";
 import db from "@db";
 import Warning from "@db/Models/Warning";
 
@@ -28,6 +29,8 @@ export default class WarnEntry extends GenericEntry {
 	}
 
 	async getWarning() {
+		// reporting an error that isn't happening here
+		// eslint-disable-next-line
 		return db.query("SELECT * FROM warnings WHERE warning_id=?", [this.warningId]).then(([res]) => new Warning(res));
 	}
 }

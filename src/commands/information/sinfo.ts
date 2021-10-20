@@ -3,7 +3,7 @@ import Command from "@cmd/Command";
 import EmbedBuilder from "@util/EmbedBuilder";
 import Eris from "eris";
 import ComponentHelper from "@util/components/ComponentHelper";
-import MaidBoye from "@MaidBoye";
+import type MaidBoye from "@MaidBoye";
 import BotFunctions from "@util/BotFunctions";
 
 export async function generateSections(this: MaidBoye,guild: Eris.Guild, author: Eris.User) {

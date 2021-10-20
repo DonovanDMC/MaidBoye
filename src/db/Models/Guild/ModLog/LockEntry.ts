@@ -1,8 +1,9 @@
-import GenericEntry, { RawGenericEntry } from "./GenericEntry";
-import GuildConfig from "../GuildConfig";
-import { DataTypes } from "@uwu-codes/types";
-import Eris from "eris";
-import MaidBoye from "@MaidBoye";
+import type { RawGenericEntry } from "./GenericEntry";
+import GenericEntry from "./GenericEntry";
+import type GuildConfig from "../GuildConfig";
+import type { DataTypes } from "@uwu-codes/types";
+import type Eris from "eris";
+import type MaidBoye from "@MaidBoye";
 
 export interface RawLockEntry extends RawGenericEntry {
 	type: "lock";

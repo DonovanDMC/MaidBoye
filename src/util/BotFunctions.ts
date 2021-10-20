@@ -1,16 +1,25 @@
 import EmbedBuilder from "./EmbedBuilder";
-import Command from "./cmd/Command";
-import ExtendedMessage from "./ExtendedMessage";
+import type Command from "./cmd/Command";
+import type ExtendedMessage from "./ExtendedMessage";
 import Yiffy from "./req/Yiffy";
 import CommandError from "./cmd/CommandError";
-import { AntiSpamEntry } from "./cmd/AntiSpam";
+import type { AntiSpamEntry } from "./cmd/AntiSpam";
 import TempFiles from "./handlers/TempFiles";
-import { BitData } from "./@types/MariaDB";
+import type { BitData } from "./@types/MariaDB";
 import GuildConfig from "../db/Models/Guild/GuildConfig";
-import Eris, { GuildAuditLogEntry } from "eris";
+import type { GuildAuditLogEntry } from "eris";
+import Eris from "eris";
 import { Strings } from "@uwu-codes/utils";
-import MaidBoye from "@MaidBoye";
-import { antiSpamDir, apiURL, beta, emojis, levelingFlatRate, levelingFlatRateStart, levelingStartRate } from "@config";
+import type MaidBoye from "@MaidBoye";
+import {
+	antiSpamDir,
+	apiURL,
+	beta,
+	emojis,
+	levelingFlatRate,
+	levelingFlatRateStart,
+	levelingStartRate
+} from "@config";
 import * as fs from "fs-extra";
 import crypto from "crypto";
 

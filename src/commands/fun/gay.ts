@@ -2,7 +2,7 @@ import Command from "@cmd/Command";
 import EmbedBuilder from "@util/EmbedBuilder";
 import Logger from "@util/Logger";
 import DankMemerAPI from "@util/req/DankMemerAPI";
-import { MemeRequestResponse } from "dankmemerapi";
+import type { MemeRequestResponse } from "dankmemerapi";
 import Eris from "eris";
 
 export default new Command("gay")
