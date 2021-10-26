@@ -4,6 +4,7 @@
   "buildDate": null,
   "description": "A cute little maid bot for keeping your server nice and tidy.",
   "main": "index.js",
+  "private": true,
   "dependencies": {
     "@augu/collections": "^1.1.0",
     "@uwu-codes/utils": "^1.0.55",
