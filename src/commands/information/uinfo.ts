@@ -94,7 +94,7 @@ export default new Command("uinfo", "userinfo")
 						`${emojis.default.dot} Tag: **${user.tag}**`,
 						`${emojis.default.dot} ID: **${user.id}**`,
 						`${emojis.default.dot} Global Avatar: ${user.avatar === null ? "[None]" : `[[Link](${user.avatarURL})]`}`,
-						`${emojis.default.dot} Banner: ${banner === null ? "[None]" : `[[Link](${Object.getOwnPropertyDescriptor(Eris.User.prototype, "bannerURL")!.get!.call({ _client: this, id: target.id, banner }) as string}})] ${!accentColor ? "" : `(#${accentColor.toString(16)})`}`}`,
+						`${emojis.default.dot} Banner: ${banner === null ? "[None]" : `[[Link](${Object.getOwnPropertyDescriptor(Eris.User.prototype, "bannerURL")!.get!.call({ _client: this, id: target.id, banner }) as string})] ${!accentColor ? "" : `(#${accentColor.toString(16)})`}`}`,
 						`${emojis.default.dot} Creation Date: ${BotFunctions.formatDiscordTime(user.createdAt, "long-datetime", true)}`,
 						member === undefined ? "" : [
 							"",
