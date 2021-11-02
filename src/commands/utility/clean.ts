@@ -17,7 +17,7 @@ export default new Command("clean", "clear", "prune", "purge")
 	.setUsage("<2-1000>")
 	.setCooldown(5e3)
 	.setExecutor(async function(msg) {
-		if (msg.args.length === 0) return msg.reply(`H-hey! You have to provide some arguments, silly.. See \`${msg.gConfig.getFormattedPrefix()}clean help\` for help`);
+		if (msg.args.length === 0) return msg.reply(`H-hey! You have to provide some arguments, silly.. See \`${msg.gConfig.getFormattedPrefix()}help clean\` for help`);
 		const amount = Number(msg.args[0]);
 		if (amount < 2) return msg.reply("H-hey! You have to provide a number 2 or higher!");
 		if (amount > 1000) return msg.reply("H-hey! You have to provide a number 1000 or lower!");

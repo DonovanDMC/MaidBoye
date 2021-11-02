@@ -100,6 +100,6 @@ export default new Command("autounarchive", "autounarch")
 				break;
 			}
 
-			default: return msg.reply(`H-hey! You have to provide some arguments, silly.. See \`${msg.gConfig.getFormattedPrefix()}autounarchive help\` for help`);
+			default: return msg.reply(`H-hey! You have to provide some arguments, silly.. See \`${msg.gConfig.getFormattedPrefix()}help autounarchive\` for help`);
 		}
 	});
