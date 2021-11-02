@@ -86,7 +86,7 @@ export default new Command("tag", "tags")
 	])
 	.setCooldown(3e3)
 	.setExecutor(async function(msg) {
-		const sub = msg.rawArgs.length === 0 ? "help" : msg.rawArgs[0].toLowerCase();
+		const sub = msg.rawArgs.length === 0 ? "help" : msg.rawArgs[0]?.toLowerCase();
 		switch (sub) {
 			case "create": {
 				if (msg.gConfig.tags.size >= 50) return msg.reply("H-hey! This server has hit the tag limit (50).. Either delete some to make more, or contact a developer.");
@@ -208,9 +208,9 @@ export default new Command("tag", "tags")
 			}
 
 			default: {
-				let name = msg.args[0].toLowerCase();
+				let name = msg.rawArgs[0]?.toLowerCase();
 				// this is mainly for slash command support
-				if (name === "get") name = msg.args[1].toLowerCase();
+				if (name === "get") name = msg.rawArgs[1]?.toLowerCase();
 				if (!name) return msg.reply(`Y-you have to specify a tag name or sub commend.. Use \`${msg.gConfig.getFormattedPrefix(0)}tag help\` if you need help.`);
 				const t = msg.gConfig.tags.find(tag => tag.name === name);
 				if (!t) return msg.reply(`I-I couldn't find a tag with the name "${name}".. Use \`${msg.gConfig.getFormattedPrefix(0)}tag help\` if you need help.`);
