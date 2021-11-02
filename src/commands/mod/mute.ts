@@ -88,7 +88,7 @@ export default new Command("mute")
 		if (["higher","same"].includes(compareMe)) return msg.reply("Th-that user is higher than, or as high as my highest role.. I cannot mute them");
 		if (member.roles.includes(r.id)) return msg.reply("Th-that member is already muted..");
 
-		let time = Time.parseTime2(msg.args.slice(1)[msg.args.length - 1]), reason: string | null = null;
+		let time = Time.parseTime2(msg.args.slice(-1)[0]), reason: string | null = null;
 		if (msg.args.length !== 1) {
 			if (time === 0) {
 				time = Time.parseTime2(msg.args.join(" "));
