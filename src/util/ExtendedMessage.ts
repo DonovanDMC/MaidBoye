@@ -39,9 +39,8 @@ export default class ExtendedMessage extends Message<Eris.GuildTextableChannel> 
 				// interaction message isn't a real message
 				if (typeof content !== "string" && content.messageReference) delete content.messageReference;
 				return self.cmdInteracton.createFollowup({
-					...(typeof content === "string" ? { content } : content),
-					file
-				}) as Promise<Eris.Message<Eris.TextChannel>>;
+					...(typeof content === "string" ? { content } : content)
+				}, file) as Promise<Eris.Message<Eris.TextChannel>>;
 				// eslint-disable-next-line deprecation/deprecation
 			} else return self.client.createMessage.call(self.client, this.id, content, file) as Promise<Eris.Message<Eris.TextChannel>>;
 		};
