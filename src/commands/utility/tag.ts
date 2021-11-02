@@ -120,7 +120,6 @@ export default new Command("tag", "tags")
 				if (msg.args.length === 1) return msg.reply("H-hey! You have to provide a name for the tag..");
 				if (msg.args.length === 2) return msg.reply("H-hey! You have to provide some content for the tag..");
 				if (["create", "modify", "delete", "list", "help", "get"].includes(msg.rawArgs[1].toLowerCase())) return msg.reply(`H-hey! That name (**${msg.rawArgs[1].toLowerCase()}**) is a blacklisted name, you can't use it..`);
-				if (msg.gConfig.tags.map(t => t.name).includes(msg.rawArgs[1].toLowerCase())) return msg.reply("H-hey! A tag already exists with that name..");
 				const t = msg.gConfig.tags.find(tag => tag.name === msg.rawArgs[1].toLowerCase());
 				if (!t) return msg.reply(`I couldn't find a tag with the name "${msg.rawArgs[1].toLowerCase()}"..`);
 				const content = msg.rawArgs.slice(2).join(" ");
