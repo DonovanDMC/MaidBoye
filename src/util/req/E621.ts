@@ -13,9 +13,6 @@ export const YiffyV3 = new E6({
 	userAgent,
 	instanceHost: "yiff.rest",
 	instancePort: 443,
-	instanceSSL: true,
-	staticHost: "v3.yiff.media",
-	staticPort: 443,
-	staticSSL: true
+	instanceSSL: true
 });
 export default E621;
