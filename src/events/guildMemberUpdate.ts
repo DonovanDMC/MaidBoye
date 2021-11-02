@@ -66,7 +66,7 @@ export default new ClientEvent("guildMemberUpdate", async function(guild, member
 			.setColor("gold")
 			.setDescription([
 				`Member: **${member.tag}** (<@!${member.id}>)`,
-				"This user had some roles were updated.",
+				"This users roles were updated.",
 				"(+ = added, - = removed)",
 				"",
 				"**Changes**:",
