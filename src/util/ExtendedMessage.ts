@@ -64,6 +64,7 @@ export default class ExtendedMessage extends Message<Eris.GuildTextableChannel> 
 		// console.log(p);
 
 		if (p.success === false) return false;
+		console.log(p);
 
 		this.args = p.arguments;
 		this.rawArgs = p.body.split(" ");
@@ -72,7 +73,7 @@ export default class ExtendedMessage extends Message<Eris.GuildTextableChannel> 
 		if (this.prefix.replace(/!/g, "") === `<@${this.client.user.id}`) this.prefix = this.gConfig.prefix[0].value;
 		this.cmd = CommandHandler.getCommand(p.command);
 		if (this.cmd !== null) {
-			const flags = Strings.parseFlags(this.args.join(" "), (name) => this.cmd!.parsedFlags.includes(name));
+			const flags = Strings.parseFlags(this.args.map(a => a.includes(" ") ? `"${a}"` : a).join(" "), (name) => this.cmd!.parsedFlags.includes(name));
 			this.dashedArgs.keyValue = flags.keyValue;
 			this.dashedArgs.value = flags.value;
 			this.args = flags.normalArgs;
