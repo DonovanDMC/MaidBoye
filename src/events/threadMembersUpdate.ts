@@ -3,16 +3,8 @@ import EmbedBuilder from "@util/EmbedBuilder";
 import GuildConfig from "@models/Guild/GuildConfig";
 import LoggingWebhookFailureHandler from "@handlers/LoggingWebhookFailureHandler";
 
-export default new ClientEvent("threadMembersUpdate", async function(thread, removedMembers, addedMembers) {
-	// waiting on pr updates
-	if (
-		removedMembers === undefined ||
-		addedMembers === undefined ||
-		(
-			removedMembers.filter(Boolean).length === 0 &&
-			addedMembers.filter(Boolean).length === 0
-		)
-	) return;
+export default new ClientEvent("threadMembersUpdate", async function(thread, addedMembers, removedMembers) {
+	if (removedMembers.filter(Boolean).length === 0 && addedMembers.filter(Boolean).length === 0) return;
 	if (!("guild" in thread)) return;
 
 	if (addedMembers.length > 0) {
