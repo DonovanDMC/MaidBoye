@@ -1,6 +1,6 @@
 {
   "name": "maidboye",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "buildDate": null,
   "description": "A cute little maid bot for keeping your server nice and tidy.",
   "main": "index.js",
