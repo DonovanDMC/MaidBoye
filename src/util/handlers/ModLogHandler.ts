@@ -91,7 +91,7 @@ export default class ModLogHandler {
 						`Target: <@${target.id}> (\`${target.tag}\`)`,
 						`Reason: **${reason ?? "None Provided"}**`,
 						`Message Delete Days: **${deleteDays}**`,
-						`Time: **${time === 0 ? "Permanent" : Time.ms(time, true, true, false)}** (id: \`${timedId!}\`)`
+						`Time: **${time === 0 ? "Permanent" : `${Time.ms(time, true, true, false)}** (id: \`${timedId!}\`)`}`
 					)
 					.setColor("red")
 					.setFooter(`Action Performed ${blame === null ? "Automatically" : `By ${blame.tag}`}`, blame === null ? botIcon : blame.avatarURL)
@@ -238,7 +238,7 @@ export default class ModLogHandler {
 					.setDescription(
 						`Target: <@${target.id}> (\`${target.tag}\`)`,
 						`Reason: **${reason ?? "None Provided"}**`,
-						`Time: **${time === 0 ? "Permanent" : Time.ms(time, true, true, false)}** (id: \`${timedId!}\`)`
+						`Time: **${time === 0 ? "Permanent" : `${Time.ms(time, true, true, false)}** (id: \`${timedId!}\`)`}`
 					)
 					.setColor("red")
 					.setFooter(`Action Performed ${blame === null ? "Automatically" : `By ${blame.tag}`}`, blame === null ? botIcon : blame.avatarURL)
