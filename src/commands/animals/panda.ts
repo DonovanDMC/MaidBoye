@@ -6,11 +6,11 @@ import Eris from "eris";
 
 export default new Command("panda")
 	.setPermissions("bot", "embedLinks")
-	.setDescription("Get an image of an owl!")
+	.setDescription("Get an image of a panda!")
 	.addApplicationCommand(Eris.Constants.ApplicationCommandTypes.CHAT_INPUT, [])
 	.setCooldown(3e3)
 	.setExecutor(async function(msg) {
-		const img = await CheweyAPI.owl();
+		const img = await CheweyAPI.panda();
 		if (!img) return msg.reply("The image api returned an error..");
 		return msg.reply({
 			embeds: [
