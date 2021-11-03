@@ -2,6 +2,7 @@ import ClientEvent from "@util/ClientEvent";
 import EmbedBuilder from "@util/EmbedBuilder";
 import GuildConfig from "@db/Models/Guild/GuildConfig";
 import BotFunctions from "@util/BotFunctions";
+import LoggingWebhookFailureHandler from "@util/handlers/LoggingWebhookFailureHandler";
 import type Eris from "eris";
 import * as fs from "fs-extra";
 import { apiURL, bulkDeleteDir } from "@config";
@@ -18,7 +19,7 @@ export default new ClientEvent("messageDeleteBulk", async function(messages: Arr
 	for (const log of logEvents) {
 		const hook = await this.getWebhook(log.webhook.id, log.webhook.token).catch(() => null);
 		if (hook === null || !hook.token) {
-			await log.delete();
+			void LoggingWebhookFailureHandler.tick(log);
 			continue;
 		}
 

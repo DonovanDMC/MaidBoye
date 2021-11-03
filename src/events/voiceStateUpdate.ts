@@ -3,6 +3,7 @@ import GuildConfig from "@db/Models/Guild/GuildConfig";
 import EmbedBuilder from "@util/EmbedBuilder";
 import type Eris from "eris";
 import BotFunctions from "@util/BotFunctions";
+import LoggingWebhookFailureHandler from "@util/handlers/LoggingWebhookFailureHandler";
 
 export default new ClientEvent("voiceStateUpdate", async function(member, oldState) {
 
@@ -10,7 +11,7 @@ export default new ClientEvent("voiceStateUpdate", async function(member, oldSta
 	for (const log of logEvents) {
 		const hook = await this.getWebhook(log.webhook.id, log.webhook.token).catch(() => null);
 		if (hook === null || !hook.token) {
-			await log.delete();
+			void LoggingWebhookFailureHandler.tick(log);
 			continue;
 		}
 

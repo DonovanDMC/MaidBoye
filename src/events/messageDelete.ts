@@ -4,6 +4,7 @@ import EmbedBuilder from "@util/EmbedBuilder";
 import { Strings } from "@uwu-codes/utils";
 import GuildConfig from "@db/Models/Guild/GuildConfig";
 import BotFunctions from "@util/BotFunctions";
+import LoggingWebhookFailureHandler from "@util/handlers/LoggingWebhookFailureHandler";
 const Redis = db.r;
 
 export default new ClientEvent("messageDelete", async function(message) {
@@ -27,7 +28,7 @@ export default new ClientEvent("messageDelete", async function(message) {
 	for (const log of logEvents) {
 		const hook = await this.getWebhook(log.webhook.id, log.webhook.token).catch(() => null);
 		if (hook === null || !hook.token) {
-			await log.delete();
+			void LoggingWebhookFailureHandler.tick(log);
 			continue;
 		}
 

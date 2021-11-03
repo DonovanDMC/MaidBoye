@@ -81,5 +81,5 @@ export default class LogEvent {
 		});
 	}
 
-	get delete() { return this.guild.removeLogEvent.bind(this.guild, this.id, "id"); }
+	get delete() { return this.guild.removeLogEvent.bind(this.guild, this.event, this.webhook.channel); }
 }

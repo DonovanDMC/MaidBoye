@@ -4,6 +4,7 @@ import EmbedBuilder from "@util/EmbedBuilder";
 import { Time } from "@uwu-codes/utils";
 import Eris from "eris";
 import BotFunctions from "@util/BotFunctions";
+import LoggingWebhookFailureHandler from "@util/handlers/LoggingWebhookFailureHandler";
 
 export default new ClientEvent("channelUpdate", async function(channel, oldChannel) {
 	if (!("guild" in channel)) return;
@@ -12,7 +13,7 @@ export default new ClientEvent("channelUpdate", async function(channel, oldChann
 	for (const log of logEvents) {
 		const hook = await this.getWebhook(log.webhook.id, log.webhook.token).catch(() => null);
 		if (hook === null || !hook.token) {
-			await log.delete();
+			void LoggingWebhookFailureHandler.tick(log);
 			continue;
 		}
 

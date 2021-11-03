@@ -2,13 +2,14 @@ import ClientEvent from "@util/ClientEvent";
 import EmbedBuilder from "@util/EmbedBuilder";
 import GuildConfig from "@db/Models/Guild/GuildConfig";
 import BotFunctions from "@util/BotFunctions";
+import LoggingWebhookFailureHandler from "@util/handlers/LoggingWebhookFailureHandler";
 
 export default new ClientEvent("guildRoleCreate", async function(guild, role) {
 	const logEvents = await GuildConfig.getLogEvents(guild.id, "roleCreate");
 	for (const log of logEvents) {
 		const hook = await this.getWebhook(log.webhook.id, log.webhook.token).catch(() => null);
 		if (hook === null || !hook.token) {
-			await log.delete();
+			void LoggingWebhookFailureHandler.tick(log);
 			continue;
 		}
 

@@ -33,6 +33,7 @@ import {
 	tempDir,
 	userAgent
 } from "@config";
+import LoggingWebhookFailureHandler from "@util/handlers/LoggingWebhookFailureHandler";
 import { performance } from "perf_hooks";
 import util from "util";
 
@@ -51,6 +52,7 @@ export default class MaidBoye extends Eris.Client {
 		await this.loadEvents();
 		await this.loadCommands();
 		MessageCollector.setClient(this);
+		LoggingWebhookFailureHandler.setClient(this);
 		ComponentInteractionCollector.setClient(this);
 		ModLogHandler.setClient(this);
 		if (!beta) CheweyAPI.analytics.initAutoPosting(this);
@@ -134,6 +136,17 @@ export default class MaidBoye extends Eris.Client {
 				} else return null;
 			}
 		}
+	}
+
+	async getGuildChannel(id: string, forceRest = false) {
+		const c = this.getChannel(id) as Eris.AnyGuildChannel;
+		if (!c || forceRest) {
+			const ch = await this.getRESTChannel(id).catch(() => null) as Eris.AnyGuildChannel | null;
+			if (ch === null || !("guild" in ch)) return null;
+			const g = this.guilds.get(ch.guild.id);
+			if (g) g.channels.add(ch);
+			return ch;
+		} else return c;
 	}
 
 	async syncApplicationCommands(guild?: string, bypass = false, filterNames?: Array<string>) {

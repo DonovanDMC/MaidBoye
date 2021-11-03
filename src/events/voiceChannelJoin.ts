@@ -1,6 +1,7 @@
 import ClientEvent from "@util/ClientEvent";
 import EmbedBuilder from "@util/EmbedBuilder";
 import GuildConfig from "@db/Models/Guild/GuildConfig";
+import LoggingWebhookFailureHandler from "@util/handlers/LoggingWebhookFailureHandler";
 
 export default new ClientEvent("voiceChannelJoin", async function(member, channel) {
 	if (!("guild" in channel)) return;
@@ -9,7 +10,7 @@ export default new ClientEvent("voiceChannelJoin", async function(member, channe
 	for (const log of logEvents) {
 		const hook = await this.getWebhook(log.webhook.id, log.webhook.token).catch(() => null);
 		if (hook === null || !hook.token) {
-			await log.delete();
+			void LoggingWebhookFailureHandler.tick(log);
 			continue;
 		}
 

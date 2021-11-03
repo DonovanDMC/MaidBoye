@@ -6,6 +6,7 @@ import BotFunctions from "@util/BotFunctions";
 import { Time } from "@uwu-codes/utils";
 import { names } from "@config";
 import chunk from "chunk";
+import LoggingWebhookFailureHandler from "@util/handlers/LoggingWebhookFailureHandler";
 
 export default new ClientEvent("guildUpdate", async function(guild, oldGuild) {
 
@@ -13,7 +14,7 @@ export default new ClientEvent("guildUpdate", async function(guild, oldGuild) {
 	for (const log of logEvents) {
 		const hook = await this.getWebhook(log.webhook.id, log.webhook.token).catch(() => null);
 		if (hook === null || !hook.token) {
-			await log.delete();
+			void LoggingWebhookFailureHandler.tick(log);
 			continue;
 		}
 

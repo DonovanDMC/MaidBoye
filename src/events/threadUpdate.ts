@@ -4,6 +4,7 @@ import { Time } from "@uwu-codes/utils";
 import type Eris from "eris";
 import BotFunctions from "@util/BotFunctions";
 import db from "@db";
+import LoggingWebhookFailureHandler from "@util/handlers/LoggingWebhookFailureHandler";
 
 export default new ClientEvent("threadUpdate", async function(thread, oldThread) {
 	if (!("guild" in thread) || oldThread === null) return;
@@ -14,7 +15,7 @@ export default new ClientEvent("threadUpdate", async function(thread, oldThread)
 	for (const log of logEvents) {
 		const hook = await this.getWebhook(log.webhook.id, log.webhook.token).catch(() => null);
 		if (hook === null || !hook.token) {
-			await log.delete();
+			void LoggingWebhookFailureHandler.tick(log);
 			continue;
 		}
 

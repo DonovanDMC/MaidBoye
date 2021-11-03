@@ -1,6 +1,7 @@
 import ClientEvent from "@util/ClientEvent";
 import EmbedBuilder from "@util/EmbedBuilder";
 import GuildConfig from "@db/Models/Guild/GuildConfig";
+import LoggingWebhookFailureHandler from "@util/handlers/LoggingWebhookFailureHandler";
 
 export default new ClientEvent("threadMembersUpdate", async function(thread, removedMembers, addedMembers) {
 	// waiting on pr updates
@@ -19,7 +20,7 @@ export default new ClientEvent("threadMembersUpdate", async function(thread, rem
 		for (const log of logEvents) {
 			const hook = await this.getWebhook(log.webhook.id, log.webhook.token).catch(() => null);
 			if (hook === null || !hook.token) {
-				await log.delete();
+				void LoggingWebhookFailureHandler.tick(log);
 				continue;
 			}
 

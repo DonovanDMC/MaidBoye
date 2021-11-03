@@ -5,6 +5,7 @@ import GuildConfig from "@db/Models/Guild/GuildConfig";
 import BotFunctions from "@util/BotFunctions";
 import type Eris from "eris";
 import { names } from "@config";
+import LoggingWebhookFailureHandler from "@util/handlers/LoggingWebhookFailureHandler";
 
 export default new ClientEvent("channelCreate", async function(channel) {
 	if (!("guild" in channel)) return;
@@ -13,7 +14,7 @@ export default new ClientEvent("channelCreate", async function(channel) {
 	for (const log of logEvents) {
 		const hook = await this.getWebhook(log.webhook.id, log.webhook.token).catch(() => null);
 		if (hook === null || !hook.token) {
-			await log.delete();
+			void LoggingWebhookFailureHandler.tick(log);
 			continue;
 		}
 
