@@ -64,7 +64,6 @@ export default class ExtendedMessage extends Message<Eris.GuildTextableChannel> 
 		// console.log(p);
 
 		if (p.success === false) return false;
-		console.log(p);
 
 		this.args = p.arguments;
 		this.rawArgs = p.body.split(" ");
