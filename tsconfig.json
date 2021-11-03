@@ -5,8 +5,7 @@
 		"baseUrl": "./src",
 		"strictPropertyInitialization": false,
 		"skipLibCheck": true,
-		"sourceMap": true,
-		"inlineSourceMap": false,
+		"inlineSourceMap": true,
 		"paths": {
 			"@root/*": ["../*"],
 			"@config": ["config/index.ts"],
