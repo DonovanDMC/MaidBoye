@@ -13,7 +13,7 @@ import {
 } from "@uwu-codes/utils";
 import Timer from "@util/Timer";
 import BotFunctions from "@util/BotFunctions";
-import CommandHandler from "@util/cmd/CommandHandler";
+import CommandHandler from "@cmd/CommandHandler";
 import UserConfig from "@models/User/UserConfig";
 import GuildConfig from "@models/Guild/GuildConfig";
 import type MaidBoye from "@MaidBoye";

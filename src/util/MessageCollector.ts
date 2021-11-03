@@ -1,4 +1,4 @@
-import type MaidBoye from "../main";
+import type MaidBoye from "@MaidBoye";
 import type Eris from "eris";
 
 export default class MessageCollector {

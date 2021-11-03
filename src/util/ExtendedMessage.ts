@@ -1,11 +1,11 @@
 
-import type Command from "./cmd/Command";
-import CommandHandler from "./cmd/CommandHandler";
 import BotFunctions from "./BotFunctions";
-import type GuildConfig from "../db/Models/Guild/GuildConfig";
-import type UserConfig from "../db/Models/User/UserConfig";
-import type MaidBoye from "../main";
-import db from "../db";
+import type Command from "@cmd/Command";
+import CommandHandler from "@cmd/CommandHandler";
+import type GuildConfig from "@models/Guild/GuildConfig";
+import type UserConfig from "@models/User/UserConfig";
+import type MaidBoye from "@MaidBoye";
+import db from "@db";
 import { defaultPrefix } from "@config";
 import type { Member } from "eris";
 import type Eris from "eris";

@@ -1,6 +1,6 @@
 import type GuildConfig from "./GuildConfig";
-import type { BitData } from "../../../util/@types/MariaDB";
-import BotFunctions from "../../../util/BotFunctions";
+import type { BitData } from "@util/@types/MariaDB";
+import BotFunctions from "@util/BotFunctions";
 import type { DataTypes } from "@uwu-codes/types";
 
 export interface RawDisableEntry {

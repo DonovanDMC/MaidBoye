@@ -1,6 +1,6 @@
 import type Route from "./Route";
-import Logger from "../util/Logger";
-import type MaidBoye from "../main";
+import type MaidBoye from "@MaidBoye";
+import Logger from "@util/Logger";
 import {
 	antiSpamDir,
 	apiCookieSecrets,

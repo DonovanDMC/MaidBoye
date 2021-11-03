@@ -1,5 +1,5 @@
 import Command from "./Command";
-import { antiSpamEntryExpiry } from "../../config";
+import { antiSpamEntryExpiry } from "@config";
 
 export interface AntiSpamEntry {
 	addedAt: number;

@@ -1,5 +1,4 @@
 import { emojis } from "@config";
-
 import Category from "@cmd/Category";
 
 export default new Category("fun", __filename)

@@ -1,6 +1,6 @@
 import ComponentInteractionHandler from "../main";
-import CheweyAPI from "@util/req/CheweyAPI";
-import Yiffy from "@util/req/Yiffy";
+import CheweyAPI from "@req/CheweyAPI";
+import Yiffy from "@req/Yiffy";
 import BotFunctions from "@util/BotFunctions";
 import EmbedBuilder from "@util/EmbedBuilder";
 

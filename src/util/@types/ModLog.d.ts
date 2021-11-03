@@ -64,7 +64,7 @@ declare namespace ModLog {
 		type: "unban";
 	}
 
-	interface UnlockEntry extends GenericEntry {
+	interface UnLockEntry extends GenericEntry {
 		type: "unlock";
 	}
 

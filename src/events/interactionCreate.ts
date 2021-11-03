@@ -1,5 +1,5 @@
-import type { ComponentInteractionType } from "../events/components/main";
-import ComponentInteractionHandler from "../events/components/main";
+import type { ComponentInteractionType } from "@events/components/main";
+import ComponentInteractionHandler from "@events/components/main";
 import { beta } from "@config";
 import CommandHandler from "@cmd/CommandHandler";
 import db from "@db";

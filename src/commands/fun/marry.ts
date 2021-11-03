@@ -3,7 +3,7 @@ import db from "@db";
 import BotFunctions from "@util/BotFunctions";
 import ComponentHelper from "@util/components/ComponentHelper";
 import EmbedBuilder from "@util/EmbedBuilder";
-import Yiffy from "@util/req/Yiffy";
+import Yiffy from "@req/Yiffy";
 
 export default new Command("marry")
 	.setPermissions("bot", "embedLinks")

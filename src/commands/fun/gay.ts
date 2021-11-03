@@ -1,7 +1,7 @@
 import Command from "@cmd/Command";
 import EmbedBuilder from "@util/EmbedBuilder";
 import Logger from "@util/Logger";
-import DankMemerAPI from "@util/req/DankMemerAPI";
+import DankMemerAPI from "@req/DankMemerAPI";
 import type { MemeRequestResponse } from "dankmemerapi";
 import Eris from "eris";
 

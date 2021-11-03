@@ -1,8 +1,8 @@
 import Command from "@cmd/Command";
 import ComponentHelper from "@util/components/ComponentHelper";
 import EmbedBuilder from "@util/EmbedBuilder";
-import CheweyAPI from "@util/req/CheweyAPI";
-import Yiffy from "@util/req/Yiffy";
+import CheweyAPI from "@req/CheweyAPI";
+import Yiffy from "@req/Yiffy";
 import Eris from "eris";
 
 export default new Command("birb")

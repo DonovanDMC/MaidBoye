@@ -1,5 +1,5 @@
 import ComponentInteractionHandler from "../main";
-import Yiffy from "@util/req/Yiffy";
+import Yiffy from "@req/Yiffy";
 import EmbedBuilder from "@util/EmbedBuilder";
 import ComponentHelper from "@util/components/ComponentHelper";
 

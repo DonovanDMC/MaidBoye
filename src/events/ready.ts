@@ -1,6 +1,6 @@
 import API from "../api";
-import ClientEvent from "../util/ClientEvent";
-import Logger from "../util/Logger";
+import ClientEvent from "@util/ClientEvent";
+import Logger from "@util/Logger";
 import { beta, clientInfo, services, statuses } from "@config";
 import { Utility } from "@uwu-codes/utils";
 import { Node } from "lavalink";

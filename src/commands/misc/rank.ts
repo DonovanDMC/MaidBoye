@@ -1,5 +1,5 @@
-import UserConfig from "../../db/Models/User/UserConfig";
-import BotFunctions from "../../util/BotFunctions";
+import UserConfig from "@models/User/UserConfig";
+import BotFunctions from "@util/BotFunctions";
 import Command from "@cmd/Command";
 import EmbedBuilder from "@util/EmbedBuilder";
 import Eris from "eris";

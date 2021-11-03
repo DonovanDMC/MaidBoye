@@ -1,12 +1,12 @@
-import db from "../../db";
-import BotFunctions from "../../util/BotFunctions";
-import type MaidBoye from "../../main";
-import ComponentHelper from "../../util/components/ComponentHelper";
+import db from "@db";
+import BotFunctions from "@util/BotFunctions";
+import type MaidBoye from "@MaidBoye";
+import ComponentHelper from "@util/components/ComponentHelper";
 import Command from "@cmd/Command";
 import EmbedBuilder from "@util/EmbedBuilder";
 import { Strings } from "@uwu-codes/utils";
 import { emojis, permissionNames } from "@config";
-import CommandHandler from "@util/cmd/CommandHandler";
+import CommandHandler from "@cmd/CommandHandler";
 import type { RawDisableEntry } from "@models/Guild/DisableEntry";
 import DisableEntry from "@models/Guild/DisableEntry";
 import chunk from "chunk";

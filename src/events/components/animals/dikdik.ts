@@ -1,7 +1,7 @@
 import ComponentInteractionHandler from "../main";
 import BotFunctions from "@util/BotFunctions";
 import EmbedBuilder from "@util/EmbedBuilder";
-import Yiffy from "@util/req/Yiffy";
+import Yiffy from "@req/Yiffy";
 
 ComponentInteractionHandler
 	.registerHandler("dikdik-newimg", false, async function handler(interaction) {

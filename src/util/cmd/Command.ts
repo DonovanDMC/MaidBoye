@@ -1,6 +1,6 @@
 import CommandHandler from "./CommandHandler";
-import type MaidBoye from "../../main";
 import type ExtendedMessage from "../ExtendedMessage";
+import type MaidBoye from "@MaidBoye";
 import type { ArrayOneOrMore } from "@uwu-codes/types";
 import Eris from "eris";
 import type { Permissions } from "@util/Constants";

@@ -1,5 +1,5 @@
 import ComponentInteractionHandler from "../main";
-import CheweyAPI from "@util/req/CheweyAPI";
+import CheweyAPI from "@req/CheweyAPI";
 import BotFunctions from "@util/BotFunctions";
 import EmbedBuilder from "@util/EmbedBuilder";
 

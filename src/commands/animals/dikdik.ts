@@ -1,7 +1,7 @@
 import Command from "@cmd/Command";
 import ComponentHelper from "@util/components/ComponentHelper";
 import EmbedBuilder from "@util/EmbedBuilder";
-import Yiffy from "@util/req/Yiffy";
+import Yiffy from "@req/Yiffy";
 import Eris from "eris";
 
 export default new Command("dikdik")

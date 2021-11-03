@@ -26,6 +26,8 @@ import type { AnyDisableEntry, RawDisableEntry } from "./DisableEntry";
 import DisableEntry from "./DisableEntry";
 import type { RawLevelRole } from "./LevelRole";
 import LevelRole from "./LevelRole";
+import AutoUnarchiveEntry from "./AutoUnarchiveEntry";
+import type { RawAutoUnarchiveEntry } from "./AutoUnarchiveEntry";
 import type { RawGuildBlacklist } from "../Blacklist";
 import Blacklist, { GuildBlacklist } from "../Blacklist";
 import WebhookStore from "@util/WebhookStore";
@@ -37,8 +39,6 @@ import type { yiffTypes } from "@config";
 import { defaultPrefix } from "@config";
 import db from "@db";
 import { Collection } from "@augu/collections";
-import type { RawAutoUnarchiveEntry } from "@models/Guild/AutoUnarchiveEntry";
-import AutoUnarchiveEntry from "@models/Guild/AutoUnarchiveEntry";
 import * as crypto from "crypto";
 
 export interface RawGuildConfig {

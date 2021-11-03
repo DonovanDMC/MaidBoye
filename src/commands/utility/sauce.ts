@@ -1,5 +1,5 @@
-import E621, { YiffyV3 } from "@util/req/E621";
-import SauceNAO from "@util/req/SauceNAO";
+import E621, { YiffyV3 } from "@req/E621";
+import SauceNAO from "@req/SauceNAO";
 import Command from "@cmd/Command";
 import Eris from "eris";
 import type { Post } from "e621";

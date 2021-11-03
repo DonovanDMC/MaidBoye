@@ -1,5 +1,5 @@
-import { userAgent, apiKeys } from "../../config";
 import Logger from "../Logger";
+import { userAgent, apiKeys } from "@config";
 import YiffyAPI from "yiffy";
 
 const Yiffy = new YiffyAPI({

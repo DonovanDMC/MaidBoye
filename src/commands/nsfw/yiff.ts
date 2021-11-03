@@ -3,7 +3,7 @@ import Command from "@cmd/Command";
 import EmbedBuilder from "@util/EmbedBuilder";
 import { yiffTypes } from "@config";
 import Logger from "@util/Logger";
-import Yiffy from "@util/req/Yiffy";
+import Yiffy from "@req/Yiffy";
 import { Strings } from "@uwu-codes/utils";
 import Eris from "eris";
 import ComponentHelper from "@util/components/ComponentHelper";

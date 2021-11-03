@@ -1,4 +1,4 @@
-import EmbedBuilder from "../../util/EmbedBuilder";
+import EmbedBuilder from "@util/EmbedBuilder";
 import type MaidBoye from "@MaidBoye";
 import Command from "@cmd/Command";
 import { botIcon, emojis, guildDefaults, names } from "@config";

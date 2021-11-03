@@ -1,6 +1,6 @@
 import Command from "@cmd/Command";
 import EmbedBuilder from "@util/EmbedBuilder";
-import Yiffy from "@util/req/Yiffy";
+import Yiffy from "@req/Yiffy";
 import Eris from "eris";
 import ComponentHelper from "@util/components/ComponentHelper";
 

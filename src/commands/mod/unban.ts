@@ -1,4 +1,4 @@
-import ModLogHandler from "../../util/handlers/ModLogHandler";
+import ModLogHandler from "@handlers/ModLogHandler";
 import Command from "@cmd/Command";
 import CommandError from "@cmd/CommandError";
 import Eris from "eris";

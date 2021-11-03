@@ -1,12 +1,12 @@
 import EmbedBuilder from "./EmbedBuilder";
-import type Command from "./cmd/Command";
 import type ExtendedMessage from "./ExtendedMessage";
-import Yiffy from "./req/Yiffy";
-import CommandError from "./cmd/CommandError";
-import type { AntiSpamEntry } from "./cmd/AntiSpam";
-import TempFiles from "./handlers/TempFiles";
 import type { BitData } from "./@types/MariaDB";
-import GuildConfig from "../db/Models/Guild/GuildConfig";
+import type Command from "@cmd/Command";
+import TempFiles from "@handlers/TempFiles";
+import Yiffy from "@req/Yiffy";
+import CommandError from "@cmd/CommandError";
+import type { AntiSpamEntry } from "@cmd/AntiSpam";
+import GuildConfig from "@models/Guild/GuildConfig";
 import type { GuildAuditLogEntry } from "eris";
 import Eris from "eris";
 import { Strings } from "@uwu-codes/utils";

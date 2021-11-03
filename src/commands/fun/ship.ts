@@ -2,7 +2,7 @@ import Command from "@cmd/Command";
 import { developers, emojis } from "@config";
 import EmbedBuilder from "@util/EmbedBuilder";
 import Logger from "@util/Logger";
-import FluxPoint from "@util/req/FluxPoint";
+import FluxPoint from "@req/FluxPoint";
 import Eris from "eris";
 
 export default new Command("ship")

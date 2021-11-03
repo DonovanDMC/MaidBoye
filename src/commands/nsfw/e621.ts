@@ -4,7 +4,7 @@ import { apiKeys, developers, emojis, userAgent } from "@config";
 import Eris, { DiscordRESTError } from "eris";
 import ComponentHelper from "@util/components/ComponentHelper";
 import type MaidBoye from "@MaidBoye";
-import E621 from "@util/req/E621";
+import E621 from "@req/E621";
 import fetch from "node-fetch";
 import Logger from "@util/Logger";
 import ErrorHandler from "@handlers/ErrorHandler";

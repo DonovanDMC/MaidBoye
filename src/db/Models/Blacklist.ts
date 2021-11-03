@@ -1,5 +1,5 @@
 import db from "..";
-import type { BooleanData } from "../../util/@types/MariaDB";
+import type { BooleanData } from "@util/@types/MariaDB";
 import type { DataTypes } from "@uwu-codes/types";
 
 export interface RawBlacklist {

@@ -15,6 +15,7 @@ moduleAlias.addAliases({
 	"@db": `${d}/src/db`,
 	"@models": `${d}/src/models`,
 	"@commands": `${d}/src/commands`,
+	"@req": `${d}/src/util/req`,
 	"@MaidBoye": `${d}/src/main`
 });
 import MessageCollector from "./MessageCollector";

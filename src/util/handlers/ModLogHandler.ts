@@ -1,6 +1,6 @@
-import db from "../../db";
-import GuildConfig from "../../db/Models/Guild/GuildConfig";
-import type MaidBoye from "../../main";
+import db from "@db";
+import GuildConfig from "@models/Guild/GuildConfig";
+import type MaidBoye from "@MaidBoye";
 import type Eris from "eris";
 import EmbedBuilder from "@util/EmbedBuilder";
 import { botIcon } from "@config";

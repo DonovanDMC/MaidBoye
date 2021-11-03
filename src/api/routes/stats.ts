@@ -1,7 +1,7 @@
-import type MaidBoye from "../../main";
 import Route from "../Route";
+import type MaidBoye from "@MaidBoye";
 import { beta } from "@config";
-import CommandHandler from "@util/cmd/CommandHandler";
+import CommandHandler from "@cmd/CommandHandler";
 
 export default class StatusRoute extends Route {
 	constructor(client: MaidBoye) {

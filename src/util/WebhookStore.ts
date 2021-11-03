@@ -1,4 +1,4 @@
-import DebugEvent from "../events/debug";
+import DebugEvent from "@events/debug";
 import { botIcon, webhooks } from "@config";
 import type { GuildTextableChannel, Message, WebhookPayload } from "eris";
 import Eris from "eris";
