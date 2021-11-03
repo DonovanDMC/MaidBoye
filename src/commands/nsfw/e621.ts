@@ -7,7 +7,7 @@ import type MaidBoye from "@MaidBoye";
 import E621 from "@util/req/E621";
 import fetch from "node-fetch";
 import Logger from "@util/Logger";
-import ErrorHandler from "@util/handlers/ErrorHandler";
+import ErrorHandler from "@handlers/ErrorHandler";
 
 // attachment version: https://pastebin.com/D4ZBuLjw
 export default new Command("e621", "e6")

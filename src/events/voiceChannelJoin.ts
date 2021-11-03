@@ -1,7 +1,7 @@
 import ClientEvent from "@util/ClientEvent";
 import EmbedBuilder from "@util/EmbedBuilder";
-import GuildConfig from "@db/Models/Guild/GuildConfig";
-import LoggingWebhookFailureHandler from "@util/handlers/LoggingWebhookFailureHandler";
+import GuildConfig from "@models/Guild/GuildConfig";
+import LoggingWebhookFailureHandler from "@handlers/LoggingWebhookFailureHandler";
 
 export default new ClientEvent("voiceChannelJoin", async function(member, channel) {
 	if (!("guild" in channel)) return;

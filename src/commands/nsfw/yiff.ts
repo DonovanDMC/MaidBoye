@@ -1,4 +1,4 @@
-import type GuildConfig from "@db/Models/Guild/GuildConfig";
+import type GuildConfig from "@models/Guild/GuildConfig";
 import Command from "@cmd/Command";
 import EmbedBuilder from "@util/EmbedBuilder";
 import { yiffTypes } from "@config";

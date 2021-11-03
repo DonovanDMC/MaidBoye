@@ -1,5 +1,5 @@
 import Command from "@cmd/Command";
-import UserConfig from "@db/Models/User/UserConfig";
+import UserConfig from "@models/User/UserConfig";
 import db from "@db";
 import { developers } from "@config";
 import Eris from "eris";

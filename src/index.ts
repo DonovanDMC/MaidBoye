@@ -10,7 +10,7 @@ import {
 import MaidBoye from "./main";
 import Logger from "@util/Logger";
 import { Time } from "@uwu-codes/utils";
-import ErrorHandler from "@util/handlers/ErrorHandler";
+import ErrorHandler from "@handlers/ErrorHandler";
 import { execSync } from "child_process";
 
 process

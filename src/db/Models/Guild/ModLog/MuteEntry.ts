@@ -4,8 +4,8 @@ import type GuildConfig from "../GuildConfig";
 import type { DataTypes } from "@uwu-codes/types";
 import type MaidBoye from "@MaidBoye";
 import type Eris from "eris";
-import type { RawTimedEntry } from "@db/Models/TimedEntry";
-import TimedEntry from "@db/Models/TimedEntry";
+import type { RawTimedEntry } from "@models/TimedEntry";
+import TimedEntry from "@models/TimedEntry";
 import db from "@db";
 
 export interface RawMuteEntry extends RawGenericEntry {

@@ -1,11 +1,11 @@
 import ClientEvent from "@util/ClientEvent";
 import db from "@db";
-import GuildConfig from "@db/Models/Guild/GuildConfig";
+import GuildConfig from "@models/Guild/GuildConfig";
 import EmbedBuilder from "@util/EmbedBuilder";
 import { Strings } from "@uwu-codes/utils";
 import type Eris from "eris";
 import BotFunctions from "@util/BotFunctions";
-import LoggingWebhookFailureHandler from "@util/handlers/LoggingWebhookFailureHandler";
+import LoggingWebhookFailureHandler from "@handlers/LoggingWebhookFailureHandler";
 const Redis = db.r;
 
 export default new ClientEvent("messageUpdate", async function(message, oldMessage) {

@@ -14,8 +14,8 @@ import {
 import Timer from "@util/Timer";
 import BotFunctions from "@util/BotFunctions";
 import CommandHandler from "@util/cmd/CommandHandler";
-import UserConfig from "@db/Models/User/UserConfig";
-import GuildConfig from "@db/Models/Guild/GuildConfig";
+import UserConfig from "@models/User/UserConfig";
+import GuildConfig from "@models/Guild/GuildConfig";
 import type MaidBoye from "@MaidBoye";
 import * as config from "@config";
 import util from "util";

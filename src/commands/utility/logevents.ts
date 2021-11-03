@@ -7,8 +7,8 @@ import Eris, { DiscordRESTError } from "eris";
 import BotFunctions from "@util/BotFunctions";
 import { Request, Strings } from "@uwu-codes/utils";
 import FileType from "file-type";
-import ErrorHandler from "@util/handlers/ErrorHandler";
-import LogEvent from "@db/Models/Guild/LogEvent";
+import ErrorHandler from "@handlers/ErrorHandler";
+import LogEvent from "@models/Guild/LogEvent";
 import chunk from "chunk";
 
 export default new Command("logevents", "logging")

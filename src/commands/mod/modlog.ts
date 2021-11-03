@@ -3,14 +3,14 @@ import type MaidBoye from "@MaidBoye";
 import Command from "@cmd/Command";
 import { botIcon, emojis, guildDefaults, names } from "@config";
 import CommandError from "@cmd/CommandError";
-import ModLogUtil from "@util/handlers/ModLogHandler";
+import ModLogUtil from "@handlers/ModLogHandler";
 import ComponentHelper from "@util/components/ComponentHelper";
 import ComponentInteractionCollector from "@util/components/ComponentInteractionCollector";
 import Eris, { DiscordRESTError } from "eris";
 import { Request } from "@uwu-codes/utils";
 import FileType from "file-type";
-import type GuildConfig from "@db/Models/Guild/GuildConfig";
-import ErrorHandler from "@util/handlers/ErrorHandler";
+import type GuildConfig from "@models/Guild/GuildConfig";
+import ErrorHandler from "@handlers/ErrorHandler";
 
 export default new Command("modlog")
 	.setPermissions("bot", "embedLinks", "manageChannels", "manageWebhooks")

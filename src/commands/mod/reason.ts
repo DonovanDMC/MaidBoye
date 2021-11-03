@@ -2,7 +2,7 @@ import Command from "@cmd/Command";
 import BotFunctions from "@util/BotFunctions";
 import CommandError from "@util/cmd/CommandError";
 import EmbedBuilder from "@util/EmbedBuilder";
-import ModLogHandler from "@util/handlers/ModLogHandler";
+import ModLogHandler from "@handlers/ModLogHandler";
 import Logger from "@util/Logger";
 import Eris from "eris";
 

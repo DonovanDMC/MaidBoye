@@ -1,11 +1,11 @@
 import ClientEvent from "@util/ClientEvent";
 import EmbedBuilder from "@util/EmbedBuilder";
 import { Time } from "@uwu-codes/utils";
-import GuildConfig from "@db/Models/Guild/GuildConfig";
+import GuildConfig from "@models/Guild/GuildConfig";
 import BotFunctions from "@util/BotFunctions";
 import type Eris from "eris";
 import { names } from "@config";
-import LoggingWebhookFailureHandler from "@util/handlers/LoggingWebhookFailureHandler";
+import LoggingWebhookFailureHandler from "@handlers/LoggingWebhookFailureHandler";
 
 export default new ClientEvent("channelCreate", async function(channel) {
 	if (!("guild" in channel)) return;

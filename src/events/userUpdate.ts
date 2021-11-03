@@ -1,7 +1,7 @@
 import ClientEvent from "@util/ClientEvent";
-import GuildConfig from "@db/Models/Guild/GuildConfig";
+import GuildConfig from "@models/Guild/GuildConfig";
 import EmbedBuilder from "@util/EmbedBuilder";
-import LoggingWebhookFailureHandler from "@util/handlers/LoggingWebhookFailureHandler";
+import LoggingWebhookFailureHandler from "@handlers/LoggingWebhookFailureHandler";
 import Eris from "eris";
 
 export default new ClientEvent("userUpdate", async function(user, oldUser) {

@@ -3,8 +3,8 @@ import type { DataTypes } from "@uwu-codes/types";
 import type MaidBoye from "@MaidBoye";
 import type Eris from "eris";
 import db from "@db";
-import type { RawStrike } from "@db/Models/Strike";
-import Strike from "@db/Models/Strike";
+import type { RawStrike } from "@models/Strike";
+import Strike from "@models/Strike";
 
 export interface RawGenericEntry {
 	id: string;

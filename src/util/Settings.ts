@@ -4,7 +4,7 @@ import EmbedBuilder from "./EmbedBuilder";
 import ComponentHelper from "./components/ComponentHelper";
 import { emojis, yiffTypes } from "@config";
 import Eris from "eris";
-import type GuildConfig from "@db/Models/Guild/GuildConfig";
+import type GuildConfig from "@models/Guild/GuildConfig";
 import { Strings } from "@uwu-codes/utils";
 import db from "@db";
 

@@ -1,4 +1,4 @@
-import type LogEvent from "@db/Models/Guild/LogEvent";
+import type LogEvent from "@models/Guild/LogEvent";
 import type MaidBoye from "@MaidBoye";
 import EmbedBuilder from "@util/EmbedBuilder";
 import Logger from "@util/Logger";

@@ -3,7 +3,7 @@ import Eris, { DiscordRESTError } from "eris";
 import EmbedBuilder from "@util/EmbedBuilder";
 import ComponentHelper from "@util/components/ComponentHelper";
 import type MaidBoye from "@MaidBoye";
-import ErrorHandler from "@util/handlers/ErrorHandler";
+import ErrorHandler from "@handlers/ErrorHandler";
 
 export default new Command("furpile")
 	.setPermissions("bot", "embedLinks")

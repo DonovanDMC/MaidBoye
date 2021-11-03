@@ -5,7 +5,7 @@ import type { DataTypes } from "@uwu-codes/types";
 import type MaidBoye from "@MaidBoye";
 import type Eris from "eris";
 import db from "@db";
-import Warning from "@db/Models/Warning";
+import Warning from "@models/Warning";
 
 export interface RawWarnEntry extends RawGenericEntry {
 	type: "warn";

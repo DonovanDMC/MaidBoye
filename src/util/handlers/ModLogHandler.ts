@@ -7,11 +7,11 @@ import { botIcon } from "@config";
 import { Time } from "@uwu-codes/utils";
 import Logger from "@util/Logger";
 import type { CountResponse, OkPacket } from "@util/@types/MariaDB";
-import type { RawTimedEntry } from "@db/Models/TimedEntry";
-import TimedEntry from "@db/Models/TimedEntry";
-import UserConfig from "@db/Models/User/UserConfig";
-import type { AnyEntry, RawBanEntry, RawMuteEntry } from "@db/Models/Guild/ModLog/All";
-import { UnBanEntry, UnLockDownEntry, UnLockEntry, UnMuteEntry } from "@db/Models/Guild/ModLog/All";
+import type { RawTimedEntry } from "@models/TimedEntry";
+import TimedEntry from "@models/TimedEntry";
+import UserConfig from "@models/User/UserConfig";
+import type { AnyEntry, RawBanEntry, RawMuteEntry } from "@models/Guild/ModLog/All";
+import { UnBanEntry, UnLockDownEntry, UnLockEntry, UnMuteEntry } from "@models/Guild/ModLog/All";
 import crypto from "crypto";
 
 export default class ModLogHandler {

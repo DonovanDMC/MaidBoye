@@ -8,12 +8,12 @@ import EmbedBuilder from "@util/EmbedBuilder";
 import Logger from "@util/Logger";
 import ExtendedMessage from "@util/ExtendedMessage";
 import type { Permissions } from "@util/Constants";
-import ErrorHandler from "@util/handlers/ErrorHandler";
+import ErrorHandler from "@handlers/ErrorHandler";
 import CommandError from "@cmd/CommandError";
 import { Strings, Timers } from "@uwu-codes/utils";
 import Eris from "eris";
-import StatsHandler from "@util/handlers/StatsHandler";
-import EventsASecondHandler from "@util/handlers/EventsASecondHandler";
+import StatsHandler from "@handlers/StatsHandler";
+import EventsASecondHandler from "@handlers/EventsASecondHandler";
 import db from "@db";
 import {
 	antiSpamMaxVL,

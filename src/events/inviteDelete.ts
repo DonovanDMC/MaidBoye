@@ -1,10 +1,10 @@
 import ClientEvent from "@util/ClientEvent";
 import EmbedBuilder from "@util/EmbedBuilder";
 import { Time } from "@uwu-codes/utils";
-import GuildConfig from "@db/Models/Guild/GuildConfig";
+import GuildConfig from "@models/Guild/GuildConfig";
 import BotFunctions from "@util/BotFunctions";
 import Eris from "eris";
-import LoggingWebhookFailureHandler from "@util/handlers/LoggingWebhookFailureHandler";
+import LoggingWebhookFailureHandler from "@handlers/LoggingWebhookFailureHandler";
 
 export default new ClientEvent("inviteDelete", async function(guild, invite) {
 	const logEvents = await GuildConfig.getLogEvents(guild.id, "inviteDelete");

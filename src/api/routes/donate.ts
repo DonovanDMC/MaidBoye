@@ -5,8 +5,8 @@ import type MaidBoye from "@MaidBoye";
 import WebhookStore from "@util/WebhookStore";
 import EmbedBuilder from "@util/EmbedBuilder";
 import db from "@db";
-import type { RawUserConfig } from "@db/Models/User/UserConfig";
-import UserConfig from "@db/Models/User/UserConfig";
+import type { RawUserConfig } from "@models/User/UserConfig";
+import UserConfig from "@models/User/UserConfig";
 
 interface KoFiDonation {
 	message_id: string;

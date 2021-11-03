@@ -8,10 +8,10 @@ import chunk from "chunk";
 import { emojis } from "@config";
 import BotFunctions from "@util/BotFunctions";
 import { Strings } from "@uwu-codes/utils";
-import WarnEntry from "@db/Models/Guild/ModLog/WarnEntry";
-import type { AnyEntry } from "@db/Models/Guild/ModLog/All";
-import ModLogHandler from "@util/handlers/ModLogHandler";
-import ErrorHandler from "@util/handlers/ErrorHandler";
+import WarnEntry from "@models/Guild/ModLog/WarnEntry";
+import type { AnyEntry } from "@models/Guild/ModLog/All";
+import ModLogHandler from "@handlers/ModLogHandler";
+import ErrorHandler from "@handlers/ErrorHandler";
 
 export default new Command("inspect")
 	.setPermissions("bot", "embedLinks")

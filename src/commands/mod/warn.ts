@@ -1,7 +1,7 @@
 import ModLogHandler from "../../util/handlers/ModLogHandler";
 import Command from "@cmd/Command";
 import CommandError from "@cmd/CommandError";
-import UserConfig from "@db/Models/User/UserConfig";
+import UserConfig from "@models/User/UserConfig";
 import Eris from "eris";
 
 export default new Command("warn", "bonk")

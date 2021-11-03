@@ -3,8 +3,8 @@ import Logger from "@util/Logger";
 import type { GatewayDispatchEvents, GatewayGuildCreateDispatchData } from "discord-api-types";
 import { GatewayOpcodes } from "discord-api-types";
 import type { VoiceServerUpdate, VoiceStateUpdate } from "lavalink";
-import StatsHandler from "@util/handlers/StatsHandler";
-import EventsASecondHandler from "@util/handlers/EventsASecondHandler";
+import StatsHandler from "@handlers/StatsHandler";
+import EventsASecondHandler from "@handlers/EventsASecondHandler";
 import db from "@db";
 const Redis = db.r;
 

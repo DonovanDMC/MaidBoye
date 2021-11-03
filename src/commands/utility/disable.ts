@@ -7,8 +7,8 @@ import EmbedBuilder from "@util/EmbedBuilder";
 import { Strings } from "@uwu-codes/utils";
 import { emojis, permissionNames } from "@config";
 import CommandHandler from "@util/cmd/CommandHandler";
-import type { RawDisableEntry } from "@db/Models/Guild/DisableEntry";
-import DisableEntry from "@db/Models/Guild/DisableEntry";
+import type { RawDisableEntry } from "@models/Guild/DisableEntry";
+import DisableEntry from "@models/Guild/DisableEntry";
 import chunk from "chunk";
 import Eris from "eris";
 

@@ -5,7 +5,7 @@ import ComponentHelper from "@util/components/ComponentHelper";
 import type { JSONResponse } from "yiffy";
 import BotFunctions from "@util/BotFunctions";
 import { Strings } from "@uwu-codes/utils";
-import type GuildConfig from "@db/Models/Guild/GuildConfig";
+import type GuildConfig from "@models/Guild/GuildConfig";
 
 ComponentInteractionHandler
 	.registerHandler("yiff-newimg-", false, async function handler(interaction) {

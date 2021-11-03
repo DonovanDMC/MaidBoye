@@ -1,6 +1,6 @@
-import { emojis, noIcon } from "../config";
-import WebhookStore from "../util/WebhookStore";
-import EmbedBuilder from "../util/EmbedBuilder";
+import { emojis, noIcon } from "@config";
+import WebhookStore from "@util/WebhookStore";
+import EmbedBuilder from "@util/EmbedBuilder";
 import ClientEvent from "@util/ClientEvent";
 import Logger from "@util/Logger";
 import db from "@db";

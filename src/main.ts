@@ -11,7 +11,7 @@ import type { ChatInputApplicationCommandStructure } from "eris";
 import Eris from "eris";
 import * as fs from "fs-extra";
 import type { Node } from "lavalink";
-import ModLogHandler from "@util/handlers/ModLogHandler";
+import ModLogHandler from "@handlers/ModLogHandler";
 import YiffRocks from "yiff-rocks";
 import AntiSpam from "@util/cmd/AntiSpam";
 import ComponentInteractionCollector from "@util/components/ComponentInteractionCollector";
@@ -33,7 +33,7 @@ import {
 	tempDir,
 	userAgent
 } from "@config";
-import LoggingWebhookFailureHandler from "@util/handlers/LoggingWebhookFailureHandler";
+import LoggingWebhookFailureHandler from "@handlers/LoggingWebhookFailureHandler";
 import { performance } from "perf_hooks";
 import util from "util";
 

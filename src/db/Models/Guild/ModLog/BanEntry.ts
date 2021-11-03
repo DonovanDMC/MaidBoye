@@ -5,8 +5,8 @@ import type { DataTypes } from "@uwu-codes/types";
 import type Eris from "eris";
 import type MaidBoye from "@MaidBoye";
 import db from "@db";
-import type { RawTimedEntry } from "@db/Models/TimedEntry";
-import TimedEntry from "@db/Models/TimedEntry";
+import type { RawTimedEntry } from "@models/TimedEntry";
+import TimedEntry from "@models/TimedEntry";
 
 export interface RawBanEntry extends RawGenericEntry {
 	type: "ban";

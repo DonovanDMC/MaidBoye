@@ -4,7 +4,7 @@ import Logger from "../util/Logger";
 import { beta, clientInfo, services, statuses } from "@config";
 import { Utility } from "@uwu-codes/utils";
 import { Node } from "lavalink";
-import { TimedModerationHandler } from "@util/handlers/ModLogHandler";
+import { TimedModerationHandler } from "@handlers/ModLogHandler";
 
 export default new ClientEvent("ready", async function() {
 	if (this.firstReady === true) return Logger.getLogger("Ready").warn("Ready event called after first ready, ignoring.");

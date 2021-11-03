@@ -37,8 +37,8 @@ import type { yiffTypes } from "@config";
 import { defaultPrefix } from "@config";
 import db from "@db";
 import { Collection } from "@augu/collections";
-import type { RawAutoUnarchiveEntry } from "@db/Models/Guild/AutoUnarchiveEntry";
-import AutoUnarchiveEntry from "@db/Models/Guild/AutoUnarchiveEntry";
+import type { RawAutoUnarchiveEntry } from "@models/Guild/AutoUnarchiveEntry";
+import AutoUnarchiveEntry from "@models/Guild/AutoUnarchiveEntry";
 import * as crypto from "crypto";
 
 export interface RawGuildConfig {

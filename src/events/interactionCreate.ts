@@ -1,7 +1,7 @@
-import { beta } from "../config";
-import CommandHandler from "../util/cmd/CommandHandler";
 import type { ComponentInteractionType } from "../events/components/main";
 import ComponentInteractionHandler from "../events/components/main";
+import { beta } from "@config";
+import CommandHandler from "@cmd/CommandHandler";
 import db from "@db";
 import ClientEvent from "@util/ClientEvent";
 import Logger from "@util/Logger";

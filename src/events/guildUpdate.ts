@@ -1,12 +1,12 @@
 import ClientEvent from "@util/ClientEvent";
-import GuildConfig from "@db/Models/Guild/GuildConfig";
+import GuildConfig from "@models/Guild/GuildConfig";
 import EmbedBuilder from "@util/EmbedBuilder";
 import Eris from "eris";
 import BotFunctions from "@util/BotFunctions";
 import { Time } from "@uwu-codes/utils";
 import { names } from "@config";
 import chunk from "chunk";
-import LoggingWebhookFailureHandler from "@util/handlers/LoggingWebhookFailureHandler";
+import LoggingWebhookFailureHandler from "@handlers/LoggingWebhookFailureHandler";
 
 export default new ClientEvent("guildUpdate", async function(guild, oldGuild) {
 

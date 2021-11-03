@@ -1,10 +1,10 @@
 import ClientEvent from "@util/ClientEvent";
-import GuildConfig from "@db/Models/Guild/GuildConfig";
+import GuildConfig from "@models/Guild/GuildConfig";
 import EmbedBuilder from "@util/EmbedBuilder";
 import { Time } from "@uwu-codes/utils";
 import Eris from "eris";
 import BotFunctions from "@util/BotFunctions";
-import LoggingWebhookFailureHandler from "@util/handlers/LoggingWebhookFailureHandler";
+import LoggingWebhookFailureHandler from "@handlers/LoggingWebhookFailureHandler";
 
 export default new ClientEvent("channelUpdate", async function(channel, oldChannel) {
 	if (!("guild" in channel)) return;

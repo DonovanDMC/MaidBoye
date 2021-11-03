@@ -1,9 +1,9 @@
 import ClientEvent from "@util/ClientEvent";
-import GuildConfig from "@db/Models/Guild/GuildConfig";
+import GuildConfig from "@models/Guild/GuildConfig";
 import EmbedBuilder from "@util/EmbedBuilder";
 import type Eris from "eris";
 import BotFunctions from "@util/BotFunctions";
-import LoggingWebhookFailureHandler from "@util/handlers/LoggingWebhookFailureHandler";
+import LoggingWebhookFailureHandler from "@handlers/LoggingWebhookFailureHandler";
 
 export default new ClientEvent("voiceStateUpdate", async function(member, oldState) {
 

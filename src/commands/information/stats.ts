@@ -1,7 +1,7 @@
 import Command from "@cmd/Command";
 import { emojis } from "@config";
 import EmbedBuilder from "@util/EmbedBuilder";
-import EventsASecondHandler from "@util/handlers/EventsASecondHandler";
+import EventsASecondHandler from "@handlers/EventsASecondHandler";
 import db from "@db";
 import { Strings } from "@uwu-codes/utils";
 import Timer from "@util/Timer";

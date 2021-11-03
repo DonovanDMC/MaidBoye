@@ -6,7 +6,7 @@ import { emojis } from "@config";
 import chunk from "chunk";
 import Command from "@cmd/Command";
 import Eris, { DiscordRESTError } from "eris";
-import ErrorHandler from "@util/handlers/ErrorHandler";
+import ErrorHandler from "@handlers/ErrorHandler";
 
 
 export default new Command("levelroles")

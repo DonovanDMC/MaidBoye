@@ -3,7 +3,7 @@ import type MaidBoye from "@MaidBoye";
 import ComponentHelper from "@util/components/ComponentHelper";
 import EmbedBuilder from "@util/EmbedBuilder";
 import Eris, { DiscordRESTError } from "eris";
-import ErrorHandler from "@util/handlers/ErrorHandler";
+import ErrorHandler from "@handlers/ErrorHandler";
 import { emojis } from "@config";
 
 export default new Command("awoo", "howl")

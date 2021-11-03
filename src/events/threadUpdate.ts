@@ -4,7 +4,7 @@ import { Time } from "@uwu-codes/utils";
 import type Eris from "eris";
 import BotFunctions from "@util/BotFunctions";
 import db from "@db";
-import LoggingWebhookFailureHandler from "@util/handlers/LoggingWebhookFailureHandler";
+import LoggingWebhookFailureHandler from "@handlers/LoggingWebhookFailureHandler";
 
 export default new ClientEvent("threadUpdate", async function(thread, oldThread) {
 	if (!("guild" in thread) || oldThread === null) return;

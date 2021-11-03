@@ -7,43 +7,20 @@
 		"skipLibCheck": true,
 		"inlineSourceMap": true,
 		"paths": {
-			"@root/*": [
-				"../*"
-			],
-			"@config": [
-				"config/index.ts"
-			],
-			"@config/*": [
-				"config/*"
-			],
-			"@util/*": [
-				"util/*"
-			],
-			"@cmd/*": [
-				"util/cmd/*"
-			],
-			"@db": [
-				"db/index.ts"
-			],
-			"@db/*": [
-				"db/*"
-			],
-			"@commands/*": [
-				"commands/*"
-			],
-			"@MaidBoye": [
-				"main.ts"
-			]
+			"@root/*": ["../*"],
+			"@config": ["config/index.ts"],
+			"@config/*": ["config/*"],
+			"@util/*": ["util/*"],
+			"@handlers/*": ["util/handlers/*"],
+			"@cmd/*": ["util/cmd/*"],
+			"@events/*": ["events/*"],
+			"@db": ["db/index.ts"],
+			"@db/*": ["db/*"],
+			"@models/*": ["db/Models/*"],
+			"@commands/*": ["commands/*"],
+			"@MaidBoye": ["main.ts"]
 		}
 	},
-	"include": [
-		"**/*"
-	],
-	"exclude": [
-		"node_modules",
-		"build",
-		"tmp",
-		"logs",
-		"test"
-	]
+	"include": ["**/*"],
+	"exclude": ["node_modules", "build", "tmp", "logs", "test"]
 }

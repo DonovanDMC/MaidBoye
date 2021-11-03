@@ -1,8 +1,8 @@
 import ClientEvent from "@util/ClientEvent";
 import EmbedBuilder from "@util/EmbedBuilder";
-import GuildConfig from "@db/Models/Guild/GuildConfig";
+import GuildConfig from "@models/Guild/GuildConfig";
 import BotFunctions from "@util/BotFunctions";
-import LoggingWebhookFailureHandler from "@util/handlers/LoggingWebhookFailureHandler";
+import LoggingWebhookFailureHandler from "@handlers/LoggingWebhookFailureHandler";
 import type Eris from "eris";
 import * as fs from "fs-extra";
 import { apiURL, bulkDeleteDir } from "@config";

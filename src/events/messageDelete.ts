@@ -2,9 +2,9 @@ import ClientEvent from "@util/ClientEvent";
 import db from "@db";
 import EmbedBuilder from "@util/EmbedBuilder";
 import { Strings } from "@uwu-codes/utils";
-import GuildConfig from "@db/Models/Guild/GuildConfig";
+import GuildConfig from "@models/Guild/GuildConfig";
 import BotFunctions from "@util/BotFunctions";
-import LoggingWebhookFailureHandler from "@util/handlers/LoggingWebhookFailureHandler";
+import LoggingWebhookFailureHandler from "@handlers/LoggingWebhookFailureHandler";
 const Redis = db.r;
 
 export default new ClientEvent("messageDelete", async function(message) {

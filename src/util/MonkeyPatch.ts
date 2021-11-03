@@ -9,8 +9,11 @@ moduleAlias.addAliases({
 	"@root": d,
 	"@config": `${d}/src/config`,
 	"@util": `${d}/src/util`,
+	"@handlers": `${d}/src/util/handlers`,
 	"@cmd": `${d}/src/util/cmd`,
+	"@events": `${d}/src/events`,
 	"@db": `${d}/src/db`,
+	"@models": `${d}/src/models`,
 	"@commands": `${d}/src/commands`,
 	"@MaidBoye": `${d}/src/main`
 });

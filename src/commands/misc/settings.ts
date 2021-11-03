@@ -1,4 +1,4 @@
-import ErrorHandler from "@util/handlers/ErrorHandler";
+import ErrorHandler from "@handlers/ErrorHandler";
 import Command from "@cmd/Command";
 import { emojis } from "@config";
 import ComponentHelper from "@util/components/ComponentHelper";

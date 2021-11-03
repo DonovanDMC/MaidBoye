@@ -1,10 +1,10 @@
 import ClientEvent from "@util/ClientEvent";
-import GuildConfig from "@db/Models/Guild/GuildConfig";
+import GuildConfig from "@models/Guild/GuildConfig";
 import EmbedBuilder from "@util/EmbedBuilder";
 import type Eris from "eris";
 import BotFunctions from "@util/BotFunctions";
 import { permissionNames } from "@config";
-import LoggingWebhookFailureHandler from "@util/handlers/LoggingWebhookFailureHandler";
+import LoggingWebhookFailureHandler from "@handlers/LoggingWebhookFailureHandler";
 
 export default new ClientEvent("guildRoleUpdate", async function(guild, role, oldRole) {
 

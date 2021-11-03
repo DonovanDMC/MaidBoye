@@ -3,7 +3,7 @@ import Eris, { DiscordRESTError } from "eris";
 import EmbedBuilder from "@util/EmbedBuilder";
 import ComponentHelper from "@util/components/ComponentHelper";
 import type MaidBoye from "@MaidBoye";
-import ErrorHandler from "@util/handlers/ErrorHandler";
+import ErrorHandler from "@handlers/ErrorHandler";
 import { emojis } from "@config";
 
 export default new Command("conga")

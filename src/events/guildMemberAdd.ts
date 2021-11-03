@@ -1,9 +1,9 @@
 import ClientEvent from "@util/ClientEvent";
 import EmbedBuilder from "@util/EmbedBuilder";
-import GuildConfig from "@db/Models/Guild/GuildConfig";
+import GuildConfig from "@models/Guild/GuildConfig";
 import BotFunctions from "@util/BotFunctions";
 import { developers, emojis, names } from "@config";
-import LoggingWebhookFailureHandler from "@util/handlers/LoggingWebhookFailureHandler";
+import LoggingWebhookFailureHandler from "@handlers/LoggingWebhookFailureHandler";
 
 export default new ClientEvent("guildMemberAdd", async function(guild, member) {
 	const logEvents = await GuildConfig.getLogEvents(guild.id, "memberAdd");
