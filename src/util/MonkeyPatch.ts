@@ -13,7 +13,7 @@ moduleAlias.addAliases({
 	"@cmd": `${d}/src/util/cmd`,
 	"@events": `${d}/src/events`,
 	"@db": `${d}/src/db`,
-	"@models": `${d}/src/db/models`,
+	"@models": `${d}/src/db/Models`,
 	"@commands": `${d}/src/commands`,
 	"@req": `${d}/src/util/req`,
 	"@MaidBoye": `${d}/src/main`
