@@ -61,10 +61,8 @@ export default class DonateRoute extends Route {
 
 				if (user !== null) {
 					const dUser = await client.getUser(user.id);
-					if (dUser) e
-						.setFooter(`${e.getFooter()?.text || ""} | Discord: ${dUser.tag}`)
-						.setAuthor(dUser.tag, dUser.avatarURL);
-					else e.setFooter(`${e.getFooter()?.text || ""} | Discord: ${user.id}`);
+					if (dUser) e.setAuthor(dUser.tag, dUser.avatarURL);
+					else e.setAuthor(user.id);
 				}
 
 				void WebhookStore.execute("donations", {
