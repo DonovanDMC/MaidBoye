@@ -16,9 +16,9 @@ export default class ComponentInteractionCollector {
 		this.client.on("interactionCreate", this.processInteraction.bind(this));
 	}
 
-	static processInteraction(interaction: Eris.PingInteraction | Eris.ComponentInteraction | Eris.CommandInteraction | Eris.UnknownInteraction) {
+	static processInteraction(interaction: Eris.PingInteraction | Eris.ComponentInteraction | Eris.CommandInteraction | Eris.AutocompleteInteraction | Eris.UnknownInteraction) {
 		let used = false;
-		if (interaction instanceof Eris.PingInteraction || interaction instanceof Eris.UnknownInteraction || interaction instanceof Eris.CommandInteraction) return false;
+		if (!(interaction instanceof Eris.ComponentInteraction)) return false;
 		if (interaction.data === undefined) return false;
 		const collectors = this.collectors.filter((col) => col.channel === interaction.channel.id);
 		for (const c of collectors) {

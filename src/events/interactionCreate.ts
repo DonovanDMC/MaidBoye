@@ -1,3 +1,5 @@
+import type { AutocompleteInteractionType } from "./autocomplete/main";
+import AutocompleteInteractionHandler from "./autocomplete/main";
 import type { ComponentInteractionType } from "@events/components/main";
 import ComponentInteractionHandler from "@events/components/main";
 import { beta } from "@config";
@@ -140,6 +142,10 @@ export default new ClientEvent("interactionCreate", async function(interaction) 
 			if (!("member" in interaction) || interaction.member === undefined) return;
 			void ComponentInteractionHandler.handle(interaction as ComponentInteractionType, this);
 			break;
+		}
+
+		case Eris.Constants.InteractionTypes.APPLICATION_COMMAND_AUTOCOMPLETE: {
+			void AutocompleteInteractionHandler.handle(interaction as AutocompleteInteractionType, this);
 		}
 	}
 });

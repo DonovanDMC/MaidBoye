@@ -42,7 +42,7 @@ export default class ComponentInteractionHandler {
 		void handler.call(client, interaction);
 	}
 
-	static registerHandler(id: string, idExact: boolean, handler: (this: MaidBoye, interaction: ComponentInteractionType) => Promise<unknown>) {
+	static registerHandler(id: string, idExact: boolean, handler: HandlerFunction) {
 		if (this.handlers.has(id)) throw new Error(`Duplicate handler id "${id}"`);
 		this.handlers.set(id, {
 			handler,

@@ -34,6 +34,7 @@ import {
 	userAgent
 } from "@config";
 import LoggingWebhookFailureHandler from "@handlers/LoggingWebhookFailureHandler";
+import AutocompleteInteractionHandler from "@events/autocomplete/main";
 import { performance } from "perf_hooks";
 import util from "util";
 
@@ -58,6 +59,7 @@ export default class MaidBoye extends Eris.Client {
 		if (!beta) CheweyAPI.analytics.initAutoPosting(this);
 		AntiSpam.init();
 		YiffRocks.setUserAgent(userAgent);
+		AutocompleteInteractionHandler.init();
 		ComponentInteractionHandler.init();
 		await this.connect();
 	}
@@ -172,7 +174,8 @@ export default class MaidBoye extends Eris.Client {
 		}
 		fs.writeFileSync(`${dataDir}/slash.json`, JSON.stringify(commands));
 
-		return (guild === undefined ? this.bulkEditCommands(commands.filter(c => (!filterNames || filterNames.length === 0) || filterNames.includes(c.name))) : this.bulkEditGuildCommands(guild, commands.filter(c => (!filterNames || filterNames.length === 0) || filterNames.includes(c.name))))
+		const d = commands.filter(c => (!filterNames || filterNames.length === 0) || filterNames.includes(c.name));
+		return (guild === undefined ? this.bulkEditCommands(d) : this.bulkEditGuildCommands(guild, d))
 			.then(
 				({ length }) => {
 					const end = process.hrtime.bigint();

@@ -24,15 +24,25 @@ export default new Command("selfroles", "selfrole")
 				{
 					type: Eris.Constants.ApplicationCommandOptionTypes.STRING,
 					name: "role",
-					description: "The name of the role you want to join (see list)",
-					required: true
+					description: "The name of the role you want to join (see list, uses autocomplete)",
+					required: true,
+					autocomplete: true
 				}
 			]
 		},
 		{
 			type: Eris.Constants.ApplicationCommandOptionTypes.SUB_COMMAND,
 			name: "leave",
-			description: "Leave a self assignable role (opens select menu)"
+			description: "Leave a self assignable role",
+			options: [
+				{
+					type: Eris.Constants.ApplicationCommandOptionTypes.STRING,
+					name: "role",
+					description: "The name of the role you want to leave (see list, uses autocomplete)",
+					required: true,
+					autocomplete: true
+				}
+			]
 		},
 		{
 			type: Eris.Constants.ApplicationCommandOptionTypes.SUB_COMMAND,
@@ -120,6 +130,16 @@ export default new Command("selfroles", "selfrole")
 			}
 
 			case "join": {
+				if (msg.cmdInteracton !== null) {
+					// we can't use ephemeral messages because the original application command acknowledgement is not ephemeral
+					// @FIXME ^
+					if (/autocomplete\.none\.[0-9]{15,21}/.exec(msg.args[1])) return msg.cmdInteracton.createMessage({
+						content: "As the menu said, this server does not have any self assignable roles."
+					});
+					else if (/autocomplete\.all\.[0-9]{15,21}/.exec(msg.args[1])) return msg.cmdInteracton.createMessage({
+						content: "As the menu said, you already have all of the roles this server offers."
+					});
+				}
 				if (msg.gConfig.selfRoles.size === 0) return msg.reply("Th-this server doesnt't have any self roles..");
 				const roles = msg.gConfig.selfRoles.map(({ role }) => msg.channel.guild.roles.get(role)!).filter(r => r.name.toLowerCase().includes(msg.args.slice(1).join(" ").toLowerCase()));
 				let role: Eris.Role;
@@ -200,6 +220,16 @@ export default new Command("selfroles", "selfrole")
 			}
 
 			case "leave": {
+				if (msg.cmdInteracton !== null) {
+					// we can't use ephemeral messages because the original application command acknowledgement is not ephemeral
+					// @FIXME ^
+					if (/autocomplete\.none\.[0-9]{15,21}/.exec(msg.args[1])) return msg.cmdInteracton.createMessage({
+						content: "As the menu said, this server does not have any self assignable roles."
+					});
+					else if (/autocomplete\.nojoin\.[0-9]{15,21}/.exec(msg.args[1])) return msg.cmdInteracton.createMessage({
+						content: "As the menu said, you haven't gained any roles via self roles."
+					});
+				}
 				if (msg.gConfig.selfRoles.size === 0) return msg.reply("Th-this server doesnt't have any self roles..");
 				if (selfList.length === 0) return msg.reply("Y-you haven't gained any roles via self roles..");
 				const makeChoice = await msg.reply({
