@@ -35,7 +35,7 @@ export default class DonateRoute extends Route {
 				const d = JSON.parse<KoFiDonation>((req.body as { data: string; }).data);
 				const [user = null] = await db.query("SELECT * FROM users WHERE premium_kofi_email = ?", [crypto.createHash("md5").update(d.email).digest("hex")]) as Array<RawUserConfig>;
 				if (user !== null) {
-					await UserConfig.prototype.edit.call(user, {
+					await UserConfig.prototype.edit.call({ id: user.id, reload: () => null }, {
 						donations: {
 							months: user.premium_months + 1,
 							// only change it to true
@@ -54,13 +54,22 @@ export default class DonateRoute extends Route {
 						]
 					});
 				}
+				const e = new EmbedBuilder()
+					.setTitle(`${d.type === "Donation" ? "One Time Donation" : d.is_first_payment ? `New Subscription ${emojis.default.tada}` : "Renewed Subscription"} | Amount: ${Number(d.amount)} ${d.currency}`)
+					.setDescription(d.is_public ? d.message : "User Has Chosen To Keep Their Donation Private.")
+					.setFooter(`Name: ${d.is_public ? d.from_name : "[Private]"}${user === null ? " | This Donation Is Unclaimed" : ""}`, botIcon);
+
+				if (user !== null) {
+					const dUser = await client.getUser(user.id);
+					if (dUser) e
+						.setFooter(`${e.getFooter()?.text || ""} | Discord: ${dUser.tag}`)
+						.setAuthor(dUser.tag, dUser.avatarURL);
+					else e.setFooter(`${e.getFooter()?.text || ""} | Discord: ${user.id}`);
+				}
+
 				void WebhookStore.execute("donations", {
 					embeds: [
-						new EmbedBuilder()
-							.setTitle(`${d.type === "Donation" ? "One Time Donation" : d.is_first_payment ? `New Subscription ${emojis.default.tada}` : "Renewed Subscription"} | Amount: ${Number(d.amount)} ${d.currency}`)
-							.setDescription(d.is_public ? d.message : "User Has Chosen To Keep Their Donation Private.")
-							.setFooter(`Name: ${d.is_public ? d.from_name : "[Private]"}${user === null ? " | This Donation Is Unclaimed" : ""}`, botIcon)
-							.toJSON()
+						e.toJSON()
 					]
 				}, false);
 
