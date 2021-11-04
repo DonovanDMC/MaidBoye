@@ -51,8 +51,7 @@ export interface RawLevel {
 export type UserConfigKV = DataTypes<UserConfig>;
 export default class UserConfig {
 	id: string;
-	// @TODO remove roles from this array when they are manually removed
-	// so they can't remove manually added roles
+	// @TODO remove roles from this array when they are manually removed\
 	selfRolesJoined: Array<SelfRoleJoined>;
 	donations: {
 		kofiEmail: string | null;

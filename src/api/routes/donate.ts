@@ -7,6 +7,7 @@ import EmbedBuilder from "@util/EmbedBuilder";
 import db from "@db";
 import type { RawUserConfig } from "@models/User/UserConfig";
 import UserConfig from "@models/User/UserConfig";
+import crypto from "crypto";
 
 interface KoFiDonation {
 	message_id: string;
@@ -32,7 +33,7 @@ export default class DonateRoute extends Route {
 			.post("/ko-fi", async(req, res) => {
 				if (req.query.code !== apiKeys["ko-fi"]) return res.status(401).end();
 				const d = JSON.parse<KoFiDonation>((req.body as { data: string; }).data);
-				const [user = null] = await db.query("SELECT * FROM users WHERE premium_kofi_email = ?", [d.email]) as Array<RawUserConfig>;
+				const [user = null] = await db.query("SELECT * FROM users WHERE premium_kofi_email = ?", [crypto.createHash("md5").update(d.email).digest("hex")]) as Array<RawUserConfig>;
 				if (user !== null) {
 					await UserConfig.prototype.edit.call(user, {
 						donations: {

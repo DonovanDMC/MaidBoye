@@ -234,12 +234,16 @@ Object.defineProperties(Eris.Message.prototype, {
 	}
 });
 
-Object.defineProperties(Eris.GuildChannel.prototype, {
+
+Object.defineProperties(Eris.Channel.prototype, {
 	awaitMessages: {
 		async value(this: Eris.GuildTextableChannel, timeout: number, filter: (msg: Eris.Message<Eris.TextableChannel>) => boolean = (() => true), limit?: number) {
 			return MessageCollector.awaitMessages(this.id, timeout, filter, limit as 1);
 		}
-	},
+	}
+});
+
+Object.defineProperties(Eris.GuildChannel.prototype, {
 	awaitComponentInteractions: {
 		async value(this: Eris.GuildTextableChannel, timeout: number, filter: (interaction: Eris.ComponentInteraction) => boolean = (() => true), limit?: number) {
 			return ComponentInteractionCollector.awaitInteractions(this.id, timeout, filter, limit as 1);
