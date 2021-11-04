@@ -141,7 +141,8 @@ export default new Command("selfroles", "selfrole")
 					});
 				}
 				if (msg.gConfig.selfRoles.size === 0) return msg.reply("Th-this server doesnt't have any self roles..");
-				const roles = msg.gConfig.selfRoles.map(({ role }) => msg.channel.guild.roles.get(role)!).filter(r => r.name.toLowerCase().includes(msg.args.slice(1).join(" ").toLowerCase()));
+				const [,id] = /(?:<@&)?([0-9]{15,21})>?/.exec(msg.args[1]) ?? [];
+				const roles = msg.gConfig.selfRoles.map(({ role }) => msg.channel.guild.roles.get(role)!).filter(r => r.name.toLowerCase().includes(msg.args.slice(1).join(" ").toLowerCase()) || (id && r.id === id));
 				let role: Eris.Role;
 				if (roles.length === 0) return msg.reply("No roles were found with what you provided..");
 				else if (roles.length === 1) {
@@ -232,44 +233,59 @@ export default new Command("selfroles", "selfrole")
 				}
 				if (msg.gConfig.selfRoles.size === 0) return msg.reply("Th-this server doesnt't have any self roles..");
 				if (selfList.length === 0) return msg.reply("Y-you haven't gained any roles via self roles..");
-				const makeChoice = await msg.reply({
-					embeds: [
-						new EmbedBuilder(true, msg.author)
-							.setDescription("Please select a role to leave.\nIf a role you're looking for isn't listed here, and you have the role, you did not join it via self roles. You cannot leave roles that were manually assigned to you by server staff.")
-							.setColor("gold")
+				let made: string, choice: Eris.ComponentInteraction<Eris.TextableChannel> | null = null;
+				const [,id] = /(?:<@&)?([0-9]{15,21})>?/.exec(msg.args[1] || "") ?? [];
+				if (id) made = id;
+				else {
+					const makeChoice = await msg.reply({
+						embeds: [
+							new EmbedBuilder(true, msg.author)
+								.setDescription("Please select a role to leave.\nIf a role you're looking for isn't listed here, and you have the role, you did not join it via self roles. You cannot leave roles that were manually assigned to you by server staff.")
+								.setColor("gold")
+								.toJSON()
+						],
+						components: new ComponentHelper()
+							.addSelectMenu(`select-role.${msg.author.id}`, selfList.map(r => ({
+								label: msg.channel.guild.roles.get(r.role)?.name ?? `Unknown[${r.role}]`,
+								value: r.role
+							})), "Select A Role To Leave", 1, 1)
+							.addInteractionButton(ComponentHelper.BUTTON_DANGER, `select-role.${msg.author.id}.cancel`, false, ComponentHelper.emojiToPartial(emojis.default.x, "default"), "Cancel")
 							.toJSON()
-					],
-					components: new ComponentHelper()
-						.addSelectMenu(`select-role.${msg.author.id}`, selfList.map(r => ({
-							label: msg.channel.guild.roles.get(r.role)?.name ?? `Unknown[${r.role}]`,
-							value: r.role
-						})), "Select A Role To Leave", 1, 1)
-						.addInteractionButton(ComponentHelper.BUTTON_DANGER, `select-role.${msg.author.id}.cancel`, false, ComponentHelper.emojiToPartial(emojis.default.x, "default"), "Cancel")
-						.toJSON()
-				});
-				const choice = await ComponentInteractionCollector.awaitInteractions(msg.channel.id, 3e4, (i) => i.data.custom_id.startsWith(`select-role.${msg.author.id}`) && i.message.id === makeChoice.id && !!i.member?.user && i.member.user.id === msg.author.id);
-				if (choice === null) return msg.reply("Th-this either timed out, or you made an invalid selection..");
-				await choice.acknowledge();
-				if (choice.data.custom_id.endsWith("cancel")) return choice.editOriginalMessage({
-					embeds: [
-						new EmbedBuilder(true, msg.author)
-							.setDescription("Cancelled.")
-							.setColor("red")
-							.toJSON()
-					],
-					components: []
-				});
-				// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
-				const [made] = (choice.data as Eris.ComponentInteractionSelectMenuData).values!;
-				if (!selfList.map(r => r.role).includes(made)) return choice.editOriginalMessage({
-					embeds: [
-						new EmbedBuilder(true, msg.author)
-							.setDescription("You made an invalid choice..")
-							.setColor("red")
-							.toJSON()
-					],
-					components: []
-				});
+					});
+					choice = await ComponentInteractionCollector.awaitInteractions(msg.channel.id, 3e4, (i) => i.data.custom_id.startsWith(`select-role.${msg.author.id}`) && i.message.id === makeChoice.id && !!i.member?.user && i.member.user.id === msg.author.id);
+					if (choice === null) return msg.reply("Th-this either timed out, or you made an invalid selection..");
+					await choice.acknowledge();
+					if (choice.data.custom_id.endsWith("cancel")) return choice.editOriginalMessage({
+						embeds: [
+							new EmbedBuilder(true, msg.author)
+								.setDescription("Cancelled.")
+								.setColor("red")
+								.toJSON()
+						],
+						components: []
+					});
+					// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+					made = (choice.data as Eris.ComponentInteractionSelectMenuData).values![0];
+				}
+				if (!selfList.map(r => r.role).includes(made)) {
+					if (choice) return choice.editOriginalMessage({
+						embeds: [
+							new EmbedBuilder(true, msg.author)
+								.setDescription("You made an invalid choice..")
+								.setColor("red")
+								.toJSON()
+						],
+						components: []
+					});
+					else return msg.reply({
+						embeds: [
+							new EmbedBuilder(true, msg.author)
+								.setDescription("You made an invalid choice..")
+								.setColor("red")
+								.toJSON()
+						]
+					});
+				}
 
 				// we can safely assume the role has been deleted or something similar
 				// if they don't have the role at this point
@@ -286,7 +302,7 @@ export default new Command("selfroles", "selfrole")
 				if (msg.member.roles.includes(made)) await msg.member.removeRole(made, "SelfRoles[Leave]");
 				await msg.uConfig.removeSelfRoleJoined(msg.channel.guild.id, made, "role");
 				await msg.uConfig.fix();
-				return choice.editOriginalMessage({
+				if (choice) return choice.editOriginalMessage({
 					embeds: [
 						new EmbedBuilder(true, msg.author)
 							.setDescription(`Congrats, you no longer have the <@&${made}> role.`)
@@ -294,6 +310,14 @@ export default new Command("selfroles", "selfrole")
 							.toJSON()
 					],
 					components: []
+				});
+				else return msg.reply({
+					embeds: [
+						new EmbedBuilder(true, msg.author)
+							.setDescription(`Congrats, you no longer have the <@&${made}> role.`)
+							.setColor("orange")
+							.toJSON()
+					]
 				});
 				break;
 			}
