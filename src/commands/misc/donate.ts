@@ -21,7 +21,7 @@ export default new Command("donate")
 			}
 			await msg.uConfig.edit({
 				donations: {
-					kofiEmail: crypto.createHash("md5").update(d.content).digest("hex")
+					kofiEmail: crypto.createHash("md5").update(w.content.trim()).digest("hex")
 				}
 			});
 			await d.edit("Done, thank you.");
