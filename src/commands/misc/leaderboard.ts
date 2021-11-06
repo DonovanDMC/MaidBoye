@@ -23,7 +23,7 @@ export default new Command("leaderboard", "lb")
 		return msg.reply({
 			embeds: [
 				new EmbedBuilder(true, msg.author)
-					.setTitle(global ? "Global Leaderboard" : "Server Loeaderboard")
+					.setTitle(global ? "Global Leaderboard" : "Server Leaderboard")
 					.setDescription(
 						await Promise.all(lb.map(async(v, i) => {
 							const u = await this.getUser(v.user);
