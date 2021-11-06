@@ -108,8 +108,10 @@ export default class db {
 		});
 	}
 
-	static async getKeys(pattern: string) {
-		return new Promise<Array<string>>(resolve => {
+	static async getKeys<T extends (string | number) = string>(pattern: string, get: true, parse?: (val: string) => T): Promise<Record<string, T>>
+	static async getKeys<T extends (string | number) = string>(pattern: string, get?: false, parse?: (val: string) => T): Promise<Array<T>>
+	static async getKeys<T extends (string | number) = string>(pattern: string, get = false, parse: (val: string) => T = (val) => val as T) {
+		return new Promise<Array<T> | Record<string, T>>(resolve => {
 			// we use a one off client so we don't block the main one
 			const client = new IORedis(services.redis.port, services.redis.host, {
 				username: services.redis.username,
@@ -120,8 +122,15 @@ export default class db {
 			});
 			client.on("ready", async() => {
 				const keys = await Utility.getKeys(client, pattern);
+				if (get && keys.length > 0) {
+					const val = await client.mget(keys) as Array<string>;
+					await client.quit();
+					return resolve(val.filter(Boolean).map((v,i) => ({
+						[keys[i]]: parse(v)
+					})).reduce((a,b) => ({ ...a, ...b }), {}));
+				}
 				await client.quit();
-				return resolve(keys);
+				return resolve(keys as Array<T>);
 			});
 		});
 	}

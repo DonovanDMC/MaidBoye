@@ -347,8 +347,13 @@ export default new ClientEvent("messageCreate", async function (message) {
 	t.end("restrictions");
 
 	StatsHandler.trackBulkNoResponse(
+		"stats:commands",
 		`stats:commands:${cmd.triggers[0]}`,
-		`stats:users:${msg.author.id}:commands:${cmd.triggers[0]}`
+		`stats:users:${msg.author.id}:commands`,
+		`stats:users:${msg.author.id}:commands:${cmd.triggers[0]}`,
+		`stats:guilds:${msg.channel.guild.id}:commands`,
+		`stats:guilds:${msg.channel.guild.id}:users:${msg.author.id}:commands`,
+		`stats:guilds:${msg.channel.guild.id}:users:${msg.author.id}:commands:${cmd.triggers[0]}`
 	);
 	EventsASecondHandler.add("COMMANDS");
 	EventsASecondHandler.add(`COMMANDS.${cmd.triggers[0].toUpperCase()}`);

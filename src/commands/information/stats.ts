@@ -37,6 +37,15 @@ export default new Command("stats")
 
 		const sec = EventsASecondHandler.get();
 
+		const userTotal = await Redis.get(`stats:users:${msg.author.id}:commands`).then(v => Number(v));
+		const userCommands = await db.getKeys(`stats:users:${msg.author.id}:commands:*`, true, (val) => Number(val));
+		const [userMostKey, userMostValue] = Object.entries(userCommands).sort(([, b], [, d]) => d - b)[0];
+		const userGuildTotal = await Redis.get(`stats:guilds:${msg.channel.guild.id}:users:${msg.author.id}:commands`).then(v => Number(v));
+		const userGuildCommands = await db.getKeys(`stats:guilds:${msg.channel.guild.id}:users:${msg.author.id}:commands:*`, true, (val) => Number(val));
+		const [userGuildMostKey, userGuildMostValue] = Object.entries(userGuildCommands).sort(([, b], [, d]) => d - b)[0];
+		const allTotal = await Redis.get("stats:commands").then(v => Number(v));
+		const allCommands = await db.getKeys("stats:commands:*", true, (val) => Number(val));
+		const [allMostKey, allMostValue] = Object.entries(allCommands).sort(([, b], [, d]) => d - b)[0];
 		return msg.reply({
 			embeds: [
 				new EmbedBuilder(true, msg.author)
@@ -44,7 +53,15 @@ export default new Command("stats")
 					.addField("Events", await Promise.all(Object.entries(sec).filter(([key]) => !["GENERAL"].includes(key) && !key.startsWith("COMMANDS")).map(async([key, value]) => {
 						const v = await Redis.get(`stats:events:${key}`);
 						return `${emojis.default.dot} **${key}** ${value}/second (${(v ?? 0).toLocaleString("en-US")} total)`;
-					})).then(v => v.join("\n")), false)
+					})).then(v => v.join("\n")), true)
+					.addField("Commands", [
+						`Total You: **${userTotal}**`,
+						`Most You: \`${userMostKey.split(":").slice(-1)[0]}\` (**${userMostValue}**)`,
+						`Total Server: **${userGuildTotal}**`,
+						`Most Server: \`${userGuildMostKey.split(":").slice(-1)[0]}\` (**${userGuildMostValue}**)`,
+						`Total Global: **${allTotal}**`,
+						`Most Global: \`${allMostKey.split(":").slice(-1)[0]}\` (**${allMostValue}**)`
+					].join("\n"), false)
 					.addField("MariaDB", sql === undefined ? "None" : [
 						`Ping: **${Timer.calc(sqlStart, sqlEnd, 2, false)}**`,
 						`Total Connections: **${sql.TOTAL_CONNECTIONS.toLocaleString("en-US")}**`,
