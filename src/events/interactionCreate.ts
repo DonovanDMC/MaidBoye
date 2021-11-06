@@ -30,7 +30,7 @@ export default new ClientEvent("interactionCreate", async function(interaction) 
 					const setting = Settings.find(s => !!interaction.data.options!.find(o => slashify(s.name) === o.name));
 					if (setting) {
 						await interaction.acknowledge();
-						void setting.execSlash(interaction);
+						void setting.execSlash.call(setting, interaction);
 					}
 					return;
 				}

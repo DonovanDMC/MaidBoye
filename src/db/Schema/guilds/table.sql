@@ -14,6 +14,7 @@ CREATE TABLE `guilds` (
 	`settings_snipe_disabled`           TINYINT(1)   NOT NULL DEFAULT 0,
 	`settings_delete_mod_commands`      TINYINT(1)   NOT NULL DEFAULT 0,
 	`settings_announce_level_up`        TINYINT(1)   NOT NULL DEFAULT 0,
+	`settings_auto_sourcing`            TINYINT(1)   NOT NULL DEFAULT 0
 	PRIMARY KEY                                      (`id`),
 	UNIQUE KEY                          `id`         (`id`)
 );

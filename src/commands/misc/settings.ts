@@ -163,7 +163,7 @@ export default new Command("settings")
 							components: []
 						});
 						return [false, false];
-					} else return n.exec(msg, m);
+					} else return n.exec.call(n, msg, m);
 				}
 			}
 
