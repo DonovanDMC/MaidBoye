@@ -24,12 +24,22 @@ import {
 	permissionNames,
 	supportLink
 } from "@config";
+import RequestProxy from "@util/RequestProxy";
+import Sauce, { autoMimeTypes } from "@util/Sauce";
 const Redis = db.r;
 
 export default new ClientEvent("messageCreate", async function (message) {
 	const t = new Timers((developers.includes(message.author.id) || beta) === true ? (label, info) => Logger.getLogger(label).debug(info) : false);
+	// private channels are sent as partials with only the id in gateway v8+
+	if (!("type" in message.channel)) {
+		const ch = await this.getRESTChannel(message.channel.id);
+		if (ch.type === Eris.Constants.ChannelTypes.DM) {
+			this.privateChannels.add(ch);
+			this.privateChannelMap[ch.id] = message.author.id;
+			message.channel = ch;
+		}
+	}
 	if (message.author.bot === true || !("type" in message.channel) || message.channel.type === Eris.Constants.ChannelTypes.GROUP_DM) return;
-
 	t.start("userBl");
 	const userBl = await UserConfig.prototype.checkBlacklist.call({ id: message.author.id });
 	if (userBl.active.length > 0) {
@@ -50,6 +60,32 @@ export default new ClientEvent("messageCreate", async function (message) {
 			`stats:users:${message.author.id}:directMessage`
 		);
 		Logger.info(`Direct message recieved from ${message.author.tag} (${message.author.id}) | Content: ${message.content || "NONE"}${message.attachments.length !== 0 ? ` | Attachments: ${message.attachments.map((a, i) => `[${i}]: ${a.url}`).join(", ")}` : ""}`);
+		let c = message.content;
+		if (c.startsWith("<") && c.endsWith(">")) c = c.slice(1, -1);
+		let val = Strings.validateURL(c);
+		if (!val && message.attachments.length > 0) {
+			const f = message.attachments.find(a => autoMimeTypes.includes(a.content_type ?? ""));
+			c = (f || message.attachments[0]).url;
+			val = true;
+		}
+		if (val) {
+			const head = await RequestProxy.head(c);
+			if (autoMimeTypes.includes(head.headers.get("content-type") ?? "")) {
+				const { method, tried, post, saucePercent, sourceOverride, snRateLimited, url } = await Sauce(c, undefined, true) as Exclude<Awaited<ReturnType<typeof Sauce>>, null>;
+				if (snRateLimited) return message.reply(`SauceNAO is ratelimiting us, so we couldn't try SauceNAO, we tried these instead: \`${tried.join("`, `")}\``);
+				if (method === undefined) return message.reply(`We couldn't find anything for the image "<${url}>"..\nWe tried: \`${tried.join("`, `")}\``);
+				if (method === "e621" && post !== null) {
+					return message.reply(`We found these sources via direct md5 lookup on e621\nLookup: <${url}>\n\nResults:\nhttps://e621.net/posts/${post.id}\n${post.sources.map(v => `<${v}>`).join("\n")}`);
+				} else if (method === "yiffy2" && sourceOverride) {
+					// we will only get to yiffy2 for YiffyAPI V2 images without an e621 source, other images end up being process like md5 lookups
+					return message.reply(`We found these sources via direct md5 lookup on YiffyAPI V2\nLookup: <${url}>\n\nResults:\n${(Array.isArray(sourceOverride) ? sourceOverride : [sourceOverride]).map((v, i) => i === 0 ? v : `<${v}>`).join("\n")}`);
+				} else if (method === "yiffy3" && post !== null) {
+					return message.reply(`We found these sources via direct md5 lookup on YiffyAPI V3\nLookup: <${url}>\n\nResults:\nhttps://yiff.rest/posts/${post.id}\n${post.sources.map(v => `<${v}>`).join("\n")}`);
+				} else if (method === "saucenao" && sourceOverride) {
+					return message.reply(`We these sources via a reverse image search on saucenao (similarity: ${saucePercent}%)\nLookup: <${url}>\n\nResults:\n${(Array.isArray(sourceOverride) ? sourceOverride : [sourceOverride]).map((v, i) => (i === 0 ? v : `<${v}>`).replace(/posts\/show/, "posts" /* legacy */)).join("\n")}`);
+				}
+			}
+		}
 		return message.channel.createMessage({
 			embeds: [
 				new EmbedBuilder()
@@ -137,7 +173,10 @@ export default new ClientEvent("messageCreate", async function (message) {
 				} else void msg.author.createMessage(`You leveled up in **${msg.channel.guild.name}** from **${oldLevel}** to **${level}**\n(I sent this here because I couldn't create messages in the channel you leveled up in)`);
 			}
 		}
+	}
 
+	if (cmd === null) {
+		/// e
 	}
 
 	if (load === false || cmd === null || msg.member === null) return;

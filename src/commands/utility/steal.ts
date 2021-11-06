@@ -1,10 +1,9 @@
 import Command from "@cmd/Command";
-import { apiKeys, userAgent } from "@config";
 import Logger from "@util/Logger";
 import CommandError from "@cmd/CommandError";
 import Eris from "eris";
-import fetch from "node-fetch";
 import Tinify from "tinify";
+import RequestProxy from "@util/RequestProxy";
 import { URL } from "url";
 
 export default new Command("steal")
@@ -51,12 +50,7 @@ export default new Command("steal")
 
 		if (!name) name = "Unknown";
 
-		const img = await fetch(`https://proxy-request.yiff.workers.dev?url=${encodeURIComponent(!id ? msg.args[0] : `https://cdn.discordapp.com/emojis/${id}`)}`, {
-			headers: {
-				"Authorization": apiKeys.proxyReq,
-				"User-Agent": userAgent
-			}
-		});
+		const img = await RequestProxy.get(!id ? msg.args[0] : `https://cdn.discordapp.com/emojis/${id}`);
 		const og = await img.buffer();
 		let b: Uint8Array;
 		if (og.byteLength > 256000) {
