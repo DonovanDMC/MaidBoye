@@ -186,8 +186,8 @@ export default new ClientEvent("messageCreate", async function (message) {
 	}
 
 	t.start("source.guild");
-	if (cmd === null) {
-		let c = message.content;
+	if (cmd === null && msg.gConfig.settings.autoSourcing) {
+		let c = msg.content;
 		if (c.startsWith("<") && c.endsWith(">")) c = c.slice(1, -1);
 		let val = Strings.validateURL(c);
 		if (!val && message.attachments.length > 0) {
