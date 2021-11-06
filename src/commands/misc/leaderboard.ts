@@ -27,7 +27,7 @@ export default new Command("leaderboard", "lb")
 					.setDescription(
 						await Promise.all(lb.map(async(v, i) => {
 							const u = await this.getUser(v.user);
-							return `${((page - 1) * lbPerPage) + (i + 1)}.) **${u === null ? `${v.user}:${v.guild}` : u.tag}** - Level **${v.xp.level}** (${v.xp.leftover}/${v.xp.leftover + v.xp.needed})`;
+							return `${((page - 1) * lbPerPage) + (i + 1)}.) **${u === null ? `[${v.user}:${v.guild}]` : u.tag}** - Level **${v.xp.level}** (${v.xp.leftover}/${v.xp.leftover + v.xp.needed})`;
 						}))
 					)
 					.setFooter(`Page ${page}/${maxPages} | Results Are Cached For ${global ? "5" : "2"} Minutes`, msg.channel.guild.iconURL || undefined)
