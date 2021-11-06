@@ -53,8 +53,8 @@ export default new Command("settings")
 					components: new ComponentHelper()
 						.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-back.${msg.author.id}`, page === 1, ComponentHelper.emojiToPartial(emojis.default.back, "default"), "Back")
 						.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-configure.${msg.author.id}`, false, ComponentHelper.emojiToPartial(emojis.custom.settings, "custom"), "Configure")
-						.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-exit.${msg.author.id}`, false, ComponentHelper.emojiToPartial(emojis.default.x, "default"), "Exit")
 						.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-next.${msg.author.id}`, page  === pages.length, ComponentHelper.emojiToPartial(emojis.default.next, "default"), "Next")
+						.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-exit.${msg.author.id}`, false, ComponentHelper.emojiToPartial(emojis.default.x, "default"), "Exit")
 						.toJSON()
 				} as Eris.InteractionContent;
 				if (id && token) await this.createInteractionResponse(id, token, { type: Eris.Constants.InteractionResponseTypes.UPDATE_MESSAGE, data: body });

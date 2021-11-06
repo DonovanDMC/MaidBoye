@@ -1,9 +1,8 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import type ExtendedMessage from "./ExtendedMessage";
 import EmbedBuilder from "./EmbedBuilder";
 import ComponentHelper from "./components/ComponentHelper";
 import { emojis, yiffTypes } from "@config";
-import Eris, { Guild } from "eris";
+import Eris from "eris";
 import type GuildConfig from "@models/Guild/GuildConfig";
 import { Strings } from "@uwu-codes/utils";
 import db from "@db";
@@ -52,7 +51,7 @@ function genericBoolean(name: string, dbName: keyof GuildConfig["settings"], des
 			value: emojiValue,
 			type: emojiType
 		},
-		displayFormat(guild: GuildConfig) { return `\`${guild.settings[this.dbName] ? "Enabled" : "Disabled"}\``; },
+		displayFormat(guild: GuildConfig) { return `\`${guild.settings[this.dbName] ? (type === 0 ? "Yes" : "Enabled") : (type === 0 ? "No" : "Disabled")}\``; },
 		get slashCommandOptions() {
 			return [
 				{
@@ -604,7 +603,7 @@ const Settings = [
 		"Auto Link Sourcing",
 		"autoSourcing",
 		"if linked images should be auto sourced (includes non prefixed messages)",
-		null,
+		"if linked images should be auto sourced",
 		0,
 		emojis.default.info,
 		"default"
