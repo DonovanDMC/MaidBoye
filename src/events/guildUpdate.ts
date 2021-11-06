@@ -294,14 +294,14 @@ export default new ClientEvent("guildUpdate", async function(guild, oldGuild) {
 		const oldFlags = BotFunctions.getSystemChannelFlags(oldGuild.systemChannelFlags);
 		const newFlags = BotFunctions.getSystemChannelFlags(guild.systemChannelFlags);
 		if (oldGuild.systemChannelFlags !== guild.systemChannelFlags) {
-			if (oldFlags.SUPPRESS_GUILD_REMINDER_NOTIFICATIONS !== newFlags.SUPPRESS_GUILD_REMINDER_NOTIFICATIONS)  embeds.push(new EmbedBuilder(true)
+			if (oldFlags.SUPPRESS_GUILD_REMINDER_NOTIFICATIONS !== newFlags.SUPPRESS_GUILD_REMINDER_NOTIFICATIONS) embeds.push(new EmbedBuilder(true)
 				.setTitle("Server Updated")
 				.setColor("gold")
 				.setDescription(`This server's system channel had server reminder notifications ${oldFlags.SUPPRESS_GUILD_REMINDER_NOTIFICATIONS ? "disabled" : "enabled"}.`)
 				.toJSON()
 			);
 
-			if (oldFlags.SUPPRESS_JOIN_NOTIFICATIONS !== newFlags.SUPPRESS_JOIN_NOTIFICATIONS)  embeds.push(new EmbedBuilder(true)
+			if (oldFlags.SUPPRESS_JOIN_NOTIFICATIONS !== newFlags.SUPPRESS_JOIN_NOTIFICATIONS) embeds.push(new EmbedBuilder(true)
 				.setTitle("Server Updated")
 				.setColor("gold")
 				.setDescription(`This server's system channel had join notifications ${oldFlags.SUPPRESS_JOIN_NOTIFICATIONS ? "disabled" : "enabled"}.`)
@@ -312,6 +312,13 @@ export default new ClientEvent("guildUpdate", async function(guild, oldGuild) {
 				.setTitle("Server Updated")
 				.setColor("gold")
 				.setDescription(`This server's system channel had premium subscription notifications ${oldFlags.SUPPRESS_PREMIUM_SUBSCRIPTIONS ? "disabled" : "enabled"}.`)
+				.toJSON()
+			);
+
+			if (oldFlags.SUPPRESS_JOIN_NOTIFICATION_REPLIES !== newFlags.SUPPRESS_JOIN_NOTIFICATION_REPLIES)  embeds.push(new EmbedBuilder(true)
+				.setTitle("Server Updated")
+				.setColor("gold")
+				.setDescription(`This server's system channel join notification replies ${oldFlags.SUPPRESS_JOIN_NOTIFICATION_REPLIES ? "disabled" : "enabled"}.`)
 				.toJSON()
 			);
 		}
