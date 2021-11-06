@@ -3,7 +3,7 @@ import type ExtendedMessage from "./ExtendedMessage";
 import EmbedBuilder from "./EmbedBuilder";
 import ComponentHelper from "./components/ComponentHelper";
 import { emojis, yiffTypes } from "@config";
-import Eris from "eris";
+import Eris, { Guild } from "eris";
 import type GuildConfig from "@models/Guild/GuildConfig";
 import { Strings } from "@uwu-codes/utils";
 import db from "@db";
@@ -41,82 +41,125 @@ async function duplicate(originalMessage: ExtendedMessage, botMessage: Eris.Mess
 export type ExecReturn = [keepGoing: true, wait: boolean] | [keepGoing: false, wait: false];
 export const slashify = (str: string) => str.toLowerCase().replace(/\s/g, "-");
 
-async function genericBooleanExec(this: typeof Settings[number],  originalMessage: ExtendedMessage, botMessage: Eris.Message<Eris.GuildTextableChannel>): Promise<ExecReturn> {
-	const b = JSON.parse<Eris.AdvancedMessageContent>(JSON.stringify({ embeds: botMessage.embeds, components: botMessage.components }));
-	await botMessage.edit({
-		embeds: [
-			new EmbedBuilder(true, originalMessage.author)
-				.setTitle(`Server Settings: ${this.name}`)
-				.setDescription("Please select an option from below.")
-				.toJSON()
-		],
-		components: new ComponentHelper()
-			.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-back.${originalMessage.author.id}`, false, ComponentHelper.emojiToPartial(emojis.default.back, "default"), "Back")
-			.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-exit.${originalMessage.author.id}`, false, ComponentHelper.emojiToPartial(emojis.default.x, "default"), "Exit")
-			.addRow()
-			.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-yes.${originalMessage.author.id}`, false, ComponentHelper.emojiToPartial(emojis.custom.greenTick, "custom"), "Yes")
-			.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-no.${originalMessage.author.id}`, false, ComponentHelper.emojiToPartial(emojis.custom.redTick, "custom"), "No")
-			.toJSON()
-	});
-	const wait = await originalMessage.channel.awaitComponentInteractions(6e4, (it) => it.data.custom_id.startsWith("settings-") && it.member!.user.id === originalMessage.author.id && it.message.id === botMessage.id);
-	if (wait === null) {
-		await botMessage.edit({
-			content: "",
-			components: []
-		});
-		return [false, false];
-	} else {
-		const v = wait.data.custom_id.split("-")[1].split(".")[0];
-		await wait.acknowledge();
-		if (v === null) {
-			if (wait.data.custom_id.includes("back")) {
-				await botMessage.edit(b);
-				return [true, false];
-			} else {
+function genericBoolean(name: string, dbName: keyof GuildConfig["settings"], description: string, shortDescription: string | null, type: 0 | 1, emojiValue: string, emojiType: "default" | "custom") {
+	return {
+		name,
+		dbName,
+		description,
+		shortDescription,
+		validValuesDescription: type === 0 ? "`yes` or `no`" : "`enabled` or `disabled`",
+		emoji: {
+			value: emojiValue,
+			type: emojiType
+		},
+		displayFormat(guild: GuildConfig) { return `\`${guild.settings[this.dbName] ? "Enabled" : "Disabled"}\``; },
+		get slashCommandOptions() {
+			return [
+				{
+					type: Eris.Constants.ApplicationCommandOptionTypes.STRING,
+					name: "value",
+					description: "The option value.",
+					choices: type === 0 ? [
+						{
+							name: "Yes",
+							value: "yes"
+						},
+						{
+							name: "No",
+							value: "no"
+						}
+					] : [
+						{
+							name: "Enabled",
+							value: "enabled"
+						},
+						{
+							name: "Disabled",
+							value: "disabled"
+						}
+					],
+					required: true
+
+				}
+			] as Array<Eris.ApplicationCommandOptionsStringWithoutAutocomplete>;
+		},
+		async exec(originalMessage: ExtendedMessage, botMessage: Eris.Message<Eris.GuildTextableChannel>): Promise<ExecReturn> {
+			const b = JSON.parse<Eris.AdvancedMessageContent>(JSON.stringify({ embeds: botMessage.embeds, components: botMessage.components }));
+			await botMessage.edit({
+				embeds: [
+					new EmbedBuilder(true, originalMessage.author)
+						.setTitle(`Server Settings: ${this.name}`)
+						.setDescription("Please select an option from below.")
+						.toJSON()
+				],
+				components: new ComponentHelper()
+					.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-back.${originalMessage.author.id}`, false, ComponentHelper.emojiToPartial(emojis.default.back, "default"), "Back")
+					.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-exit.${originalMessage.author.id}`, false, ComponentHelper.emojiToPartial(emojis.default.x, "default"), "Exit")
+					.addRow()
+					.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-yes.${originalMessage.author.id}`, false, ComponentHelper.emojiToPartial(emojis.custom.greenTick, "custom"), "Yes")
+					.addInteractionButton(ComponentHelper.BUTTON_PRIMARY, `settings-no.${originalMessage.author.id}`, false, ComponentHelper.emojiToPartial(emojis.custom.redTick, "custom"), "No")
+					.toJSON()
+			});
+			const wait = await originalMessage.channel.awaitComponentInteractions(6e4, (it) => it.data.custom_id.startsWith("settings-") && it.member!.user.id === originalMessage.author.id && it.message.id === botMessage.id);
+			if (wait === null) {
 				await botMessage.edit({
 					content: "",
 					components: []
 				});
 				return [false, false];
-			}
-		}
+			} else {
+				const v = wait.data.custom_id.split("-")[1].split(".")[0];
+				await wait.acknowledge();
+				if (v === null) {
+					if (wait.data.custom_id.includes("back")) {
+						await botMessage.edit(b);
+						return [true, false];
+					} else {
+						await botMessage.edit({
+							content: "",
+							components: []
+						});
+						return [false, false];
+					}
+				}
 
-		if ((originalMessage.gConfig.settings[this.dbName] === false && v === "no") || (originalMessage.gConfig.settings.snipeDisabled === true && v === "yes")) {
-			const dup = await duplicate(originalMessage, botMessage, this.name, originalMessage.gConfig.settings[this.dbName] ? "Yes" : "No");
-			if (dup === true) {
-				await botMessage.edit(b);
-				return [true, false];
+				if ((originalMessage.gConfig.settings[this.dbName] === false && v === "no") || (originalMessage.gConfig.settings.snipeDisabled === true && v === "yes")) {
+					const dup = await duplicate(originalMessage, botMessage, this.name, originalMessage.gConfig.settings[this.dbName] ? "Yes" : "No");
+					if (dup === true) {
+						await botMessage.edit(b);
+						return [true, false];
+					}
+					return [false, false];
+				}
+				await originalMessage.gConfig.edit({
+					settings: {
+						[this.dbName]: v === "yes"
+					}
+				});
+				await botMessage.edit({
+					content: `**${this.name}** has been updated to \`${v}\`. Returning to menu in 3 seconds..`,
+					embeds: b.embeds,
+					components: b.components
+				});
+				return [true, true];
 			}
-			return [false, false];
+		},
+		async execSlash(interaction: Eris.CommandInteraction) {
+			if (!interaction.guildID || !interaction.member || interaction.data.options === undefined || interaction.data.options.length === 0) return;
+			const main = interaction.data.options.find(o => o.name === slashify(this.name)) as Eris.InteractionDataOptionsSubCommand;
+			if (!main || main.options === undefined || main.options.length === 0) return;
+			const t = main.options.find(o => o.name === "value");
+			if (!t || t.type !== Eris.Constants.ApplicationCommandOptionTypes.STRING) return;
+			const gConfig = await db.getGuild(interaction.guildID);
+			if (gConfig.settings[this.dbName] === (["enabled", "yes"].includes(t.value))) return interaction.createMessage(`H-hey! **${this.name}** is already set to \`${Strings.ucwords(t.value)}\`..`);
+			await gConfig.edit({
+				settings: {
+					[this.dbName]: ["enabled", "yes"].includes(t.value)
+				}
+			});
+			return interaction.createMessage(`**${this.name}** was updated to \`${Strings.ucwords(t.value)}\`.`);
 		}
-		await originalMessage.gConfig.edit({
-			settings: {
-				[this.dbName]: v === "yes"
-			}
-		});
-		await botMessage.edit({
-			content: `**${this.name}** has been updated to \`${v}\`. Returning to menu in 3 seconds..`,
-			embeds: b.embeds,
-			components: b.components
-		});
-		return [true, true];
-	}
-}
-
-async function genericBooleanSlashExec(this: typeof Settings[number], interaction: Eris.CommandInteraction) {
-	if (!interaction.guildID || !interaction.member || interaction.data.options === undefined || interaction.data.options.length === 0) return;
-	const main = interaction.data.options.find(o => o.name === slashify(this.name)) as Eris.InteractionDataOptionsSubCommand;
-	if (!main || main.options === undefined || main.options.length === 0) return;
-	const type = main.options.find(o => o.name === "value");
-	if (!type || type.type !== Eris.Constants.ApplicationCommandOptionTypes.STRING) return;
-	const gConfig = await db.getGuild(interaction.guildID);
-	if (gConfig.settings[this.dbName] === (["enabled", "yes"].includes(type.value))) return interaction.createMessage(`H-hey! **${this.name}** is already set to \`${Strings.ucwords(type.value)}\`..`);
-	await gConfig.edit({
-		settings: {
-			[this.dbName]: ["enabled", "yes"].includes(type.value)
-		}
-	});
-	return interaction.createMessage(`**${this.name}** was updated to \`${Strings.ucwords(type.value)}\`.`);
+	};
 }
 
 const Settings = [
@@ -521,178 +564,53 @@ const Settings = [
 			});
 		}
 	},
-	{
-		name: "Command Images",
-		dbName: "commandImages" as const,
-		description: "if we should display images on some `fun` commands",
-		shortDescription: null,
-		validValuesDescription: "`yes` or `no`",
-		emoji: {
-			value: emojis.custom.thumb,
-			type: "custom" as const
-		},
-		displayFormat(guild: GuildConfig) { return `\`${guild.settings[this.dbName] ? "Enabled" : "Disabled"}\``; },
-		get slashCommandOptions() {
-			return [
-				{
-					type: Eris.Constants.ApplicationCommandOptionTypes.STRING,
-					name: "value",
-					description: "The option value.",
-					choices: [
-						{
-							name: "Enabled",
-							value: "enabled"
-						},
-						{
-							name: "Disabled",
-							value: "disabled"
-						}
-					],
-					required: true
-
-				}
-			] as Array<Eris.ApplicationCommandOptionsStringWithoutAutocomplete>;
-		},
-		exec: genericBooleanExec,
-		execSlash: genericBooleanSlashExec
-	},
-	{
-		name: "Delete Mod Commands",
-		dbName: "deleteModCommands" as const,
-		description: "if moderation invocations should be deleted",
-		shortDescription: null,
-		validValuesDescription: "`enabled` or `disabled`",
-		emoji: {
-			value: emojis.default.pencil,
-			type: "default" as const
-		},
-		displayFormat(guild: GuildConfig) { return `\`${guild.settings[this.dbName] ? "Enabled" : "Disabled"}\``; },
-		get slashCommandOptions() {
-			return [
-				{
-					type: Eris.Constants.ApplicationCommandOptionTypes.STRING,
-					name: "value",
-					description: "The option value.",
-					choices: [
-						{
-							name: "Enabled",
-							value: "enabled"
-						},
-						{
-							name: "Disabled",
-							value: "disabled"
-						}
-					],
-					required: true
-				}
-			] as Array<Eris.ApplicationCommandOptionsStringWithoutAutocomplete>;
-		},
-		exec: genericBooleanExec,
-		execSlash: genericBooleanSlashExec
-	},
-	{
-		name: "Snipes Disabled",
-		dbName: "snipeDisabled" as const,
-		description: "if snipe/editsnipe should be disabled",
-		shortDescription: null,
-		validValuesDescription: "`yes` or `no`",
-		emoji: {
-			value: emojis.default.pencil,
-			type: "default" as const
-		},
-		displayFormat(guild: GuildConfig) { return `\`${guild.settings[this.dbName] ? "Yes" : "No"}\``; },
-		get slashCommandOptions() {
-			return [
-				{
-					type: Eris.Constants.ApplicationCommandOptionTypes.STRING,
-					name: "value",
-					description: "The option value.",
-					choices: [
-						{
-							name: "Yes",
-							value: "yes"
-						},
-						{
-							name: "No",
-							value: "no"
-						}
-					],
-					required: true
-				}
-			] as Array<Eris.ApplicationCommandOptionsStringWithoutAutocomplete>;
-		},
-		exec: genericBooleanExec,
-		execSlash: genericBooleanSlashExec
-	},
-	{
-		name: "Level Up Announcements",
-		dbName: "announceLevelUp" as const,
-		description: "if level ups should be announced (in channel)",
-		shortDescription: null,
-		validValuesDescription: "`enabled` or `disabled`",
-		emoji: {
-			value: emojis.default.pencil,
-			type: "default" as const
-		},
-		displayFormat(guild: GuildConfig) { return `\`${guild.settings[this.dbName] ? "Enabled" : "Disabled"}\``; },
-		get slashCommandOptions() {
-			return [
-				{
-					type: Eris.Constants.ApplicationCommandOptionTypes.STRING,
-					name: "value",
-					description: "The option value.",
-					choices: [
-						{
-							name: "Enabled",
-							value: "enabled"
-						},
-						{
-							name: "Disabled",
-							value: "disabled"
-						}
-					],
-					required: true
-				}
-			] as Array<Eris.ApplicationCommandOptionsStringWithoutAutocomplete>;
-		},
-		exec: genericBooleanExec,
-		execSlash: genericBooleanSlashExec
-	},
-	{
-		name: "Auto Link Sourcing",
-		dbName: "autoSourcing" as const,
-		description: "if linked images should be auto sourced",
-		shortDescription: null,
-		validValuesDescription: "`yes` or `no`",
-		emoji: {
-			value: emojis.default.info,
-			type: "default" as const
-		},
-		displayFormat(guild: GuildConfig) { return `\`${guild.settings[this.dbName] ? "Yes" : "No"}\``; },
-		get slashCommandOptions() {
-			return [
-				{
-					type: Eris.Constants.ApplicationCommandOptionTypes.STRING,
-					name: "value",
-					description: "The option value.",
-					choices: [
-						{
-							name: "Yes",
-							value: "yes"
-						},
-						{
-							name: "No",
-							value: "no"
-						}
-					],
-					required: true
-				}
-			] as Array<Eris.ApplicationCommandOptionsStringWithoutAutocomplete>;
-		},
-		exec: genericBooleanExec,
-		execSlash: genericBooleanSlashExec
-	}
+	genericBoolean(
+		"Command Images",
+		"commandImages",
+		"if we should display images on some `fun` commands",
+		null,
+		0,
+		emojis.custom.thumb,
+		"custom"
+	),
+	genericBoolean(
+		"Delete Mod Commands",
+		"deleteModCommands",
+		"if moderation invocations should be deleted",
+		null,
+		1,
+		emojis.default.pencil,
+		"default"
+	),
+	genericBoolean(
+		"Snipes Disabled",
+		"snipeDisabled",
+		"if snipe/editsnipe should be disabled",
+		null,
+		0,
+		emojis.default.pencil,
+		"default"
+	),
+	genericBoolean(
+		"Level Up Announcements",
+		"announceLevelUp",
+		"if level ups should be announced (in channel)",
+		null,
+		1,
+		emojis.default.pencil,
+		"default"
+	),
+	genericBoolean(
+		"Auto Link Sourcing",
+		"autoSourcing",
+		"if linked images should be auto sourced (includes non prefixed messages)",
+		null,
+		0,
+		emojis.default.info,
+		"default"
+	)
 ];
+
 export default Settings;
 
 Settings.forEach(s => {
