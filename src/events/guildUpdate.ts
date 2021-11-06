@@ -297,28 +297,28 @@ export default new ClientEvent("guildUpdate", async function(guild, oldGuild) {
 			if (oldFlags.SUPPRESS_GUILD_REMINDER_NOTIFICATIONS !== newFlags.SUPPRESS_GUILD_REMINDER_NOTIFICATIONS) embeds.push(new EmbedBuilder(true)
 				.setTitle("Server Updated")
 				.setColor("gold")
-				.setDescription(`This server's system channel had server reminder notifications ${oldFlags.SUPPRESS_GUILD_REMINDER_NOTIFICATIONS ? "disabled" : "enabled"}.`)
+				.setDescription(`This server's system channel had server reminder notifications ${oldFlags.SUPPRESS_GUILD_REMINDER_NOTIFICATIONS ? "enabled" : "disabled"}.`)
 				.toJSON()
 			);
 
 			if (oldFlags.SUPPRESS_JOIN_NOTIFICATIONS !== newFlags.SUPPRESS_JOIN_NOTIFICATIONS) embeds.push(new EmbedBuilder(true)
 				.setTitle("Server Updated")
 				.setColor("gold")
-				.setDescription(`This server's system channel had join notifications ${oldFlags.SUPPRESS_JOIN_NOTIFICATIONS ? "disabled" : "enabled"}.`)
+				.setDescription(`This server's system channel had join notifications ${oldFlags.SUPPRESS_JOIN_NOTIFICATIONS ? "enabled" : "disabled"}.`)
 				.toJSON()
 			);
 
-			if (oldFlags.SUPPRESS_PREMIUM_SUBSCRIPTIONS !== newFlags.SUPPRESS_PREMIUM_SUBSCRIPTIONS)  embeds.push(new EmbedBuilder(true)
+			if (oldFlags.SUPPRESS_PREMIUM_SUBSCRIPTIONS !== newFlags.SUPPRESS_PREMIUM_SUBSCRIPTIONS) embeds.push(new EmbedBuilder(true)
 				.setTitle("Server Updated")
 				.setColor("gold")
-				.setDescription(`This server's system channel had premium subscription notifications ${oldFlags.SUPPRESS_PREMIUM_SUBSCRIPTIONS ? "disabled" : "enabled"}.`)
+				.setDescription(`This server's system channel had premium subscription notifications ${oldFlags.SUPPRESS_PREMIUM_SUBSCRIPTIONS ? "enabled" : "disabled"}.`)
 				.toJSON()
 			);
 
-			if (oldFlags.SUPPRESS_JOIN_NOTIFICATION_REPLIES !== newFlags.SUPPRESS_JOIN_NOTIFICATION_REPLIES)  embeds.push(new EmbedBuilder(true)
+			if (oldFlags.SUPPRESS_JOIN_NOTIFICATION_REPLIES !== newFlags.SUPPRESS_JOIN_NOTIFICATION_REPLIES) embeds.push(new EmbedBuilder(true)
 				.setTitle("Server Updated")
 				.setColor("gold")
-				.setDescription(`This server's system channel join notification replies ${oldFlags.SUPPRESS_JOIN_NOTIFICATION_REPLIES ? "disabled" : "enabled"}.`)
+				.setDescription(`This server's system channel had join notification replies ${oldFlags.SUPPRESS_JOIN_NOTIFICATION_REPLIES ? "enabled" : "disabled"}.`)
 				.toJSON()
 			);
 		}
