@@ -12,9 +12,9 @@ export default new Command("leaderboard", "lb")
 	.setDescription("Get the leveling leaderboard")
 	.addApplicationCommand(Eris.Constants.ApplicationCommandTypes.CHAT_INPUT, [])
 	.setCooldown(3e3)
-	.setParsedFlags("global")
+	.setUsage("[global]")
 	.setExecutor(async function(msg) {
-		const global = msg.dashedArgs.value.includes("global");
+		const global = msg.args[0]?.toLowerCase() === "global";
 		const lbTotal = await db.query(`SELECT COUNT(*) FROM levels${global ? "" : " WHERE guild_id=?"}`, global ? [] : [msg.channel.guild.id]).then((c: CountResponse) => Number(c[0]["COUNT(*)"]));
 		const maxPages = Math.ceil(lbTotal / lbPerPage);
 		const page = 1;
