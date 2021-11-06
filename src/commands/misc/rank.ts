@@ -4,7 +4,6 @@ import Command from "@cmd/Command";
 import EmbedBuilder from "@util/EmbedBuilder";
 import Eris from "eris";
 
-// @FIXME more efficient system for leaderboards
 export default new Command("rank")
 	.setPermissions("bot", "embedLinks")
 	.setDescription("Get someone's rank..")
@@ -17,6 +16,7 @@ export default new Command("rank")
 			required: false
 		}
 	])
+	.addApplicationCommand(Eris.Constants.ApplicationCommandTypes.USER, "Rank")
 	.setCooldown(3e3)
 	.setExecutor(async function(msg) {
 		// return msg.reply("H-hey! We're still ironing out the final details of this command.. Check back later!");
@@ -25,6 +25,8 @@ export default new Command("rank")
 
 		const exp = await UserConfig.prototype.getExp.call({ id: member.id }, msg.channel.guild.id);
 		const { level, leftover, needed } = BotFunctions.calcLevel(exp);
+		const localRank = await BotFunctions.getGuildRank(msg.channel.guild.id, member.id);
+		const globalRank = await BotFunctions.getGlobalRank(member.id);
 		return msg.reply({
 			embeds: [
 				new EmbedBuilder(true, msg.author)
@@ -32,7 +34,8 @@ export default new Command("rank")
 					.setDescription([
 						`Level: **${level}** (${leftover}/${leftover + needed})`,
 						`EXP: ${exp.toLocaleString()}`,
-						"Rank: 0/0 (this is not a bug)"
+						`Local Rank: ${localRank ? `**${localRank.rank}**/**${localRank.total}**` : "Unknown"}`,
+						`Global Rank: ${globalRank ? `**${globalRank.rank}**/**${globalRank.total}**` : "Unknown"}`
 					])
 					.toJSON()
 			]

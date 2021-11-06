@@ -67,6 +67,4 @@ declare module "eris" {
 		async awaitComponentInteractionsGeneric(timeout: number, messageId: string, userId: string, limit: number): Promise<Array<ComponentInteraction>>;
 		async awaitComponentInteractionsGeneric(timeout: number, messageId: string, userId: string, limit?: 1): Promise<ComponentInteraction | null>;
 	}
-
-	type GuildTextableChannelWithoutThreads = Exclude<GuildTextableChannel, AnyThreadChannel>;
 }

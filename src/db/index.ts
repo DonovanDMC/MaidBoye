@@ -18,6 +18,7 @@ import IORedis from "ioredis";
 import Timer from "@util/Timer";
 import type { Pool } from "mariadb";
 import mariadb from "mariadb";
+import { Utility } from "@uwu-codes/utils";
 import crypto from "crypto";
 
 export
@@ -94,13 +95,33 @@ export default class db {
 				username: services.redis.username,
 				password: services.redis.password,
 				db: this.redisDb,
-				connectionName: `MaidBoye${beta ? "Beta" : ""}`
+				connectionName: `MaidBoye${beta ? "Beta" : ""}`,
+				enableReadyCheck: true
 			});
 
-			this.r.on("connect", () => {
-				const end = Timer.end();
-				Logger.getLogger("Database[Redis]").debug(`Successfully connected in ${Timer.calc(start, end, 0, false)}`);
-				resolve();
+			this.r
+				.on("connect", () => {
+					const end = Timer.end();
+					Logger.getLogger("Database[Redis]").debug(`Successfully connected in ${Timer.calc(start, end, 0, false)}`);
+				})
+				.on("ready", () => resolve());
+		});
+	}
+
+	static async getKeys(pattern: string) {
+		return new Promise<Array<string>>(resolve => {
+			// we use a one off client so we don't block the main one
+			const client = new IORedis(services.redis.port, services.redis.host, {
+				username: services.redis.username,
+				password: services.redis.password,
+				db: this.redisDb,
+				connectionName: `MaidBoye${beta ? "Beta" : ""}`,
+				enableReadyCheck: true
+			});
+			client.on("ready", async() => {
+				const keys = await Utility.getKeys(client, pattern);
+				await client.quit();
+				return resolve(keys);
 			});
 		});
 	}

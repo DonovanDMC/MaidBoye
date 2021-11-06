@@ -18,9 +18,13 @@ import {
 	emojis,
 	levelingFlatRate,
 	levelingFlatRateStart,
-	levelingStartRate
+	levelingStartRate,
+	lbPerPage
 } from "@config";
 import * as fs from "fs-extra";
+import db from "@db";
+const Redis = db.r;
+import type { RawLevel } from "@models/User/UserConfig";
 import crypto from "crypto";
 
 // since a lot of the fun commands are generic, we have to do this
@@ -445,5 +449,59 @@ export default class BotFunctions {
 	static async getAuditLogEntry(guild: Eris.Guild, type: keyof typeof Eris["Constants"]["AuditLogActions"], filter: (log: GuildAuditLogEntry) => boolean = () => true) {
 		const log = await guild.getAuditLog({ actionType: Eris.Constants.AuditLogActions[type] });
 		return log.entries.find(filter) ?? null;
+	}
+
+	static async getGlobalLeaderboard(page = 1, desc = true) {
+		if (Redis) {
+			const cache = await Redis.get(`cache:lb:global:${page}:${desc ? "desc" : "asc"}`);
+			if (cache) return JSON.parse<typeof r>(cache);
+		}
+		const lb = await db.query(`SELECT * FROM levels ORDER BY xp${desc ? " DESC" : " ASC"}${page === -1 ? "" : ` LIMIT ${lbPerPage} OFFSET ${(page - 1) * lbPerPage}`}`) as Array<RawLevel>;
+		const r = lb.map(level => ({
+			user: level.user_id,
+			guild: level.guild_id,
+			xp: this.calcLevel(level.xp)
+		}));
+		// cache global leaderboards for 5 minutes
+		if (Redis) void Redis.setex(`cache:lb:global:${page}:${desc ? "desc" : "asc"}`, 300, JSON.stringify(r));
+		return r;
+	}
+
+	static async getGuildLeaderboard(guild: string, page = 1, desc = true) {
+		if (Redis) {
+			const cache = await Redis.get(`cache:lb:${guild}:${page}:${desc ? "desc" : "asc"}`);
+			if (cache) return JSON.parse<typeof r>(cache);
+		}
+		const lb = await db.query(`SELECT * FROM levels WHERE guild_id=? ORDER BY xp${desc ? " DESC" : " ASC"}${page === -1 ? "" : ` LIMIT ${lbPerPage} OFFSET ${(page - 1) * lbPerPage}`}`, [guild]) as Array<RawLevel>;
+		const r = lb.map(level => ({
+			user: level.user_id,
+			guild: level.guild_id,
+			xp: this.calcLevel(level.xp)
+		}));
+		// cache guild leaderboards for 2 minutes
+		if (Redis) void Redis.setex(`cache:lb:${guild}:${page}:${desc ? "desc" : "asc"}`, 120, JSON.stringify(r));
+		return r;
+	}
+
+	static async getGlobalRank(user: string) {
+		const [rank] = await db.query("SELECT * FROM (SELECT @rank:=@rank+1 AS pos, (SELECT COUNT(*) FROM levels) AS total, id, user_id, guild_id, xp FROM levels, (SELECT @rank := 0) r ORDER BY xp DESC) t WHERE user_id = ? LIMIT 1", [user]) as Array<RawLevel & { pos: number; total: number; }>;
+		return !rank ? null : {
+			rank: rank.pos,
+			total: rank.total,
+			user: rank.user_id,
+			guild: rank.guild_id,
+			xp: this.calcLevel(rank.xp)
+		};
+	}
+
+	static async getGuildRank(guild: string, user: string) {
+		const [rank] = await db.query("SELECT * FROM (SELECT @rank:=@rank+1 AS pos, (SELECT COUNT(*) FROM levels WHERE guild_id = ?) AS total, id, user_id, guild_id, xp FROM levels, (SELECT @rank := 0) r  WHERE guild_id = ? ORDER BY xp DESC) t WHERE user_id = ? LIMIT 1", [guild, guild, user]) as Array<RawLevel & { pos: number; total: number; }>;
+		return !rank ? null : {
+			rank: rank.pos,
+			total: rank.total,
+			user: rank.user_id,
+			guild: rank.guild_id,
+			xp: this.calcLevel(rank.xp)
+		};
 	}
 }

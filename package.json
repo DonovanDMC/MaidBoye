@@ -7,7 +7,7 @@
   "private": true,
   "dependencies": {
     "@augu/collections": "^1.1.0",
-    "@uwu-codes/utils": "^1.0.57",
+    "@uwu-codes/utils": "^1.0.58",
     "cheweyapi": "^1.0.3",
     "chunk": "^0.0.3",
     "dankmemerapi": "^1.0.27",

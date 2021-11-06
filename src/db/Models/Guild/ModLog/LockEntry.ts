@@ -17,6 +17,6 @@ export default class LockEntry extends GenericEntry {
 	}
 
 	async getTarget(client: MaidBoye) {
-		return super.getTarget.call(this, client) as Promise<Eris.GuildTextableChannelWithoutThreads>;
+		return super.getTarget.call(this, client) as Promise<Eris.GuildTextableChannel>;
 	}
 }

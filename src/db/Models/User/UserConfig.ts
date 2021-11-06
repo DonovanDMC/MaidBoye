@@ -30,6 +30,7 @@ import db from "@db";
 import Logger from "@util/Logger";
 import type { DataTypes, DeepPartial, Writeable } from "@uwu-codes/types";
 import type { CountResponse, OkPacket } from "@util/@types/MariaDB";
+import { StringLiteralLike } from "typescript";
 import crypto from "crypto";
 
 export interface RawUserConfig {

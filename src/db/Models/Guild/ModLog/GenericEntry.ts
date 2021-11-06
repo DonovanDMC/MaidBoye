@@ -68,7 +68,7 @@ export default abstract class GenericEntry {
 
 	async getTarget(client: MaidBoye) {
 		if (this.target === null) return null;
-		if (["lock", "unlock"].includes(this.type)) return client.getChannel(this.target) as Eris.GuildTextableChannelWithoutThreads;
+		if (["lock", "unlock"].includes(this.type)) return client.getChannel(this.target) as Eris.GuildTextableChannel;
 		return client.getUser(this.target);
 	}
 
@@ -85,7 +85,7 @@ export default abstract class GenericEntry {
 		if (this.messageId === null) return null;
 		const cnf = await this.getGuildConfig();
 		if (cnf.modlog.enabled === false || !cnf.modlog.webhook?.channelId) return null;
-		return (client.getMessage(cnf.modlog.webhook.channelId, this.messageId).catch(() => null)) as Promise<Eris.Message<Eris.GuildTextableChannelWithoutThreads> | null>;
+		return (client.getMessage(cnf.modlog.webhook.channelId, this.messageId).catch(() => null)) as Promise<Eris.Message<Eris.GuildTextableChannel> | null>;
 	}
 
 	async getStrike() {
