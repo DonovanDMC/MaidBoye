@@ -14,7 +14,7 @@ export default new Command("leaderboard", "lb")
 	.setCooldown(3e3)
 	.setParsedFlags("global")
 	.setExecutor(async function(msg) {
-		const global = false;
+		const global = msg.dashedArgs.value.includes("global");
 		const lbTotal = await db.query(`SELECT COUNT(*) FROM levels${global ? "" : " WHERE guild_id=?"}`, global ? [] : [msg.channel.guild.id]).then((c: CountResponse) => Number(c[0]["COUNT(*)"]));
 		const maxPages = Math.ceil(lbTotal / lbPerPage);
 		const page = 1;
@@ -33,7 +33,7 @@ export default new Command("leaderboard", "lb")
 					.setFooter(`Page ${page}/${maxPages} | Results Are Cached For ${global ? "5" : "2"} Minutes`, msg.channel.guild.iconURL || undefined)
 					.toJSON()
 			],
-			components: new ComponentHelper()
+			components: maxPages === 1 ? [] : new ComponentHelper()
 				.addInteractionButton(ComponentHelper.BUTTON_SECONDARY, `lb-first.page-${page}.${global ? "global" : `guild-${msg.channel.guild.id}`}.${msg.author.id}`, page === 1, ComponentHelper.emojiToPartial(emojis.default.back, "default"), "First")
 				.addInteractionButton(ComponentHelper.BUTTON_SECONDARY, `lb-prev.page-${page}.${global ? "global" : `guild-${msg.channel.guild.id}`}.${msg.author.id}`, page === 1, ComponentHelper.emojiToPartial(emojis.default.first, "default"), "Previous")
 				.addInteractionButton(ComponentHelper.BUTTON_SECONDARY, `general-exit.${msg.author.id}`, false, ComponentHelper.emojiToPartial(emojis.default.stop, "default"), "Stop")

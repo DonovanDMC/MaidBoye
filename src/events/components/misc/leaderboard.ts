@@ -13,14 +13,12 @@ ComponentInteractionHandler
 		const maxPages = Math.ceil(lbTotal / lbPerPage);
 		let page = Number(interaction.data.custom_id.split(".")[1].split("-")[1]);
 		const action = interaction.data.custom_id.split(".")[0].split("-")[1];
-		console.log(action, page);
 		switch (action) {
 			case "first": page = 1; break;
 			case "prev": page--; break;
 			case "next": page++; break;
 			case "last": page = maxPages; break;
 		}
-		console.log(page);
 		const lb = await (global ? BotFunctions.getGlobalLeaderboard(page) : BotFunctions.getGuildLeaderboard(interaction.member.guild.id, page));
 		return interaction.editParent({
 			embeds: [
