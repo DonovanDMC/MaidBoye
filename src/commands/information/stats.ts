@@ -56,11 +56,11 @@ export default new Command("stats")
 					})).then(v => v.join("\n")), true)
 					.addField("Commands", [
 						`Total You: **${userTotal}**`,
-						`Most You: \`${userMostKey.split(":").slice(-1)[0]}\` (**${userMostValue}**)`,
+						`Most You: \`${userMostKey.split(":").slice(-1)[0]}\` (**${userMostValue}**, ${parseFloat(((userMostValue / userTotal) * 100).toFixed(2))}%)`,
 						`Total Server: **${userGuildTotal}**`,
-						`Most Server: \`${userGuildMostKey.split(":").slice(-1)[0]}\` (**${userGuildMostValue}**)`,
+						`Most Server: \`${userGuildMostKey.split(":").slice(-1)[0]}\` (**${userGuildMostValue}**, ${parseFloat(((userGuildMostValue / userGuildTotal) * 100).toFixed(2))}%)`,
 						`Total Global: **${allTotal}**`,
-						`Most Global: \`${allMostKey.split(":").slice(-1)[0]}\` (**${allMostValue}**)`
+						`Most Global: \`${allMostKey.split(":").slice(-1)[0]}\` (**${allMostValue}**, ${parseFloat(((allMostValue / allTotal) * 100).toFixed(2))}%)`
 					].join("\n"), false)
 					.addField("MariaDB", sql === undefined ? "None" : [
 						`Ping: **${Timer.calc(sqlStart, sqlEnd, 2, false)}**`,
