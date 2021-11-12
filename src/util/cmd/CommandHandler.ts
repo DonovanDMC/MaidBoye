@@ -72,7 +72,8 @@ export default class CommandHandler {
 	static removeCommand(d: string, log = true) {
 		const cmd = this.getCommand(d);
 		if (!cmd) throw new Error(`Invalid command "${d}" provided in CommandHandler#removeCommand`);
-		this.commands.splice(this.commands.indexOf(cmd), 1);
+		const cat = this.getCategory(cmd.category)!;
+		cat.commands.splice(cat.commands.indexOf(cmd), 1);
 		delete require.cache[require.resolve(cmd.file)];
 		cmd.triggers.forEach(t => this.commandMap.delete(t));
 		if (log) Logger.getLogger("CommandHandler").info(`Removed the command "${d}" (${cmd.file})`);
