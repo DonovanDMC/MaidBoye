@@ -7,9 +7,5 @@ CREATE TABLE `tags` (
 	`created_by`   VARCHAR(21)  NOT NULL,
 	`modified_at`  BIGINT(20)   UNSIGNED DEFAULT NULL,
 	`modified_by`  VARCHAR(21)  DEFAULT NULL,
-	PRIMARY KEY                 (`id`),
-	UNIQUE KEY     `id`         (`id`),
-	UNIQUE KEY     `tag_guild`  (`name`, `guild_id`) USING HASH,
-	KEY            `name`       (`name`),
-	KEY            `guild_id`   (`guild_id`)
+	PRIMARY KEY                 (`id`)
 );

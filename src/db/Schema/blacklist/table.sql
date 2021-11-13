@@ -10,11 +10,5 @@ CREATE TABLE `blacklist` (
 	`created_by_tag`  TINYTEXT       NOT NULL,
 	`created_at`      BIGINT(20)     NOT NULL,
 	`report`          TINYTEXT       DEFAULT NULL,
-	PRIMARY KEY                      (`id`),
-	UNIQUE KEY        `id`           (`id`),
-	KEY               `guild_id`     (`guild_id`),
-	KEY               `user_id`      (`user_id`),
-	KEY               `created_by`   (`created_by`),
-	KEY               `created_at`   (`created_at`),
-	KEY               `expire_time`  (`expire_time`)
+	PRIMARY KEY                      (`id`)
 );

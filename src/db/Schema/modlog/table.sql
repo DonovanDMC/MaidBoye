@@ -16,14 +16,5 @@ CREATE TABLE `modlog` (
 	`warning_id`      TINYINT(3)       UNSIGNED DEFAULT NULL,
 	`total`           INT(10)          UNSIGNED DEFAULT NULL,
 	`active`          TINYINT(1)       DEFAULT NULL,
-	PRIMARY KEY                        (`id`),
-	UNIQUE KEY        `id`             (`id`),
-	UNIQUE KEY        `entryid_guild`  (`entry_id`,`guild_id`),
-	UNIQUE KEY        `message_id`     (`message_id`),
-	UNIQUE KEY        `strike_id`      (`strike_id`),
-	KEY               `entry_id`       (`entry_id`),
-	KEY               `guild_id`       (`guild_id`),
-	KEY               `target`         (`target`),
-	KEY               `blame`          (`blame`),
-	KEY               `timed_id`       (`timed_id`)
+	PRIMARY KEY                        (`id`)
 );

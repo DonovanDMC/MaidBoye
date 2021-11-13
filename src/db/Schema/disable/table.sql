@@ -5,8 +5,6 @@ CREATE TABLE `disable` (
 	`filter_value`  TINYTEXT            DEFAULT NULL,
 	`value`         VARCHAR(21)         DEFAULT NULL,
 	`filter_type`   BIT(2)              NOT NULL,
-	PRIMARY KEY                         (`id`),
-	UNIQUE KEY      `id`                (`id`),
-	KEY             `guild_id`          (`guild_id`),
-	UNIQUE KEY      `exact_entry_type`  (`type`, `filter_type`, `value`, `filter_value`)
+	PRIMARY KEY                         (`id`)
+	
 );
