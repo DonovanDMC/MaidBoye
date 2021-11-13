@@ -9,10 +9,10 @@ ALTER TABLE `warnings`
 	-- Indexes
 	ADD UNIQUE INDEX IF NOT EXISTS `id`             (`id`),
 	ADD UNIQUE INDEX IF NOT EXISTS `guild_user_wid` (`guild_id`, `user_id`, `warning_id`),
-	ADD UNIQUE INDEX IF NOT EXISTS `guild_id`       (`guild_id`),
-	ADD UNIQUE INDEX IF NOT EXISTS `user_id`        (`user_id`),
-	ADD UNIQUE INDEX IF NOT EXISTS `blame_id`       (`blame_id`),
-	ADD UNIQUE INDEX IF NOT EXISTS `warning_id`     (`warning_id`),
+	ADD INDEX IF NOT EXISTS `guild_id`       (`guild_id`),
+	ADD INDEX IF NOT EXISTS `user_id`        (`user_id`),
+	ADD INDEX IF NOT EXISTS `blame_id`       (`blame_id`),
+	ADD INDEX IF NOT EXISTS `warning_id`     (`warning_id`),
 	-- Foreign Keys
 	ADD CONSTRAINT `fk_warnings_guildid` FOREIGN KEY IF NOT EXISTS (`guild_id`) REFERENCES `guilds` (`id`),
 	ADD CONSTRAINT `fk_warnings_userid`  FOREIGN KEY IF NOT EXISTS (`user_id`)  REFERENCES `users`  (`id`),
