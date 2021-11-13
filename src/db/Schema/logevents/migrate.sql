@@ -1,10 +1,10 @@
 ALTER TABLE `logevents`
-	CREATE COLUMN IF NOT EXISTS `id`                  CHAR(12)     NOT NULL,
-	CREATE COLUMN IF NOT EXISTS `guild_id`            VARCHAR(21)  NOT NULL,
-	CREATE COLUMN IF NOT EXISTS `event`               VARCHAR(20)  NOT NULL,
-	CREATE COLUMN IF NOT EXISTS `webhook_id`          VARCHAR(21)  NOT NULL,
-	CREATE COLUMN IF NOT EXISTS `webhook_token`       TINYTEXT     NOT NULL,
-	CREATE COLUMN IF NOT EXISTS `webhook_channel_id`  VARCHAR(21)  NOT NULL,
+	ADD COLUMN IF NOT EXISTS `id`                  CHAR(12)     NOT NULL,
+	ADD COLUMN IF NOT EXISTS `guild_id`            VARCHAR(21)  NOT NULL,
+	ADD COLUMN IF NOT EXISTS `event`               VARCHAR(20)  NOT NULL,
+	ADD COLUMN IF NOT EXISTS `webhook_id`          VARCHAR(21)  NOT NULL,
+	ADD COLUMN IF NOT EXISTS `webhook_token`       TINYTEXT     NOT NULL,
+	ADD COLUMN IF NOT EXISTS `webhook_channel_id`  VARCHAR(21)  NOT NULL,
 	-- Indexes
 	ADD UNIQUE INDEX IF NOT EXISTS `id`                  (`id`),
 	ADD UNIQUE INDEX IF NOT EXISTS `guild_event_channel` (`guild_id`,`event`,`webhook_channel_id`),
