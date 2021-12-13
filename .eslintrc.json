@@ -1,5 +1,5 @@
 {
-	"extends": "@uwu-codes/eslint-config",
+	"extends": "@uwu-codes/eslint-config/ts.json",
 	"rules": {
 		"import/no-extraneous-dependencies": "off",
 		"no-inner-declarations": "off",
