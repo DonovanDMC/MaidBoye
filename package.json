@@ -18,7 +18,7 @@
     "eris": "github:DonovanDMC/eris#b9d3f3c3781e6489b36f52130ee7071cca85acb7",
     "express": "^4.17.1",
     "express-session": "^1.17.2",
-    "file-type": "^17.0.0",
+    "file-type": "^16.5.3",
     "fluxpointapi": "^1.0.0",
     "fs-extra": "^10.0.0",
     "fuzzy-search": "^3.2.1",
