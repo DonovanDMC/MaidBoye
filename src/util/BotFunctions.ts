@@ -202,8 +202,16 @@ export default class BotFunctions {
 	static getUserFlags(user: Eris.User) {
 		const removedFlags = [
 			"NONE",
-			"DISCORD_PARTNER",
-			"VERIFIED_BOT_DEVELOPER"
+			"DISCORD_EMPLOYEE",                                       // DISCORD_STAFF
+			"PARTNERED_SERVER_OWNER", "DISCORD_PARTNER",              // PARTNER
+			"HYPESQUAD_EVENTS",                                       // HYPESQUAD
+			"HYPESQUAD_ONLINE_HOUSE_1",                               // HOUSE_BRAVERY
+			"HYPESQUAD_ONLINE_HOUSE_2",                               // HOUSE_BRILLIANCE
+			"HYPESQUAD_ONLINE_HOUSE_3",                               // HOUSE_BALANCE
+			"EARLY_SUPPORTER",                                        // PREMIUM_EARLY_SUPPORTER
+			"TEAM_USER",                                              // TEAM_PSUEDO_USER
+			"EARLY_VERIFIED_BOT_DEVELOPER", "VERIFIED_BOT_DEVELOPER", // VERIFIED_DEVELOPER
+			"DISCORD_CERTIFIED_MODERATOR"                             // CERTIFIED_MODERATOR
 		] as const;
 		return Object.entries(Eris.Constants.UserFlags).filter(([f]) => !removedFlags.includes(f as (typeof removedFlags)[number])).map(([f, v]) => ({
 			[f]: ((user.publicFlags ?? 0) & v) === v

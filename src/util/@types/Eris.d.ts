@@ -59,7 +59,7 @@ declare module "eris" {
 	}
 
 	interface GuildChannel {
-		readonly typeString: keyof Constants["ChannelTypes"];
+		readonly typeString: Exclude<keyof Constants["ChannelTypes"], "GUILD_STAGE">;
 
 		async awaitComponentInteractions(timeout: number, filter: (interaction: ComponentInteraction) => boolean, limit: number): Promise<Array<ComponentInteraction>>;
 		async awaitComponentInteractions(timeout: number, filter?: (interaction: ComponentInteraction) => boolean, limit?: 1): Promise<ComponentInteraction | null>;

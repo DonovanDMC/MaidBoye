@@ -1,4 +1,3 @@
-/* eslint-disable deprecation/deprecation */
 // eslint-disable-next-line @typescript-eslint/triple-slash-reference
 /// <reference path="./@types/Eris.d.ts" />
 /* eslint-disable import/order */
@@ -256,7 +255,10 @@ Object.defineProperties(Eris.GuildChannel.prototype, {
 	},
 	typeString: {
 		get(this: Eris.GuildTextableChannel) {
-			return Object.entries(Eris.Constants.ChannelTypes).find(([, n]) => this.type === n)![0];
+			const deprecatedChannelTypes = [
+				"GUILD_STAGE"
+			];
+			return Object.entries(Eris.Constants.ChannelTypes).filter(([t]) => !deprecatedChannelTypes.includes(t)).find(([, n]) => this.type === n)![0];
 		}
 	}
 });
