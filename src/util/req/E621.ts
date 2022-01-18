@@ -7,12 +7,9 @@ const E621 = new E6({
 	authKey: apiKeys.e621.key,
 	userAgent
 });
-export const YiffyV3 = new E6({
+export const YiffyV3 = new E6.YiffyAPI({
 	authUser: apiKeys.yiffy_v3.username,
 	authKey: apiKeys.yiffy_v3.key,
-	userAgent,
-	instanceHost: "yiff.rest",
-	instancePort: 443,
-	instanceSSL: true
+	userAgent
 });
 export default E621;

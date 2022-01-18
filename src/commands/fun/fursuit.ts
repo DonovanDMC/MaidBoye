@@ -27,7 +27,7 @@ export default new Command("fursuit")
 			components: new ComponentHelper()
 				.addURLButton(img.shortURL, false, undefined, "Full Image")
 				.addURLButton(img.sources[0] || "https://yiff.rest", img.sources.length === 0, undefined, "Source")
-				.addURLButton(img.reportURL, false, undefined, "Report")
+				.addURLButton("https://report.yiff.media", true, undefined, "Report")
 				.toJSON()
 		});
 	});
