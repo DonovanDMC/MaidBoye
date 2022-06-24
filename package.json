@@ -35,7 +35,7 @@
     "yiffy": "^2.0.16"
   },
   "scripts": {
-    "build": "rm -rf build && tsc && ts-node scripts/build-date.ts && echo Build Finished",
+    "build": "tsc && ts-node scripts/build-date.ts && echo Build Finished",
     "dev": "ts-node src/index.ts",
     "start": "node index.js",
     "start:nobuild": "node index.js",
@@ -75,7 +75,7 @@
     "discord-api-types": "^0.25.2",
     "eslint": "^8.4.1",
     "sagiri": "^3.1.1",
-    "ts-node": "^10.4.0",
+    "ts-node": "^10.8.1",
     "typescript": "^4.7.4"
   },
   "engine": {
