@@ -12,7 +12,7 @@ export default new ClientEvent("shardDisconnect", async function shardDisconnect
 			EmbedBuilder
 				.new()
 				.setColor("red")
-				.setFooter(`Shard ${id + 1}/${this.shards.size}`)
+				.setFooter(`Shard ${Number(id) + 1}/${this.shards.size}`)
 				.setTitle("Shard Disconnect")
 				.setDescription(`Shard #${id} disconnected.`)
 				.toJSON()
