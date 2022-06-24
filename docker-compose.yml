@@ -1,0 +1,35 @@
+
+
+version: "3"
+
+services:
+  maidboye:
+    build: .
+    container_name: maidboye
+    volumes:
+      - modules:/app/node_modules
+      - /mnt/data:/opt/MaidBoyeData
+    environment:
+      MODE: prod
+      DATA_DIR: /data
+      PTR: 1
+    restart: always
+    healthcheck:
+      interval: 10s
+      timeout: 2s
+      test: lsof -i :8443 || exit 1
+    hostname: maidboye.bots.containers.local
+    ports:
+      - 127.1.1.1:8443:8443
+      - 127.1.1.2:8443:8443
+    networks:
+      default:
+        ipv4_address: 172.18.0.3
+
+networks:
+  default:
+    name: pterodactyl_nw
+    external: true
+
+volumes:
+  modules: null
