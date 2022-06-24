@@ -25,7 +25,7 @@ services:
       - 127.1.1.2:8443:8443
     networks:
       default:
-        ipv4_address: 172.18.0.3
+        ipv4_address: 172.18.0.4
 
 networks:
   default:
