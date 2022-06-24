@@ -37,7 +37,7 @@
   "scripts": {
     "build": "rm -rf build && tsc && ts-node scripts/build-date.ts && echo Build Finished",
     "dev": "ts-node src/index.ts",
-    "start": "npm run build && node index.js",
+    "start": "node index.js",
     "start:nobuild": "node index.js",
     "lint": "eslint src --ext .ts",
     "lint:fix": "eslint src --ext .ts --fix"

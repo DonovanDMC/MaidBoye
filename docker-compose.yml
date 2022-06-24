@@ -8,6 +8,7 @@ services:
     container_name: maidboye
     volumes:
       - modules:/app/node_modules
+      - build:/app./build
       - /mnt/data:/opt/MaidBoyeData
     environment:
       MODE: prod
@@ -32,4 +33,5 @@ networks:
     external: true
 
 volumes:
+  build: null
   modules: null
