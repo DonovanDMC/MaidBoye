@@ -44,7 +44,7 @@ services:
         ipv4_address: 172.18.0.3
   redis:
     image: redis:alpine
-    command: redis-server --disable-thp yes --supervised no --bind 0.0.0.0 --requirepass "$REDIS_PASSWORD"
+    command: redis-server --disable-thp yes --supervised no --bind 0.0.0.0 --protected-mode no
     container_name: redis.maidboye
     volumes:
       - ./data/redis:/data
