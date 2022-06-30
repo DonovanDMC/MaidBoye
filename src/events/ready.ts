@@ -22,15 +22,6 @@ export default new ClientEvent("ready", async function() {
 		this.cpuUsage = await Utility.getCPUUsage()
 	, 1e3);
 	TimedModerationHandler.init();
-	this.lava = new Node({
-		password: services.lavalink.password,
-		userID: clientInfo.id,
-		shardCount: this.shards.size,
-		host: `${services.lavalink.host}:${services.lavalink.port}`,
-		send: (guildId, packet) => {
-			this.shards.get(Number(((BigInt(guildId) >> 22n) % BigInt(this.shards.size)).toString()))?.sendWS((packet as { op: number; }).op, (packet as { d: Record<string, unknown>; }).d);
-		}
-	});
 
 	if (!beta) {
 		void this.syncApplicationCommands.call(this);
