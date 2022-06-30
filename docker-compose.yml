@@ -9,7 +9,7 @@ services:
     volumes:
       - modules:/app/node_modules
       - build:/app/build
-      - /mnt/data:/opt/MaidBoyeData
+      - ./data/bot:/mnt/data
     environment:
       MODE: prod
       DATA_DIR: /data
