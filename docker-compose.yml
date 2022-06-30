@@ -28,7 +28,7 @@ services:
         ipv4_address: 172.18.0.4
   mariadb:
     image: mariadb
-    container_name: mariadb.websites
+    container_name: mariadb.maidboye
     volumes:
       - ./data/db:/var/lib/mysql
     environment:
@@ -38,14 +38,14 @@ services:
       interval: 5s
       timeout: 2s
       test: mysqladmin --user=root --password=$$MYSQL_ROOT_PASSWORD ping
-    hostname: mariadb.websites.containers.local
+    hostname: mariadb.maidboye.containers.local
     networks:
       default:
         ipv4_address: 172.18.0.3
   redis:
     image: redis:alpine
     command: redis-server --disable-thp yes --supervised no --bind 0.0.0.0 --requirepass "$REDIS_PASSWORD"
-    container_name: redis.websites
+    container_name: redis.maidboye
     volumes:
       - ./data/redis:/data
     healthcheck:
@@ -53,7 +53,7 @@ services:
       interval: 10s
       timeout: 5s
     restart: always
-    hostname: redis.websites.containers.local
+    hostname: redis.maidboye.containers.local
     networks:
       default:
         ipv4_address: 172.18.0.2
