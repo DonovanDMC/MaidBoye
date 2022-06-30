@@ -8,7 +8,7 @@ services:
     container_name: maidboye
     volumes:
       - modules:/app/node_modules
-      - build:/app./build
+      - build:/app/build
       - /mnt/data:/opt/MaidBoyeData
     environment:
       MODE: prod
@@ -26,11 +26,47 @@ services:
     networks:
       default:
         ipv4_address: 172.18.0.4
+  mariadb:
+    image: mariadb
+    container_name: mariadb.websites
+    volumes:
+      - ./data/db:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: "$MARIADB_ROOT_PASSWORD"
+    restart: always
+    healthcheck:
+      interval: 5s
+      timeout: 2s
+      test: mysqladmin --user=root --password=$$MYSQL_ROOT_PASSWORD ping
+    hostname: mariadb.websites.containers.local
+    networks:
+      default:
+        ipv4_address: 172.18.0.3
+  redis:
+    image: redis:alpine
+    command: redis-server --disable-thp yes --supervised no --bind 0.0.0.0 --requirepass "$REDIS_PASSWORD"
+    container_name: redis.websites
+    volumes:
+      - ./data/redis:/data
+    healthcheck:
+      test: redis-cli ping
+      interval: 10s
+      timeout: 5s
+    restart: always
+    hostname: redis.websites.containers.local
+    networks:
+      default:
+        ipv4_address: 172.18.0.2
 
-networks:
+networks:  
   default:
-    name: pterodactyl_nw
-    external: true
+    name: maidboye
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.18.0.0/29
+          gateway: 172.18.0.1
 
 volumes:
   build: null
