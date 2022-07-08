@@ -90,62 +90,7 @@ export default new Command("e621", "e6")
 				} else if (post.file.ext === "webm") {
 					e.setDescription(`This post is a video. Please view it [directly](https://e621.net/posts/${post.id}) on e621.`);
 					if (msg.gConfig.settings.e621ThumbnailType !== "none") {
-						let url = "https://http.cat/500";
-						try {
-					type CreateTimeType = "total" | "upload" | "cut" | "getVTG" | "convert";
-					interface Thumbnail {
-						url: string;
-						startTime: string | null;
-						endTime: string | null;
-						createTime: (Record<CreateTimeType, number> & Record<`${CreateTimeType}Ns`, string>) | null;
-					}
-
-					// @FIXME change this if original methods get added
-					if (token && m)
-						await this.editWebhookMessage(this.user.id, token, "@original", {
-							embeds: [
-								new EmbedBuilder(true, undefined, m.embeds[0])
-									.setDescription("Generating post preview..")
-									.setImage("https://assets.maid.gay/loading.gif")
-									.toJSON()
-							],
-							components: m.components
-						});
-					const b = await fetch("https://v2.yiff.rest/e621-thumb/create", {
-						method: "POST",
-						headers: {
-							"User-Agent": userAgent,
-							"Authorization": apiKeys.e621Thumb,
-							"Content-Type": "application/json"
-						},
-						body: JSON.stringify({
-							type: msg.gConfig.settings.e621ThumbnailType || "image",
-							url: post.file.url,
-							length: 2.5
-						})
-					}).then((v) => v.json() as Promise<{
-						success: true;
-						data: Thumbnail;
-					}>);
-					url = b.data.url;
-					if (developers.includes(msg.author.id)) {
-						console.log("Start Time:", b.data.startTime || "Cached");
-						console.log("End Time:", b.data.endTime || "Cached");
-						if (b.data.createTime === null) console.log("Create Time: Cached");
-						else {
-							console.log("Create Time:");
-							console.log(`Total Time: ${b.data.createTime.total}ms (${b.data.createTime.totalNs}ns)`);
-							console.log(`Upload Time: ${b.data.createTime.upload}ms (${b.data.createTime.uploadNs}ns)`);
-							console.log(`Cut Time: ${b.data.createTime.cut}ms (${b.data.createTime.cutNs}ns)`);
-							console.log(`Get VTG Time: ${b.data.createTime.getVTG}ms (${b.data.createTime.getVTGNs}ns)`);
-							console.log(`Convert Time: ${b.data.createTime.convert}ms (${b.data.createTime.convertNs}ns)`);
-						}
-					}
-						} catch (err) {
-							Logger.getLogger("E621Command").error(`Error creating webm thumbnail (https://e621.net/posts/${post.id})`);
-							console.error(err);
-						}
-						e.setImage(url);
+						e.setImage("https://http.cat/500");
 					}
 				} else e.setImage(post.file.url);
 				e.setDescription(e.getDescription()!, "(post numbers may fluctuate as we filter things)");
