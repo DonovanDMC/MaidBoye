@@ -23,7 +23,8 @@ export default new Command("settings")
 	})))
 	.setCooldown(3e3)
 	.setExecutor(async function(msg) {
-		try {
+		return msg.reply("Due to some technical issues, this command can no longer be used.");
+		/* try {
 			let page = 1;
 			const pages = chunk(Settings, 3);
 			function formatEmbed(v: typeof Settings) {
@@ -171,5 +172,5 @@ export default new Command("settings")
 		} catch (err) {
 			if (err instanceof DiscordRESTError) return ErrorHandler.handleDiscordError(err, msg);
 			else throw err;
-		}
+		} */
 	});
