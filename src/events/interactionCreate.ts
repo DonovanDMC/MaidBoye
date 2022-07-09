@@ -26,14 +26,18 @@ export default new ClientEvent("interactionCreate", async function(interaction) 
 			});
 			if (beta) Logger.getLogger("InteractionCreate").debug("new command interaction recieved:", util.inspect(interaction.data, { depth: 3, colors: true }));
 			if (interaction.data.name === "settings") {
-				if (interaction.data.options && interaction.data.options.length > 0) {
+				return interaction.createMessage({
+					content: "Due to some technical issues, this command can no longer be used.",
+					flags: 64
+				});
+				/* if (interaction.data.options && interaction.data.options.length > 0) {
 					const setting = Settings.find(s => !!interaction.data.options!.find(o => slashify(s.name) === o.name));
 					if (setting) {
 						await interaction.acknowledge();
 						void setting.execSlash.call(setting, interaction);
 					}
 					return;
-				}
+				} */
 			}
 			await interaction.acknowledge();
 			const userMentions = [] as Array<string>, roleMentions = [] as Array<string>;
