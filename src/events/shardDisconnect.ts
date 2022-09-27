@@ -1,22 +1,8 @@
-import { beta } from "@config";
-import ClientEvent from "@util/ClientEvent";
-import EmbedBuilder from "@util/EmbedBuilder";
-import Logger from "@util/Logger";
-import WebhookStore from "@util/WebhookStore";
+import ClientEvent from "../util/ClientEvent.js";
+import Logger from "../util/Logger.js";
+import StatsHandler from "../util/StatsHandler.js";
 
-export default new ClientEvent("shardDisconnect", async function shardDisconnectEvent (err, id) {
-	Logger.error(`Shard #${id} disconnected.`, err);
-	// this.shards.get(id)!.editStatus(initialStatus.status, initialStatus.game);
-	return WebhookStore.execute("status", {
-		embeds: [
-			EmbedBuilder
-				.new()
-				.setColor("red")
-				.setFooter(`Shard ${Number(id) + 1}/${this.shards.size}`)
-				.setTitle("Shard Disconnect")
-				.setDescription(`Shard #${id} disconnected.`)
-				.toJSON()
-		],
-		username: `Maid Boye${beta ? " Beta" : ""} Shard Status`
-	});
+export default new ClientEvent("shardDisconnect", async function shardDisconnectEvent(err, id) {
+    Logger.error(`Shard #${id} Disconnected`, err);
+    StatsHandler.track("SHARD_DISCONNECT", id, (err as Error & { code: number; } | undefined)?.code || null);
 });

@@ -1,709 +1,335 @@
-import db from "@db";
-import GuildConfig from "@models/Guild/GuildConfig";
-import type MaidBoye from "@MaidBoye";
-import type Eris from "eris";
-import EmbedBuilder from "@util/EmbedBuilder";
-import { botIcon } from "@config";
+import TimedModerationHandler from "./TimedModerationHandler.js";
+import type GuildConfig from "../../db/Models/GuildConfig.js";
+import type MaidBoye from "../../main";
+import UserConfig from "../../db/Models/UserConfig.js";
+import Logger from "../Logger.js";
+import type { ModLogCreationData } from "../../db/Models/ModLog.js";
+import ModLog, { ModLogType } from "../../db/Models/ModLog.js";
+import Util from "../Util.js";
+import Config from "../../config/index.js";
+import { Colors } from "../Constants.js";
+import type Timed from "../../db/Models/Timed.js";
+import { TimedType } from "../../db/Models/Timed.js";
+import Strike, { StrikeType } from "../../db/Models/Strike.js";
+import type {
+    AnyOptions,
+    BanOptions,
+    ClearWarningsOptions,
+    CreateEntryResultStrikeTimed,
+    CreateEntryResultStrike,
+    CreateEntryResultNeither,
+    DeleteWarningOptions,
+    KickOptions,
+    LockdownOptions,
+    LockOptions,
+    MuteOptions,
+    SoftbanOptions,
+    StrikeOptions,
+    UnbanOptions,
+    UnlockdownOptions,
+    UnlockOptions,
+    UnmuteOptions,
+    WarningOptions
+} from "../@types/modlog.js";
+import Warning from "../../db/Models/Warning.js";
 import { Time } from "@uwu-codes/utils";
-import Logger from "@util/Logger";
-import type { CountResponse, OkPacket } from "@util/@types/MariaDB";
-import type { RawTimedEntry } from "@models/TimedEntry";
-import TimedEntry from "@models/TimedEntry";
-import UserConfig from "@models/User/UserConfig";
-import type { AnyEntry, RawBanEntry, RawMuteEntry } from "@models/Guild/ModLog/All";
-import { UnBanEntry, UnLockDownEntry, UnLockEntry, UnMuteEntry } from "@models/Guild/ModLog/All";
-import crypto from "crypto";
+import { Guild, Member, User } from "oceanic.js";
+import { randomUUID } from "crypto";
 
 export default class ModLogHandler {
-	static client: MaidBoye;
-	static setClient(client: MaidBoye) {
-		this.client = client;
-		return this;
-	}
+    static client: MaidBoye;
 
-	static async check(guild: string | GuildConfig) {
-		if (!(guild instanceof GuildConfig)) guild = await db.getGuild(guild);
-		if (guild.modlog.enabled === true) {
-			if (guild.modlog.webhook === null) await guild.edit({
-				modlog: {
-					enabled: false
-				}
-			});
-			else {
-				if (!guild.modlog.webhook.id || !guild.modlog.webhook.token) await guild.edit({
-					modlog: {
-						enabled: false,
-						webhook: null
-					}
-				});
-				else {
-					const wh = await this.client.getWebhook(guild.modlog.webhook.id, guild.modlog.webhook.token).catch(() => null);
-					if (wh === null) await guild.edit({
-						modlog: {
-							enabled: false,
-							webhook: null
-						}
-					});
-					else {
-						if (wh.channel_id !== undefined && guild.modlog.webhook.channelId !== wh.channel_id) await guild.edit({
-							modlog: {
-								webhook: {
-									channelId: wh.channel_id!
-								}
-							}
-						});
-					}
-				}
-			}
-		}
+    static async check(gConfig: GuildConfig) {
+        if (gConfig.modlog.enabled) {
+            if (gConfig.modlog.webhook === null) {
+                await gConfig.setSetting("MODLOG_ENABLED", false);
+                await gConfig.setSetting("WEBHOOK_MANAGED", false);
+                return false;
+            }
 
-		return guild.reload().then((r) => r.modlog.enabled);
-	}
+            if (!gConfig.modlog.webhook.id || !gConfig.modlog.webhook.token) {
+                await gConfig.setSetting("MODLOG_ENABLED", false);
+                await gConfig.setSetting("WEBHOOK_MANAGED", false);
+                await gConfig.edit({
+                    modlog_webhook_id:         null,
+                    modlog_webhook_token:      null,
+                    modlog_webhook_channel_id: null
+                });
+                return false;
+            }
 
-	static getEntryId(guildId: string) {
-		return db.query("SELECT COUNT(*) FROM modlog WHERE guild_id=?", [guildId]).then((v: CountResponse) => (Number(v[0]["COUNT(*)"] ?? 0) + 1));
-	}
+            const hook = await this.client.rest.webhooks.get(gConfig.modlog.webhook.id, gConfig.modlog.webhook.token).catch(() => null);
+            if (!hook) {
+                await gConfig.setSetting("MODLOG_ENABLED", false);
+                await gConfig.setSetting("WEBHOOK_MANAGED", false);
+                await gConfig.edit({
+                    modlog_webhook_id:         null,
+                    modlog_webhook_token:      null,
+                    modlog_webhook_channel_id: null
+                });
+                return false;
+            }
 
-	static async executeWebhook(guild: GuildConfig, payload: Eris.WebhookPayload) {
-		if (
-			guild.modlog.enabled === false ||
-			guild.modlog.webhook === null ||
-			!(guild.modlog.webhook.id || guild.modlog.webhook.token)
-		) return null;
-		return this.client.executeWebhook(guild.modlog.webhook.id, guild.modlog.webhook.token, {
-			...payload,
-			wait: true
-		}).catch(() => null);
-	}
+            if (hook.applicationID !== this.client.user.id) {
+                await gConfig.setSetting("WEBHOOK_MANAGED", false);
+            }
 
-	static async createBanEntry(guild: GuildConfig, target: Eris.User | Eris.Member, blame: Eris.User | Eris.Member | null, reason: string | null, time: number, deleteDays: number) {
-		const check = await this.check(guild);
-		const entryId = await this.getEntryId(guild.id);
-		const id = crypto.randomBytes(6).toString("hex");
-		await db.createUserIfNotExists(target.id);
-		const timedId = time === 0 ? null : await TimedModerationHandler.add(guild.id, target.id, "ban", time);
-		const m = await this.executeWebhook(guild, {
-			embeds: [
-				new EmbedBuilder()
-					.setTitle(`User Banned | Case #${entryId}`)
-					.setAuthor(...("guild" in target ? [target.guild.name, target.guild.iconURL ?? undefined] : [target.tag, target.avatarURL]) as [name: string, icon_url?: string])
-					.setDescription(
-						`Target: <@${target.id}> (\`${target.tag}\`)`,
-						`Reason: **${reason ?? "None Provided"}**`,
-						`Message Delete Days: **${deleteDays}**`,
-						`Time: ${time === 0 ? "**Permanent**" : `**${Time.ms(time, true, true, false)}** (id: \`${timedId!}\`)`}`
-					)
-					.setColor("red")
-					.setFooter(`Action Performed ${blame === null ? "Automatically" : `By ${blame.tag}`}`, blame === null ? botIcon : blame.avatarURL)
-					.toJSON()
-			]
-		});
-		// I prefer doing this over the db call required for getting the full user
-		const [strikeId] = await UserConfig.prototype.addStrike.call({ id: target.id }, guild.id, blame === null ? "automatic" : blame.id);
+            if (hook.channelID !== null && hook.channelID !== gConfig.modlog.webhook.channelID) {
+                await gConfig.edit({
+                    modlog_webhook_channel_id: hook.channelID
+                });
+            }
+        }
 
-		await db.insert("modlog", {
-			id,
-			entry_id: entryId,
-			guild_id: guild.id,
-			message_id: m === null ? null : m.id,
-			strike_id: strikeId,
-			target: target.id,
-			blame: blame === null ? "automatic" : blame.id,
-			reason,
-			type: "ban",
-			created_at: Date.now(),
-			delete_days: deleteDays,
-			timed_id: timedId
-		});
+        return gConfig.modlog.enabled;
+    }
 
-		return { id, entryId, check, strikeId, timedId };
-	}
+    static async createEntry(options: BanOptions | MuteOptions): Promise<CreateEntryResultStrikeTimed>;
+    static async createEntry(options: SoftbanOptions | KickOptions | WarningOptions): Promise<CreateEntryResultStrike>;
+    static async createEntry(options: UnbanOptions | UnmuteOptions | LockOptions | UnlockOptions | LockdownOptions | UnlockdownOptions | DeleteWarningOptions | ClearWarningsOptions | StrikeOptions): Promise<CreateEntryResultNeither>;
+    static async createEntry(options: AnyOptions) {
+        const { type, gConfig, guild, blame, reason } = options;
+        const check = await this.check(options.gConfig);
+        if ("target" in options && (options.target instanceof User || options.target instanceof Member)) await UserConfig.createIfNotExists(options.target.id);
+        const caseID = await ModLog.getNextID(gConfig.id);
+        const data: ModLogCreationData = {
+            type:      ModLogType.BAN,
+            case_id:   caseID,
+            guild_id:  options.guild.id,
+            target_id: "target" in options ? options.target.id : null,
+            blame_id:  options.blame?.id,
+            reason:    options.reason
+        };
+        let text: string, color: number, timed: Timed | null = null, strike: Strike | null = null;
+        switch (type) {
+            case ModLogType.BAN: {
+                const { target, time, deleteSeconds } = options;
+                if (time > 0) timed = await TimedModerationHandler.add(TimedType.BAN, guild.id, target.id, time);
+                data.delete_seconds = deleteSeconds;
+                text = [
+                    `Target: <@!${target.id}> (\`${target.tag}\`)`,
+                    `Reason: ${reason}`,
+                    `Message Delete Hours: **${deleteSeconds * 60}**`,
+                    `Time: ${!timed ? "Permanent" : `${Time.ms(time, { words: true, seconds: true })} (expiry: ${Util.formatDiscordTime(timed.expiresAt.getTime(), "long-datetime")})`}`
+                ].join("\n");
+                strike = await Strike.create({
+                    id:       randomUUID(),
+                    guild_id: guild.id,
+                    user_id:  target.id,
+                    blame_id: blame?.id || null,
+                    type:     StrikeType.BAN
+                });
+                color = Colors.red;
+                break;
+            }
 
-	static async createKickEntry(guild: GuildConfig, target: Eris.User | Eris.Member, blame: Eris.User | Eris.Member | null, reason: string | null) {
-		const check = await this.check(guild);
-		const entryId = await this.getEntryId(guild.id);
-		const id = crypto.randomBytes(6).toString("hex");
-		await db.createUserIfNotExists(target.id);
-		const m = await this.executeWebhook(guild, {
-			embeds: [
-				new EmbedBuilder()
-					.setTitle(`User Kicked | Case #${entryId}`)
-					.setAuthor(...("guild" in target ? [target.guild.name, target.guild.iconURL ?? undefined] : [target.tag, target.avatarURL]) as [name: string, icon_url?: string])
-					.setDescription(
-						`Target: <@${target.id}> (\`${target.tag}\`)`,
-						`Reason: **${reason ?? "None Provided"}**`
-					)
-					.setColor("red")
-					.setFooter(`Action Performed ${blame === null ? "Automatically" : `By ${blame.tag}`}`, blame === null ? botIcon : blame.avatarURL)
-					.toJSON()
-			]
-		});
+            case ModLogType.UNBAN: {
+                const { target } = options;
+                text = [
+                    `Target: <@!${target.id}> (\`${target.tag}\`)`,
+                    `Reason: ${reason}`
+                ].join("\n");
+                color = Colors.green;
+                break;
+            }
 
-		const [strikeId] = await UserConfig.prototype.addStrike.call({ id: target.id }, guild.id, blame === null ? "automatic" : blame.id);
+            case ModLogType.SOFTBAN: {
+                const { target, deleteSeconds } = options;
+                data.delete_seconds = deleteSeconds;
+                text = [
+                    `Target: <@!${target.id}> (\`${target.tag}\`)`,
+                    `Reason: ${reason}`,
+                    `Message Delete Hours: **${deleteSeconds * 60}**`
+                ].join("\n");
+                color = Colors.red;
+                break;
+            }
 
-		await db.insert("modlog", {
-			id,
-			entry_id: entryId,
-			guild_id: guild.id,
-			message_id: m === null ? null : m.id,
-			strike_id: strikeId,
-			target: target.id,
-			blame: blame === null ? "automatic" : blame.id,
-			reason,
-			type: "kick",
-			created_at: Date.now()
-		});
+            case ModLogType.MUTE: {
+                const { target, time } = options;
+                // Discord only allows up to 28 days via api
+                if (time > 0) timed = await TimedModerationHandler.add(TimedType.MUTE, guild.id, target.id, time);
+                text = [
+                    `Target: <@!${target.id}> (\`${target.tag}\`)`,
+                    `Reason: ${reason}`,
+                    `Time: ${!timed ? "Permanent" : `${Time.ms(time, { words: true, seconds: true })} (expiry: ${Util.formatDiscordTime(timed.expiresAt.getTime(), "long-datetime")})`}`
+                ].join("\n");
+                strike = await Strike.create({
+                    id:       randomUUID(),
+                    guild_id: guild.id,
+                    user_id:  target.id,
+                    blame_id: blame?.id || null,
+                    type:     StrikeType.MUTE
+                });
+                color = Colors.red;
+                break;
+            }
 
-		return { id, entryId, check, strikeId };
-	}
+            case ModLogType.UNMUTE: {
+                const { target } = options;
+                text = [
+                    `Target: <@!${target.id}> (\`${target.tag}\`)`,
+                    `Reason: ${reason}`
+                ].join("\n");
+                color = Colors.green;
+                break;
+            }
 
-	static async createLockEntry(guild: GuildConfig, target: Exclude<Eris.GuildTextableChannel, Eris.AnyThreadChannel>, blame: Eris.User | Eris.Member | null, reason: string | null) {
-		const check = await this.check(guild);
-		const entryId = await this.getEntryId(guild.id);
-		const id = crypto.randomBytes(6).toString("hex");
-		const m = await this.executeWebhook(guild, {
-			embeds: [
-				new EmbedBuilder()
-					.setTitle(`Channel Locked | Case #${entryId}`)
-					.setAuthor(target.guild.name, target.guild.iconURL ?? undefined)
-					.setDescription(
-						`Target: <#${target.id}> (\`${target.id}\`)`,
-						`Reason: **${reason ?? "None Provided"}**`
-					)
-					.setColor("red")
-					.setFooter(`Action Performed ${blame === null ? "Automatically" : `By ${blame.tag}`}`, blame === null ? botIcon : blame.avatarURL)
-					.toJSON()
-			]
-		});
+            case ModLogType.KICK: {
+                const { target } = options;
+                text = [
+                    `Target: <@!${target.id}> (\`${target.tag}\`)`,
+                    `Reason: ${reason}`
+                ].join("\n");
+                strike = await Strike.create({
+                    id:       randomUUID(),
+                    guild_id: guild.id,
+                    user_id:  target.id,
+                    blame_id: blame?.id || null,
+                    type:     StrikeType.KICK
+                });
+                color = Colors.red;
+                break;
+            }
 
-		await db.insert("modlog", {
-			id,
-			entry_id: entryId,
-			guild_id: guild.id,
-			message_id: m === null ? null : m.id,
-			target: target.id,
-			blame: blame === null ? "automatic" : blame.id,
-			reason,
-			type: "lock",
-			created_at: Date.now()
-		});
+            case ModLogType.LOCK: {
+                const { target } = options;
+                text = [
+                    `Target: <#${target.id}> (\`${target.id}\`)`,
+                    `Reason: ${reason}`
+                ].join("\n");
+                color = Colors.red;
+                break;
+            }
 
-		return { id, entryId, check };
-	}
+            case ModLogType.UNLOCK: {
+                const { target } = options;
+                text = [
+                    `Target: <#${target.id}> (\`${target.id}\`)`,
+                    `Reason: ${reason}`
+                ].join("\n");
+                color = Colors.green;
+                break;
+            }
 
-	static async createLockDownEntry(guild: GuildConfig, blame: Eris.User | Eris.Member | null, reason: string | null) {
-		const check = await this.check(guild);
-		const entryId = await this.getEntryId(guild.id);
-		const id = crypto.randomBytes(6).toString("hex");
-		const g = this.client.guilds.get(guild.id);
-		const m = await this.executeWebhook(guild, {
-			embeds: [
-				new EmbedBuilder()
-					.setTitle(`Lockdown Initialized | Case #${entryId}`)
-					.setAuthor(...(g === undefined ? ["Unknown"] : [g.name, g.iconURL ?? undefined]) as [name: string, icon_url?: string])
-					.setDescription(
-						`Reason: **${reason ?? "None Provided"}**`
-					)
-					.setColor("red")
-					.setFooter(`Action Performed ${blame === null ? "Automatically" : `By ${blame.tag}`}`, blame === null ? botIcon : blame.avatarURL)
-					.toJSON()
-			]
-		});
+            case ModLogType.LOCKDOWN: {
+                text = [
+                    `Reason: ${reason}`
+                ].join("\n");
+                color = Colors.red;
+                break;
+            }
 
-		await db.insert("modlog", {
-			id,
-			entry_id: entryId,
-			guild_id: guild.id,
-			message_id: m === null ? null : m.id,
-			blame: blame === null ? "automatic" : blame.id,
-			reason,
-			type: "lockdown",
-			created_at: Date.now()
-		});
+            case ModLogType.UNLOCKDOWN: {
+                text = [
+                    `Reason: ${reason}`
+                ].join("\n");
+                color = Colors.green;
+                break;
+            }
 
-		return { id, entryId, check };
-	}
+            case ModLogType.WARNING: {
+                const { target, warningID } = options;
+                const warning = await Warning.get(warningID);
+                data.warning_id = warningID;
+                text = [
+                    `Target: <@${target.id}> (\`${target.tag}\`)`,
+                    `Reason: **${reason}**`,
+                    `Warning Id: **${warning?.id || "Unknown"}**`
+                ].join("\n");
+                strike = await Strike.create({
+                    id:       randomUUID(),
+                    guild_id: guild.id,
+                    user_id:  target.id,
+                    blame_id: blame?.id || null,
+                    type:     StrikeType.WARNING
+                });
+                color = Colors.red;
+                break;
+            }
 
-	static async createMuteEntry(guild: GuildConfig, target: Eris.User | Eris.Member, blame: Eris.User | Eris.Member | null, reason: string | null, time: number) {
-		const check = await this.check(guild);
-		const entryId = await this.getEntryId(guild.id);
-		const id = crypto.randomBytes(6).toString("hex");
-		await db.createUserIfNotExists(target.id);
-		const timedId = time === 0 ? null : await TimedModerationHandler.add(guild.id, target.id, "mute", time);
-		const m = await this.executeWebhook(guild, {
-			embeds: [
-				new EmbedBuilder()
-					.setTitle(`User Muted | Case #${entryId}`)
-					.setAuthor(...("guild" in target ? [target.guild.name, target.guild.iconURL ?? undefined] : [target.tag, target.avatarURL]) as [name: string, icon_url?: string])
-					.setDescription(
-						`Target: <@${target.id}> (\`${target.tag}\`)`,
-						`Reason: **${reason ?? "None Provided"}**`,
-						`Time: ${time === 0 ? "**Permanent**" : `**${Time.ms(time, true, true, false)}** (id: \`${timedId!}\`)`}`
-					)
-					.setColor("red")
-					.setFooter(`Action Performed ${blame === null ? "Automatically" : `By ${blame.tag}`}`, blame === null ? botIcon : blame.avatarURL)
-					.toJSON()
-			]
-		});
+            case ModLogType.DELETE_WARNING: {
+                const { target, warningID } = options;
+                text = [
+                    `Target: <@${target.id}> (\`${target.tag}\`)`,
+                    `Reason: **${reason}**`,
+                    `Warning Id: **${warningID}**`
+                ].join("\n");
+                color = Colors.orange;
+                break;
+            }
 
-		const [strikeId] = await UserConfig.prototype.addStrike.call({ id: target.id }, guild.id, blame === null ? "automatic" : blame.id);
+            case ModLogType.CLEAR_WARNINGS: {
+                const { target, amount } = options;
+                text = [
+                    `Target: <@${target.id}> (\`${target.tag}\`)`,
+                    `Reason: **${reason}**`,
+                    `Total Removed: **${amount}**`
+                ].join("\n");
+                color = Colors.green;
+                break;
+            }
 
-		await db.insert("modlog", {
-			id,
-			entry_id: entryId,
-			guild_id: guild.id,
-			message_id: m === null ? null : m.id,
-			strike_id: strikeId,
-			target: target.id,
-			blame: blame === null ? "automatic" : blame.id,
-			reason,
-			type: "mute",
-			created_at: Date.now(),
-			timed_id: timedId
-		});
+            case ModLogType.STRIKE: {
+                const { target, amount } = options;
+                text = [
+                    `Target: <@${target.id}> (\`${target.tag}\`)`,
+                    `Reason: **${reason}**`,
+                    `Amount: **${amount}**`
+                ].join("\n");
+                color = Colors.red;
+                break;
+            }
 
-		return { id, entryId, check, strikeId };
-	}
+            default: throw new Error(`Unhandled modlog type: ${type as number} (${JSON.stringify(options)})`);
+        }
 
-	static async createSoftBanEntry(guild: GuildConfig, target: Eris.User | Eris.Member, blame: Eris.User | Eris.Member | null, reason: string | null, deleteDays: number) {
-		const check = await this.check(guild);
-		const entryId = await this.getEntryId(guild.id);
-		const id = crypto.randomBytes(6).toString("hex");
-		await db.createUserIfNotExists(target.id);
-		const m = await this.executeWebhook(guild, {
-			embeds: [
-				new EmbedBuilder()
-					.setTitle(`User Soft Banned | Case #${entryId}`)
-					.setAuthor(...("guild" in target ? [target.guild.name, target.guild.iconURL ?? undefined] : [target.tag, target.avatarURL]) as [name: string, icon_url?: string])
-					.setDescription(
-						`Target: <@${target.id}> (\`${target.tag}\`)`,
-						`Reason: **${reason ?? "None Provided"}**`
-					)
-					.setColor("red")
-					.setFooter(`Action Performed ${blame === null ? "Automatically" : `By ${blame.tag}`}`, blame === null ? botIcon : blame.avatarURL)
-					.toJSON()
-			]
-		});
+        const msg = await this.executeWebhook(guild, gConfig, blame, ModLogType.BAN, caseID, color, text);
 
-		const [strikeId] = await UserConfig.prototype.addStrike.call({ id: target.id }, guild.id, blame === null ? "automatic" : blame.id);
+        data.channel_id = msg?.channelID;
+        data.message_id = msg?.id;
+        if (timed) data.timed_id = timed.id;
+        if (strike) data.strike_id = strike.id;
 
-		await db.insert("modlog", {
-			id,
-			entry_id: entryId,
-			guild_id: guild.id,
-			message_id: m === null ? null : m.id,
-			strike_id: strikeId,
-			target: target.id,
-			blame: blame === null ? "automatic" : blame.id,
-			reason,
-			type: "softban",
-			created_at: Date.now(),
-			delete_days: deleteDays
-		});
+        const log = await ModLog.create(data);
 
-		return { id, entryId, check, strikeId };
-	}
+        return { entry: log, message: msg, timed, strike, caseID, active: check } as unknown;
+    }
 
-	static async createUnBanEntry(guild: GuildConfig, target: Eris.User | Eris.Member, blame: Eris.User | Eris.Member | null, reason: string | null) {
-		const check = await this.check(guild);
-		const entryId = await this.getEntryId(guild.id);
-		const id = crypto.randomBytes(6).toString("hex");
-		await db.createUserIfNotExists(target.id);
-		const m = await this.executeWebhook(guild, {
-			embeds: [
-				new EmbedBuilder()
-					.setTitle(`User Unbanned | Case #${entryId}`)
-					.setAuthor(...("guild" in target ? [target.guild.name, target.guild.iconURL ?? undefined] : [target.tag, target.avatarURL]) as [name: string, icon_url?: string])
-					.setDescription(
-						`Target: <@${target.id}> (\`${target.tag}\`)`,
-						`Reason: **${reason ?? "None Provided"}**`
-					)
-					.setColor("green")
-					.setFooter(`Action Performed ${blame === null ? "Automatically" : `By ${blame.tag}`}`, blame === null ? botIcon : blame.avatarURL)
-					.toJSON()
-			]
-		});
+    static async executeWebhook(guild: Guild, gConfig: GuildConfig, blame: User | Member | null, type: ModLogType, caseID: number, color: number, description: string, title?: string) {
+        const titles = {
+            [ModLogType.BAN]:            "User Banned",
+            [ModLogType.UNBAN]:          "User Unbanned",
+            [ModLogType.SOFTBAN]:        "User Softbanned",
+            [ModLogType.MUTE]:           "User Muted",
+            [ModLogType.UNMUTE]:         "User Unmuted",
+            [ModLogType.KICK]:           "User Kicked",
+            [ModLogType.LOCK]:           "Channel Locked",
+            [ModLogType.UNLOCK]:         "Channel Unlocked",
+            [ModLogType.LOCKDOWN]:       "Lockdown Started",
+            [ModLogType.UNLOCKDOWN]:     "Lockdown Ended",
+            [ModLogType.WARNING]:        "User Warned",
+            [ModLogType.DELETE_WARNING]: "User Warning Removed",
+            [ModLogType.CLEAR_WARNINGS]: "User Warnings Cleared",
+            [ModLogType.STRIKE]:         "User Strike Given"
+        };
+        if (!(await this.check(gConfig))) return null;
+        return this.client.rest.webhooks.execute(gConfig.modlog.webhook!.id, gConfig.modlog.webhook!.token, {
+            ...{
+                embeds: Util.makeEmbed(false)
+                    .setAuthor(guild.name, guild.iconURL() ?? undefined)
+                    .setTitle(title || `${titles[type] || `Unknown Case Type (${type})`} | Case #${caseID}`)
+                    .setDescription(description)
+                    .setColor(color)
+                    .setFooter(`Action Performed ${!blame ? "Automatically" : `By ${blame.tag}`}`, blame === null ? Config.botIcon : blame.avatarURL())
+                    .toJSON(true)
+            },
+            wait: true
+        }).catch(() => null);
+    }
 
-		// no strike
-		await db.insert("modlog", {
-			id,
-			entry_id: entryId,
-			guild_id: guild.id,
-			message_id: m === null ? null : m.id,
-			target: target.id,
-			blame: blame === null ? "automatic" : blame.id,
-			reason,
-			type: "unban",
-			created_at: Date.now()
-		});
-
-		return { id, entryId, check };
-	}
-
-	static async createUnLockEntry(guild: GuildConfig, target: Exclude<Eris.GuildTextableChannel, Eris.AnyThreadChannel>, blame: Eris.User | Eris.Member | null, reason: string | null) {
-		const check = await this.check(guild);
-		const entryId = await this.getEntryId(guild.id);
-		const id = crypto.randomBytes(6).toString("hex");
-		await db.createUserIfNotExists(target.id);
-		const m = await this.executeWebhook(guild, {
-			embeds: [
-				new EmbedBuilder()
-					.setTitle(`Channel UnLocked | Case #${entryId}`)
-					.setAuthor(target.guild.name, target.guild.iconURL ?? undefined)
-					.setDescription(
-						`Target: <#${target.id}> (\`${target.id}\`)`,
-						`Reason: **${reason ?? "None Provided"}**`
-					)
-					.setColor("green")
-					.setFooter(`Action Performed ${blame === null ? "Automatically" : `By ${blame.tag}`}`, blame === null ? botIcon : blame.avatarURL)
-					.toJSON()
-			]
-		});
-
-		await db.insert("modlog", {
-			id,
-			entry_id: entryId,
-			guild_id: guild.id,
-			message_id: m === null ? null : m.id,
-			target: target.id,
-			blame: blame === null ? "automatic" : blame.id,
-			reason,
-			type: "unlock",
-			created_at: Date.now()
-		});
-
-		return { id, entryId, check };
-	}
-
-	static async createUnLockDownEntry(guild: GuildConfig, blame: Eris.User | Eris.Member | null, reason: string | null) {
-		const check = await this.check(guild);
-		const entryId = await this.getEntryId(guild.id);
-		const id = crypto.randomBytes(6).toString("hex");
-		const g = this.client.guilds.get(guild.id);
-		const m = await this.executeWebhook(guild, {
-			embeds: [
-				new EmbedBuilder()
-					.setTitle(`Lockdown Removed | Case #${entryId}`)
-					.setAuthor(...(g === undefined ? ["Unknown"] : [g.name, g.iconURL ?? undefined]) as [name: string, icon_url?: string])
-					.setDescription(
-						`Reason: **${reason ?? "None Provided"}**`
-					)
-					.setColor("green")
-					.setFooter(`Action Performed ${blame === null ? "Automatically" : `By ${blame.tag}`}`, blame === null ? botIcon : blame.avatarURL)
-					.toJSON()
-			]
-		});
-
-		await db.insert("modlog", {
-			id,
-			entry_id: entryId,
-			guild_id: guild.id,
-			message_id: m === null ? null : m.id,
-			blame: blame === null ? "automatic" : blame.id,
-			reason,
-			type: "unlockdown",
-			created_at: Date.now()
-		});
-
-		return { id, entryId, check };
-	}
-
-	static async createUnMuteEntry(guild: GuildConfig, target: Eris.User | Eris.Member, blame: Eris.User | Eris.Member | null, reason: string | null) {
-		const check = await this.check(guild);
-		const entryId = await this.getEntryId(guild.id);
-		const id = crypto.randomBytes(6).toString("hex");
-		await db.createUserIfNotExists(target.id);
-		const m = await this.executeWebhook(guild, {
-			embeds: [
-				new EmbedBuilder()
-					.setTitle(`User Unmuted | Case #${entryId}`)
-					.setAuthor(...("guild" in target ? [target.guild.name, target.guild.iconURL ?? undefined] : [target.tag, target.avatarURL]) as [name: string, icon_url?: string])
-					.setDescription(
-						`Target: <@${target.id}> (\`${target.tag}\`)`,
-						`Reason: **${reason ?? "None Provided"}**`
-					)
-					.setColor("green")
-					.setFooter(`Action Performed ${blame === null ? "Automatically" : `By ${blame.tag}`}`, blame === null ? botIcon : blame.avatarURL)
-					.toJSON()
-			]
-		});
-
-		await db.insert("modlog", {
-			id,
-			entry_id: entryId,
-			guild_id: guild.id,
-			message_id: m === null ? null : m.id,
-			target: target.id,
-			blame: blame === null ? "automatic" : blame.id,
-			reason,
-			type: "unmute",
-			created_at: Date.now()
-		});
-
-		return { id, entryId, check };
-	}
-
-	static async createWarnEntry(guild: GuildConfig, target: Eris.User | Eris.Member, blame: Eris.User | Eris.Member | null, reason: string | null, warningId: number) {
-		const check = await this.check(guild);
-		const entryId = await this.getEntryId(guild.id);
-		const id = crypto.randomBytes(6).toString("hex");
-		await db.createUserIfNotExists(target.id);
-		const m = await this.executeWebhook(guild, {
-			embeds: [
-				new EmbedBuilder()
-					.setTitle(`User Warned | Case #${entryId}`)
-					.setAuthor(...("guild" in target ? [target.guild.name, target.guild.iconURL ?? undefined] : [target.tag, target.avatarURL]) as [name: string, icon_url?: string])
-					.setDescription(
-						`Target: <@${target.id}> (\`${target.tag}\`)`,
-						`Reason: **${reason ?? "None Provided"}**`,
-						`Warning Id: **${warningId}**`
-					)
-					.setColor("gold")
-					.setFooter(`Action Performed ${blame === null ? "Automatically" : `By ${blame.tag}`}`, blame === null ? botIcon : blame.avatarURL)
-					.toJSON()
-			]
-		});
-
-		const [strikeId] = await UserConfig.prototype.addStrike.call({ id: target.id }, guild.id, blame === null ? "automatic" : blame.id);
-
-		await db.insert("modlog", {
-			id,
-			entry_id: entryId,
-			guild_id: guild.id,
-			message_id: m === null ? null : m.id,
-			strike_id: strikeId,
-			target: target.id,
-			blame: blame === null ? "automatic" : blame.id,
-			reason,
-			type: "warn",
-			created_at: Date.now(),
-			active: true,
-			warning_id: warningId
-		});
-
-		return { id, entryId, check };
-	}
-
-	static async createDeleteWarnEntry(guild: GuildConfig, target: Eris.User | Eris.Member, blame: Eris.User | Eris.Member | null, reason: string | null, warningId: string) {
-		const check = await this.check(guild);
-		const entryId = await this.getEntryId(guild.id);
-		const id = crypto.randomBytes(6).toString("hex");
-		await db.createUserIfNotExists(target.id);
-		const m = await this.executeWebhook(guild, {
-			embeds: [
-				new EmbedBuilder()
-					.setTitle(`User Warning Removed | Case #${entryId}`)
-					.setAuthor(...("guild" in target ? [target.guild.name, target.guild.iconURL ?? undefined] : [target.tag, target.avatarURL]) as [name: string, icon_url?: string])
-					.setDescription(
-						`Target: <@${target.id}> (\`${target.tag}\`)`,
-						`Reason: **${reason ?? "None Provided"}**`,
-						`Warning Id: **${warningId}**`
-					)
-					.setColor("orange")
-					.setFooter(`Action Performed ${blame === null ? "Automatically" : `By ${blame.tag}`}`, blame === null ? botIcon : blame.avatarURL)
-					.toJSON()
-			]
-		});
-
-		await db.insert("modlog", {
-			id,
-			entry_id: entryId,
-			guild_id: guild.id,
-			message_id: m === null ? null : m.id,
-			target: target.id,
-			blame: blame === null ? "automatic" : blame.id,
-			reason,
-			type: "deletewarning",
-			created_at: Date.now(),
-			warning_id: warningId
-		});
-
-		return { id, entryId, check };
-	}
-
-	static async createClearWarningsEntry(guild: GuildConfig, target: Eris.User | Eris.Member, blame: Eris.User | Eris.Member | null, reason: string | null, total: number) {
-		const check = await this.check(guild);
-		const entryId = await this.getEntryId(guild.id);
-		const id = crypto.randomBytes(6).toString("hex");
-		await db.createUserIfNotExists(target.id);
-		const m = await this.executeWebhook(guild, {
-			embeds: [
-				new EmbedBuilder()
-					.setTitle(`User Warnings Cleared | Case #${entryId}`)
-					.setAuthor(...("guild" in target ? [target.guild.name, target.guild.iconURL ?? undefined] : [target.tag, target.avatarURL]) as [name: string, icon_url?: string])
-					.setDescription(
-						`Target: <@${target.id}> (\`${target.tag}\`)`,
-						`Reason: **${reason ?? "None Provided"}**`,
-						`Total Removed: **${total}**`
-					)
-					.setColor("green")
-					.setFooter(`Action Performed ${blame === null ? "Automatically" : `By ${blame.tag}`}`, blame === null ? botIcon : blame.avatarURL)
-					.toJSON()
-			]
-		});
-
-		await db.insert("modlog", {
-			id,
-			entry_id: entryId,
-			guild_id: guild.id,
-			message_id: m === null ? null : m.id,
-			target: target.id,
-			blame: blame === null ? "automatic" : blame.id,
-			reason,
-			type: "clearwarnings",
-			created_at: Date.now(),
-			total
-		});
-
-		return { id, entryId, check };
-	}
-
-	static entryToString(e: AnyEntry) {
-		switch (e.constructor) {
-			case UnBanEntry: return "unban";
-			case UnLockDownEntry: return "unlockdown";
-			case UnLockEntry: return "unlock";
-			case UnMuteEntry: return "unmute";
-			default: return e.constructor.name.replace(/([A-Z])/g, " $1").trim().replace(/ Entry/i, "").toLowerCase();
-		}
-	}
-}
-
-export class TimedModerationHandler {
-	private static interval: NodeJS.Timeout | undefined;
-	static get client() { return ModLogHandler.client; }
-	private static processed = [] as Array<string>;
-	static init() {
-		this.interval = setInterval(this.process.bind(this), 1e3);
-		Logger.getLogger("TimedModerationHandler").info("Successfully initialized.");
-	}
-	static stop() {
-		if (this.interval) clearInterval(this.interval);
-		this.interval = undefined;
-		Logger.getLogger("TimedModerationHandler").info("Successfully stopped.");
-	}
-
-	static async add(guildId: string, userId: string, type: TimedEntry["type"], time: number) {
-		const id = crypto.randomBytes(6).toString("hex");
-		await db.createUserIfNotExists(userId);
-		await db.query("INSERT INTO timed (id, type, guild_id, user_id, time, expiry) VALUES (?, ?, ?, ?, ?, ?)", [
-			id,
-			type,
-			guildId,
-			userId,
-			time,
-			Date.now() + time
-		]);
-
-		return id;
-	}
-
-	static async remove(id: string) {
-		await db.query("UPDATE modlog SET timed_id = NULL WHERE timed_id = ?", [id]);
-		return db.query("DELETE FROM timed WHERE id=?", [id]).then((r: OkPacket) => r.affectedRows > 0);
-	}
-
-	static async process() {
-		const entries = await db.query("SELECT * FROM timed WHERE expiry <= ROUND(UNIX_TIMESTAMP() * 1000)") as Array<RawTimedEntry>;
-		for (const e of entries) {
-			const entry = new TimedEntry(e);
-			if (this.processed.includes(entry.id)) continue;
-			this.processed.push(entry.id);
-			Logger.getLogger("TimedModerationHandler").debug(`Processing timed entry "${entry.id}" for the guild "${entry.guildId}"`);
-			const g = await db.getGuild(entry.guildId);
-			const [m] = await db.query("SELECT * FROM modlog WHERE timed_id=?", [entry.id]) as Array<RawBanEntry | RawMuteEntry>;
-			const b = m === undefined ? null : await this.client.getUser(m.blame);
-			const u = await this.client.getUser(entry.userId);
-			if (u === null) {
-				await this.remove(entry.id);
-				continue;
-			}
-
-			switch (entry.type) {
-				case "ban": {
-					const v = await ModLogHandler.check(g);
-					const unb = await this.client.unbanGuildMember(entry.guildId, entry.userId, `Timed Unban (${b === null ? "Unknown" : b.tag})`).then(() => true).catch(() => false);
-					if (v) {
-						if (unb === false) await ModLogHandler.executeWebhook(g, {
-							embeds: [
-								new EmbedBuilder()
-									.setTitle("Automatic Unban Failed")
-									.setAuthor(u.tag, u.avatarURL)
-									.setDescription(`I failed to automatically unban <@!${u.id}>.`)
-									.setColor("red")
-									.setFooter("Action Performed Automatically", botIcon)
-									.toJSON()
-							]
-						}); else await ModLogHandler.createUnBanEntry(g, u, null, "Timed Action");
-						await this.remove(entry.id);
-						continue;
-					}
-					break;
-				}
-
-				case "mute": {
-					const v = await ModLogHandler.check(g);
-					if (g.settings.muteRole === null) {
-						await ModLogHandler.executeWebhook(g, {
-							embeds: [
-								new EmbedBuilder()
-									.setTitle("Automatic Unmute Failed")
-									.setAuthor(u.tag, u.avatarURL)
-									.setDescription(`I failed to automatically unmute <@!${u.id}>, due to the mute role no longer being set.`)
-									.setColor("red")
-									.setFooter("Action Performed Automatically", botIcon)
-									.toJSON()
-							]
-						});
-						await this.remove(entry.id);
-						return;
-					}
-					const hasRole = this.client.guilds.get(g.id)?.roles.has(g.settings.muteRole);
-					if (!hasRole) {
-					// role might not be cached, because Discord™️
-						const hasRoleREST = await ModLogHandler.client.getRESTGuildRoles(g.id).then(r => r.map(j => j.id).includes(g.settings.muteRole!)).catch(() => null);
-						// role no longer exists, discard entry
-						if (!hasRoleREST) {
-							await this.remove(entry.id);
-							return;
-						}
-					}
-					const member = await this.client.getMember(entry.guildId, entry.userId);
-					if (member === null) {
-
-						await ModLogHandler.executeWebhook(g, {
-							embeds: [
-								new EmbedBuilder()
-									.setTitle("Automatic Unmute Failed")
-									.setAuthor(u.tag, u.avatarURL)
-									.setDescription(`I failed to automatically unmute <@!${u.id}>, as they are no longer in this server.`)
-									.setColor("red")
-									.setFooter("Action Performed Automatically", botIcon)
-									.toJSON()
-							]
-						});
-						await this.remove(entry.id);
-						return;
-					}
-					const unm = await this.client.removeGuildMemberRole(entry.guildId, entry.userId, g.settings.muteRole, `Timed Unmute (${b === null ? "Unknown" : b.tag})`).then(() => true).catch(() => false);
-					if (v) {
-						if (unm === false) await ModLogHandler.executeWebhook(g, {
-							embeds: [
-								new EmbedBuilder()
-									.setTitle("Automatic Unmute Failed")
-									.setAuthor(u.tag, u.avatarURL)
-									.setDescription(`I failed to automatically unmute <@!${u.id}>.`)
-									.setColor("red")
-									.setFooter("Action Performed Automatically", botIcon)
-									.toJSON()
-							]
-						}); else await ModLogHandler.createUnMuteEntry(g, u, null, "Timed Action");
-						await this.remove(entry.id);
-						continue;
-					}
-					break;
-				}
-			}
-		}
-	}
+    static async init(client: MaidBoye) {
+        this.client = client;
+        Logger.getLogger("ModLogHandler").info("Initialized");
+    }
 }

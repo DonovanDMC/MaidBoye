@@ -1,90 +1,85 @@
-import ClientEvent from "@util/ClientEvent";
-import GuildConfig from "@models/Guild/GuildConfig";
-import EmbedBuilder from "@util/EmbedBuilder";
-import LoggingWebhookFailureHandler from "@handlers/LoggingWebhookFailureHandler";
-import Eris from "eris";
+import ClientEvent from "../util/ClientEvent.js";
+import LogEvent, { LogEvents } from "../db/Models/LogEvent.js";
+import Util from "../util/Util.js";
+import { Colors } from "../util/Constants.js";
+import { EmbedOptions, UserFlags } from "oceanic.js";
 
-export default new ClientEvent("userUpdate", async function(user, oldUser) {
-	if (oldUser === null) return;
-	const embeds = [] as Array<Eris.EmbedOptions>;
+export default new ClientEvent("userUpdate", async function userUpdateEvent(user, oldUser) {
+    if (oldUser === null) return;
+    const guilds = this.guilds.filter(g => g.members.has(user.id));
+    const events: Array<LogEvent> = [];
+    for (const guild of guilds) {
+        events.push(...(await LogEvent.getType(guild.id, LogEvents.USER_UPDATE)));
+    }
+    if (events.length === 0) return;
 
-	if (oldUser.accentColor !== user.accentColor) embeds.push(new EmbedBuilder(true)
-		.setTitle("Member Updated")
-		.setColor("gold")
-		.setDescription([
-			`Member: ${user.tag} (<@!${user.id}>)`,
-			"This user changed their accent color."
-		])
-		.addField("Old Accent Color", `${!oldUser.accentColor ? "[NONE]" : oldUser.accentColor}`, false)
-		.addField("New Accent Color", `${!user.accentColor ? "[NONE]" : user.accentColor}`, false)
-		.toJSON()
-	);
+    const embeds: Array<EmbedOptions> = [];
 
-	if (oldUser.avatar !== user.avatar) embeds.push(new EmbedBuilder(true)
-		.setTitle("Member Updated")
-		.setColor("gold")
-		.setDescription([
-			`Member: ${user.tag} (<@!${user.id}>)`,
-			"This user changed their global avatar.",
-			"",
-			// eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-			oldUser.avatar === null ? "[No Old Avatar]" : `[Old Avatar](${Object.getOwnPropertyDescriptor(Eris.User.prototype, "avatarURL")!.get!.call({ _client: this, id: user.id, avatar: oldUser.avatar })})`,
-			user.avatar === null ? "[No New Avatar]" : `[New Avatar](${user.avatarURL})`
-		])
-		.toJSON()
-	);
+    if (user.avatar !== oldUser.avatar) {
+        embeds.push(Util.makeEmbed(true)
+            .setTitle("User Updated")
+            .setColor(Colors.gold)
+            .setDescription([
+                `User: **${user.tag}** (${user.id})`,
+                "This user's avatar was updated."
+            ])
+            .setImage(user.avatarURL())
+            .toJSON()
+        );
+    }
 
-	if (oldUser.banner !== user.banner) embeds.push(new EmbedBuilder(true)
-		.setTitle("Member Updated")
-		.setColor("gold")
-		.setDescription([
-			`Member: ${user.tag} (<@!${user.id}>)`,
-			"This user changed their banner.",
-			"",
-			// eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-			oldUser.banner === null ? "[No Old Banner]" : `[Old Banner](${Object.getOwnPropertyDescriptor(Eris.User.prototype, "bannerURL")!.get!.call({ _client: this, id: user.id, avatar: oldUser.avatar })})`,
-			user.banner === null ? "[No New Banner]" : `[New Banner](${user.bannerURL!})`
-		])
-		.toJSON()
-	);
+    if (user.discriminator !== oldUser.discriminator) {
+        embeds.push(Util.makeEmbed(true)
+            .setTitle("User Updated")
+            .setColor(Colors.gold)
+            .setDescription([
+                `User: **${user.tag}** (${user.id})`,
+                "This user's discriminator was updated."
+            ])
+            .addField("Old Discriminator", oldUser.discriminator, true)
+            .addField("New Discriminator", user.discriminator, true)
+            .toJSON()
+        );
+    }
 
-	if (oldUser.discriminator !== user.discriminator) embeds.push(new EmbedBuilder(true)
-		.setTitle("Member Updated")
-		.setColor("gold")
-		.setDescription([
-			`Member: ${user.tag} (<@!${user.id}>)`,
-			"This user changed their discriminator."
-		])
-		.addField("Old Discriminator", oldUser.discriminator, false)
-		.addField("New Discriminator", user.discriminator, false)
-		.toJSON()
-	);
+    const oldFlags = Util.getFlagsArray(UserFlags, oldUser.publicFlags);
+    const newFlags = Util.getFlagsArray(UserFlags, user.publicFlags);
+    const addedFlags = newFlags.filter(f => !oldFlags.includes(f));
+    const removedFlags = oldFlags.filter(f => !newFlags.includes(f));
+    if (addedFlags.length > 0 || removedFlags.length > 0) {
+        embeds.push(Util.makeEmbed(true)
+            .setTitle("User Updated")
+            .setColor(Colors.gold)
+            .setDescription([
+                `User: **${user.tag}** (${user.id})`,
+                "This user's flags were updated.",
+                "",
+                "```diff",
+                ...addedFlags.map(f => `+ ${f}`),
+                ...removedFlags.map(f => `- ${f}`),
+                "```"
+            ])
+            .toJSON()
+        );
+    }
 
-	if (oldUser.username !== user.username) embeds.push(new EmbedBuilder(true)
-		.setTitle("Member Updated")
-		.setColor("gold")
-		.setDescription([
-			`Member: ${user.tag} (<@!${user.id}>)`,
-			"This user changed their username."
-		])
-		.addField("Old Username", oldUser.username, false)
-		.addField("New Username", user.username, false)
-		.toJSON()
-	);
+    if (user.username !== oldUser.username) {
+        embeds.push(Util.makeEmbed(true)
+            .setTitle("User Updated")
+            .setColor(Colors.gold)
+            .setDescription([
+                `User: **${user.tag}** (${user.id})`,
+                "This user's username was updated."
+            ])
+            .addField("Old Username", oldUser.username, true)
+            .addField("New Username", user.username, true)
+            .toJSON()
+        );
+    }
 
-	if (embeds.length > 0) {
-		const guilds = this.guilds.filter(g => g.members.has(user.id));
-		for (const guild of guilds) {
-			const logEvents = await GuildConfig.getLogEvents(guild.id, "memberUpdate");
-			for (const log of logEvents) {
-				const hook = await this.getWebhook(log.webhook.id, log.webhook.token).catch(() => null);
-				if (hook === null || !hook.token) {
-					void LoggingWebhookFailureHandler.tick(log);
-					continue;
-				}
+    if (embeds.length === 0) return;
 
-				await this.executeWebhook(hook.id, hook.token, { embeds });
-			}
-		}
-	}
+    for (const log of events) {
+        await log.execute(this, { embeds });
+    }
 });

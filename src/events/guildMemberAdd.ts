@@ -1,41 +1,32 @@
-import ClientEvent from "@util/ClientEvent";
-import EmbedBuilder from "@util/EmbedBuilder";
-import GuildConfig from "@models/Guild/GuildConfig";
-import BotFunctions from "@util/BotFunctions";
-import { developers, emojis, names } from "@config";
-import LoggingWebhookFailureHandler from "@handlers/LoggingWebhookFailureHandler";
+import ClientEvent from "../util/ClientEvent.js";
+import LogEvent, { LogEvents } from "../db/Models/LogEvent.js";
+import Util from "../util/Util.js";
+import { Colors } from "../util/Constants.js";
+import { UserFlagNames } from "../util/Names.js";
+import Config from "../config/index.js";
+import { UserFlags } from "oceanic.js";
 
-export default new ClientEvent("guildMemberAdd", async function(guild, member) {
-	const logEvents = await GuildConfig.getLogEvents(guild.id, "memberAdd");
-	for (const log of logEvents) {
-		const hook = await this.getWebhook(log.webhook.id, log.webhook.token).catch(() => null);
-		if (hook === null || !hook.token) {
-			void LoggingWebhookFailureHandler.tick(log);
-			continue;
-		}
+export default new ClientEvent("guildMemberAdd", async function guildMemberAddEvent(member) {
+    const events = await LogEvent.getType(member.guildID, LogEvents.MEMBER_ADD);
+    if (events.length === 0) return;
 
-		const badges: Array<keyof typeof names["badges"]> = BotFunctions.getUserFlagsArray(member.user);
-		if (developers.includes(member.id)) badges.push("DEVELOPER");
-		if (badges.length === 0) badges.push("NONE");
+    const flags = Util.getFlagsArray(UserFlags, member.user.publicFlags);
+    const embed = Util.makeEmbed(true)
+        .setTitle("Member Joined")
+        .setColor(Colors.green)
+        .addField("Member Info", [
+            `User: **${member.tag}** (${member.mention})`,
+            `Nickname: ${member.nick ?? "[NONE]"}`,
+            `Roles: ${member.roles.map(r => `<@&${r}>`).join(" ")}`,
+            `Created At: ${Util.formatDiscordTime(member.createdAt, "short-datetime", true)}`,
+            `Pending: **${member.pending ? "Yes" : "No"}**`,
+            "",
+            "**Badges**:",
+            ...(flags.length ? flags.map(f => `${Config.emojis.default.dot} ${UserFlagNames[UserFlags[f]]}`) : ["- None"]),
+            ...(member.id === "242843345402069002" ? [`${Config.emojis.default.dot} ${Config.emojis.custom.don} Developer`] : [])
+        ].join("\n"), false);
 
-		const e = new EmbedBuilder(true)
-			.setTitle("Member Joined")
-			.setColor("green")
-			.addField("Member Info", [
-				`User: ${member.tag} (<@!${member.id}>)`,
-				`Nickname: ${member.nick ?? "[NONE]"}`,
-				`Roles: ${member.roles.map(r => `<@&${r}>`).join(" ")}`,
-				`Created At: ${BotFunctions.formatDiscordTime(member.createdAt, "short-datetime", true)}`,
-				`Pending: **${member.pending ? "Yes" : "No"}**`,
-				"",
-				"**Badges**:",
-				...badges.map(f => `${emojis.default.dot} ${names.badges[f]}`)
-			].join("\n"), false);
-
-		await this.executeWebhook(hook.id, hook.token, {
-			embeds: [
-				e.toJSON()
-			]
-		});
-	}
+    for (const log of events) {
+        await log.execute(this, { embeds: embed.toJSON(true) });
+    }
 });

@@ -1,6 +1,6 @@
-import ClientEvent from "@util/ClientEvent";
-import Logger from "@util/Logger";
+import ClientEvent from "../util/ClientEvent.js";
+import Logger from "../util/Logger.js";
 
-export default new ClientEvent("warn", async function(info, id) {
-	Logger.getLogger(id === undefined ? undefined : `Shard #${id}`).warn(info);
+export default new ClientEvent("warn", async function warnEvent(info, id) {
+    Logger.getLogger(`Warning${!id ? "" : ` | Shard #${id}`}`).warn(info);
 });

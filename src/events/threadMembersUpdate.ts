@@ -1,63 +1,52 @@
-import ClientEvent from "@util/ClientEvent";
-import EmbedBuilder from "@util/EmbedBuilder";
-import GuildConfig from "@models/Guild/GuildConfig";
-import LoggingWebhookFailureHandler from "@handlers/LoggingWebhookFailureHandler";
+import ClientEvent from "../util/ClientEvent.js";
+import LogEvent, { LogEvents } from "../db/Models/LogEvent.js";
+import Util from "../util/Util.js";
+import { Colors } from "../util/Constants.js";
+import { AnyThreadChannel, EmbedOptions, ThreadChannel } from "oceanic.js";
 
-export default new ClientEvent("threadMembersUpdate", async function(thread, addedMembers, removedMembers) {
-	if (removedMembers.filter(Boolean).length === 0 && addedMembers.filter(Boolean).length === 0) return;
-	if (!("guild" in thread)) return;
+export default new ClientEvent("threadMembersUpdate", async function threadMembersUpdateEvent(thread, addedMembers, removedMembers) {
+    const eventsAdd = await LogEvent.getType(thread.guildID, LogEvents.THREAD_MEMBER_ADD);
+    const eventsRemove = await LogEvent.getType(thread.guildID, LogEvents.THREAD_MEMBER_REMOVE);
+    if (eventsAdd.length === 0 && eventsRemove.length === 0) return;
 
-	if (addedMembers.length > 0) {
-		const logEvents = await GuildConfig.getLogEvents(thread.guild.id, "threadJoin");
-		for (const log of logEvents) {
-			const hook = await this.getWebhook(log.webhook.id, log.webhook.token).catch(() => null);
-			if (hook === null || !hook.token) {
-				void LoggingWebhookFailureHandler.tick(log);
-				continue;
-			}
+    if (!(thread instanceof ThreadChannel)) thread = await this.rest.channels.get<AnyThreadChannel>(thread.id);
+    if (eventsAdd.length > 0 && addedMembers.length > 0) {
+        const embeds: Array<EmbedOptions> = [];
+        for (const { userID } of addedMembers) {
+            const member = (await this.getMember(thread.guildID, userID))!;
+            embeds.push(Util.makeEmbed(true)
+                .setTitle("Thread Member Added")
+                .setColor(Colors.green)
+                .setDescription([
+                    `Thread: ${(thread as AnyThreadChannel).name} (${thread.id})`,
+                    `Member: **${member.tag}** (${member.id})`
+                ])
+                .toJSON()
+            );
+        }
 
-			await this.executeWebhook(hook.id, hook.token, {
-				embeds: [
-					new EmbedBuilder(true)
-						.setTitle("Thread Join")
-						.setColor("green")
-						.setDescription([
-							`Thread: <#${thread.name}>`,
-							"Some people joined this thread.",
-							"",
-							"**Members**:",
-							...addedMembers.map(m => `<@!${m.id}>`)
-						])
-						.toJSON()
-				]
-			});
-		}
-	}
+        for (const log of eventsAdd) {
+            await log.execute(this, { embeds });
+        }
+    }
 
-	if (removedMembers.length > 0) {
-		const logEvents = await GuildConfig.getLogEvents(thread.guild.id, "threadLeave");
-		for (const log of logEvents) {
-			const hook = await this.getWebhook(log.webhook.id, log.webhook.token).catch(() => null);
-			if (hook === null || !hook.token) {
-				await log.delete();
-				continue;
-			}
+    if (eventsRemove.length > 0 && removedMembers.length > 0) {
+        const embeds: Array<EmbedOptions> = [];
+        for (const { userID } of removedMembers) {
+            const member = (await this.getMember(thread.guildID, userID))!;
+            embeds.push(Util.makeEmbed(true)
+                .setTitle("Thread Member Removed")
+                .setColor(Colors.green)
+                .setDescription([
+                    `Thread: ${(thread as AnyThreadChannel).name} (${thread.id})`,
+                    `Member: **${member.tag}** (${member.id})`
+                ])
+                .toJSON()
+            );
+        }
 
-			await this.executeWebhook(hook.id, hook.token, {
-				embeds: [
-					new EmbedBuilder(true)
-						.setTitle("Thread Leave")
-						.setColor("red")
-						.setDescription([
-							`Thread: <#${thread.name}>`,
-							"Some people left this thread.",
-							"",
-							"**Members**:",
-							...removedMembers.map(m => `<@!${m.id}>`)
-						])
-						.toJSON()
-				]
-			});
-		}
-	}
+        for (const log of eventsAdd) {
+            await log.execute(this, { embeds });
+        }
+    }
 });

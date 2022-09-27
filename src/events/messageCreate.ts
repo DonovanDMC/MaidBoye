@@ -1,391 +1,131 @@
-import UserConfig from "@models/User/UserConfig";
-import AntiSpam from "@cmd/AntiSpam";
-import WebhookStore from "@util/WebhookStore";
-import BotFunctions from "@util/BotFunctions";
-import GuildConfig from "@models/Guild/GuildConfig";
-import ClientEvent from "@util/ClientEvent";
-import EmbedBuilder from "@util/EmbedBuilder";
-import Logger from "@util/Logger";
-import ExtendedMessage from "@util/ExtendedMessage";
-import type { Permissions } from "@util/Constants";
-import ErrorHandler from "@handlers/ErrorHandler";
-import CommandError from "@cmd/CommandError";
-import { Strings, Timers } from "@uwu-codes/utils";
-import Eris from "eris";
-import StatsHandler from "@handlers/StatsHandler";
-import EventsASecondHandler from "@handlers/EventsASecondHandler";
-import db from "@db";
+import Config from "../config/index.js";
+import ClientEvent from "../util/ClientEvent.js";
+import db from "../db/index.js";
+import Util from "../util/Util.js";
+import RequestProxy from "../util/RequestProxy.js";
+import { Colors } from "../util/Constants.js";
+import { State } from "../util/State.js";
+import Logger from "../util/Logger.js";
 import {
-	antiSpamMaxVL,
-	antiSpamWarnThreshold,
-	beta,
-	defaultPrefix,
-	developers,
-	permissionNames,
-	supportLink
-} from "@config";
-import RequestProxy from "@util/RequestProxy";
-import Sauce, { autoMimeTypes } from "@util/Sauce";
-const Redis = db.r;
+    Internal,
+    Strings,
+    Time,
+    Timer,
+    Timers,
+    Utility,
+    ReNice
+} from "@uwu-codes/utils";
+import * as Oceanic from "oceanic.js";
+import { parse, strip } from "dashargs";
+import { ButtonColors, ComponentBuilder } from "@oceanicjs/builders";
+import type { MessageActionRow } from "oceanic.js";
+import { inspect } from "util";
 
-export default new ClientEvent("messageCreate", async function (message) {
-	const t = new Timers((developers.includes(message.author.id) || beta) === true ? (label, info) => Logger.getLogger(label).debug(info) : false);
-	// private channels are sent as partials with only the id in gateway v8+
-	if (!("type" in message.channel)) {
-		const ch = await this.getRESTChannel(message.channel.id);
-		if (ch.type === Eris.Constants.ChannelTypes.DM) {
-			this.privateChannels.add(ch);
-			this.privateChannelMap[ch.id] = message.author.id;
-			message.channel = ch;
-		}
-	}
-	if (message.author.bot === true || !("type" in message.channel) || message.channel.type === Eris.Constants.ChannelTypes.GROUP_DM) return;
-	t.start("userBl");
-	const userBl = await UserConfig.prototype.checkBlacklist.call({ id: message.author.id });
-	if (userBl.active.length > 0) {
-		if (userBl.noticeNotShown.active.length > 0) {
-			const bl = userBl.noticeNotShown.active[0];
-			await message.reply(`H-hey! You've been blacklisted..\nDeveloper: **${bl.createdByTag}**\nReason: ${bl.reason ?? "None Provided."}\nExpiry: ${bl.expireTime === 0 ? "Never" : BotFunctions.formatDiscordTime(bl.expireTime, "short-datetime", true)}`);
-			// we should only show one notice, as to not annoy them too much
-			await Promise.all(userBl.noticeNotShown.active.map(async (b) => b.setNoticeShown(true)));
-		}
-		return;
-	}
-	t.end("userBl");
+async function format(obj: unknown) {
+    if (obj instanceof Promise) obj = await obj;
+    if (Array.isArray(obj)) return JSON.stringify(obj, (k, v: unknown) => typeof v === "bigint" ? `${v.toString()}n` : v);
+    return inspect(obj, { depth: 1, colors: false, showHidden: false });
+}
 
-	t.start("dm");
-	if (message.channel.type === Eris.Constants.ChannelTypes.DM) {
-		StatsHandler.trackBulkNoResponse(
-			"stats:directMessage",
-			`stats:users:${message.author.id}:directMessage`
-		);
-		Logger.info(`Direct message recieved from ${message.author.tag} (${message.author.id}) | Content: ${message.content || "NONE"}${message.attachments.length !== 0 ? ` | Attachments: ${message.attachments.map((a, i) => `[${i}]: ${a.url}`).join(", ")}` : ""}`);
+const evalVariables: Record<string, unknown> = {
+    Oceanic,
+    db,
+    Util,
+    Redis: db.redis,
+    Internal,
+    Strings,
+    Time,
+    Timer,
+    Timers,
+    Utility,
+    ReNice,
+    RequestProxy,
+    Config
+};
 
+export default new ClientEvent("messageCreate", async function messageCreateEvent(msg) {
+    if (Config.developers.includes(msg.author.id)) {
+        const [prefix, command, ...args] = msg.content.split(" ");
 
-		t.start("source.dm");
-		let c = message.content;
-		if (c.startsWith("<") && c.endsWith(">")) c = c.slice(1, -1);
-		let val = Strings.validateURL(c);
-		if (!val && message.attachments.length > 0) {
-			const f = message.attachments.find(a => autoMimeTypes.includes(a.content_type ?? ""));
-			c = (f || message.attachments[0]).url;
-			val = true;
-		}
-		if (val) {
-			const head = await RequestProxy.head(c);
-			if (autoMimeTypes.includes(head.headers.get("content-type") ?? "")) {
-				const { method, tried, post, saucePercent, sourceOverride, snRateLimited, url } = await Sauce(c, undefined, true) as Exclude<Awaited<ReturnType<typeof Sauce>>, null>;
-				if (snRateLimited) return message.reply(`SauceNAO is ratelimiting us, so we couldn't try SauceNAO, we tried these instead: \`${tried.join("`, `")}\``);
-				if (method === undefined) return message.reply(`We couldn't find anything for the image "<${url}>"..\nWe tried: \`${tried.join("`, `")}\``);
-				StatsHandler.trackNoResponse("stats:source:dm");
-				if (method === "e621" && post !== null) {
-					StatsHandler.trackNoResponse("stats:source:dm:e621");
-					return message.reply(`We found these sources via direct md5 lookup on e621\nLookup: <${url}>\n\nResults:\nhttps://e621.net/posts/${post.id}\n${post.sources.map(v => `<${v}>`).join("\n")}`);
-				} else if (method === "yiffy2" && sourceOverride) {
-					StatsHandler.trackNoResponse("stats:source:dm:yiffy2");
-					// we will only get to yiffy2 for YiffyAPI V2 images without an e621 source, other images end up being process like md5 lookups
-					return message.reply(`We found these sources via direct md5 lookup on YiffyAPI V2\nLookup: <${url}>\n\nResults:\n${(Array.isArray(sourceOverride) ? sourceOverride : [sourceOverride]).map((v, i) => i === 0 ? v : `<${v}>`).join("\n")}`);
-				} else if (method === "yiffy3" && post !== null) {
-					StatsHandler.trackNoResponse("stats:source:dm:yiffy3");
-					return message.reply(`We found these sources via direct md5 lookup on YiffyAPI V3\nLookup: <${url}>\n\nResults:\nhttps://yiff.rest/posts/${post.id}\n${post.sources.map(v => `<${v}>`).join("\n")}`);
-				} else if (method === "saucenao" && sourceOverride) {
-					StatsHandler.trackNoResponse("stats:source:dm:saucenao");
-					return message.reply(`We found these sources via a reverse image search on saucenao (similarity: ${saucePercent}%)\nLookup: <${url}>\n\nResults:\n${(Array.isArray(sourceOverride) ? sourceOverride : [sourceOverride]).map((v, i) => (i === 0 ? v : `<${v}>`).replace(/posts\/show/, "posts" /* legacy */)).join("\n")}`);
-				}
-			}
-		}
+        if (new RegExp(`^<@!?${this.user.id}>`).test(prefix)) {
+            switch (command) {
+                case "eval": {
+                // eslint-disable-next-line guard-for-in, @typescript-eslint/no-implied-eval, no-new-func -- typescript messes with variable names so we have to remake them
+                    for (const k in evalVariables) new Function("value", `${k} = value`)(evalVariables[k]);
+                    let res: unknown;
+                    const flags = parse(args.join(" "), {
+                        parseArgs: false
+                    });
+                    const arg = strip(args.join(" "), {
+                        removeFlags: true
+                    });
+                    const start = Timer.getTime();
+                    try {
+                    // eslint-disable-next-line no-eval
+                        res = await eval(`(async()=>{${arg.includes("return") ? "" : "return "}${arg}})()`);
+                    } catch (err) {
+                        res = err;
+                    }
+                    const end = Timer.getTime();
 
-		t.end("source.dm");
-		return message.channel.createMessage({
-			embeds: [
-				new EmbedBuilder()
-					.setTitle("Hi!")
-					.setDescription(`H-hey... I see you direct messaged me.. If you need some help, y-you can join my support server.. <${supportLink}>\nMy default prefix is \`${defaultPrefix.trim()}\`, and you can list my commands b-by using \`${defaultPrefix}help\` in a server.\n\nI-if you don't want this response, run \`${defaultPrefix}toggledmresponse\` in a server..`)
-					.setAuthor(message.author.tag, message.author.avatarURL)
-					.setFooter(">w<")
-					.toJSON()
-			]
-		});
-	}
-	t.end("dm");
+                    const f = await format(res);
+                    const t = Timer.calc(start, end, 3, false);
 
-	// ignore if we can't send messages
-	// (we need to check channel and guild to remove Uncached and PrivateChannel)
-	if (!("channel" in message) || !("guild" in message.channel) || !message.channel.permissionsOf(this.user.id).has("sendMessages")) return;
-
-	t.start("guildBl");
-	const guildBl = await GuildConfig.prototype.checkBlacklist.call({ id: message.guildID });
-	if (guildBl.active.length > 0) {
-		if (guildBl.noticeNotShown.active.length > 0) {
-			const bl = userBl.noticeNotShown.active[0];
-			await message.reply(`H-hey! This server has been blacklisted..\nDeveloper: **${bl.createdByTag}**\nReason: ${bl.reason ?? "None Provided."}\nExpiry: ${bl.expireTime === 0 ? "Never" : BotFunctions.formatDiscordTime(bl.expireTime, "short-datetime", true)}`);
-			// we should only show one notice, as to not annoy them too much
-			await Promise.all(guildBl.noticeNotShown.active.map(async (b) => b.setNoticeShown(true)));
-		}
-		return;
-	}
-	t.end("guildBl");
-	// not anymore
-	// we completely ignore messages inside of threads
-	/* if ([
-		Eris.Constants.ChannelTypes.GUILD_NEWS_THREAD,
-		Eris.Constants.ChannelTypes.GUILD_PUBLIC_THREAD,
-		Eris.Constants.ChannelTypes.GUILD_PRIVATE_THREAD
-	].includes(message.channel.type as 10)) return; */
-
-	t.start("extend");
-	const msg = new ExtendedMessage(message as Eris.Message<Exclude<Eris.GuildTextableChannel, Eris.AnyThreadChannel>>, this);
-	t.end("extend");
-	t.start("process");
-	const load = await msg.load();
-	t.end("process");
-	if (msg.content.toLowerCase().startsWith("maid make")) return msg.reply("Th-that's not my purpose..");
-	if (msg.content.toLowerCase() === "maid fuck me") return msg.reply("I-I don't even know you..");
-	const { cmd } = msg;
-	StatsHandler.trackNoResponse("stats", "message", msg.channel.typeString);
-
-	t.start("leveling");
-	const levelingCooldown = await Redis.exists(`leveling:${msg.author.id}:${msg.channel.guild.id}:cooldown`);
-	if (!levelingCooldown) {
-		await Redis.setex(`leveling:${msg.author.id}:${msg.channel.guild.id}:cooldown`, 60, "");
-		const amount = Math.floor(Math.random() * 10) + 5;
-		const oldExp = await msg.uConfig.getExp(msg.channel.guild.id);
-		const { level: oldLevel } = BotFunctions.calcLevel(oldExp);
-		await msg.uConfig.addExp(msg.channel.guild.id, amount);
-		const exp = await msg.uConfig.getExp(msg.channel.guild.id);
-		const { level } = BotFunctions.calcLevel(exp);
-		if (level > oldLevel) {
-			const roles = msg.gConfig.levelRoles.filter(l => l.xpRequired <= exp && !msg.member.roles.includes(l.role));
-			for (const { role, id } of roles) await msg.member.addRole(role, `Leveling (${oldLevel} -> ${level})`).catch(() =>
-				void msg.gConfig.removeLevelRole(id, "id")
-			);
-			if (msg.gConfig.settings.announceLevelUp) {
-				let m: Eris.Message;
-				if (msg.channel.permissionsOf(this.user.id).has("sendMessages")) {
-					if (msg.channel.permissionsOf(this.user.id).has("embedLinks")) m = await msg.channel.createMessage({
-						embeds: [
-							new EmbedBuilder(true, msg.author)
-								.setTitle("Level Up!")
-								.setDescription(`<@!${msg.author.id}> leveled up from **${oldLevel}** to **${level}**!`, roles.length === 0 ? [] : [
-									"Roles Gained:",
-									...roles.map(r => `- <@&${r.role}>`)
-								])
-								.toJSON()
-						]
-					});
-					else m = await msg.channel.createMessage({
-						content: `Congrats <@!${msg.author.id}> on leveling up from **${oldLevel}** to **${level}**!`,
-						allowedMentions: { users: false }
-					});
-					setTimeout(() => {
-						void m.delete().catch(() => null);
-					}, 2e4);
-				} else void msg.author.createMessage(`You leveled up in **${msg.channel.guild.name}** from **${oldLevel}** to **${level}**\n(I sent this here because I couldn't create messages in the channel you leveled up in)`);
-			}
-		}
-	}
-
-	t.start("source.guild");
-	if (cmd === null && msg.gConfig.settings.autoSourcing) {
-		let c = msg.content;
-		if (c.startsWith("<") && c.endsWith(">")) c = c.slice(1, -1);
-		let val = Strings.validateURL(c);
-		if (!val && message.attachments.length > 0) {
-			const f = message.attachments.find(a => autoMimeTypes.includes(a.content_type ?? ""));
-			c = (f || message.attachments[0]).url;
-			val = true;
-		}
-		if (val) {
-			const head = await RequestProxy.head(c);
-			if (autoMimeTypes.includes(head.headers.get("content-type") ?? "")) {
-				const { method, tried, post, saucePercent, sourceOverride, snRateLimited, url } = await Sauce(c, undefined, true) as Exclude<Awaited<ReturnType<typeof Sauce>>, null>;
-				if (snRateLimited) return message.reply(`SauceNAO is ratelimiting us, so we couldn't try SauceNAO, we tried these instead: \`${tried.join("`, `")}\``);
-				if (method === undefined) return message.reply(`We couldn't find anything for the image "<${url}>"..\nWe tried: \`${tried.join("`, `")}\``);
-				StatsHandler.trackNoResponse("stats:source:guild");
-				if (method === "e621" && post !== null) {
-					StatsHandler.trackNoResponse("stats:source:guild:e621");
-					if (post.rating !== "s" && !msg.channel.nsfw) return msg.reply("The sauce we found isn't rated as safe, please try again in an nsfw channel..");
-					return msg.reply(`We found these sources via direct md5 lookup on e621\nLookup: <${url}>\n\nResults:\nhttps://e621.net/posts/${post.id}\n${post.sources.map(v => `<${v}>`).join("\n")}`);
-				} else if (method === "yiffy2" && sourceOverride) {
-					// we will only get to yiffy2 for YiffyAPI V2 images without an e621 source, other images end up being processed like md5 lookups
-					StatsHandler.trackNoResponse("stats:source:guild:yiffy2");
-					if (!msg.channel.nsfw) return msg.reply("Unable to determine if sauce is nsfw, please try again in an nsfw channel..");
-					else return msg.reply(`We found these sources via direct md5 lookup on YiffyAPI V2\nLookup: <${url}>\n\nResults:\n${(Array.isArray(sourceOverride) ? sourceOverride : [sourceOverride]).map((v, i) => i === 0 ? v : `<${v}>`).join("\n")}`);
-				} else if (method === "yiffy3" && post !== null) {
-					StatsHandler.trackNoResponse("stats:source:guild:yiffy3");
-					if (post.rating !== "s" && !msg.channel.nsfw) return msg.reply("The sauce we found isn't rated as safe, please try again in an nsfw channel..");
-					return msg.reply(`We found these sources via direct md5 lookup on YiffyAPI V3\nLookup: <${url}>\n\nResults:\nhttps://yiff.rest/posts/${post.id}\n${post.sources.map(v => `<${v}>`).join("\n")}`);
-				} else if (method === "saucenao" && sourceOverride) {
-					StatsHandler.trackNoResponse("stats:source:saucenao");
-					if (!msg.channel.nsfw) return msg.reply("Unable to determine if sauce is nsfw, please try again in an nsfw channel..");
-					return msg.reply(`We found these sources via a reverse image search on saucenao (similarity: ${saucePercent}%)\nLookup: <${url}>\n\nResults:\n${(Array.isArray(sourceOverride) ? sourceOverride : [sourceOverride]).map((v, i) => (i === 0 ? v : `<${v}>`).replace(/posts\/show/, "posts" /* legacy */)).join("\n")}`);
-				}
-			}
-		}
-	}
-	t.end("source.guild");
-
-	if (load === false || cmd === null || msg.member === null) return;
-	/* const user = await msg.getUserFromArgs();
-	const member = await msg.getMemberFromArgs();
-	const channel = await msg.getChannelFromArgs();
-	const role = await msg.getRoleFromArgs();
-
-	console.log(
-		"dashedArgs:", msg.dashedArgs,
-		"| args:", msg.args,
-		"| rawArgs:", msg.rawArgs,
-		"| prefix:", msg.prefix,
-		"| cmd:", cmd.triggers[0],
-		"\n",
-		"getUserFromArgs:", user?.tag ?? null,
-		"| getMemberFromArgs:", member?.tag ?? null,
-		"| getChannelFromArgs:", channel?.name ?? null,
-		"| getRoleFromArgs:", role?.name ?? null
-	); */
-
-	// ignore commands in report channels
-	if (/^user-report-([a-z\d]+)$/i.exec(msg.channel.name) && !cmd.triggers.includes("report")) return;
+                    if (flags.has("delete") || flags.has("d")) await msg.delete().catch(() => null);
+                    if (!(flags.has("silent") || flags.has("s"))) {
+                        let file: string | undefined, out = String(flags.has("raw") || flags.has("r") ? res : f);
+                        if (out.length >= 750) {
+                            try {
+                                file = inspect(JSON.parse(out), { depth: 1 });
+                            } catch (e) {
+                                file = out;
+                            }
+                            out = "see attached file";
+                        }
 
 
-	if (!developers.includes(msg.author.id)) {
-		t.start("disable");
-		if (msg.gConfig.disable.length > 0 && !msg.member.permissions.has("manageGuild")) {
-			const server = msg.gConfig.disable.filter(d => d.filterType === "server" && ((d.type === "all" && d.value === null) || ("command" && cmd.triggers[0] === d.value) || (d.type === "category" && cmd.category === d.value)));
-			const user = msg.gConfig.disable.filter(d => d.filterType === "user" && msg.author.id === d.filterValue && ((d.type === "all" && d.value === null) || ("command" && cmd.triggers[0] === d.value) || (d.type === "category" && cmd.category === d.value)));
-			const role = msg.gConfig.disable.filter(d => d.filterType === "role" && msg.member.roles.includes(d.filterValue) && ((d.type === "all" && d.value === null) || ("command" && cmd.triggers[0] === d.value) || (d.type === "category" && cmd.category === d.value)));
-			const channel = msg.gConfig.disable.filter(d => d.filterType === "channel" && msg.channel.id === d.filterValue && ((d.type === "all" && d.value === null) || ("command" && cmd.triggers[0] === d.value) || (d.type === "category" && cmd.category === d.value)));
+                        await this.rest.channels.createMessage(msg.channelID, {
+                            embeds: [
+                                Util.makeEmbed(true, msg.author)
+                                    .setTitle(`Time Taken: ${t}`)
+                                    .setColor(res instanceof Error ? Colors.red : Colors.green)
+                                    .addField(`${Config.emojis.default.in} Input`, `\`\`\`js\n${Strings.truncateWords(arg, 750)}\`\`\``, false)
+                                    .addField(`${Config.emojis.default.out} Output`, `\`\`\`js\n${out}\`\`\``, false)
+                                    .toJSON()
+                            ],
+                            components: new ComponentBuilder<MessageActionRow>()
+                                .addInteractionButton({
+                                    customID: State.new(msg.author.id, "eval", "trash").encode(),
+                                    emoji:    ComponentBuilder.emojiToPartial(Config.emojis.default.trash, "default"),
+                                    style:    ButtonColors.RED
+                                })
+                                .addInteractionButton({
+                                    customID: State.new(msg.author.id, "eval", "delete").encode(),
+                                    emoji:    ComponentBuilder.emojiToPartial(Config.emojis.default.x, "default"),
+                                    style:    ButtonColors.GREEN
+                                })
+                                .toJSON(),
+                            files: file ? [{
+                                contents: Buffer.from(file),
+                                name:     "output.txt"
+                            }] : undefined
+                        });
+                    } else {
+                        Logger.getLogger("Eval").info("Silent Eval Return (formatted):", f);
+                        Logger.getLogger("Eval").info("Silent Eval Return (raw):", res);
+                        Logger.getLogger("Eval").info("Silent Eval Time:", t);
+                    }
+                    break;
+                }
+            }
+        }
+    }
 
-			if (server.length || user.length || role.length || channel.length) return;
-		}
-		t.end("disable");
-
-		t.start("antispam");
-		AntiSpam.add(msg.author.id, cmd);
-		const anti = AntiSpam.get(msg.author.id);
-		if ((anti.length % antiSpamWarnThreshold) === 0) {
-			const report = BotFunctions.generateReport(msg.author, anti);
-			await WebhookStore.execute("antispam", {
-				embeds: [
-					new EmbedBuilder(true, msg.author)
-						.setTitle(`Possible Command Spam | VL: ${anti.length}`)
-						.setDescription(`Report URL: ${report.id}\n[Report URL](${report.url})`)
-						.toJSON()
-				]
-			});
-			if (anti.length > antiSpamMaxVL) await msg.uConfig.addBlacklist("antispam", this.user.id, "Command Spam", Date.now() + 2.592e+8, report.id);
-		}
-		t.end("antispam");
-
-		t.start("restrictions");
-		if (cmd.restrictions.includes("developer")) {
-			StatsHandler.trackBulkNoResponse(
-				"stats:restrictionFail:developer",
-				`stats:users:${msg.author.id}:restrictionFail:developer`
-			);
-			return msg.reply("H-hey! You aren't one of my developers!");
-		}
-		if (cmd.restrictions.includes("nsfw") && !msg.channel.nsfw) {
-			StatsHandler.trackBulkNoResponse(
-				"stats:restrictionFail:nsfw",
-				`stats:users:${msg.author.id}:restrictionFail:nsfw`
-			);
-			return msg.reply("H-hey! You have to use that in an nsfw channel!");
-		}
-		if (cmd.restrictions.includes("beta") && !beta) {
-			StatsHandler.trackBulkNoResponse(
-				"stats:restrictionFail:beta",
-				`stats:users:${msg.author.id}:restrictionFail:beta`
-			);
-			return msg.reply("H-hey! This command can only be used in beta!");
-		}
-		const optionalUser = [] as Array<Permissions>;
-		const missingUser = [] as Array<Permissions>;
-		for (const [perm, optional] of cmd.userPermissions) {
-			if (!msg.member.permissions.has(perm)) {
-				if (optional) optionalUser.push(perm);
-				else missingUser.push(perm);
-			}
-		}
-
-		// I don't really know how to inform users of "optional" permissions right now
-
-		if (missingUser.length > 0) {
-			StatsHandler.trackBulkNoResponse(
-				...(missingUser.map(p => [
-					`stats:missingPermission:user:${p}`,
-					`stats:users:${msg.author.id}:missingPermission:user:${p}`
-				//                                 typescript™️
-				]).reduce((a,b) => a.concat(b), []) as [first: string, ...other: Array<string>])
-			);
-			return msg.reply(`H-hey! You're missing the ${Strings.plural("permission", missingUser)} **${Strings.joinAnd(missingUser.map(p => permissionNames[p] || p), "**, **")}**.. You must have these to use this command!`);
-		}
-		// needs to be started either way or end will error
-	} else t.start("restrictions");
-
-	// we still check these when developers run commands
-	const optionalBot = [] as Array<Permissions>;
-	const missingBot = [] as Array<Permissions>;
-	for (const [perm, optional] of cmd.botPermissions) {
-		if (!msg.channel.guild.me.permissions.has(perm)) {
-			if (optional) optionalBot.push(perm);
-			else missingBot.push(perm);
-		}
-	}
-
-	// @FIXME fix Strings#joinAnd boldness
-	if (missingBot.length > 0) {
-		StatsHandler.trackBulkNoResponse(
-			...(missingBot.map(p => [
-				`stats:missingPermission:bot:${p}`,
-				`stats:users:${msg.author.id}:missingPermission:bot:${p}`
-				//                                 typescript™️
-			]).reduce((a,b) => a.concat(b), []) as [first: string, ...other: Array<string>])
-		);
-		return msg.reply(`H-hey! I'm missing the ${Strings.plural("permission", missingBot)} **${Strings.joinAnd(missingBot.map(p => permissionNames[p] || p), "**, **")}**.. I must have these for this command to function!`);
-	}
-	t.end("restrictions");
-
-	StatsHandler.trackBulkNoResponse(
-		"stats:commands",
-		`stats:commands:${cmd.triggers[0]}`,
-		`stats:users:${msg.author.id}:commands`,
-		`stats:users:${msg.author.id}:commands:${cmd.triggers[0]}`,
-		`stats:guilds:${msg.channel.guild.id}:commands`,
-		`stats:guilds:${msg.channel.guild.id}:users:${msg.author.id}:commands`,
-		`stats:guilds:${msg.channel.guild.id}:users:${msg.author.id}:commands:${cmd.triggers[0]}`
-	);
-	EventsASecondHandler.add("COMMANDS");
-	EventsASecondHandler.add(`COMMANDS.${cmd.triggers[0].toUpperCase()}`);
-	Logger.getLogger("CommandHandler").info(`Command ${cmd.triggers[0]} ran with ${msg.args.length === 0 ? "no arguments" : `the arguments "${msg.args.join(" ")}"`} by ${msg.author.tag} (${msg.author.id}) in the guild ${msg.channel.guild.name} (${msg.channel.guild.id})`);
-
-	t.start("run");
-	void cmd.run.call(this, msg, cmd)
-		.then(res => {
-			t.end("run");
-			if (res instanceof Error) throw res;
-		})
-		.catch(async(err: Error) => {
-			if (err instanceof CommandError) {
-				if (err.message === "INVALID_USAGE") {
-					StatsHandler.trackBulkNoResponse(
-						`stats:commands:${cmd.triggers[0]}:invalidUsage`,
-						`stats:users:${msg.author.id}:commands:${cmd.triggers[0]}:invalidUsage`
-					);
-					return msg.reply(`H-hey! You didn't use that command right. check \`${msg.gConfig.getFormattedPrefix(0)}help ${cmd.triggers[0]}\` for info on how to use it..`);
-				}
-				return;
-			}
-
-			// ignore errors from eval command
-			if (cmd.triggers.includes("eval")) return;
-
-			StatsHandler.trackNoResponse(`stats:commands:${cmd.triggers[0]}:error`);
-
-			const code = await ErrorHandler.handleError(err, msg);
-
-			if (code === null) return msg.reply("S-sorry! There was an error while running that.. Our internal error reporting service didn't return any further info.");
-			else return msg.reply(`S-sorry! There was an error while running that.. I-if you want, you can report it to my developers, or try again later..\nCode: \`${code}\`\nSupport: ${supportLink}`);
-		}
-		);
+    if (new RegExp(`^<@!?${this.user.id}> `).test(msg.content)) {
+        const [,...args] = msg.content.split(" ");
+        const content = args.join(" ").toLowerCase();
+        if (content.startsWith("make me")) return this.rest.channels.createMessage(msg.channelID, { content: "Th-that's not my purpose.." });
+        if (content.startsWith("fuck me")) return this.rest.channels.createMessage(msg.channelID, { content: "I-I don't even know you.." });
+        if (content.startsWith("bend over")) return this.rest.channels.createMessage(msg.channelID, { content: "N-no ~w~" });
+    }
 });

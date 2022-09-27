@@ -1,44 +1,39 @@
-import ClientEvent from "@util/ClientEvent";
-import EmbedBuilder from "@util/EmbedBuilder";
+import ClientEvent from "../util/ClientEvent.js";
+import LogEvent, { LogEvents } from "../db/Models/LogEvent.js";
+import Util from "../util/Util.js";
+import { Colors } from "../util/Constants.js";
+import { ChannelTypeNames } from "../util/Names.js";
+import { AuditLogActionTypes } from "oceanic.js";
 import { Time } from "@uwu-codes/utils";
-import GuildConfig from "@models/Guild/GuildConfig";
-import BotFunctions from "@util/BotFunctions";
-import type Eris from "eris";
-import { names } from "@config";
-import LoggingWebhookFailureHandler from "@handlers/LoggingWebhookFailureHandler";
 
-export default new ClientEvent("channelCreate", async function(channel) {
-	if (!("guild" in channel)) return;
+export default new ClientEvent("channelCreate", async function channelCreateEvent(channel) {
+    const events = await LogEvent.getType(channel.guildID, LogEvents.CHANNEL_CREATE);
+    if (events.length === 0) return;
 
-	const logEvents = await GuildConfig.getLogEvents(channel.guild.id, "channelCreate");
-	for (const log of logEvents) {
-		const hook = await this.getWebhook(log.webhook.id, log.webhook.token).catch(() => null);
-		if (hook === null || !hook.token) {
-			void LoggingWebhookFailureHandler.tick(log);
-			continue;
-		}
+    const embed = Util.makeEmbed(true)
+        .setTitle("Channel Created")
+        .setColor(Colors.green)
+        .addField("Channel Info", [
+            `Name: **${channel.name}**`,
+            `Type: **${ChannelTypeNames[channel.type]}**`,
+            `Parent: **${channel.parentID === null ? "[NONE]" : `<#${channel.parentID}>`}**`,
+            `NSFW: **${"nsfw" in channel ? channel.nsfw ? "Yes" : "No" : "N/A"}**`,
+            `SlowMode: **${"rateLimitPerUser" in channel ? Time.ms(channel.rateLimitPerUser * 1000, { words: true }) : ""}**`
+        ].join("\n"), false);
 
-		const parent = channel.parentID === null ? null : channel.guild.channels.get(channel.parentID) ?? null;
-		const e = new EmbedBuilder(true)
-			.setTitle("Channel Created")
-			.setColor("green")
-			.addField("Channel Info", [
-				`Name: **${channel.name}**`,
-				`Type: **${names.channelTypes[channel.typeString]}**`,
-				`Parent: **${channel.parentID === null ? "[NONE]" : parent === null ? channel.parentID : parent.name}**`,
-				`NSFW: **${channel.nsfw ? "Yes" : "No"}**`,
-				`SlowMode: **${["GUILD_TEXT", "GUILD_NEWS", "GUILD_NEWS_THREAD", "GUILD_PUBLIC_THREAD", "GUILD_PRIVATE_THREAD"].includes(channel.typeString) ? Time.ms((channel as Eris.GuildTextableChannel).rateLimitPerUser * 1000, true) : ""}**`
-			].join("\n"), false);
+    if (channel.guild.clientMember.permissions.has("VIEW_AUDIT_LOG")) {
+        const auditLog = await channel.guild.getAuditLog({
+            actionType: AuditLogActionTypes.CHANNEL_CREATE,
+            limit:      50
+        });
+        const entry = auditLog.entries.find(e => e.targetID === channel.id);
+        if (entry?.user && (entry.createdAt.getTime() + 5e3) > Date.now()) {
+            embed.addField("Blame", `**${entry.user.tag}** (${entry.user.tag})`, false);
+            if (entry.reason) embed.addField("Reason", entry.reason, false);
+        }
+    }
 
-		if (channel.guild.permissionsOf(this.user.id).has("viewAuditLog")) {
-			const audit = await BotFunctions.getAuditLogEntry(channel.guild, "CHANNEL_CREATE", (a) => a.targetID === channel.id);
-			if (audit !== null && (audit.createdAt + 5e3) > Date.now()) e.addField("Blame", `${audit.user.tag} (${audit.user.id})`, false);
-		}
-
-		await this.executeWebhook(hook.id, hook.token, {
-			embeds: [
-				e.toJSON()
-			]
-		});
-	}
+    for (const log of events) {
+        await log.execute(this, { embeds: embed.toJSON(true) });
+    }
 });

@@ -1,51 +1,57 @@
-import ClientEvent from "@util/ClientEvent";
-import db from "@db";
-import EmbedBuilder from "@util/EmbedBuilder";
+import ClientEvent from "../util/ClientEvent.js";
+import ModLog from "../db/Models/ModLog.js";
+import db from "../db/index.js";
+import LogEvent, { LogEvents } from "../db/Models/LogEvent.js";
+import Util from "../util/Util.js";
+import { Colors } from "../util/Constants.js";
+import EncryptionHandler from "../util/handlers/EncryptionHandler.js";
 import { Strings } from "@uwu-codes/utils";
-import GuildConfig from "@models/Guild/GuildConfig";
-import BotFunctions from "@util/BotFunctions";
-import LoggingWebhookFailureHandler from "@handlers/LoggingWebhookFailureHandler";
-const Redis = db.r;
+import { AuditLogActionTypes, Message } from "oceanic.js";
 
-export default new ClientEvent("messageDelete", async function(message) {
-	if (!("content" in message) || !("guild" in message.channel)) return;
-	await Redis
-		.multi()
-		.lpush(`snipe:delete:${message.channel.id}`, JSON.stringify({
-			content: message.content,
-			author: message.author.id,
-			time: Date.now(),
-			ref: !message.referencedMessage ? null : {
-				link: message.referencedMessage.jumpLink,
-				author: message.referencedMessage.author.id,
-				content: message.referencedMessage.content
-			}
-		}))
-		.ltrim(`snipe:delete:${message.channel.id}`, 0, 2)
-		.exec();
+// this requires the messageContent intent
+export default new ClientEvent("messageDelete", async function messageDeleteEvent(msg) {
+    if (!("guildID" in msg) || !msg.guildID || !(msg instanceof Message)) return;
+    // if the message gets deleted, we remove the message from the case
+    const modCase = await ModLog.getFromMessage(msg.guildID, msg.id);
+    if (modCase) await modCase.edit({ message_id: null });
 
-	const logEvents = await GuildConfig.getLogEvents(message.channel.guild.id, "messageUpdate");
-	for (const log of logEvents) {
-		const hook = await this.getWebhook(log.webhook.id, log.webhook.token).catch(() => null);
-		if (hook === null || !hook.token) {
-			void LoggingWebhookFailureHandler.tick(log);
-			continue;
-		}
+    if (msg.content !== "") await db.redis
+        .multi()
+        .lpush(`snipe:delete:${msg.channelID}`, JSON.stringify({
+            content: EncryptionHandler.encrypt(msg.content),
+            author:  msg.author.id,
+            time:    Date.now(),
+            ref:     !msg.referencedMessage ? null : {
+                link:    msg.referencedMessage.jumpLink,
+                author:  msg.referencedMessage.author.id,
+                content: EncryptionHandler.encrypt(msg.referencedMessage.content)
+            }
+        }))
+        .ltrim(`snipe:delete:${msg.channelID}`, 0, 2)
+        .expire(`snipe:delete:${msg.channelID}`, 21600)
+        .exec();
 
-		const e = new EmbedBuilder(true, message.author)
-			.setTitle("Message Deleted")
-			.setColor("red")
-			.addField("Content", Strings.truncate(message.content || "[No Content]", 1000), false);
+    const events = await LogEvent.getType(msg.guildID, LogEvents.MESSAGE_DELETE);
+    if (events.length === 0) return;
 
-		if (message.channel.guild.permissionsOf(this.user.id).has("viewAuditLog")) {
-			const audit = await BotFunctions.getAuditLogEntry(message.channel.guild, "MESSAGE_DELETE", (a) => a.targetID === message.author.id && !!a.channel && a.channel.id === message.channel.id);
-			if (audit !== null) e.addField("Blame", `${audit.user.tag} (${audit.user.id})`, false);
-		}
+    const embed = Util.makeEmbed(true, msg.author)
+        .setTitle("Message Deleted")
+        .setColor(Colors.red)
+        .addField("Content", Strings.truncate(msg.content || "[No Content]", 1000), false);
 
-		await this.executeWebhook(hook.id, hook.token, {
-			embeds: [
-				e.toJSON()
-			]
-		});
-	}
+    if (msg.guild?.clientMember.permissions.has("VIEW_AUDIT_LOG")) {
+        const auditLog = await msg.guild.getAuditLog({
+            actionType: AuditLogActionTypes.MESSAGE_DELETE,
+            limit:      50
+        });
+        const entry = auditLog.entries[0];
+        if (entry?.user && (entry.createdAt.getTime() + 5e3) > Date.now()) {
+            embed.addField("Blame", `${entry.user.tag} (${entry.user.id})`, false);
+            if (entry.reason) embed.addField("Reason", entry.reason, false);
+        }
+    }
+
+    for (const log of events) {
+        await log.execute(this, { embeds: embed.toJSON(true) });
+    }
 });

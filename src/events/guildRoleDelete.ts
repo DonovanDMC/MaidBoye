@@ -1,40 +1,36 @@
-import ClientEvent from "@util/ClientEvent";
-import EmbedBuilder from "@util/EmbedBuilder";
-import GuildConfig from "@models/Guild/GuildConfig";
-import BotFunctions from "@util/BotFunctions";
-import LoggingWebhookFailureHandler from "@handlers/LoggingWebhookFailureHandler";
+import ClientEvent from "../util/ClientEvent.js";
+import LogEvent, { LogEvents } from "../db/Models/LogEvent.js";
+import Util from "../util/Util.js";
+import { Colors } from "../util/Constants.js";
+import { AuditLogActionTypes, Guild, Role } from "oceanic.js";
 
-export default new ClientEvent("guildRoleDelete", async function(guild, role) {
-	const logEvents = await GuildConfig.getLogEvents(guild.id, "roleDelete");
-	for (const log of logEvents) {
-		const hook = await this.getWebhook(log.webhook.id, log.webhook.token).catch(() => null);
-		if (hook === null || !hook.token) {
-			void LoggingWebhookFailureHandler.tick(log);
-			continue;
-		}
+export default new ClientEvent("guildRoleDelete", async function guildRoleDeleteEvent(role, guild) {
+    const events = await LogEvent.getType(guild.id, LogEvents.ROLE_DELETE);
+    for (const log of events) {
+        const embed = Util.makeEmbed(true)
+            .setTitle("Role Deleted")
+            .setColor(Colors.red)
+            .addField("Role Info", role instanceof Role ? [
+                `Name: **${role.name}**`,
+                `Color: **${role.color === 0 ? "[NONE]" : `#${role.color.toString(16).padStart(6, "0").toUpperCase()}`}**`,
+                `Hoisted: **${role.hoist ? "Yes" : "No"}**`,
+                `Managed: **${role.managed ? "Yes" : "No"}**`,
+                `Mentionable: **${role.mentionable ? "Yes" : "No"}**`,
+                `Permissions: [${role.permissions.allow}](https://discordapi.com/permissions.html#${role.permissions.allow})`,
+                `Position: **${role.position}**`
+            ].join("\n") : `Role ID: \`${role.id}\`\nNo other information is known.`, false);
+        if (guild instanceof Guild && guild.clientMember.permissions.has("VIEW_AUDIT_LOG")) {
+            const auditLog = await guild.getAuditLog({
+                actionType: AuditLogActionTypes.ROLE_CREATE,
+                limit:      50
+            });
+            const entry = auditLog.entries.find(e => e.targetID === role.id);
+            if (entry?.user && (entry.createdAt.getTime() + 5e3) > Date.now()) {
+                embed.addField("Blame", `**${entry.user.tag}** (${entry.user.tag})`, false);
+                if (entry.reason) embed.addField("Reason", entry.reason, false);
+            }
+        }
 
-		const e = new EmbedBuilder(true)
-			.setTitle("Role Deleted")
-			.setColor("red")
-			.addField("Role Info", [
-				`Name: **${role.name}**`,
-				`Color: **${role.color === 0 ? "[NONE]" : `#${role.color.toString(16).padStart(6, "0").toUpperCase()}`}**`,
-				`Hoisted: **${role.hoist ? "Yes" : "No"}**`,
-				`Managed: **${role.managed ? "Yes" : "No"}**`,
-				`Mentionable: **${role.mentionable ? "Yes" : "No"}**`,
-				`Permissions: [${role.permissions.allow}](https://discordapi.com/permissions.html#${role.permissions.allow})`,
-				`Position: **${role.position}**`
-			].join("\n"), false);
-
-		if (guild.permissionsOf(this.user.id).has("viewAuditLog")) {
-			const audit = await BotFunctions.getAuditLogEntry(guild, "ROLE_DELETE", (a) => a.targetID === role.id);
-			if (audit !== null && (audit.createdAt + 5e3) > Date.now()) e.addField("Blame", `${audit.user.tag} (${audit.user.id})`, false);
-		}
-
-		await this.executeWebhook(hook.id, hook.token, {
-			embeds: [
-				e.toJSON()
-			]
-		});
-	}
+        await log.execute(this, { embeds: embed.toJSON(true) });
+    }
 });
