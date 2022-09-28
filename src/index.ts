@@ -6,9 +6,7 @@ import MaidBoye from "./main.js";
 import Config from "./config/index.js";
 import Logger from "./util/Logger.js";
 import { Time } from "@uwu-codes/utils";
-import { readFile } from "fs/promises";
 
-console.log((await readFile("/data/hostname", "utf8")).trim());
 const bot = new MaidBoye(initTime);
 await bot.rest.getBotGateway().then(function preLaunchInfo({ sessionStartLimit: { remaining, total, resetAfter }, shards }) {
     Logger.getLogger("Launch").info(`Mode: ${Config.isDevelopment ? "BETA" : "PROD"} | CWD: ${process.cwd()} | PID: ${process.pid}`);
