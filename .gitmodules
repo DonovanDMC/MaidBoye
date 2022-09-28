@@ -1,8 +1,4 @@
-[submodule "Config"]
-	path = src/config
+[submodule "Private Config"]
+	path = src/config/private
 	url = https://github.com/DonovanDMC/MaidBoyeConfig
-	branch = master
-[submodule "Locale"]
-	path = src/locale
-	url = https://github.com/DonovanDMC/MaidBoye
-	branch = locale
+	branch = rewrite

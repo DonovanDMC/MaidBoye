@@ -1,34 +1,31 @@
-import ClientEvent from "@util/ClientEvent";
-import EmbedBuilder from "@util/EmbedBuilder";
-import GuildConfig from "@models/Guild/GuildConfig";
-import BotFunctions from "@util/BotFunctions";
-import LoggingWebhookFailureHandler from "@handlers/LoggingWebhookFailureHandler";
+import ClientEvent from "../util/ClientEvent.js";
+import LogEvent, { LogEvents } from "../db/Models/LogEvent.js";
+import Util from "../util/Util.js";
+import { Colors } from "../util/Constants.js";
+import { AuditLogActionTypes, Guild } from "oceanic.js";
 
-export default new ClientEvent("guildBanRemove", async function(guild, user) {
-	const logEvents = await GuildConfig.getLogEvents(guild.id, "banRemove");
-	for (const log of logEvents) {
-		const hook = await this.getWebhook(log.webhook.id, log.webhook.token).catch(() => null);
-		if (hook === null || !hook.token) {
-			void LoggingWebhookFailureHandler.tick(log);
-			continue;
-		}
+export default new ClientEvent("guildBanRemove", async function guildBanRemoveEvent(guild, user) {
+    const events = await LogEvent.getType(guild.id, LogEvents.BAN_REMOVE);
+    if (events.length === 0) return;
 
-		const e = new EmbedBuilder(true)
-			.setTitle("Member Unbanned")
-			.setColor("green")
-			.addField("Member", `${user.tag} (${user.id})`, false);
+    const embed = Util.makeEmbed(true)
+        .setTitle("Member Unbanned")
+        .setColor(Colors.green)
+        .addField("Member", `**${user.tag}** (${user.mention})`, false);
 
-		if (guild.permissionsOf(this.user.id).has("viewAuditLog")) {
-			const audit = await BotFunctions.getAuditLogEntry(guild, "MEMBER_BAN_REMOVE", (a) => a.targetID === user.id);
-			if (audit !== null) e
-				.addField("Blame", `${audit.user.tag} (${audit.user.id})`, false)
-				.addField("Reason", audit.reason ?? "[Unknown]", false);
-		}
+    if (guild instanceof Guild && guild.clientMember.permissions.has("VIEW_AUDIT_LOG")) {
+        const auditLog = await guild.getAuditLog({
+            actionType: AuditLogActionTypes.MEMBER_BAN_REMOVE,
+            limit:      50
+        });
+        const entry = auditLog.entries[0];
+        if (entry?.user && (entry.createdAt.getTime() + 5e3) > Date.now()) {
+            embed.addField("Blame", `**${entry.user.tag}** (${entry.user.mention})`, false);
+            if (entry.reason) embed.addField("Reason", entry.reason, false);
+        }
+    }
 
-		await this.executeWebhook(hook.id, hook.token, {
-			embeds: [
-				e.toJSON()
-			]
-		});
-	}
+    for (const log of events) {
+        await log.execute(this, { embeds: embed.toJSON(true) });
+    }
 });

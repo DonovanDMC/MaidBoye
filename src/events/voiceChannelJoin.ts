@@ -1,27 +1,37 @@
-import ClientEvent from "@util/ClientEvent";
-import EmbedBuilder from "@util/EmbedBuilder";
-import GuildConfig from "@models/Guild/GuildConfig";
-import LoggingWebhookFailureHandler from "@handlers/LoggingWebhookFailureHandler";
+import ClientEvent from "../util/ClientEvent.js";
+import LogEvent, { LogEvents } from "../db/Models/LogEvent.js";
+import Util from "../util/Util.js";
+import { Colors } from "../util/Constants.js";
+import { AuditLogActionTypes, Channel, StageChannel, VoiceChannel } from "oceanic.js";
 
-export default new ClientEvent("voiceChannelJoin", async function(member, channel) {
-	if (!("guild" in channel)) return;
+export default new ClientEvent("voiceChannelJoin", async function voiceChannelJoinEvent(member, inputChannel) {
+    if (!(inputChannel instanceof Channel)) inputChannel = await this.rest.channels.get(inputChannel.id);
+    const channel = inputChannel as VoiceChannel | StageChannel;
+    const events = await LogEvent.getType(channel.guildID, LogEvents.VOICE_JOIN);
+    if (events.length === 0) return;
 
-	const logEvents = await GuildConfig.getLogEvents(channel.guild.id, "voiceJoin");
-	for (const log of logEvents) {
-		const hook = await this.getWebhook(log.webhook.id, log.webhook.token).catch(() => null);
-		if (hook === null || !hook.token) {
-			void LoggingWebhookFailureHandler.tick(log);
-			continue;
-		}
+    const embed = Util.makeEmbed(true)
+        .setTitle("Voice Channel Joined")
+        .setColor(Colors.green)
+        .addField("Info", [
+            `Channel: **${channel.name}** (${channel.id})`,
+            `Member: **${member.tag}** (${member.id})`
+        ].join("\n"), false);
 
-		await this.executeWebhook(hook.id, hook.token, {
-			embeds: [
-				new EmbedBuilder(true)
-					.setTitle("Voice Channel Joined")
-					.setColor("green")
-					.setDescription(`<@!${member.id}> joined the voice channel <#${channel.id}>.`)
-					.toJSON()
-			]
-		});
-	}
+    if (channel.guild.clientMember.permissions.has("VIEW_AUDIT_LOG")) {
+        const auditLog = await channel.guild.getAuditLog({
+            actionType: AuditLogActionTypes.MEMBER_MOVE,
+            limit:      50
+        });
+        const entry = auditLog.entries.find(e => e.options?.channelID === channel.id);
+        if (entry?.user && (entry.createdAt.getTime() + 5e3) > Date.now()) {
+            embed.setTitle("Voice Channel Member Moved");
+            embed.addField("Blame", `**${entry.user.tag}** (${entry.user.tag})`, false);
+            if (entry.reason) embed.addField("Reason", entry.reason, false);
+        }
+    }
+
+    for (const log of events) {
+        await log.execute(this, { embeds: embed.toJSON(true) });
+    }
 });

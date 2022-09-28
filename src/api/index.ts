@@ -1,68 +1,80 @@
-import type Route from "./Route";
-import type MaidBoye from "@MaidBoye";
-import Logger from "@util/Logger";
-import {
-	antiSpamDir,
-	apiCookieSecrets,
-	apiIP,
-	apiOptions,
-	apiPort,
-	apiSecure,
-	apiURL,
-	assetsDir,
-	baseDir,
-	errorsDir
-} from "@config";
+/// <reference path="../util/@types/express-session.d.ts" />
+import Config from "../config/index.js";
+import Logger from "../util/Logger.js";
+import StatsHandler from "../util/StatsHandler.js";
 import express from "express";
 import session from "express-session";
+import { create } from "express-handlebars";
 import morgan from "morgan";
-import * as fs from "fs-extra";
-import * as http from "http";
-import * as https from "https";
 
-export default class API {
-	static server: http.Server | https.Server | null = null;
-	static app: express.Express;
-	static async launch(client: MaidBoye) {
-		this.app = express()
-			.set("trust proxy", true)
-			.set("views", [`${baseDir}/src/api/templates`])
-			.set("view engine", "ejs")
-			.use("/errors/:id", async(req, res) => {
-				if (!fs.existsSync(`${errorsDir}/${req.params.id}`)) return res.status(404).end("not found");
-				else return res.status(200).header("Content-Type", "text/plain").sendFile(`${errorsDir}/${req.params.id}`);
-			})
-			.use("/reports/:user/:id", async(req, res) => {
-				if (!fs.existsSync(`${antiSpamDir}/${req.params.user}/${req.params.id}`)) return res.status(404).end("not found");
-				else return res.status(200).header("Content-Type", "text/plain").sendFile(`${antiSpamDir}/${req.params.user}/${req.params.id}`);
-			})
-			.use("/assets", express.static(assetsDir))
-			.use(morgan("combined"))
-			.use(express.json())
-			.use(express.urlencoded({ extended: true }))
-			.use(session({
-				secret: apiCookieSecrets,
-				name: "maid-boye",
-				resave: true,
-				saveUninitialized: false,
-				cookie: {
-					maxAge: 2.628e+9,
-					signed: true,
-					httpOnly: true,
-					path: "/",
-					secure: true,
-					sameSite: "strict"
-				}
-			}));
-		fs.readdirSync(`${__dirname}/routes`).forEach(p => {
-			// eslint-disable-next-line @typescript-eslint/no-var-requires, no-shadow
-			const { default: v } = require(`${__dirname}/routes/${p}`) as { default: new(client: MaidBoye) => Route; };
-			const r = new v(client);
-			this.app.use(r.path, r.app);
-		});
+export const hbs = create({
+    extname:       "hbs",
+    defaultLayout: "default",
+    layoutsDir:    new URL("./views/layouts", import.meta.url).pathname,
+    partialsDir:   new URL("./views/partials", import.meta.url).pathname
+});
+const app = express()
+    .engine("hbs", hbs.engine)
+    .set("view engine", "hbs")
+    .set("views", new URL("./views/pages", import.meta.url).pathname)
+    .set("view options", { pretty: true })
+    .set("trust proxy", true)
+    .set("x-powered-by", false)
+    .use(express.json())
+    .use(express.urlencoded({ extended: true }))
+    .use(session({
+        name:   "maid",
+        secret: Config.cookieSecret,
+        cookie: {
+            maxAge:   8.64e7,
+            secure:   true,
+            httpOnly: true,
+            domain:   /\d+\.\d+\.\d+\.\d+/.test(Config.apiHost) ? Config.apiHost : `.${Config.apiHost}`
+        },
+        resave:            false,
+        saveUninitialized: true
+    }))
+    .use(morgan("dev"))
+    .use(async(req, res, next) => {
+        res.header({
+            "Referrer-Policy":  "no-referrer-when-downgrade",
+            "X-XSS-Protection": [
+                "1",
+                "mode=block",
+                "report=https://yiff.report-uri.com/r/d/xss/enforce"
+            ].join("; "),
+            "Access-Control-Allow-Headers": [
+                "Content-Type",
+                "Authorization"
+            ].join(", "),
+            "Access-Control-Allow-Origin":  "*",
+            "Access-Control-Allow-Methods": [
+                "GET",
+                "POST",
+                "OPTIONS",
+                "HEAD"
+            ].join(", "),
+            "X-Frame-Options": "DENY",
+            "Cache-Control":   "no-cache",
+            "X-Powered-By":    ["Yiff", "Large Knots", "Bottomless Foxes"][Math.floor(Math.random() * 3)]
+        });
+        return next();
+    })
+    .get("/online", async (req, res) => res.status(200).json({
+        success: true,
+        uptime:  process.uptime()
+    }))
+    .get("/session", async(req, res) => res.status(200).json({ id: StatsHandler.SessionID }))
+    .use("/features", (await import("./routes/features.js")).default)
+    .use("/leveling", (await import("./routes/leveling.js")).default)
+    .use("/bulk-delete", (await import("./routes/bulkDelete.js")).default)
+// last 3 param handler = 404, 4 param handler = error
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+    .use(async (req, res, next) => res.status(404).end("Not Found"))
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+    .use(async (err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
+        Logger.getLogger("API").error(err);
+        return res.status(500).end("Internal Server Error");
+    });
 
-		// @TODO listener tests & retries
-		(apiSecure ? https : http).createServer(apiOptions, this.app).listen(apiPort, apiIP);
-		Logger.getLogger("API").info(`Now Listening on ${apiURL} (${apiIP}:${apiPort})`);
-	}
-}
+export default app;

@@ -1,41 +1,46 @@
-import ClientEvent from "@util/ClientEvent";
-import EmbedBuilder from "@util/EmbedBuilder";
+import ClientEvent from "../util/ClientEvent.js";
+import LogEvent, { LogEvents } from "../db/Models/LogEvent.js";
+import Util from "../util/Util.js";
+import { Colors } from "../util/Constants.js";
+import { InviteTargetTypeNames } from "../util/Names.js";
+import { AuditLogActionTypes, Invite } from "oceanic.js";
 import { Time } from "@uwu-codes/utils";
-import GuildConfig from "@models/Guild/GuildConfig";
-import BotFunctions from "@util/BotFunctions";
-import Eris from "eris";
-import LoggingWebhookFailureHandler from "@handlers/LoggingWebhookFailureHandler";
 
-export default new ClientEvent("inviteDelete", async function(guild, invite) {
-	const logEvents = await GuildConfig.getLogEvents(guild.id, "inviteDelete");
-	for (const log of logEvents) {
-		const hook = await this.getWebhook(log.webhook.id, log.webhook.token).catch(() => null);
-		if (hook === null || !hook.token) {
-			void LoggingWebhookFailureHandler.tick(log);
-			continue;
-		}
+export default new ClientEvent("inviteDelete", async function inviteDeleteEvent(invite) {
+    if (!invite.guild?.id) return;
+    const events = await LogEvent.getType(invite.guild.id, LogEvents.INVITE_DELETE);
+    if (events.length === 0) return;
 
-		const user = !invite.inviter ? "**Unknown**" : `**${invite.inviter.tag}** (<@!${invite.inviter.id}>)`;
-		const e = new EmbedBuilder(true)
-			.setTitle("Invite Deleted")
-			.setColor("red")
-			.addField("Invite Info", [
-				`Channel: ${invite.channel.type === Eris.Constants.ChannelTypes.GUILD_CATEGORY ? invite.channel.name! : `<#${invite.channel.id}>`}`,
-				`Max Age: ${invite.maxAge === 0 ? "Permanent" : `${Time.ms(invite.maxAge * 1000, true)} (${BotFunctions.formatDiscordTime(Math.floor(Date.now() / 1000) + invite.maxAge, "relative")})`}`,
-				`Uses: **${invite.uses}/${invite.maxUses === 0 ? "Unlimited" : invite.maxUses}**`,
-				`Temporary: **${invite.temporary ? "Yes" : "No"}**`,
-				`Creator: ${user}`
-			].join("\n"), false);
+    const embed = Util.makeEmbed(true)
+        .setTitle("Invite Deleted")
+        .setColor(Colors.red)
+        .addField("Invite Info", [
+            `Channel: <#${invite instanceof Invite ? invite.channelID! : invite.channel!.id}>`,
+            `Code: **${invite.code}**`,
+            ...(invite instanceof Invite ? [
+                `Inviter: ${invite.inviter ? `**${invite.inviter.tag}** (${invite.inviter.mention})` : "**Unknown**"}`,
+                `Expire After: **${invite.maxAge === 0 ? "Never" : Time.ms(invite.maxAge, { words: true })}**`,
+                `Max Uses: **${invite.maxUses === 0 ? "Unlimited" : invite.maxUses}**`,
+                `Target Application: **${invite.targetApplication ? invite.targetApplication.name : "None"}**`,
+                `Target Type: **${invite.targetType ? InviteTargetTypeNames[invite.targetType] : "None"}**`,
+                `Target User: ${invite.targetUser ? `**${invite.targetUser.tag}** (${invite.targetUser.mention})` : "**None**"}`,
+                `Temporary: **${invite.temporary ? "Yes" : "No"}**`
+            ] : [])
+        ].join("\n"), false);
 
-		if (guild.permissionsOf(this.user.id).has("viewAuditLog")) {
-			const audit = await BotFunctions.getAuditLogEntry(guild, "INVITE_DELETE", (a) => a.after !== null && a.after.code === invite.code);
-			if (audit !== null && (audit.createdAt + 5e3) > Date.now()) e.addField("Blame", `${audit.user.tag} (${audit.user.id})`, false);
-		}
+    if (invite instanceof Invite && invite.guild?.clientMember.permissions.has("VIEW_AUDIT_LOG")) {
+        const auditLog = await invite.guild.getAuditLog({
+            actionType: AuditLogActionTypes.INVITE_DELETE,
+            limit:      50
+        });
+        const entry = auditLog.entries.find(e => e.changes?.find(c => c.key === "code" && c.new_value === invite.code));
+        if (entry?.user && (entry.createdAt.getTime() + 5e3) > Date.now()) {
+            embed.addField("Blame", `**${entry.user.tag}** (${entry.user.tag})`, false);
+            if (entry.reason) embed.addField("Reason", entry.reason, false);
+        }
+    }
 
-		await this.executeWebhook(hook.id, hook.token, {
-			embeds: [
-				e.toJSON()
-			]
-		});
-	}
+    for (const log of events) {
+        await log.execute(this, { embeds: embed.toJSON(true) });
+    }
 });

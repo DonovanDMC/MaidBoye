@@ -1,255 +1,134 @@
-import ClientEvent from "@util/ClientEvent";
-import Logger from "@util/Logger";
-import db from "@db";
-import type Category from "@cmd/Category";
-import CommandHandler from "@cmd/CommandHandler";
-import MessageCollector from "@util/MessageCollector";
-import CheweyAPI from "@req/CheweyAPI";
-import ComponentInteractionHandler from "@events/components/main";
-import { Strings, Utility } from "@uwu-codes/utils";
-import type { ChatInputApplicationCommandStructure } from "eris";
-import Eris from "eris";
-import * as fs from "fs-extra";
-import type { Node } from "lavalink";
-import ModLogHandler from "@handlers/ModLogHandler";
-import YiffRocks from "yiff-rocks";
-import AntiSpam from "@cmd/AntiSpam";
-import ComponentInteractionCollector from "@util/components/ComponentInteractionCollector";
-import Timer from "@util/Timer";
-import fetch from "node-fetch";
-import type { RESTPostOAuth2ClientCredentialsResult } from "discord-api-types";
-import {
-	antiSpamDir,
-	assetsDir,
-	beta,
-	bulkDeleteDir,
-	commandsDir,
-	dataDir,
-	errorsDir,
-	eventsDir,
-	liteClientInfo,
-	mainLogsDir,
-	notesDir,
-	tempDir,
-	userAgent
-} from "@config";
-import LoggingWebhookFailureHandler from "@handlers/LoggingWebhookFailureHandler";
-import AutocompleteInteractionHandler from "@events/autocomplete/main";
-import { performance } from "perf_hooks";
-import util from "util";
+import Config from "./config/index.js";
+import Util from "./util/Util.js";
+import ClientEvent from "./util/ClientEvent.js";
+import Logger from "./util/Logger.js";
+import CommandHandler from "./util/cmd/CommandHandler.js";
+import api from "./api/index.js";
+import { ApplicationCommandTypeNames } from "./util/Names.js";
+import { Strings, Timer } from "@uwu-codes/utils";
+import type { ModuleImport } from "@uwu-codes/types";
+import type {
+    AnyGuildChannel,
+    AnyThreadChannel,
+    CreateApplicationCommandOptions,
+    RawThreadChannel,
+    TypedCollection
+} from "oceanic.js";
+import { Client, ThreadChannel } from "oceanic.js";
+import { mkdir, readdir } from "fs/promises";
 
-export default class MaidBoye extends Eris.Client {
-	events = new Map<string, ClientEvent>();
-	cpuUsage = 0;
-	firstReady = false;
-	lava: Node;
-	constructor(token: string, options: Eris.ClientOptions) {
-		super(token, options);
-	}
+export default class MaidBoye extends Client {
+    cpuUsage = 0;
+    events = new Map<string, ClientEvent>();
+    firstReady = false;
+    initTime = 0n;
+    presenceUpdateInterval: NodeJS.Timeout | null = null;
+    readyTime = 0n;
+    server: typeof api;
+    constructor(initTime: bigint) {
+        super(Config.clientOptions);
+        this.initTime = initTime;
+        this.presenceUpdateInterval = null;
+    }
 
-	async launch() {
-		this.dirCheck();
-		await db.init(true, true);
-		await this.loadEvents();
-		await this.loadCommands();
-		MessageCollector.setClient(this);
-		LoggingWebhookFailureHandler.setClient(this);
-		ComponentInteractionCollector.setClient(this);
-		ModLogHandler.setClient(this);
-		if (!beta) CheweyAPI.analytics.initAutoPosting(this);
-		AntiSpam.init();
-		YiffRocks.setUserAgent(userAgent);
-		AutocompleteInteractionHandler.init();
-		ComponentInteractionHandler.init();
-		await this.connect();
-	}
+    async dirCheck() {
+        const directories = [
+            Config.logsDirectory,
+            Config.dataDir,
+            Config.eventsDirectory,
+            Config.commandsDirectory
+        ];
+        for (const dir of directories) await mkdir(dir, { recursive: true });
+    }
 
-	dirCheck() {
-		[
-			dataDir,
-			mainLogsDir,
-			errorsDir,
-			assetsDir,
-			bulkDeleteDir,
-			notesDir,
-			tempDir,
-			antiSpamDir
-		].forEach((dir) => fs.mkdirpSync(dir));
-	}
+    async getGuildChannel<CH extends AnyGuildChannel = AnyGuildChannel>(id: string, forceRest = false) {
+        const ch = this.getChannel(id) as CH;
+        if (!ch || forceRest) {
+            const channel = await this.rest.channels.get(id).catch(() => null) as CH | null;
+            if (channel === null || !("guild" in channel)) return null;
+            const guild = this.guilds.get(channel.guild.id);
+            if (guild) {
+                if (channel instanceof ThreadChannel) {
+                    guild.threads.add(channel);
+                    this.threadGuildMap[channel.id] = guild.id;
+                    const parent = await this.getGuildChannel(channel.parentID);
+                    if (parent && "threads" in parent) (parent.threads as TypedCollection<string, RawThreadChannel, AnyThreadChannel>).add(channel);
+                } else {
+                    guild.channels.add(channel);
+                    this.channelGuildMap[channel.id] = guild.id;
+                }
+            }
+            return channel;
+        } else return ch;
+    }
 
-	async loadEvents() {
-		const oStart = performance.now();
-		if (!fs.existsSync(eventsDir)) throw new Error(`Events directory "${eventsDir}" does not exist.`);
-		const list = await fs.readdir(eventsDir).then(v => v.filter(f => fs.lstatSync(`${eventsDir}/${f}`).isFile()).map(ev => `${eventsDir}/${ev}`));
-		Logger.getLogger("EventManager").debug(`Got ${list.length} ${Strings.plural("event", list)} to load`);
-		for (const loc of list) {
-			const start = performance.now();
-			let event = await import(loc) as ClientEvent | { default: ClientEvent; };
-			if ("default" in event) event = event.default;
-			if (!Utility.isOfType(event, ClientEvent)) throw new TypeError(`Export of event file "${loc}" is not an instance of ClientEvent.`);
-			this.events.set(event.name, event);
-			this.on(event.name, event.listener.bind(this));
-			const end = performance.now();
-			Logger.getLogger("EventManager").debug(`Loaded the ${event.name} event in ${(end - start).toFixed(3)}ms`);
-		}
-		const oEnd = performance.now();
-		Logger.getLogger("EventManager").debug(`Loaded ${list.length} ${Strings.plural("event", list)} in ${(oEnd - oStart).toFixed(3)}ms`);
-	}
+    async getMember(guildID: string, userID: string, forceRest = false) {
+        if (!this.guilds.has(guildID)) return this.rest.guilds.getMember(guildID, userID).catch(() => null);
+        else {
+            const guild = this.guilds.get(guildID)!;
+            const current = guild.members.get(userID);
+            if (current && forceRest === false) return current;
+            else return guild.fetchMembers({ userIDs: [userID] }).then(([member]) => member).catch(() => null);
+        }
+    }
 
-	async loadCommands() {
-		const start = performance.now();
-		if (!fs.existsSync(commandsDir)) throw new Error(`Commands directory "${commandsDir}" does not exist.`);
-		const loadWhitelist: Array<string> | null = null;
-		const list = await fs.readdir(commandsDir).then(v => v.map(ev => `${commandsDir}/${ev}`));
-		for (const loc of list) {
-			// eslint-disable-next-line @typescript-eslint/no-unsafe-call
-			if (beta && (Array.isArray(loadWhitelist) && !(loadWhitelist as Array<string>).includes(loc.split("/").slice(-1)[0]))) continue;
-			const { default: cat } = (await import(loc)) as { default: Category; };
-			CommandHandler.registerCategory(cat);
-			CommandHandler.loadCategoryCommands(cat.name, cat.dir);
-		}
-		const end = performance.now();
-		Logger.getLogger("CommandManager").debug(`Loaded ${CommandHandler.commands.length} commands in ${(end - start).toFixed(3)}ms`);
-	}
+    async getUser(id: string, forceRest = false) {
+        const current = this.users.get(id);
+        if (current && forceRest === false) return current;
+        return this.rest.users.get(id).catch(() => null);
+    }
 
-	async getUser(id: string, forceRest = false) {
-		const cur = this.users.get(id);
-		if (cur && forceRest === false) return cur;
-		const u = await this.getRESTUser(id).catch(() => null);
-		if (u !== null) {
-			if (forceRest && cur) this.users.remove(cur);
-			this.users.add(u);
-			return u;
-		} else return null;
-	}
+    async handleRegistrationError(commands: Array<CreateApplicationCommandOptions>, err: Error) {
+        Logger.getLogger("CommandRegistration").error("Failed To Register Commands:", err);
+        for (const cmd of commands) Logger.getLogger("CommandRegistration").error(`Command At ${commands.indexOf(cmd)}: ${cmd.name} (${ApplicationCommandTypeNames[cmd.type]})`);
+    }
 
-	async getMember(guildId: string, userId: string, forceRest = false) {
-		if (!this.guilds.has(guildId)) return this.getRESTGuildMember(guildId, userId).catch(() => null);
-		else {
-			const g = this.guilds.get(guildId)!;
-			const cur = g.members.get(userId);
-			if (cur && forceRest === false) return cur;
-			else {
-				const m = await g.getRESTMember(userId).catch(() => null);
-				if (m !== null) {
-					// if (force && cur) g.members.remove(cur);
-					g.members.add(m, g);
-					return m;
-				} else return null;
-			}
-		}
-	}
+    async launch() {
+        await this.dirCheck();
+        await this.loadEvents();
+        await CommandHandler.load();
+        /* register commands in ready event */
+        return this.connect();
+    }
 
-	async getGuildChannel(id: string, forceRest = false) {
-		const c = this.getChannel(id) as Eris.AnyGuildChannel;
-		if (!c || forceRest) {
-			const ch = await this.getRESTChannel(id).catch(() => null) as Eris.AnyGuildChannel | null;
-			if (ch === null || !("guild" in ch)) return null;
-			const g = this.guilds.get(ch.guild.id);
-			if (g) g.channels.add(ch);
-			return ch;
-		} else return c;
-	}
+    async loadEvents() {
+        const overallStart = Timer.getTime();
+        if (!await Util.exists(Config.eventsDirectory))  throw new Error(`Events directory "${Config.eventsDirectory}" does not exist.`);
+        const events = (await readdir(Config.eventsDirectory, { withFileTypes: true })).filter(ev => ev.isFile()).map(ev => `${Config.eventsDirectory}/${ev.name}`);
+        for (const event of events) {
+            const start = Timer.getTime();
+            let ev = await import(event) as ModuleImport<ClientEvent>;
+            if ("default" in ev) ev = ev.default;
+            if (!(ev instanceof ClientEvent)) throw new TypeError(`Export of event file "${event}" is not an instance of ClientEvent.`);
+            this.events.set(ev.name, ev);
+            this.on(ev.name, ev.listener.bind(this));
+            const end = Timer.getTime();
+            Logger.getLogger("EventManager").debug(`Loaded the ${ev.name} event in ${Timer.calc(start, end, 3, false)}`);
+        }
+        const overallEnd = Timer.getTime();
+        Logger.getLogger("EventManager").debug(`Loaded ${events.length} ${Strings.plural("event", events)} in ${Timer.calc(overallStart, overallEnd, 3, false)}`);
+    }
 
-	async syncApplicationCommands(guild?: string, bypass = false, filterNames?: Array<string>) {
-		const start = process.hrtime.bigint();
-		const commands = CommandHandler.commands.reduce<Array<Eris.ApplicationCommandStructure>>((a, b) => a.concat(...b.applicationCommands), []);
+    async registerCommands() {
+        const commands = [
+            ...CommandHandler.commands.map(cmd => cmd.toJSON()),
+            ...CommandHandler.userCommands.map(cmd => cmd.toJSON()),
+            ...CommandHandler.messageCommands.map(cmd => cmd.toJSON())
+        ];
+        await this.application.bulkEditGuildCommands(Config.developmentGuild, []);
+        const regStart = Timer.getTime();
+        if (Config.useGuildCommands) await this.application.bulkEditGuildCommands(Config.developmentGuild, commands).catch(this.handleRegistrationError.bind(this, commands));
+        else await this.application.bulkEditGlobalCommands(commands).catch(this.handleRegistrationError.bind(this, commands));
+        const regEnd = Timer.getTime();
+        Logger.getLogger("CommandRegistration").info(`Registered ${commands.length} commands in ${Timer.calc(regStart, regEnd, 3, false)}`);
+    }
 
-		// due to not all categories being loaded before the help command
-		((commands.find(cmd => cmd.name === "help")! as ChatInputApplicationCommandStructure).options![0] as Eris.ApplicationCommandOptionsStringWithoutAutocomplete).choices = CommandHandler.categories.map(cat => {
-			if (cat.restrictions.includes("disabled") || cat.restrictions.includes("developer") || (cat.restrictions.includes("beta") && !beta)) return;
-			else return {
-				name: cat.displayName.text,
-				value: cat.name
-			};
-		}).filter(Boolean) as Eris.ApplicationCommandOptionWithChoices<never>["choices"];
-
-		if (bypass !== true) {
-			// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
-			const v = (fs.existsSync(`${dataDir}/slash.json`) ? JSON.parse(fs.readFileSync(`${dataDir}/slash.json`).toString()) : []) as typeof commands;
-			if (JSON.stringify(commands) === JSON.stringify(v)) {
-				Logger.getLogger("SlashCommandSync").debug("Skipping sync due to no changes");
-				return true;
-			}
-		}
-		fs.writeFileSync(`${dataDir}/slash.json`, JSON.stringify(commands));
-
-		const d = commands.filter(c => (!filterNames || filterNames.length === 0) || filterNames.includes(c.name));
-		return (guild === undefined ? this.bulkEditCommands(d) : this.bulkEditGuildCommands(guild, d))
-			.then(
-				({ length }) => {
-					const end = process.hrtime.bigint();
-					Logger.getLogger("SlashCommandSync").debug(`Synced ${length} commands in ${Timer.calc(start, end, 2, false)}`);
-					return true;
-				},
-				(err: Error) => {
-					Logger.getLogger("SlashCommandSync").debug("Error detected, printing command index list");
-					commands.forEach((cmd, index) => {
-						Logger.getLogger("SlashCommandSync").debug(`Command at index "${index}": ${cmd.name} (type: ${Object.entries(Eris.Constants.ApplicationCommandTypes).find(([, v]) => cmd.type === v)![0]})`);
-					});
-					Logger.getLogger("SlashCommandSync").error(err);
-					return false;
-				}
-			);
-	}
-
-	async syncLiteApplicationCommands(guild?: string, bypass = false, filterNames?: Array<string>) {
-		const start = process.hrtime.bigint();
-		const commands = [
-			// since our help command is not stateless, we have to add a custom one
-			{
-				name: "help",
-				description: "List my commands",
-				options: []
-			},
-			...CommandHandler.commands.reduce<Array<Eris.ApplicationCommandStructure>>((a, b) => a.concat(...b.liteApplicationCommands), [])
-		];
-
-		if (bypass !== true) {
-			// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
-			const v = (fs.existsSync(`${dataDir}/slash-lite.json`) ? JSON.parse(fs.readFileSync(`${dataDir}/slash-lite.json`).toString()) : []) as typeof commands;
-			if (JSON.stringify(commands) === JSON.stringify(v)) {
-				Logger.getLogger("SlashCommandSync").debug("Skipping sync due to no changes");
-				return true;
-			}
-		}
-		fs.writeFileSync(`${dataDir}/slash-lite.json`, JSON.stringify(commands));
-
-		const grant = await fetch("https://discord.com/api/oauth2/token", {
-			method: "POST",
-			body: "grant_type=client_credentials&scope=applications.commands.update",
-			headers: {
-				"Authorization": `Basic ${Buffer.from(`${liteClientInfo.id}:${liteClientInfo.secret}`).toString("base64")}`,
-				"User-Agent": userAgent,
-				"Content-Type": "application/x-www-form-urlencoded"
-			}
-		});
-		const token = await grant.json().then((v) => (v as RESTPostOAuth2ClientCredentialsResult).access_token);
-
-		return fetch(`https://discord.com/api/v9/applications/${liteClientInfo.id}${guild === undefined ? "/commands" : `/guilds/${guild}/commands`}`, {
-			method: "PUT",
-			body: JSON.stringify(commands.filter(c => (!filterNames || filterNames.length === 0) || filterNames.includes(c.name))),
-			headers: {
-				"Authorization": `Bearer ${token}`,
-				"User-Agent": userAgent,
-				"Content-Type": "application/json"
-			}
-		})
-			.then(async(res) => {
-				const end = process.hrtime.bigint();
-				Logger.getLogger("LiteSlashCommandSync").debug(`Synced ${commands.length} commands in ${Timer.calc(start, end, 2, false)}`);
-				const body = await res.json() as unknown;
-				if (res.status >= 400) Logger.getLogger("LiteSlashCommandSync").error(util.inspect(body, { depth: null, colors: true }));
-				return true;
-			},
-			(err: Error) => {
-				Logger.getLogger("LiteSlashCommandSync").debug("Error detected, printing command index list");
-				commands.forEach((cmd, index) => {
-					Logger.getLogger("LiteSlashCommandSync").debug(`Command at index "${index}": ${cmd.name}`);
-				});
-				Logger.getLogger("LiteSlashCommandSync").error(err);
-				return false;
-			}
-			);
-	}
+    async startAPIServer() {
+        return new Promise<void>(resolve => {
+            (this.server = api).listen(Config.apiPort, Config.apiHost,  () => {
+                Logger.getLogger("API").info(`API listening on ${Config.apiHost}:${Config.apiPort} (${Config.apiURL})`);
+                resolve();
+            });
+        });
+    }
 }

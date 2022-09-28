@@ -1,34 +1,36 @@
-import ClientEvent from "@util/ClientEvent";
-import EmbedBuilder from "@util/EmbedBuilder";
-import GuildConfig from "@models/Guild/GuildConfig";
-import BotFunctions from "@util/BotFunctions";
-import LoggingWebhookFailureHandler from "@handlers/LoggingWebhookFailureHandler";
+import ClientEvent from "../util/ClientEvent.js";
+import LogEvent, { LogEvents } from "../db/Models/LogEvent.js";
+import Util from "../util/Util.js";
+import { Colors } from "../util/Constants.js";
+import { AuditLogActionTypes, Channel, StageChannel, VoiceChannel } from "oceanic.js";
 
-export default new ClientEvent("voiceChannelLeave", async function(member, channel) {
-	if (!("guild" in channel)) return;
+export default new ClientEvent("voiceChannelLeave", async function voiceChannelLeaveEvent(member, inputChannel) {
+    if (!(inputChannel instanceof Channel)) inputChannel = await this.rest.channels.get(inputChannel.id);
+    const channel = inputChannel as VoiceChannel | StageChannel;
+    const events = await LogEvent.getType(channel.guildID, LogEvents.VOICE_LEAVE);
+    if (events.length === 0) return;
 
-	const logEvents = await GuildConfig.getLogEvents(channel.guild.id, "voiceJoin");
-	for (const log of logEvents) {
-		const hook = await this.getWebhook(log.webhook.id, log.webhook.token).catch(() => null);
-		if (hook === null || !hook.token) {
-			void LoggingWebhookFailureHandler.tick(log);
-			continue;
-		}
+    const embed = Util.makeEmbed(true)
+        .setTitle("Voice Channel Left")
+        .setColor(Colors.green)
+        .addField("Info", [
+            `Channel: **${channel.name}** (${channel.id})`,
+            `Member: **${member.tag}** (${member.id})`
+        ].join("\n"), false);
 
-		const e = new EmbedBuilder(true)
-			.setTitle("Voice Channel Left")
-			.setColor("red")
-			.setDescription(`<@!${member.id}> left the voice channel <#${channel.id}>.`);
+    if (channel.guild.clientMember.permissions.has("VIEW_AUDIT_LOG")) {
+        const auditLog = await channel.guild.getAuditLog({
+            actionType: AuditLogActionTypes.MEMBER_DISCONNECT,
+            limit:      50
+        });
+        const entry = auditLog.entries[0];
+        if (entry?.user && (entry.createdAt.getTime() + 5e3) > Date.now()) {
+            embed.addField("Blame", `**${entry.user.tag}** (${entry.user.tag})`, false);
+            if (entry.reason) embed.addField("Reason", entry.reason, false);
+        }
+    }
 
-		if (channel.guild.permissionsOf(this.user.id).has("viewAuditLog")) {
-			const audit = await BotFunctions.getAuditLogEntry(channel.guild, "MEMBER_DISCONNECT", (a) => a.targetID === channel.id);
-			if (audit !== null && (audit.createdAt + 5e3) > Date.now()) e.addField("Blame", `${audit.user.tag} (${audit.user.id})`, false);
-		}
-
-		await this.executeWebhook(hook.id, hook.token, {
-			embeds: [
-				e.toJSON()
-			]
-		});
-	}
+    for (const log of events) {
+        await log.execute(this, { embeds: embed.toJSON(true) });
+    }
 });

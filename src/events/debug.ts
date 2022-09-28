@@ -1,6 +1,6 @@
-import ClientEvent from "@util/ClientEvent";
-import Logger from "@util/Logger";
+import ClientEvent from "../util/ClientEvent.js";
+import Logger from "../util/Logger.js";
 
-export default new ClientEvent("debug", async function(info, id) {
-	Logger.getLogger(id === undefined ? undefined : `Shard #${id}`).debug(info);
+export default new ClientEvent("debug", async function debugEvent(info, id) {
+    Logger.getLogger(`Debug${!id ? "" : ` | Shard #${id}`}`).debug(info);
 });

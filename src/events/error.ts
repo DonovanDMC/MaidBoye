@@ -1,9 +1,6 @@
-import ClientEvent from "@util/ClientEvent";
-import Logger from "@util/Logger";
-import ErrorHandler from "@handlers/ErrorHandler";
+import ClientEvent from "../util/ClientEvent.js";
+import Logger from "../util/Logger.js";
 
-export default new ClientEvent("error", async function(info, id) {
-	Logger.getLogger(id === undefined ? undefined : `Shard #${id}`).error(info);
-	const code = await ErrorHandler.handleError(info, "event");
-	Logger.getLogger(id === undefined ? undefined : `Shard #${id}`).error("Error Code:", code === null ? "Not Saved" : code);
+export default new ClientEvent("error", async function errorEvent(info, id) {
+    Logger.getLogger(`Error${!id ? "" : ` | Shard #${id}`}`).error(info);
 });

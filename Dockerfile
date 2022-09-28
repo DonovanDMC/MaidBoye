@@ -1,9 +1,9 @@
-FROM node:16
+FROM node:18-alpine
 
 WORKDIR /app
 COPY . .
-RUN apt-get update && apt-get upgrade -y && apt-get install -y lsof
-RUN npm i -g npm typescript
+RUN apk add --no-cache lsof ffmpeg git
+RUN npm i --location=global npm typescript
 RUN npm install --development --force
 RUN npm run build
-CMD npm start
+CMD ["node", "/app/build/src/index.js"]

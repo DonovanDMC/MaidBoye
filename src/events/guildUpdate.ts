@@ -1,368 +1,451 @@
-import ClientEvent from "@util/ClientEvent";
-import GuildConfig from "@models/Guild/GuildConfig";
-import EmbedBuilder from "@util/EmbedBuilder";
-import Eris from "eris";
-import BotFunctions from "@util/BotFunctions";
+import ClientEvent from "../util/ClientEvent.js";
+import LogEvent, { LogEvents } from "../db/Models/LogEvent.js";
+import Util from "../util/Util.js";
+import { Colors } from "../util/Constants.js";
+import {
+    DefaultMessageNotificationLevelNames,
+    ExplicitContentFilterLevelNames,
+    getFeatureName,
+    GuildNSFWLevelNames,
+    MFALevelNames,
+    SystemChannelFlagNames,
+    VerificationLevelNames
+} from "../util/Names.js";
+import {
+    AuditLogActionTypes,
+    EmbedOptions,
+    GuildFeature,
+    SystemChannelFlags,
+    WelcomeScreenChannel
+} from "oceanic.js";
 import { Time } from "@uwu-codes/utils";
-import { names } from "@config";
-import chunk from "chunk";
-import LoggingWebhookFailureHandler from "@handlers/LoggingWebhookFailureHandler";
 
-export default new ClientEvent("guildUpdate", async function(guild, oldGuild) {
+export default new ClientEvent("guildUpdate", async function guildUpdateEvent(guild, oldGuild) {
+    if (oldGuild === null) return;
+    const events = await LogEvent.getType(guild.id, LogEvents.GUILD_UPDATE);
+    for (const log of events) {
+        const embeds: Array<EmbedOptions> = [];
 
-	const logEvents = await GuildConfig.getLogEvents(guild.id, "update");
-	for (const log of logEvents) {
-		const hook = await this.getWebhook(log.webhook.id, log.webhook.token).catch(() => null);
-		if (hook === null || !hook.token) {
-			void LoggingWebhookFailureHandler.tick(log);
-			continue;
-		}
+        if (guild.afkChannelID !== oldGuild.afkChannelID) {
+            embeds.push(Util.makeEmbed(true)
+                .setTitle("Server Updated")
+                .setColor(Colors.gold)
+                .setDescription("This server's AFK channel was changed.")
+                .addField("Old Channel", oldGuild.afkChannelID ? `<#${oldGuild.afkChannelID}>` : "None", false)
+                .addField("New Channel", guild.afkChannelID ? `<#${guild.afkChannelID}>` : "None", false)
+                .toJSON()
+            );
+        }
 
-		const embeds = [] as Array<Eris.EmbedOptions>;
+        if (guild.afkTimeout !== oldGuild.afkTimeout) {
+            embeds.push(Util.makeEmbed(true)
+                .setTitle("Server Updated")
+                .setColor(Colors.gold)
+                .setDescription("This server's AFK timeout was changed.")
+                .addField("Old Timeout", oldGuild.afkTimeout === 0 ? "None" : Time.ms(oldGuild.afkTimeout * 1000, { words: true }), false)
+                .addField("New Timeout", guild.afkTimeout === 0 ? "None" : Time.ms(guild.afkTimeout * 1000, { words: true }), false)
+                .toJSON()
+            );
+        }
 
-		if (oldGuild.afkChannelID !== guild.afkChannelID) embeds.push(new EmbedBuilder(true)
-			.setTitle("Server Updated")
-			.setColor("gold")
-			.setDescription([
-				"This Server's AFK Channel was changed."
-			])
-			.addField("Old AFK Channel", oldGuild.afkChannelID === null ? "[NONE]" : `<#${oldGuild.afkChannelID}>`, false)
-			.addField("New AFK Channel", guild.afkChannelID === null ? "[NONE]" : `<#${guild.afkChannelID}>`, false)
-			.toJSON()
-		);
+        if (guild.banner !== oldGuild.banner) {
+            const embed = Util.makeEmbed(true)
+                .setTitle("Server Updated")
+                .setColor(Colors.gold)
+                .setDescription([
+                    "This server's banner was changed.",
+                    "",
+                    guild.banner === null ? "[Banner Removed]" : `[New Banner](${guild.bannerURL()!})`
+                ]);
+            if (guild.banner !== null) embed.setImage(guild.bannerURL()!);
+            embeds.push(embed.toJSON());
+        }
 
-		if (oldGuild.afkTimeout !== guild.afkTimeout) embeds.push(new EmbedBuilder(true)
-			.setTitle("Server Updated")
-			.setColor("gold")
-			.setDescription([
-				"This Server's AFK Timeout was changed."
-			])
-			.addField("Old AFK Channel", Time.ms(oldGuild.afkTimeout * 1000, true), false)
-			.addField("New AFK Channel", Time.ms(guild.afkTimeout * 1000, true), false)
-			.toJSON()
-		);
+        if (guild.defaultMessageNotifications !== oldGuild.defaultMessageNotifications) {
+            embeds.push(Util.makeEmbed(true)
+                .setTitle("Server Updated")
+                .setColor(Colors.gold)
+                .setDescription("This server's default message notifications were changed.")
+                .addField("Old Notifications", DefaultMessageNotificationLevelNames[oldGuild.defaultMessageNotifications], false)
+                .addField("New Notifications", DefaultMessageNotificationLevelNames[guild.defaultMessageNotifications], false)
+                .toJSON()
+            );
+        }
 
-		if (oldGuild.banner !== guild.banner) embeds.push(new EmbedBuilder(true)
-			.setTitle("Server Updated")
-			.setColor("gold")
-			.setDescription([
-				"This Server's Banner was changed.",
-				"",
-				// eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-				`Old Banner: ${oldGuild.banner === null ? "[NONE]" : `[here](${Object.getOwnPropertyDescriptor(Eris.Guild.prototype, "bannerURL")!.get!.call({ _client: this, id: guild.id, banner: oldGuild.banner })})`})}`,
-				`New Banner: ${guild.banner === null ? "[NONE]" : `[here](${guild.bannerURL!})`}`
-			])
-			.toJSON()
-		);
+        if (guild.description !== oldGuild.description) {
+            embeds.push(Util.makeEmbed(true)
+                .setTitle("Server Updated")
+                .setColor(Colors.gold)
+                .setDescription("This server's description was changed.")
+                .addField("Old Description", (oldGuild.description ?? "None") || "[Empty]", false)
+                .addField("New Description", (guild.description ?? "None") || "[Empty]", false)
+                .toJSON()
+            );
+        }
 
-		if (oldGuild.afkTimeout !== guild.afkTimeout) embeds.push(new EmbedBuilder(true)
-			.setTitle("Server Updated")
-			.setColor("gold")
-			.setDescription([
-				"This Server's Default Notifications was changed."
-			])
-			.addField("Old Default Notifications", names.defaultNotifications[oldGuild.defaultNotifications], false)
-			.addField("New Default Notifications", names.defaultNotifications[guild.defaultNotifications], false)
-			.toJSON()
-		);
+        if (guild.discoverySplash !== oldGuild.discoverySplash) {
+            const embed = Util.makeEmbed(true)
+                .setTitle("Server Updated")
+                .setColor(Colors.gold)
+                .setDescription([
+                    "This server's discovery splash was changed.",
+                    "",
+                    guild.discoverySplash === null ? "[Discovery Splash Removed]" : `[New Discovery Splash](${guild.discoverySplashURL()!})`
+                ]);
+            if (guild.discoverySplash !== null) embed.setImage(guild.discoverySplashURL()!);
+            embeds.push(embed.toJSON());
+        }
 
-		if (oldGuild.description !== guild.description) embeds.push(new EmbedBuilder(true)
-			.setTitle("Server Updated")
-			.setColor("gold")
-			.setDescription("This Server's Description was changed.")
-			.addField("Old Description", oldGuild.description ?? "[NONE]", false)
-			.addField("New Description", guild.description ?? "[NONE]", false)
-			.toJSON()
-		);
-
-		if (oldGuild.discoverySplash !== guild.discoverySplash) embeds.push(new EmbedBuilder(true)
-			.setTitle("Server Updated")
-			.setColor("gold")
-			.setDescription([
-				"This Server's Discovery Splash was changed.",
-				"",
-				// eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-				`Old Discovery Splash: ${oldGuild.discoverySplash === null ? "[NONE]" : `[here](${Object.getOwnPropertyDescriptor(Eris.Guild.prototype, "discoverySplashURL")!.get!.call({ _client: this, id: guild.id, splash: oldGuild.discoverySplash })})`})}`,
-				`New Discovery Splash: ${guild.discoverySplash === null ? "[NONE]" : `[here](${guild.discoverySplashURL!})`}`
-			])
-			.toJSON()
-		);
-
-		const oldEmojis = oldGuild.emojis.map(e => e.id);
-		const newEmojis = guild.emojis.map(e => e.id);
-		const addedEmojis = [] as Array<string>;
-		const removedEmojis = [] as Array<string>;
-		oldGuild.emojis.forEach(e => {
-			if (!newEmojis.includes(e.id)) removedEmojis.push(`<${e.animated ? "a" : ""}:${e.name}:${e.id}>`);
-		});
-		guild.emojis.forEach(e => {
-			if (!oldEmojis.includes(e.id)) addedEmojis.push(`<${e.animated ? "a" : ""}:${e.name}:${e.id}>`);
-		});
-		if (removedEmojis.length > 0 || addedEmojis.length > 0) embeds.push(new EmbedBuilder(true)
-			.setTitle("Server Updated")
-			.setColor("gold")
-			.setDescription([
-				"This server's emojis were changed.",
-				"(+ = added, - = removed)",
-				"",
-				"**Changes**:",
-				...addedEmojis.map(e => `+ ${e}`),
-				...removedEmojis.map(e => `- ${e}`)
-			])
-			.toJSON()
-		);
-
-		if (oldGuild.explicitContentFilter !== guild.explicitContentFilter) embeds.push(new EmbedBuilder(true)
-			.setTitle("Server Updated")
-			.setColor("gold")
-			.setDescription([
-				"This Server's Explicit Content Filter was changed."
-			])
-			.addField("Old Explicit Content Filter", names.explicitContentFilter[oldGuild.explicitContentFilter], false)
-			.addField("New Explicit Content Filter", names.explicitContentFilter[guild.explicitContentFilter], false)
-			.toJSON()
-		);
-
-		const addedFeatures = [] as Array<string>;
-		const removedFeatures = [] as Array<string>;
-		oldGuild.features.forEach(f => {
-			if (!guild.features.includes(f)) removedFeatures.push(f);
-		});
-		guild.features.forEach(f => {
-			if (!oldGuild.features.includes(f)) addedFeatures.push(f);
-		});
-
-		if (addedFeatures.length > 0 || removedFeatures.length > 0) embeds.push(new EmbedBuilder(true)
-			.setTitle("Server Updated")
-			.setColor("gold")
-			.setDescription([
-				"This server's features were changed.",
-				"(+ = added, - = removed)",
-				"",
-				"**Changes**:",
-				"```diff",
-				...addedFeatures.map(f => `+ ${names.serverFeatures[f as keyof typeof names["serverFeatures"]] || f}`),
-				...removedFeatures.map(f => `- ${names.serverFeatures[f as keyof typeof names["serverFeatures"]] || f}`),
-				"```"
-			])
-			.toJSON()
-		);
-
-		if (oldGuild.icon !== guild.icon) embeds.push(new EmbedBuilder(true)
-			.setTitle("Server Updated")
-			.setColor("gold")
-			.setDescription([
-				"This Server's Icon was changed.",
-				"",
-				// eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-				`Old Icon: ${oldGuild.icon === null ? "[NONE]" : `[here](${Object.getOwnPropertyDescriptor(Eris.Guild.prototype, "iconURL")!.get!.call({ _client: this, id: guild.id, icon: oldGuild.icon })})`})}`,
-				`New Icon: ${guild.icon === null ? "[NONE]" : `[here](${guild.iconURL!})`}`
-			])
-			.toJSON()
-		);
-
-		if (oldGuild.large !== guild.large) embeds.push(new EmbedBuilder(true)
-			.setTitle("Server Updated")
-			.setColor("gold")
-			.setDescription(oldGuild.large === true ? "This server is no longer considered large." : "This server is now considered large.")
-			.toJSON()
-		);
-
-		if (oldGuild.maxMembers !== guild.maxMembers) embeds.push(new EmbedBuilder(true)
-			.setTitle("Server Updated")
-			.setColor("gold")
-			.setDescription("This Server's Max Members was changed.")
-			.addField("Old Max Members", String(oldGuild.maxMembers ?? "[NONE]"), false)
-			.addField("New Max Members", String(guild.maxMembers), false)
-			.toJSON()
-		);
-
-		if (oldGuild.maxVideoChannelUsers !== guild.maxVideoChannelUsers) embeds.push(new EmbedBuilder(true)
-			.setTitle("Server Updated")
-			.setColor("gold")
-			.setDescription("This Server's Max Video Channel Users was changed.")
-			.addField("Old Max Video Channel Users", String(oldGuild.maxVideoChannelUsers ?? "[NONE]"), false)
-			.addField("New Max Video Channel Users", String(guild.maxVideoChannelUsers ?? "[NONE]"), false)
-			.toJSON()
-		);
-
-		if (oldGuild.mfaLevel !== guild.mfaLevel) embeds.push(new EmbedBuilder(true)
-			.setTitle("Server Updated")
-			.setColor("gold")
-			.setDescription("This Server's MFA Level was changed.")
-			.addField("Old MFA Level", names.mfaLevel[oldGuild.mfaLevel], false)
-			.addField("New MFA Level", names.mfaLevel[guild.mfaLevel], false)
-			.toJSON()
-		);
-
-		if (oldGuild.name !== guild.name) embeds.push(new EmbedBuilder(true)
-			.setTitle("Server Updated")
-			.setColor("gold")
-			.setDescription("This Server's Name was changed.")
-			.addField("Old Name", oldGuild.name, false)
-			.addField("New name", guild.name, false)
-			.toJSON()
-		);
-
-		if (oldGuild.nsfwLevel !== guild.nsfwLevel) embeds.push(new EmbedBuilder(true)
-			.setTitle("Server Updated")
-			.setColor("gold")
-			.setDescription("This Server's NSFW Level was changed.")
-			.addField("Old NSFW Level", names.nsfwLevel[oldGuild.nsfwLevel], false)
-			.addField("New NSFW Level", names.nsfwLevel[guild.nsfwLevel], false)
-			.toJSON()
-		);
-
-		if (oldGuild.ownerID !== guild.ownerID) {
-			const oldOwner = await this.getMember(guild.id, oldGuild.ownerID);
-			const newOwner = await this.getMember(guild.id, guild.ownerID);
-			embeds.push(new EmbedBuilder(true)
-				.setTitle("Server Updated")
-				.setColor("gold")
-				.setDescription("This Server's Owner was changed.")
-				.addField("Old Owner", oldOwner === null ? oldGuild.ownerID : `${oldOwner.tag} (${oldOwner.id})`, false)
-				.addField("News Owner", newOwner === null ? guild.ownerID : `${newOwner.tag} (${newOwner.id})`, false)
-				.toJSON()
-			);
-		}
-
-		if (oldGuild.preferredLocale !== guild.preferredLocale) embeds.push(new EmbedBuilder(true)
-			.setTitle("Server Updated")
-			.setColor("gold")
-			.setDescription("This Server's Preferred Locale was changed.")
-			.addField("Old Preferred Locale", oldGuild.preferredLocale ?? "[NONE]", false)
-			.addField("New Preferred Locale", guild.preferredLocale ?? "[NONE]", false)
-			.toJSON()
-		);
-
-		if (oldGuild.publicUpdatesChannelID !== guild.publicUpdatesChannelID) embeds.push(new EmbedBuilder(true)
-			.setTitle("Server Updated")
-			.setColor("gold")
-			.setDescription("This Server's Public Updates Channel was changed.")
-			.addField("Old Public Updates Channel", oldGuild.publicUpdatesChannelID === null ? "[NONE]" : `<#${oldGuild.publicUpdatesChannelID}>`, false)
-			.addField("New Public Updates Channel", guild.publicUpdatesChannelID === null ? "[NONE]" : `<#${guild.publicUpdatesChannelID}>`, false)
-			.toJSON()
-		);
-
-		if (oldGuild.rulesChannelID !== guild.rulesChannelID) embeds.push(new EmbedBuilder(true)
-			.setTitle("Server Updated")
-			.setColor("gold")
-			.setDescription("This Server's Rules Channel was changed.")
-			.addField("Old Rules Channel", oldGuild.rulesChannelID === null ? "[NONE]" : `<#${oldGuild.rulesChannelID}>`, false)
-			.addField("New Rules Channel", guild.rulesChannelID === null ? "[NONE]" : `<#${guild.rulesChannelID}>`, false)
-			.toJSON()
-		);
-
-		if (oldGuild.splash !== guild.splash) embeds.push(new EmbedBuilder(true)
-			.setTitle("Server Updated")
-			.setColor("gold")
-			.setDescription([
-				"This Server's Splash was changed.",
-				"",
-				// eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-				`Old Splash: ${oldGuild.splash === null ? "[NONE]" : `[here](${Object.getOwnPropertyDescriptor(Eris.Guild.prototype, "splashURL")!.get!.call({ _client: this, id: guild.id, splash: oldGuild.splash })})`})}`,
-				`New Splash: ${guild.splash === null ? "[NONE]" : `[here](${guild.splashURL!})`}`
-			])
-			.toJSON()
-		);
+        if (guild.explicitContentFilter !== oldGuild.explicitContentFilter) {
+            embeds.push(Util.makeEmbed(true)
+                .setTitle("Server Updated")
+                .setColor(Colors.gold)
+                .setDescription("This server's explicit content filter was changed.")
+                .addField("Old Filter", ExplicitContentFilterLevelNames[oldGuild.explicitContentFilter], false)
+                .addField("New Filter", ExplicitContentFilterLevelNames[guild.explicitContentFilter], false)
+                .toJSON()
+            );
+        }
 
 
-		const oldStickers = (oldGuild.stickers ?? []).map(e => e.id);
-		const newStickers = (guild.stickers ?? []).map(e => e.id);
-		const addedStickers = [] as Array<Eris.Sticker>;
-		const removedStickers = [] as Array<Eris.Sticker>;
-		(oldGuild.stickers ?? []).forEach(s => {
-			if (!newStickers.includes(s.id)) removedStickers.push(s);
-		});
-		(guild.stickers ?? []).forEach(s => {
-			if (!oldStickers.includes(s.id)) addedStickers.push(s);
-		});
-		if (removedStickers.length > 0 || addedStickers.length > 0) embeds.push(new EmbedBuilder(true)
-			.setTitle("Server Updated")
-			.setColor("gold")
-			.setDescription([
-				"This server's stickers were changed.",
-				"(+ = added, - = removed)",
-				"",
-				"**Changes**:",
-				...addedStickers.map(s => `+ [${s.name}](https://media.discordapp.net/stickers/${s.id}.png?size=4096)`),
-				...removedStickers.map(s => `- [${s.name}](https://media.discordapp.net/stickers/${s.id}.png?size=4096)`)
-			])
-			.toJSON()
-		);
+        const addedFeatures = [] as Array<GuildFeature>;
+        const removedFeatures = [] as Array<GuildFeature>;
+        oldGuild.features.forEach(f => {
+            if (!guild.features.includes(f)) removedFeatures.push(f);
+        });
+        guild.features.forEach(f => {
+            if (!oldGuild.features.includes(f)) addedFeatures.push(f);
+        });
+        if (addedFeatures.length > 0 || removedFeatures.length > 0) {
+            embeds.push(Util.makeEmbed(true)
+                .setTitle("Server Updated")
+                .setColor(Colors.gold)
+                .setDescription([
+                    "This server's features were changed.",
+                    "",
+                    "**Changes**:",
+                    "```diff",
+                    ...addedFeatures.map(f => `+ ${getFeatureName(f)}`),
+                    ...removedFeatures.map(f => `- ${getFeatureName(f)}`),
+                    "```"
+                ])
+                .toJSON()
+            );
+        }
 
-		const oldFlags = BotFunctions.getSystemChannelFlags(oldGuild.systemChannelFlags);
-		const newFlags = BotFunctions.getSystemChannelFlags(guild.systemChannelFlags);
-		if (oldGuild.systemChannelFlags !== guild.systemChannelFlags) {
-			if (oldFlags.SUPPRESS_GUILD_REMINDER_NOTIFICATIONS !== newFlags.SUPPRESS_GUILD_REMINDER_NOTIFICATIONS) embeds.push(new EmbedBuilder(true)
-				.setTitle("Server Updated")
-				.setColor("gold")
-				.setDescription(`This server's system channel had server reminder notifications ${oldFlags.SUPPRESS_GUILD_REMINDER_NOTIFICATIONS ? "enabled" : "disabled"}.`)
-				.toJSON()
-			);
+        if (guild.icon !== oldGuild.icon) {
+            const embed = Util.makeEmbed(true)
+                .setTitle("Server Updated")
+                .setColor(Colors.gold)
+                .setDescription([
+                    "This server's icon was changed.",
+                    "",
+                    guild.icon === null ? "[Icon Removed]" : `[New Icon](${guild.iconURL()!})`
+                ]);
+            if (guild.icon !== null) embed.setImage(guild.iconURL()!);
+            embeds.push(embed.toJSON());
+        }
 
-			if (oldFlags.SUPPRESS_JOIN_NOTIFICATIONS !== newFlags.SUPPRESS_JOIN_NOTIFICATIONS) embeds.push(new EmbedBuilder(true)
-				.setTitle("Server Updated")
-				.setColor("gold")
-				.setDescription(`This server's system channel had join notifications ${oldFlags.SUPPRESS_JOIN_NOTIFICATIONS ? "enabled" : "disabled"}.`)
-				.toJSON()
-			);
+        if (guild.maxMembers !== oldGuild.maxMembers) {
+            embeds.push(Util.makeEmbed(true)
+                .setTitle("Server Updated")
+                .setColor(Colors.gold)
+                .setDescription("This server's maximum members was changed.")
+                .addField("Old Maximum", oldGuild.maxMembers === undefined ? "Unknown" : oldGuild.maxMembers.toString(), false)
+                .addField("New Maximum", guild.maxMembers === undefined ? "Unknown" : guild.maxMembers.toString(), false)
+                .toJSON()
+            );
+        }
 
-			if (oldFlags.SUPPRESS_PREMIUM_SUBSCRIPTIONS !== newFlags.SUPPRESS_PREMIUM_SUBSCRIPTIONS) embeds.push(new EmbedBuilder(true)
-				.setTitle("Server Updated")
-				.setColor("gold")
-				.setDescription(`This server's system channel had premium subscription notifications ${oldFlags.SUPPRESS_PREMIUM_SUBSCRIPTIONS ? "enabled" : "disabled"}.`)
-				.toJSON()
-			);
+        if (guild.maxPresences !== oldGuild.maxPresences) {
+            embeds.push(Util.makeEmbed(true)
+                .setTitle("Server Updated")
+                .setColor(Colors.gold)
+                .setDescription("This server's maximum presences was changed.")
+                .addField("Old Maximum", oldGuild.maxPresences === undefined ? "Unknown" : oldGuild.maxPresences.toString(), false)
+                .addField("New Maximum", guild.maxPresences === undefined ? "Unknown" : guild.maxPresences.toString(), false)
+                .toJSON()
+            );
+        }
 
-			if (oldFlags.SUPPRESS_JOIN_NOTIFICATION_REPLIES !== newFlags.SUPPRESS_JOIN_NOTIFICATION_REPLIES) embeds.push(new EmbedBuilder(true)
-				.setTitle("Server Updated")
-				.setColor("gold")
-				.setDescription(`This server's system channel had join notification replies ${oldFlags.SUPPRESS_JOIN_NOTIFICATION_REPLIES ? "enabled" : "disabled"}.`)
-				.toJSON()
-			);
-		}
+        if (guild.maxStageVideoChannelUsers !== oldGuild.maxStageVideoChannelUsers) {
+            embeds.push(Util.makeEmbed(true)
+                .setTitle("Server Updated")
+                .setColor(Colors.gold)
+                .setDescription("This server's maximum stage video channel users was changed.")
+                .addField("Old Maximum", oldGuild.maxStageVideoChannelUsers === undefined ? "Unknown" : oldGuild.maxStageVideoChannelUsers.toString(), false)
+                .addField("New Maximum", guild.maxStageVideoChannelUsers === undefined ? "Unknown" : guild.maxStageVideoChannelUsers.toString(), false)
+                .toJSON()
+            );
+        }
 
-		if (oldGuild.systemChannelID !== guild.systemChannelID) embeds.push(new EmbedBuilder(true)
-			.setTitle("Server Updated")
-			.setColor("gold")
-			.setDescription("This Server's System Channel was changed.")
-			.addField("Old System Channel", oldGuild.systemChannelID === null ? "[NONE]" : `<#${oldGuild.systemChannelID}>`, false)
-			.addField("New System Channel", guild.systemChannelID === null ? "[NONE]" : `<#${guild.systemChannelID}>`, false)
-			.toJSON()
-		);
+        if (guild.maxVideoChannelUsers !== oldGuild.maxVideoChannelUsers) {
+            embeds.push(Util.makeEmbed(true)
+                .setTitle("Server Updated")
+                .setColor(Colors.gold)
+                .setDescription("This server's maximum video channel users was changed.")
+                .addField("Old Maximum", oldGuild.maxVideoChannelUsers === undefined ? "Unknown" : oldGuild.maxVideoChannelUsers.toString(), false)
+                .addField("New Maximum", guild.maxVideoChannelUsers === undefined ? "Unknown" : guild.maxVideoChannelUsers.toString(), false)
+                .toJSON()
+            );
+        }
 
-		if (oldGuild.vanityURL !== guild.vanityURL) embeds.push(new EmbedBuilder(true)
-			.setTitle("Server Updated")
-			.setColor("gold")
-			.setDescription("This Server's Vanity URL was changed.")
-			.addField("Old Vanity URL", oldGuild.vanityURL === null ? "[NONE]" : `[https://discord.gg/${oldGuild.vanityURL}](https://discord.gg/${oldGuild.vanityURL})`, false)
-			.addField("New Vanity URL", guild.vanityURL === null ? "[NONE]" : `[https://discord.gg/${guild.vanityURL}](https://discord.gg/${guild.vanityURL})`, false)
-			.toJSON()
-		);
+        if (guild.mfaLevel !== oldGuild.mfaLevel) {
+            embeds.push(Util.makeEmbed(true)
+                .setTitle("Server Updated")
+                .setColor(Colors.gold)
+                .setDescription("This server's MFA level was changed.")
+                .addField("Old Level", MFALevelNames[oldGuild.mfaLevel], false)
+                .addField("New Level", MFALevelNames[guild.mfaLevel], false)
+                .toJSON()
+            );
+        }
 
-		if (oldGuild.verificationLevel !== guild.verificationLevel) embeds.push(new EmbedBuilder(true)
-			.setTitle("Server Updated")
-			.setColor("gold")
-			.setDescription("This Server's Verification Level was changed.")
-			.addField("Old Verification Level", names.verificationLevel[oldGuild.verificationLevel], false)
-			.addField("New Verification Level", names.verificationLevel[guild.verificationLevel], false)
-			.toJSON()
-		);
+        if (guild.name !== oldGuild.name) {
+            embeds.push(Util.makeEmbed(true)
+                .setTitle("Server Updated")
+                .setColor(Colors.gold)
+                .setDescription("This server's name was changed.")
+                .addField("Old Name", oldGuild.name, false)
+                .addField("New Name", guild.name, false)
+                .toJSON()
+            );
+        }
 
-		if (embeds.length === 0) continue;
+        if (guild.nsfwLevel !== oldGuild.nsfwLevel) {
+            embeds.push(Util.makeEmbed(true)
+                .setTitle("Server Updated")
+                .setColor(Colors.gold)
+                .setDescription("This server's NSFW level was changed.")
+                .addField("Old Level", GuildNSFWLevelNames[oldGuild.nsfwLevel], false)
+                .addField("New Level", GuildNSFWLevelNames[guild.nsfwLevel], false)
+                .toJSON()
+            );
+        }
 
-		if (guild.permissionsOf(this.user.id).has("viewAuditLog")) {
-			const audit = await BotFunctions.getAuditLogEntry(guild, "GUILD_UPDATE");
-			if (audit !== null && (audit.createdAt + 5e3) > Date.now()) embeds.push(new EmbedBuilder(true)
-				.setTitle("Server Update: Blame")
-				.setDescription(`${audit.user.tag} (${audit.user.id})`)
-				.setColor("orange")
-				.toJSON());
-		}
+        if (guild.ownerID !== oldGuild.ownerID) {
+            embeds.push(Util.makeEmbed(true)
+                .setTitle("Server Updated")
+                .setColor(Colors.gold)
+                .setDescription("This server's owner was changed.")
+                .addField("Old Owner", `<@!${oldGuild.ownerID}>`, false)
+                .addField("New Owner", `<@!${guild.ownerID}>`, false)
+                .toJSON()
+            );
+        }
 
-		// god help us if anyone manages to change EVERYTHING in one event
-		const e = chunk(embeds, 10);
-		for (const part of e) await this.executeWebhook(hook.id, hook.token, { embeds: part });
-	}
+        if (guild.preferredLocale !== oldGuild.preferredLocale) {
+            embeds.push(Util.makeEmbed(true)
+                .setTitle("Server Updated")
+                .setColor(Colors.gold)
+                .setDescription("This server's preferred locale was changed.")
+                .addField("Old Locale", oldGuild.preferredLocale, false)
+                .addField("New Locale", guild.preferredLocale, false)
+                .toJSON()
+            );
+        }
+
+        if (guild.premiumProgressBarEnabled !== oldGuild.premiumProgressBarEnabled) {
+            embeds.push(Util.makeEmbed(true)
+                .setTitle("Server Updated")
+                .setColor(Colors.gold)
+                .setDescription(`This server's premium progress bar was ${guild.premiumProgressBarEnabled ? "enabled" : "disabled"}.`)
+                .toJSON()
+            );
+        }
+
+        if (guild.publicUpdatesChannelID !== oldGuild.publicUpdatesChannelID) {
+            embeds.push(Util.makeEmbed(true)
+                .setTitle("Server Updated")
+                .setColor(Colors.gold)
+                .setDescription("This server's public updates channel was changed.")
+                .addField("Old Channel", oldGuild.publicUpdatesChannelID === null ? "None" : `<#${oldGuild.publicUpdatesChannelID}>`, false)
+                .addField("New Channel", guild.publicUpdatesChannelID === null ? "None" : `<#${guild.publicUpdatesChannelID}>`, false)
+                .toJSON()
+            );
+        }
+
+        if (guild.region !== oldGuild.region) {
+            embeds.push(Util.makeEmbed(true)
+                .setTitle("Server Updated")
+                .setColor(Colors.gold)
+                .setDescription("This server's region was changed.")
+                .addField("Old Region", oldGuild.region === null ? "Default" : oldGuild.region === undefined ? "Unknown" : oldGuild.region, false)
+                .addField("New Region", guild.region === null ? "Default" : guild.region === undefined ? "Unknown" : guild.region, false)
+                .toJSON()
+            );
+        }
+
+        if (guild.rulesChannelID !== oldGuild.rulesChannelID) {
+            embeds.push(Util.makeEmbed(true)
+                .setTitle("Server Updated")
+                .setColor(Colors.gold)
+                .setDescription("This server's rules channel was changed.")
+                .addField("Old Channel", oldGuild.rulesChannelID === null ? "None" : `<#${oldGuild.rulesChannelID}>`, false)
+                .addField("New Channel", guild.rulesChannelID === null ? "None" : `<#${guild.rulesChannelID}>`, false)
+                .toJSON()
+            );
+        }
+
+        if (guild.splash !== oldGuild.splash) {
+            const embed = Util.makeEmbed(true)
+                .setTitle("Server Updated")
+                .setColor(Colors.gold)
+                .setDescription([
+                    "This server's splash was changed.",
+                    "",
+                    guild.splash === null ? "[Splash Removed]" : `[Splash Banner](${guild.splashURL()!})`
+                ]);
+            if (guild.splash !== null) embed.setImage(guild.splashURL()!);
+            embeds.push(embed.toJSON());
+        }
+
+        const oldSystemChannelFlags = Util.getFlagsArray(SystemChannelFlags, oldGuild.systemChannelFlags);
+        const newSystemChannelFlags = Util.getFlagsArray(SystemChannelFlags, guild.systemChannelFlags);
+
+
+        const addedSystemChannelFlags = [] as Array<keyof typeof SystemChannelFlags>;
+        const removedSystemChannelFlags = [] as Array<keyof typeof SystemChannelFlags>;
+        oldSystemChannelFlags.forEach(f => {
+            if (!newSystemChannelFlags.includes(f)) removedSystemChannelFlags.push(f);
+        });
+        newSystemChannelFlags.forEach(f => {
+            if (!oldSystemChannelFlags.includes(f)) addedSystemChannelFlags.push(f);
+        });
+        if (addedSystemChannelFlags.length > 0 || removedSystemChannelFlags.length > 0) {
+            embeds.push(Util.makeEmbed(true)
+                .setTitle("Server Updated")
+                .setColor(Colors.gold)
+                .setDescription([
+                    "This server's system channel flags were changed.",
+                    "",
+                    "**Changes**:",
+                    "```diff",
+                    ...addedSystemChannelFlags.map(f => `+ ${SystemChannelFlagNames[SystemChannelFlags[f]]}`),
+                    ...removedSystemChannelFlags.map(f => `- ${SystemChannelFlagNames[SystemChannelFlags[f]]}`),
+                    "```"
+                ])
+                .toJSON()
+            );
+        }
+
+        if (guild.systemChannelID !== oldGuild.systemChannelID) {
+            embeds.push(Util.makeEmbed(true)
+                .setTitle("Server Updated")
+                .setColor(Colors.gold)
+                .setDescription("This server's system channel was changed.")
+                .addField("Old Channel", oldGuild.systemChannelID === null ? "None" : `<#${oldGuild.systemChannelID}>`, false)
+                .addField("New Channel", guild.systemChannelID === null ? "None" : `<#${guild.systemChannelID}>`, false)
+                .toJSON()
+            );
+        }
+
+        if (guild.vanityURLCode !== oldGuild.vanityURLCode) {
+            embeds.push(Util.makeEmbed(true)
+                .setTitle("Server Updated")
+                .setColor(Colors.gold)
+                .setDescription("This server's vanity URL code was changed.")
+                .addField("Old Code", oldGuild.vanityURLCode === null ? "None" : oldGuild.vanityURLCode, false)
+                .addField("New Code", guild.vanityURLCode === null ? "None" : guild.vanityURLCode, false)
+                .toJSON()
+            );
+        }
+
+        if (guild.verificationLevel !== oldGuild.verificationLevel) {
+            embeds.push(Util.makeEmbed(true)
+                .setTitle("Server Updated")
+                .setColor(Colors.gold)
+                .setDescription("This server's verification level was changed.")
+                .addField("Old Level", VerificationLevelNames[oldGuild.verificationLevel], false)
+                .addField("New Level", VerificationLevelNames[guild.verificationLevel], false)
+                .toJSON()
+            );
+        }
+
+        if ((guild.welcomeScreen || oldGuild.welcomeScreen) && JSON.stringify(guild.welcomeScreen ?? {}) !== JSON.stringify(oldGuild.welcomeScreen ?? {})) {
+            if (guild.welcomeScreen === undefined || oldGuild.welcomeScreen === undefined) {
+                embeds.push(Util.makeEmbed(true)
+                    .setTitle("Server Updated")
+                    .setColor(Colors.gold)
+                    .setDescription(`This server's welcome screen was ${guild.welcomeScreen === undefined ? "disabled" : "enabled"}.`)
+                    .toJSON()
+                );
+            } else {
+                if (guild.welcomeScreen.description !== oldGuild.welcomeScreen.description) {
+                    embeds.push(Util.makeEmbed(true)
+                        .setTitle("Server Updated")
+                        .setColor(Colors.gold)
+                        .setDescription("This server's welcome screen description was changed.")
+                        .addField("Old Description", oldGuild.welcomeScreen.description === null ? "None" : oldGuild.welcomeScreen.description, false)
+                        .addField("New Description", guild.welcomeScreen.description === null ? "None" : guild.welcomeScreen.description, false)
+                        .toJSON()
+                    );
+                }
+                const addedChannels = [] as Array<WelcomeScreenChannel>;
+                const removedchannels = [] as Array<WelcomeScreenChannel>;
+                oldGuild.welcomeScreen.welcomeChannels.forEach(ch => {
+                    if (!guild.welcomeScreen!.welcomeChannels.includes(ch)) removedchannels.push(ch);
+                });
+                guild.welcomeScreen.welcomeChannels.forEach(ch => {
+                    if (!oldGuild.welcomeScreen!.welcomeChannels.includes(ch)) addedChannels.push(ch);
+                });
+                if (addedChannels.length > 0 || removedchannels.length > 0) {
+                    embeds.push(Util.makeEmbed(true)
+                        .setTitle("Server Updated")
+                        .setColor(Colors.gold)
+                        .setDescription([
+                            "This server's welcome screen channels were changed.",
+                            "",
+                            "**Changes**:",
+                            "```diff",
+                            ...addedChannels.map(f => `+ #${guild.channels.get(f.channelID)?.name ?? f.channelID} - ${f.description}`),
+                            ...removedchannels.map(f => `- #${guild.channels.get(f.channelID)?.name ?? f.channelID} - ${f.description}`),
+                            "```"
+                        ])
+                        .toJSON()
+                    );
+                }
+            }
+        }
+
+        if (guild.widgetChannelID !== oldGuild.widgetChannelID) {
+            embeds.push(Util.makeEmbed(true)
+                .setTitle("Server Updated")
+                .setColor(Colors.gold)
+                .setDescription("This server's widget channel was changed.")
+                .addField("Old Channel", oldGuild.widgetChannelID === null ? "None" : `<#${oldGuild.widgetChannelID}>`, false)
+                .addField("New Channel", guild.widgetChannelID === null ? "None" : `<#${guild.widgetChannelID}>`, false)
+                .toJSON()
+            );
+        }
+
+        if (guild.widgetEnabled !== oldGuild.widgetEnabled) {
+            embeds.push(Util.makeEmbed(true)
+                .setTitle("Server Updated")
+                .setColor(Colors.gold)
+                .setDescription(`This server's widget was ${guild.widgetEnabled ? "enabled" : "disabled"}.`)
+                .toJSON()
+            );
+        }
+
+        if (embeds.length === 0) continue;
+
+        if (guild.clientMember.permissions.has("VIEW_AUDIT_LOG")) {
+            const auditLog = await guild.getAuditLog({
+                actionType: AuditLogActionTypes.GUILD_UPDATE,
+                limit:      50
+            });
+            const entry = auditLog.entries.find(e => e.targetID === guild.id);
+            if (entry?.user && (entry.createdAt.getTime() + 5e3) > Date.now()) {
+                const embed = Util.makeEmbed(true)
+                    .setTitle("Server Update: Blame")
+                    .setColor(Colors.gold)
+                    .setDescription(`**${entry.user.tag}** (${entry.user.mention})`);
+                if (entry.reason) embed.addField("Reason", entry.reason, false);
+                embeds.push(embed.toJSON());
+            }
+        }
+
+        await log.execute(this, { embeds });
+    }
 });

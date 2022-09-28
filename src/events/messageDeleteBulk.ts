@@ -1,71 +1,64 @@
-import ClientEvent from "@util/ClientEvent";
-import EmbedBuilder from "@util/EmbedBuilder";
-import GuildConfig from "@models/Guild/GuildConfig";
-import BotFunctions from "@util/BotFunctions";
-import LoggingWebhookFailureHandler from "@handlers/LoggingWebhookFailureHandler";
-import type Eris from "eris";
-import * as fs from "fs-extra";
-import { apiURL, bulkDeleteDir } from "@config";
-import crypto from "crypto";
+import ClientEvent from "../util/ClientEvent.js";
+import LogEvent, { LogEvents } from "../db/Models/LogEvent.js";
+import Util from "../util/Util.js";
+import { Colors } from "../util/Constants.js";
+import Config from "../config/index.js";
+import EncryptionHandler from "../util/handlers/EncryptionHandler.js";
+import type { BulkDeleteReport } from "../util/@types/misc.js";
+import { AnyGuildTextChannel, AuditLogActionTypes, Message, Uncached } from "oceanic.js";
+import { writeFile } from "node:fs/promises";
+import { randomBytes } from "node:crypto";
 
-//                                                                 this is messy because the event type specifies guild or dm, we only want guild
-export default new ClientEvent("messageDeleteBulk", async function(messages: Array<Eris.Message<Eris.GuildTextableChannel> | { channel: Eris.GuildTextableChannel | { id: string; guild?: Eris.Uncached; }; guildID?: string; id: string; }>) {
-	const guild = messages.find(m => "guild" in m.channel)?.channel?.guild;
-	const [{ channel }] = messages;
-	if (!guild || !("name" in guild)) return;
-	if (!channel || !("name" in channel)) return;
+// this requires the messageContent intent
+export default new ClientEvent("messageDeleteBulk", async function messageDeleteBulkEvent(messages) {
+    const guild = (messages.find(msg  => "guildID" in msg) as Message<Uncached | AnyGuildTextChannel>)?.guild;
+    if (!guild) return;
 
-	const logEvents = await GuildConfig.getLogEvents(guild.id, "bulkDelete");
-	for (const log of logEvents) {
-		const hook = await this.getWebhook(log.webhook.id, log.webhook.token).catch(() => null);
-		if (hook === null || !hook.token) {
-			void LoggingWebhookFailureHandler.tick(log);
-			continue;
-		}
+    const time = Date.now();
+    const channel = (await this.getGuildChannel(messages[0]!.channelID))!;
+    const report: BulkDeleteReport = {
+        channel:      [channel.id, EncryptionHandler.encrypt(channel.name)],
+        createdAt:    time,
+        expiresAt:    time + 2592000000, // expires after 30 days
+        guild:        [guild.id, EncryptionHandler.encrypt(guild.name)],
+        messageCount: messages.length,
+        messages:     messages.map(m => {
+            const author = EncryptionHandler.encrypt("author" in m ? `${m.author.tag} (${m.author.id})` : "Unknown Author");
+            const d = Number((BigInt(m.id) / 4194304n) + 1420070400000n);
+            return {
+                author,
+                content:   "content" in m ? EncryptionHandler.encrypt(m.content) : null,
+                timestamp: d
+            };
+        })
+    };
+    const events = await LogEvent.getType(guild.id, LogEvents.MESSAGE_DELETE_BULK);
+    if (events.length === 0) return;
 
-		const text = [
-			"-- Begin Bulk Deletion Report --",
-			`Generated At: ${new Date().toUTCString()}`,
-			`Total Messages: ${messages.length}`,
-			`Server: ${guild.name} (${guild.id})`,
-			`Channel: ${channel.name} (${channel.id})`,
-			"",
-			"-- Begin Messages --",
-			...messages.map(m => {
-				const author = "author" in m ? `${m.author.tag} (${m.author.id})` : "Unknown Author";
-				const d = new Date(Number((BigInt(m.id) / 4194304n) + 1420070400000n));
-				return `[${d.toUTCString()}][${author}]: ${"content" in m ? m.content : "[No Content]"}`;
-			}),
-			"-- End Messages --",
-			"",
-			"-- Begin Disclaimers --",
-			"* If you do not want bulk delete reports to be made, disable logging for Bulk Message Delete.",
-			"* If you want this report deleted, contact a developer",
-			"* Treat the report id like a password, anyone with it can read the contents.",
-			"-- End Disclaimers --",
-			"-- End Bulk Deletion Report --"
-		].join("\n");
-		const id = crypto.randomBytes(16).toString("hex");
-		fs.writeFileSync(`${bulkDeleteDir}/${id}`, text);
+    const id = randomBytes(16).toString("hex");
+    await writeFile(`${Config.bulkDeleteDir}/${id}.json`, JSON.stringify(report));
+    const embed = Util.makeEmbed(true)
+        .setTitle("Bulk Message Deletion")
+        .setDescription([
+            `Channel: ${channel.mention}`,
+            `Total Deleted: **${messages.length}**`,
+            `Report: [here](${Config.apiURL}/bulk-delete/${id})`
+        ])
+        .setColor(Colors.red);
 
-		const e = new EmbedBuilder(true)
-			.setTitle("Bulk Message Deletion")
-			.setDescription([
-				`Channel: <#${channel.id}>`,
-				`Total Deleted: **${messages.length}**`,
-				`Report: [here](${apiURL}/bulk-delete/${id})`
-			])
-			.setColor("red");
+    if (guild.clientMember.permissions.has("VIEW_AUDIT_LOG")) {
+        const auditLog = await guild.getAuditLog({
+            actionType: AuditLogActionTypes.MESSAGE_BULK_DELETE,
+            limit:      50
+        });
+        const entry = auditLog.entries[0];
+        if (entry?.user && (entry.createdAt.getTime() + 5e3) > Date.now()) {
+            embed.addField("Blame", `${entry.user.tag} (${entry.user.id})`, false);
+            if (entry.reason) embed.addField("Reason", entry.reason, false);
+        }
+    }
 
-		if (guild.permissionsOf(this.user.id).has("viewAuditLog")) {
-			const audit = await BotFunctions.getAuditLogEntry(guild, "MESSAGE_BULK_DELETE", (a) => a.targetID === channel.id);
-			if (audit !== null) e.addField("Blame", `${audit.user.tag} (${audit.user.id})`, false);
-		}
-
-		await this.executeWebhook(hook.id, hook.token, {
-			embeds: [
-				e.toJSON()
-			]
-		});
-	}
+    for (const log of events) {
+        await log.execute(this, { embeds: embed.toJSON(true) });
+    }
 });

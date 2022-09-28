@@ -1,15 +1,10 @@
-import { apiKeys, beta, userAgent } from "@config";
+import Config from "../../config/index.js";
+import type { Post } from "e621";
 import E6 from "e621";
-
-if (beta) process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 const E621 = new E6({
-	authUser: apiKeys.e621.username,
-	authKey: apiKeys.e621.key,
-	userAgent
+    authUser:  Config.e621User,
+    authKey:   Config.e621APIKey,
+    userAgent: Config.userAgent
 });
-export const YiffyV3 = new E6.YiffyAPI({
-	authUser: apiKeys.yiffy_v3.username,
-	authKey: apiKeys.yiffy_v3.key,
-	userAgent
-});
+export const filterPosts = (posts: Array<Post>, noVideo: boolean, noFlash: boolean) => posts.filter(p => !Object.values(p.tags).reduce((a, b) => a.concat(b)).find(t => ["cub", "young"].includes(t)) || (noVideo && p.file.ext === "webm") || (noFlash && p.file.ext === "swf"));
 export default E621;

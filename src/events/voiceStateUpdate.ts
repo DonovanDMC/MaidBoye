@@ -1,100 +1,153 @@
-import ClientEvent from "@util/ClientEvent";
-import GuildConfig from "@models/Guild/GuildConfig";
-import EmbedBuilder from "@util/EmbedBuilder";
-import type Eris from "eris";
-import BotFunctions from "@util/BotFunctions";
-import LoggingWebhookFailureHandler from "@handlers/LoggingWebhookFailureHandler";
+import ClientEvent from "../util/ClientEvent.js";
+import LogEvent, { LogEvents } from "../db/Models/LogEvent.js";
+import Util from "../util/Util.js";
+import { Colors } from "../util/Constants.js";
+import { AuditLogActionTypes, EmbedField, EmbedOptions } from "oceanic.js";
 
-export default new ClientEvent("voiceStateUpdate", async function(member, oldState) {
+export default new ClientEvent("voiceStateUpdate", async function voiceStateUpdateEvent(member, oldState) {
+    if (oldState === null || member.voiceState === null) return;
+    const events = await LogEvent.getType(member.guildID, LogEvents.VOICE_STATE_UPDATE);
+    if (events.length === 0) return;
 
-	const logEvents = await GuildConfig.getLogEvents(member.guild.id, "voiceStateUpdate");
-	for (const log of logEvents) {
-		const hook = await this.getWebhook(log.webhook.id, log.webhook.token).catch(() => null);
-		if (hook === null || !hook.token) {
-			void LoggingWebhookFailureHandler.tick(log);
-			continue;
-		}
+    const embeds: Array<EmbedOptions> = [];
 
-		const embeds = [] as Array<Eris.EmbedOptions>;
-		let checkAudit = false;
+    let deafIndex = -1, muteIndex = -1;
+    if (member.voiceState.deaf !== oldState.deaf) {
+        deafIndex = embeds.push(Util.makeEmbed(true)
+            .setTitle("Voice State Update")
+            .setColor(Colors.green)
+            .setDescription([
+                `Member: **${member.tag}** (${member.id})`,
+                `This member was ${member.voiceState.deaf ? "deafened" : "undeafened"}.`
+            ])
+            .toJSON()
+        ) - 1;
+    }
 
-		if (oldState.deaf !== member.voiceState.deaf) {
-			embeds.push(new EmbedBuilder(true)
-				.setTitle("Member's Voice State Updated")
-				.setColor("gold")
-				.setDescription([
-					`Member: **${member.tag}** (<@!${member.id}>)`,
-					oldState.deaf === false ? "This user was deafened." : "This user was undeafened."
-				])
-				.toJSON()
-			);
-			checkAudit = true;
-		}
+    if (member.voiceState.mute !== oldState.mute) {
+        muteIndex = embeds.push(Util.makeEmbed(true)
+            .setTitle("Voice State Update")
+            .setColor(Colors.green)
+            .setDescription([
+                `Member: **${member.tag}** (${member.id})`,
+                `This member was ${member.voiceState.mute ? "muted" : "unmuted"}.`
+            ])
+            .toJSON()
+        ) - 1;
+    }
 
-		if (oldState.mute !== member.voiceState.mute) {
-			embeds.push(new EmbedBuilder(true)
-				.setTitle("Member's Voice State Updated")
-				.setColor("gold")
-				.setDescription([
-					`Member: **${member.tag}** (<@!${member.id}>)`,
-					oldState.deaf === false ? "This user was Muted." : "This user was unmuted."
-				])
-				.toJSON()
-			);
-			checkAudit = true;
-		}
+    if (member.voiceState.requestToSpeakTimestamp !== oldState.requestToSpeakTimestamp) {
+        embeds.push(Util.makeEmbed(true)
+            .setTitle("Voice State Update")
+            .setColor(Colors.green)
+            .setDescription([
+                `Member: **${member.tag}** (${member.id})`,
+                `This member ${member.voiceState.requestToSpeakTimestamp ? "requested" : "cancelled their request"} to speak.`
+            ])
+            .toJSON()
+        );
+    }
 
-		if (oldState.selfDeaf !== member.voiceState.selfDeaf) embeds.push(new EmbedBuilder(true)
-			.setTitle("Member's Voice State Updated")
-			.setColor("gold")
-			.setDescription([
-				`Member: **${member.tag}** (<@!${member.id}>)`,
-				oldState.deaf === false ? "This user deafened themself." : "This user undeafened themself."
-			])
-			.toJSON()
-		);
+    if (member.voiceState.selfDeaf !== oldState.selfDeaf) {
+        embeds.push(Util.makeEmbed(true)
+            .setTitle("Voice State Update")
+            .setColor(Colors.green)
+            .setDescription([
+                `Member: **${member.tag}** (${member.id})`,
+                `This member ${member.voiceState.selfDeaf ? "deafened" : "undeafened"} themselves.`
+            ])
+            .toJSON()
+        );
+    }
 
-		if (oldState.selfMute !== member.voiceState.selfMute) embeds.push(new EmbedBuilder(true)
-			.setTitle("Member's Voice State Updated")
-			.setColor("gold")
-			.setDescription([
-				`Member: **${member.tag}** (<@!${member.id}>)`,
-				oldState.deaf === false ? "This user muted themself." : "This user unmuted themself."
-			])
-			.toJSON()
-		);
+    if (member.voiceState.selfMute !== oldState.selfMute) {
+        embeds.push(Util.makeEmbed(true)
+            .setTitle("Voice State Update")
+            .setColor(Colors.green)
+            .setDescription([
+                `Member: **${member.tag}** (${member.id})`,
+                `This member ${member.voiceState.selfMute ? "muted" : "unmuted"} themselves.`
+            ])
+            .toJSON()
+        );
+    }
 
-		if (oldState.selfStream !== member.voiceState.selfStream) embeds.push(new EmbedBuilder(true)
-			.setTitle("Member's Voice State Updated")
-			.setColor("gold")
-			.setDescription([
-				`Member: **${member.tag}** (<@!${member.id}>)`,
-				oldState.deaf === false ? "This user started streaming." : "This user stopped streaming."
-			])
-			.toJSON()
-		);
+    if (member.voiceState.selfStream !== oldState.selfStream) {
+        embeds.push(Util.makeEmbed(true)
+            .setTitle("Voice State Update")
+            .setColor(Colors.green)
+            .setDescription([
+                `Member: **${member.tag}** (${member.id})`,
+                `This member ${member.voiceState.selfStream ? "started" : "stopped"} streaming.`
+            ])
+            .toJSON()
+        );
+    }
 
-		if (oldState.selfVideo !== member.voiceState.selfVideo) embeds.push(new EmbedBuilder(true)
-			.setTitle("Member's Voice State Updated")
-			.setColor("gold")
-			.setDescription([
-				`Member: **${member.tag}** (<@!${member.id}>)`,
-				oldState.deaf === false ? "This user started videoing." : "This user stopped videoing."
-			])
-			.toJSON()
-		);
+    if (member.voiceState.selfVideo !== oldState.selfVideo) {
+        embeds.push(Util.makeEmbed(true)
+            .setTitle("Voice State Update")
+            .setColor(Colors.green)
+            .setDescription([
+                `Member: **${member.tag}** (${member.id})`,
+                `This member ${member.voiceState.selfVideo ? "started" : "stopped"} sharing their camera.`
+            ])
+            .toJSON()
+        );
+    }
 
-		if (embeds.length === 0) continue;
+    if (member.voiceState.suppress !== oldState.suppress) {
+        embeds.push(Util.makeEmbed(true)
+            .setTitle("Voice State Update")
+            .setColor(Colors.green)
+            .setDescription([
+                `Member: **${member.tag}** (${member.id})`,
+                `This member was ${member.voiceState.suppress ? "suppressed" : "unsuppressed"}.`
+            ])
+            .toJSON()
+        );
+    }
 
-		if (checkAudit && member.guild.permissionsOf(this.user.id).has("viewAuditLog")) {
-			const audit = await BotFunctions.getAuditLogEntry(member.guild, "MEMBER_UPDATE", (a) => a.targetID === member.id);
-			if (audit !== null && (audit.createdAt + 5e3) > Date.now()) embeds.push(new EmbedBuilder(true)
-				.setTitle("Member Voice State Update: Blame")
-				.setDescription(`${audit.user.tag} (${audit.user.id})`)
-				.setColor("orange")
-				.toJSON());
-		}
+    if ((deafIndex !== -1 || muteIndex !== -1) && member.guild.clientMember.permissions.has("VIEW_AUDIT_LOG")) {
+        const auditLog = await member.guild.getAuditLog({
+            actionType: AuditLogActionTypes.MEMBER_UPDATE,
+            limit:      50
+        });
+        const entryDeaf = auditLog.entries.find(e => e.targetID === member.id && e.changes?.find(c => c.key === "deaf" && c.new_value === member.voiceState?.deaf && c.old_value === oldState.deaf));
+        const entryMute = auditLog.entries.find(e => e.targetID === member.id && e.changes?.find(c => c.key === "mute" && c.new_value === member.voiceState?.mute && c.old_value === oldState.mute));
 
-		await this.executeWebhook(hook.id, hook.token, { embeds });
-	}
+        if (deafIndex !== -1 && entryDeaf?.user && (entryDeaf.createdAt.getTime() + 5e3) > Date.now()) {
+            const fields: Array<EmbedField> = [];
+            fields.push({
+                name:   "Blame",
+                value:  `**${entryDeaf.user.tag}** (${entryDeaf.user.mention})`,
+                inline: false
+            });
+            if (entryDeaf.reason) fields.push({
+                name:   "Reason",
+                value:  entryDeaf.reason,
+                inline: false
+            });
+            embeds[deafIndex].fields!.push(...fields);
+        }
+
+        if (muteIndex !== -1 && entryMute?.user && (entryMute.createdAt.getTime() + 5e3) > Date.now()) {
+            const fields: Array<EmbedField> = [];
+            fields.push({
+                name:   "Blame",
+                value:  `**${entryMute.user.tag}** (${entryMute.user.mention})`,
+                inline: false
+            });
+            if (entryMute.reason) fields.push({
+                name:   "Reason",
+                value:  entryMute.reason,
+                inline: false
+            });
+            embeds[deafIndex].fields!.push(...fields);
+        }
+    }
+
+    for (const log of events) {
+        await log.execute(this, { embeds });
+    }
 });

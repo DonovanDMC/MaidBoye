@@ -1,87 +1,76 @@
-import ClientEvent from "@util/ClientEvent";
-import EmbedBuilder from "@util/EmbedBuilder";
-import GuildConfig from "@models/Guild/GuildConfig";
-import BotFunctions from "@util/BotFunctions";
-import { developers, emojis, names } from "@config";
-import LoggingWebhookFailureHandler from "@handlers/LoggingWebhookFailureHandler";
+import ClientEvent from "../util/ClientEvent.js";
+import LogEvent, { LogEvents } from "../db/Models/LogEvent.js";
+import Util from "../util/Util.js";
+import { Colors } from "../util/Constants.js";
+import { UserFlagNames } from "../util/Names.js";
+import Config from "../config/index.js";
+import { AuditLogActionTypes, Guild, Member, UserFlags } from "oceanic.js";
 
-export default new ClientEvent("guildMemberRemove", async function(guild, member) {
-	const logEvents = await GuildConfig.getLogEvents(guild.id, "memberRemove");
-	for (const log of logEvents) {
-		const hook = await this.getWebhook(log.webhook.id, log.webhook.token).catch(() => null);
-		if (hook === null || !hook.token) {
-			void LoggingWebhookFailureHandler.tick(log);
-			continue;
-		}
+export default new ClientEvent("guildMemberRemove", async function guildMemberRemoveEvent(user, guild) {
+    const member: Member | null = user instanceof Member ? user : null;
+    if (user instanceof Member) user = user.user;
+    const flags = Util.getFlagsArray(UserFlags, user.publicFlags);
+    const eventsRemove = await LogEvent.getType(guild.id, LogEvents.MEMBER_REMOVE);
+    if (eventsRemove.length > 0) {
+        if (eventsRemove.length > 0) {
+            const embed = Util.makeEmbed(true)
+                .setTitle("Member Remove")
+                .setColor(Colors.green)
+                .addField("Member Info", [
+                    `User: **${user.tag}** (${user.mention})`,
+                    `Nickname: ${member === null ? "[Unknown]" : member.nick ?? "[None]"}`,
+                    `Roles: ${member === null ? "[Unknown]" : member.roles.map(r => `<@&${r}>`).join(" ") || "[None]"}`,
+                    `Created At: ${Util.formatDiscordTime(user.createdAt, "short-datetime", true)}`,
+                    `Joined At: ${member && "joinedAt" in member && member.joinedAt !== null ? Util.formatDiscordTime(member.joinedAt, "short-datetime", true) : "Unknown"}`,
+                    `Pending: **${member && member.pending ? "Yes" : "No"}**`,
+                    "",
+                    "**Badges**:",
+                    ...(flags.length ? flags.map(f => `${Config.emojis.default.dot} ${UserFlagNames[UserFlags[f]]}`) : ["- None"]),
+                    ...(user.id === "242843345402069002" ? [`${Config.emojis.default.dot} ${Config.emojis.custom.don} Developer`] : [])
+                ].join("\n"), false);
 
-		const badges: Array<keyof typeof names["badges"]> = BotFunctions.getUserFlagsArray(member.user);
-		if (developers.includes(member.id)) badges.push("DEVELOPER");
-		if (badges.length === 0) badges.push("NONE");
+            for (const log of eventsRemove) {
+                await log.execute(this, { embeds: embed.toJSON(true) });
+            }
+        }
+    }
 
-		const e = new EmbedBuilder(true)
-			.setTitle("Member Remove")
-			.setColor("red")
-			.addField("Member Info", [
-				`User: ${member.user.username}#${member.user.discriminator} (<@!${member.id}>)`,
-				`Nickname: ${("nick" in member ? member.nick : null) ?? "[NONE]"}`,
-				`Roles: ${"roles" in member ? member.roles.map(r => `<@&${r}>`).join(" ") : "[UNKNOWN]"}`,
-				`Created At: ${BotFunctions.formatDiscordTime(member.user.createdAt, "short-datetime", true)}`,
-				`Joined At: ${"joinedAt" in member && member.joinedAt !== null ? BotFunctions.formatDiscordTime(member.joinedAt, "short-datetime", true) : "[UNKNOWN]"}`,
-				`Pending: **${"pending" in member ? member.pending ? "Yes" : "No" : "[UNKNOWN]"}**`,
-				"",
-				"**Badges**:",
-				...badges.map(f => `${emojis.default.dot} ${names.badges[f]}`)
-			].join("\n"), false);
+    const eventsKick = await LogEvent.getType(guild.id, LogEvents.MEMBER_KICK);
+    if (eventsKick.length > 0) {
+        const embed = Util.makeEmbed(true)
+            .setTitle("Member Kicked")
+            .setColor(Colors.orange)
+            .addField("Member Info", [
+                `User: **${user.mention}** (${user.tag})`,
+                `Nickname: ${member === null ? "[Unknown]" : member.nick ?? "[None]"}`,
+                `Roles: ${member === null ? "[Unknown]" : member.roles.map(r => `<@&${r}>`).join(" ") || "[None]"}`,
+                `Created At: ${Util.formatDiscordTime(user.createdAt, "short-datetime", true)}`,
+                `Joined At: ${member && "joinedAt" in member && member.joinedAt !== null ? Util.formatDiscordTime(member.joinedAt, "short-datetime", true) : "Unknown"}`,
+                `Pending: **${member && member.pending ? "Yes" : "No"}**`,
+                "",
+                "**Badges**:",
+                ...(flags.length ? flags.map(f => `${Config.emojis.default.dot} ${UserFlagNames[UserFlags[f]]}`) : ["- None"]),
+                ...(user.id === "242843345402069002" ? [`${Config.emojis.default.dot} ${Config.emojis.custom.don} Developer`] : [])
+            ].join("\n"), false);
 
-		await this.executeWebhook(hook.id, hook.token, {
-			embeds: [
-				e.toJSON()
-			]
-		});
-	}
+        let ok = false;
+        if (guild instanceof Guild && guild.clientMember.permissions.has("VIEW_AUDIT_LOG")) {
+            const auditLog = await guild.getAuditLog({
+                actionType: AuditLogActionTypes.MEMBER_KICK,
+                limit:      50
+            });
+            const entry = auditLog.entries.find(e => e.targetID === user.id);
+            if (entry?.user && (entry.createdAt.getTime() + 5e3) > Date.now()) {
+                embed.addField("Blame", `${entry.user.tag} (${entry.user.id})`, false);
+                if (entry.reason) embed.addField("Reason", entry.reason, false);
+                ok = true;
+            }
+        }
 
-	const logEventsKick = await GuildConfig.getLogEvents(guild.id, "memberKick");
-	for (const log of logEventsKick) {
-		const hook = await this.getWebhook(log.webhook.id, log.webhook.token).catch(() => null);
-		if (hook === null || !hook.token) {
-			await log.delete();
-			continue;
-		}
+        if (!ok) return;
 
-		const badges: Array<keyof typeof names["badges"]> = BotFunctions.getUserFlagsArray(member.user);
-		if (developers.includes(member.id)) badges.push("DEVELOPER");
-		if (badges.length === 0) badges.push("NONE");
-
-		const e = new EmbedBuilder(true)
-			.setTitle("Member Kicked")
-			.setColor("orange")
-			.addField("Member Info", [
-				`User: ${member.user.username}#${member.user.discriminator} (<@!${member.id}>)`,
-				`Nickname: ${("nick" in member ? member.nick : null) ?? "[NONE]"}`,
-				`Roles: ${"roles" in member ? member.roles.map(r => `<@&${r}>`).join(" ") : "[UNKNOWN]"}`,
-				`Created At: ${BotFunctions.formatDiscordTime(member.user.createdAt, "short-datetime", true)}`,
-				`Joined At: ${"joinedAt" in member && member.joinedAt !== null ? BotFunctions.formatDiscordTime(member.joinedAt, "short-datetime", true) : "[UNKNOWN]"}`,
-				`Pending: **${"pending" in member ? member.pending ? "Yes" : "No" : "[UNKNOWN]"}**`,
-				"",
-				"**Badges**:",
-				...badges.map(f => `${emojis.default.dot} ${names.badges[f]}`)
-			].join("\n"), false);
-
-		if (guild.permissionsOf(this.user.id).has("viewAuditLog")) {
-			const audit = await BotFunctions.getAuditLogEntry(guild, "MEMBER_KICK", (a) => a.targetID === member.id);
-			if (audit !== null) {
-				e
-					.addField("Blame", `${audit.user.tag} (${audit.user.id})`, false)
-					.addField("Reason", audit.reason ?? "[Unknown]", false);
-				// we only check for kick logs within the last 5 seconds
-				if ((audit.createdAt + 5e3) < Date.now()) continue;
-			} else continue;
-		} else continue;
-
-		await this.executeWebhook(hook.id, hook.token, {
-			embeds: [
-				e.toJSON()
-			]
-		});
-	}
+        for (const log of eventsKick) {
+            await log.execute(this, { embeds: embed.toJSON(true) });
+        }
+    }
 });

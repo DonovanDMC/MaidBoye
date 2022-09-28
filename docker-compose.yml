@@ -1,7 +1,3 @@
-
-
-version: "3"
-
 services:
   maidboye:
     build: .
@@ -9,65 +5,68 @@ services:
     volumes:
       - modules:/app/node_modules
       - build:/app/build
-      - ./data/bot:/mnt/data
+      - ./data/bot:/data
     environment:
-      MODE: prod
-      DATA_DIR: /data
-      PTR: 1
+      DOCKER: 1
     restart: always
     healthcheck:
       interval: 10s
       timeout: 2s
-      test: lsof -i :8443 || exit 1
+      test: lsof -i :8080 || exit 1
+    depends_on:
+      postgres:
+        condition: service_healthy
+      keydb:
+        condition: service_healthy
     hostname: maidboye.bots.containers.local
-    ports:
-      - 127.1.1.1:8443:8443
-      - 127.1.1.2:8443:8443
     networks:
       default:
-        ipv4_address: 172.18.0.4
-  mariadb:
-    image: mariadb
-    container_name: mariadb.maidboye
+        ipv4_address: 172.19.3.2
+
+  postgres:
+    image: postgres:14-alpine
+    container_name: postgres.maidboye
     volumes:
-      - ./data/db:/var/lib/mysql
+      - ./data/db:/var/lib/postgresql/data
+      - ./src/db/migrations:/docker-entrypoint-initdb.d:ro
+    restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: "$MARIADB_ROOT_PASSWORD"
-    restart: always
+      - POSTGRES_USER=maidboye
+      - POSTGRES_DB=maidboye
+      - POSTGRES_HOST_AUTH_METHOD=trust
     healthcheck:
       interval: 5s
       timeout: 2s
-      test: mysqladmin --user=root --password=$$MYSQL_ROOT_PASSWORD ping
-    hostname: mariadb.maidboye.containers.local
+      test: pg_isready -U maidboye
     networks:
       default:
-        ipv4_address: 172.18.0.3
-  redis:
-    image: redis:alpine
-    command: redis-server --disable-thp yes --supervised no --bind 0.0.0.0 --protected-mode no
-    container_name: redis.maidboye
+        ipv4_address: 172.19.3.3
+
+  keydb:
+    image: eqalpha/keydb:alpine
+    container_name: keydb.maidboye
+    command: keydb-server --save 10 1 --loglevel warning
     volumes:
-      - ./data/redis:/data
+      - ./data/keydb:/data
+    restart: unless-stopped
     healthcheck:
-      test: redis-cli ping
+      test: keydb-cli ping
       interval: 10s
       timeout: 5s
-    restart: always
-    hostname: redis.maidboye.containers.local
     networks:
       default:
-        ipv4_address: 172.18.0.2
+        ipv4_address: 172.19.3.4
 
-networks:  
+networks:
   default:
     name: maidboye
     driver: bridge
     ipam:
       driver: default
       config:
-        - subnet: 172.18.0.0/29
-          gateway: 172.18.0.1
+        - subnet: 172.19.3.0/29
+          gateway: 172.19.3.1
 
 volumes:
-  build: null
-  modules: null
+  modules:
+  build:

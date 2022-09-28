@@ -1,49 +1,47 @@
-import ClientEvent from "@util/ClientEvent";
-import EmbedBuilder from "@util/EmbedBuilder";
+import ClientEvent from "../util/ClientEvent.js";
+import LogEvent, { LogEvents } from "../db/Models/LogEvent.js";
+import Util from "../util/Util.js";
+import { Colors } from "../util/Constants.js";
+import { ChannelTypeNames } from "../util/Names.js";
+import { AuditLogActionTypes, ChannelTypes } from "oceanic.js";
 import { Time } from "@uwu-codes/utils";
-import GuildConfig from "@models/Guild/GuildConfig";
-import BotFunctions from "@util/BotFunctions";
-import { names } from "@config";
-import LoggingWebhookFailureHandler from "@handlers/LoggingWebhookFailureHandler";
-import Eris from "eris";
 
-export default new ClientEvent("threadCreate", async function(thread) {
-	if (!("guild" in thread)) return;
+export default new ClientEvent("threadCreate", async function threadCreateEvent(thread) {
+    const events = await LogEvent.getType(thread.guildID, LogEvents.THREAD_CREATE);
+    if (events.length === 0) return;
 
-	const logEvents = await GuildConfig.getLogEvents(thread.guild.id, "threadCreate");
-	for (const log of logEvents) {
-		const hook = await this.getWebhook(log.webhook.id, log.webhook.token).catch(() => null);
-		if (hook === null || !hook.token) {
-			void LoggingWebhookFailureHandler.tick(log);
-			continue;
-		}
+    const embed = Util.makeEmbed(true)
+        .setTitle("Thread Created")
+        .setColor(Colors.green)
+        .addField("Thread Info", [
+            `Name: **${thread.name}**`,
+            `Owner: **${(await this.getUser(thread.ownerID))!.tag}** (${thread.ownerID})`,
+            `Parent: <#${thread.parentID}>`,
+            `Rate Limit Per User: **${Time.ms(thread.rateLimitPerUser * 1000, { words: true })}**`,
+            `Type: **${ChannelTypeNames[thread.type]}**`,
+            "",
+            "**Thread Metadata**",
+            `Archive Timestamp: ${Util.formatDiscordTime(thread.threadMetadata.archiveTimestamp, "short-datetime")}`,
+            `Archived: **${thread.threadMetadata.archived ? "Yes" : "No"}**`,
+            `Auto Archive Duration: **${Time.ms(thread.threadMetadata.autoArchiveDuration * 1000, { words: true })}**`,
+            `Create Timestamp: ${thread.threadMetadata.createTimestamp === null ? "**Unknown**" : Util.formatDiscordTime(thread.threadMetadata.createTimestamp, "short-datetime")}`,
+            `Locked: **${thread.threadMetadata.locked ? "Yes" : "No"}**`,
+            `Invitable: **${thread.type === ChannelTypes.PRIVATE_THREAD ? thread.threadMetadata.invitable ? "Yes" : "No" : "N/A"}**`
+        ].join("\n"), false);
 
-		const parent = thread.parentID === null ? null : thread.guild.channels.get(thread.parentID) ?? null;
-		const e = new EmbedBuilder(true)
-			.setTitle("Thread Created")
-			.setColor("green")
-			.addField("Thread Info", [
-				`Name: **${thread.name}**`,
-				`Type: **${names.channelTypes[thread.typeString]}**`,
-				`Parent: **${thread.parentID === null ? "[NONE]" : parent === null ? thread.parentID : thread.name}**`,
-				`NSFW: **${thread.nsfw ? "Yes" : "No"}**`,
-				`SlowMode: **${["GUILD_TEXT", "GUILD_NEWS", "GUILD_NEWS_THREAD", "GUILD_PUBLIC_THREAD", "GUILD_PRIVATE_THREAD"].includes(thread.typeString) ? Time.ms(thread.rateLimitPerUser * 1000, true) : ""}**`,
-				`Auto Archive Duration: ${Time.ms(thread.threadMetadata.autoArchiveDuration * 6e4, true)}`,
-				`Archive Timestamp: ${BotFunctions.formatDiscordTime(thread.threadMetadata.archiveTimestamp, "short-datetime", true)}`,
-				`Archived: **${thread.threadMetadata.archived ? "Yes" : "No"}**`,
-				`Locked: **${thread.threadMetadata.locked ? "Yes" : "No"}**`,
-				`Invitable: **${thread.type === Eris.Constants.ChannelTypes.GUILD_PRIVATE_THREAD ? (thread.threadMetadata as Eris.PrivateThreadMetadata).invitable ? "Yes" : "No" : "N/A"}**`
-			].join("\n"), false);
+    if (thread.guild.clientMember.permissions.has("VIEW_AUDIT_LOG")) {
+        const auditLog = await thread.guild.getAuditLog({
+            actionType: AuditLogActionTypes.THREAD_CREATE,
+            limit:      50
+        });
+        const entry = auditLog.entries.find(e => e.targetID === thread.id);
+        if (entry?.user && (entry.createdAt.getTime() + 5e3) > Date.now()) {
+            embed.addField("Blame", `**${entry.user.tag}** (${entry.user.tag})`, false);
+            if (entry.reason) embed.addField("Reason", entry.reason, false);
+        }
+    }
 
-		if (thread.guild.permissionsOf(this.user.id).has("viewAuditLog")) {
-			const audit = await BotFunctions.getAuditLogEntry(thread.guild, "THREAD_CREATE", (a) => a.targetID === thread.id);
-			if (audit !== null && (audit.createdAt + 5e3) > Date.now()) e.addField("Blame", `${audit.user.tag} (${audit.user.id})`, false);
-		}
-
-		await this.executeWebhook(hook.id, hook.token, {
-			embeds: [
-				e.toJSON()
-			]
-		});
-	}
+    for (const log of events) {
+        await log.execute(this, { embeds: embed.toJSON(true) });
+    }
 });
