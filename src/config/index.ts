@@ -357,7 +357,7 @@ export default class Config extends PrivateConfig {
         return super.cookieSecret;
     }
     static get apiListener() {
-        return this.isDocker ? "172.19.3.2" : "127.0.0.1";
+        return this.isDocker ? "0.0.0.0" : "127.0.0.1";
     }
     static get apiPort() {
         return 8080;
