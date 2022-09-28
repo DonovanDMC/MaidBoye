@@ -6,6 +6,7 @@ services:
       - modules:/app/node_modules
       - build:/app/build
       - ./data/bot:/data
+      - /etc/hostname:/data/hostname
     environment:
       DOCKER: 1
     restart: always
