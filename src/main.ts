@@ -15,7 +15,13 @@ import type {
     TypedCollection
 } from "oceanic.js";
 import { Client, ThreadChannel } from "oceanic.js";
-import { mkdir, readdir } from "fs/promises";
+import {
+    access,
+    mkdir,
+    readdir,
+    readFile,
+    writeFile
+} from "fs/promises";
 
 export default class MaidBoye extends Client {
     cpuUsage = 0;
@@ -115,7 +121,12 @@ export default class MaidBoye extends Client {
             ...CommandHandler.userCommands.map(cmd => cmd.toJSON()),
             ...CommandHandler.messageCommands.map(cmd => cmd.toJSON())
         ];
-        await this.application.bulkEditGuildCommands(Config.developmentGuild, []);
+        const cached = await access(`${Config.dataDir}/commands.json`).then(async() => readFile(`${Config.dataDir}/commands.json`, "utf8")).catch(() => "[]");
+        if (JSON.stringify(commands) === cached) {
+            Logger.getLogger("CommandRegistration").debug("Commands are up to date, skipping registration.");
+            return;
+        }
+        writeFile(`${Config.dataDir}/commands.json`, JSON.stringify(commands), "utf8").catch(() => null);
         const regStart = Timer.getTime();
         if (Config.useGuildCommands) await this.application.bulkEditGuildCommands(Config.developmentGuild, commands).catch(this.handleRegistrationError.bind(this, commands));
         else await this.application.bulkEditGlobalCommands(commands).catch(this.handleRegistrationError.bind(this, commands));

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/member-ordering */
-import betaClient from "./json/client.beta.json" assert { type: "json" };
-import prodClient from "./json/client.prod.json" assert { type: "json" };
+import betaClient from "./private/client.beta.json" assert { type: "json" };
+import prodClient from "./private/client.prod.json" assert { type: "json" };
 import PrivateConfig from "./private/private.js";
 import emojis from "./json/emojis.json" assert { type: "json" };
 import pkg from "../../package.json" assert { type: "json" };

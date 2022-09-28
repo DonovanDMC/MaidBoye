@@ -1,6 +1,3 @@
 node_modules
 build
 data
-src/config/private.ts
-src/config/json/client.*.json
-!src/config/json/client.example.json
