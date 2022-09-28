@@ -136,7 +136,7 @@ export default class MaidBoye extends Client {
 
     async startAPIServer() {
         return new Promise<void>(resolve => {
-            (this.server = api).listen(Config.apiPort, Config.apiHost,  () => {
+            (this.server = api).listen(Config.apiPort, Config.apiListener,  () => {
                 Logger.getLogger("API").info(`API listening on ${Config.apiHost}:${Config.apiPort} (${Config.apiURL})`);
                 resolve();
             });
