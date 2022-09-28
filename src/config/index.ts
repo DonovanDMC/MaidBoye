@@ -11,7 +11,7 @@ import { readFile } from "fs/promises";
 const host = await readFile("/data/hostname", "utf8").then(val => val.trim(), () => null);
 export default class Config extends PrivateConfig {
     static get isDevelopment() {
-        return host === this.prodServerHost;
+        return host !== this.prodServerHost;
     }
 
     static override get prodServerHost() {
