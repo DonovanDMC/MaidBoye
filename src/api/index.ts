@@ -67,6 +67,7 @@ const app = express()
     .get("/session", async(req, res) => res.status(200).json({ id: StatsHandler.SessionID }))
     .use("/features", (await import("./routes/features.js")).default)
     .use("/leveling", (await import("./routes/leveling.js")).default)
+    .use("/links", (await import("./routes/links.js")).default)
     .use("/bulk-delete", (await import("./routes/bulkDelete.js")).default)
 // last 3 param handler = 404, 4 param handler = error
 // eslint-disable-next-line @typescript-eslint/no-unused-vars

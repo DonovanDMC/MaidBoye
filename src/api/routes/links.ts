@@ -33,3 +33,5 @@ app.route("/:link")
         }
         return res.status(404).end("Invalid Link");
     });
+
+export default app;
