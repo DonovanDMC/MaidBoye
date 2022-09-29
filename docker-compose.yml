@@ -2,6 +2,8 @@ services:
   maidboye:
     build: .
     container_name: maidboye
+    profiles:
+      - all
     volumes:
       - modules:/app/node_modules
       - build:/app/build
@@ -28,6 +30,7 @@ services:
     image: postgres:14-alpine
     container_name: postgres.maidboye
     profiles:
+      - all
       - db
     volumes:
       - ./data/db:/var/lib/postgresql/data
@@ -49,6 +52,7 @@ services:
     image: eqalpha/keydb:alpine
     container_name: keydb.maidboye
     profiles:
+      - all
       - db
     command: keydb-server --save 10 1 --loglevel warning
     volumes:
