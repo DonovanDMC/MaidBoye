@@ -4,7 +4,7 @@ import prodClient from "./private/client.prod.json" assert { type: "json" };
 import PrivateConfig from "./private/private.js";
 import emojis from "./json/emojis.json" assert { type: "json" };
 import pkg from "../../package.json" assert { type: "json" };
-import type { ClientOptions, UpdatePresenceOptions } from "oceanic.js";
+import { ClientOptions, Permissions, UpdatePresenceOptions } from "oceanic.js";
 import { ActivityTypes } from "oceanic.js";
 import { readFile } from "fs/promises";
 
@@ -268,8 +268,11 @@ export default class Config extends PrivateConfig {
     static get privacyPolicyLink() {
         return "https://maid.gay/privacy";
     }
-    static get invLink() {
+    static get inviteLink() {
         return "https://api.maid.gay/links/invite";
+    }
+    static get inviteRedirectURI() {
+        return "https://api.maid.gay/links/invite-done";
     }
     static get devLink() {
         return "https://furry.cool";
@@ -279,6 +282,33 @@ export default class Config extends PrivateConfig {
     }
     static get donationLink() {
         return "https://ko-fi.com/MaidBoye";
+    }
+    static get invitePermissions() {
+        return ([
+            "KICK_MEMBERS",
+            "BAN_MEMBERS",
+            "ADMINISTRATOR",
+            "MANAGE_CHANNELS",
+            "MANAGE_GUILD",
+            "VIEW_AUDIT_LOG",
+            "VIEW_CHANNEL",
+            "SEND_MESSAGES",
+            "MANAGE_MESSAGES",
+            "EMBED_LINKS",
+            "ATTACH_FILES",
+            "READ_MESSAGE_HISTORY",
+            "USE_EXTERNAL_EMOJIS",
+            "MUTE_MEMBERS",
+            "DEAFEN_MEMBERS",
+            "MOVE_MEMBERS",
+            "MANAGE_ROLES",
+            "MANAGE_WEBHOOKS",
+            "MANAGE_EMOJIS_AND_STICKERS",
+            "MANAGE_EVENTS",
+            "MANAGE_THREADS",
+            "SEND_MESSAGES_IN_THREADS",
+            "MODERATE_MEMBERS"
+        ] as const).reduce((a, b) => a | Permissions[b], 0n);
     }
 
     /* statuses */

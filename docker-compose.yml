@@ -27,6 +27,8 @@ services:
   postgres:
     image: postgres:14-alpine
     container_name: postgres.maidboye
+    profiles:
+      - db
     volumes:
       - ./data/db:/var/lib/postgresql/data
       - ./src/db/migrations:/docker-entrypoint-initdb.d:ro
@@ -46,6 +48,8 @@ services:
   keydb:
     image: eqalpha/keydb:alpine
     container_name: keydb.maidboye
+    profiles:
+      - db
     command: keydb-server --save 10 1 --loglevel warning
     volumes:
       - ./data/keydb:/data

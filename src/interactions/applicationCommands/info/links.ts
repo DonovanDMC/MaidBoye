@@ -32,7 +32,7 @@ export default new Command(import.meta.url, "links")
                     label: "Donate"
                 })
                 .addURLButton({
-                    url:   Config.invLink,
+                    url:   Config.inviteLink,
                     label: "Invite"
                 })
                 .toJSON()
