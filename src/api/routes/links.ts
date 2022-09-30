@@ -18,7 +18,7 @@ app.route("/:link")
             case "invite": return res.redirect(OAuth.constructURL({
                 clientID:           Config.clientID,
                 disableGuildSelect: false,
-                guildID:            String(req.query.guild) ?? undefined,
+                guildID:            req.query.guild === undefined ? undefined : String(req.query.guild),
                 permissions:        String(Config.invitePermissions),
                 prompt:             "consent",
                 redirectURI:        Config.inviteRedirectURI,

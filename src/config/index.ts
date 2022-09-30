@@ -271,7 +271,7 @@ export default class Config extends PrivateConfig {
         return "https://api.maid.gay/links/invite";
     }
     static get inviteRedirectURI() {
-        return "https://api.maid.gay/links/invite-done";
+        return "https://api.maid.gay/links/invite/done";
     }
     static get devLink() {
         return "https://furry.cool";
