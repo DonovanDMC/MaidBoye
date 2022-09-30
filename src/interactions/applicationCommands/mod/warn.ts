@@ -46,28 +46,22 @@ export default new Command(import.meta.url, "warn")
             reason,
             warning_id: await Warning.getNextID(interaction.guildID, member.id)
         });
+        let dmError: Error | undefined;
+        if (dm && !member.bot) await (await member.user.createDM()).createMessage({
+            allowedMentions: { users: false },
+            content:         `You were warned in ${interaction.guild.name}${gConfig.settings.dmBlame ? ` by **${interaction.member.mention}**` : ""}\nReason:\n\`\`\`\n${reason}\`\`\``
+        }).catch((err: Error) => dmError = err);
+        const { caseID, entry } = await ModLogHandler.createEntry({
+            type:      ModLogType.WARNING,
+            guild:     interaction.guild,
+            gConfig,
+            blame:     interaction.member,
+            reason,
+            target:    member,
+            warningID: w.id
+        });
         return interaction.reply({
             allowedMentions: { users: false },
-            content:         `Successfully warned ${member.mention},`
-        })
-            .then(async() => {
-                let dmError: Error | undefined;
-                if (dm && !member.bot) await (await member.user.createDM()).createMessage({
-                    allowedMentions: { users: false },
-                    content:         `You were warned in ${interaction.guild.name}${gConfig.settings.dmBlame ? ` by **${interaction.member.mention}**` : ""}\nReason:\n\`\`\`\n${reason}\`\`\``
-                }).catch((err: Error) => dmError = err);
-                const { caseID, entry } = await ModLogHandler.createEntry({
-                    type:      ModLogType.WARNING,
-                    guild:     interaction.guild,
-                    gConfig,
-                    blame:     interaction.member,
-                    reason,
-                    target:    member,
-                    warningID: w.id
-                });
-                return interaction.reply({
-                    allowedMentions: { users: false },
-                    content:         `Successfully warned ${member.mention}, ***${reason}*** - Case #${caseID}${!entry.channelID ? "" : ` (<#${entry.channelID}>)`}${dmError ? `\nFailed To DM Member: \`${dmError.name}: ${dmError.message}\`` : ""}`
-                });
-            });
+            content:         `Successfully warned ${member.mention}, ***${reason}*** - Case #${caseID}${!entry.channelID ? "" : ` (<#${entry.channelID}>)`}${dmError ? `\nFailed To DM Member: \`${dmError.name}: ${dmError.message}\`` : ""}`
+        });
     });
