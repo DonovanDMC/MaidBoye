@@ -11,12 +11,12 @@ export const hbs = create({
     extname:       "hbs",
     defaultLayout: "default",
     layoutsDir:    `${Config.baseDir}/src/api/views/layouts`,
-    partialsDir:   `${Config.baseDir}/src/api/views/pages`
+    partialsDir:   `${Config.baseDir}/src/api/views/partials`
 });
 const app = express()
     .engine("hbs", hbs.engine)
     .set("view engine", "hbs")
-    .set("views", new URL("./views/pages", import.meta.url).pathname)
+    .set("views", `${Config.baseDir}/src/api/views/pages`)
     .set("view options", { pretty: true })
     .set("trust proxy", true)
     .set("x-powered-by", false)
