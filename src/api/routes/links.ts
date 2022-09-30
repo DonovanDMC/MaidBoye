@@ -1,7 +1,6 @@
 import Config from "../../config/index.js";
 import { Router } from "express";
-import OAuth from "oceanic.js/dist/lib/routes/OAuth.js";
-import { OAuthScopes } from "oceanic.js";
+import { OAuth, OAuthScopes } from "oceanic.js";
 
 const app = Router();
 
@@ -16,7 +15,7 @@ app.route("/:link")
         switch (req.params.link) {
             case "support": return res.redirect(Config.discordLink);
             case "privacy": return res.redirect(Config.privacyPolicyLink);
-            case "invite": return res.redirect(OAuth.prototype.constructURL({
+            case "invite": return res.redirect(OAuth.constructURL({
                 clientID:           Config.clientID,
                 disableGuildSelect: false,
                 guildID:            String(req.query.guild) ?? undefined,
