@@ -214,7 +214,7 @@ export default class Config extends PrivateConfig {
 
     /* directories */
     static get baseDir() {
-        return new URL(`../../${import.meta.url.endsWith(".js") ? "" : "../"}`, import.meta.url).pathname;
+        return new URL(`../../${import.meta.url.endsWith(".js") ? "../" : ""}`, import.meta.url).pathname;
     }
 
     static get dataDir() {
