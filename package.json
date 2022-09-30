@@ -72,7 +72,7 @@
     "ioredis": "^5.2.3",
     "markdown-it": "^13.0.1",
     "morgan": "^1.10.0",
-    "oceanic.js": "^1.1.1",
+    "oceanic.js": "^1.1.2-dev.db7c3b1",
     "patch-package": "^6.4.7",
     "pg": "^8.8.0",
     "short-uuid": "^4.2.0",
