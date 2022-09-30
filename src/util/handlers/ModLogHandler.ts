@@ -235,7 +235,7 @@ export default class ModLogHandler {
                 text = [
                     `Target: <@${target.id}> (\`${target.tag}\`)`,
                     `Reason: **${reason}**`,
-                    `Warning Id: **${warning?.id || "Unknown"}**`
+                    `Warning ID: **${warning?.warningID || "Unknown"}**`
                 ].join("\n");
                 strike = await Strike.create({
                     id:       randomUUID(),
@@ -253,7 +253,7 @@ export default class ModLogHandler {
                 text = [
                     `Target: <@${target.id}> (\`${target.tag}\`)`,
                     `Reason: **${reason}**`,
-                    `Warning Id: **${warningID}**`
+                    `Warning ID: **${warningID}**`
                 ].join("\n");
                 color = Colors.orange;
                 break;

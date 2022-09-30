@@ -178,4 +178,12 @@ export default class GuildConfig {
         const settings = String(value ? Util.addBits(this._settingsData, SettingsBits[type]) : Util.removeBits(this._settingsData, SettingsBits[type]));
         return this.edit({ settings });
     }
+
+    async setSettings(values: Partial<Record<Exclude<keyof typeof SettingsBits, ExcludedSettings>, boolean>>) {
+        let settings = this._settingsData;
+        for (const [type, value] of Object.entries(values)) {
+            settings = value ? Util.addBits(settings, SettingsBits[type as keyof typeof SettingsBits]) : Util.removeBits(settings, SettingsBits[type as keyof typeof SettingsBits]);
+        }
+        return this.edit({ settings: String(settings) });
+    }
 }
