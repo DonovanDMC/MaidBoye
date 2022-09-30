@@ -10,8 +10,8 @@ import morgan from "morgan";
 export const hbs = create({
     extname:       "hbs",
     defaultLayout: "default",
-    layoutsDir:    new URL("./views/layouts", import.meta.url).pathname,
-    partialsDir:   new URL("./views/partials", import.meta.url).pathname
+    layoutsDir:    `${Config.baseDir}/src/api/views/layouts`,
+    partialsDir:   `${Config.baseDir}/src/api/views/pages`
 });
 const app = express()
     .engine("hbs", hbs.engine)

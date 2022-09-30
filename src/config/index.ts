@@ -213,8 +213,12 @@ export default class Config extends PrivateConfig {
     }
 
     /* directories */
+    static get baseDir() {
+        return new URL(`../../${import.meta.url.endsWith(".js") ? "" : "../"}`, import.meta.url).pathname;
+    }
+
     static get dataDir() {
-        return this.isDocker ? "/data" : new URL("../../data/bot", import.meta.url).pathname;
+        return this.isDocker ? "/data" : `${this.baseDir}/data/bot`;
     }
 
     static get bulkDeleteDir() {
