@@ -61,16 +61,21 @@ export default class Config extends PrivateConfig {
                 autoReconnect: true,
                 concurrency:   "auto",
                 intents:       [
-                    "DIRECT_MESSAGES",
+                    "GUILDS",
+                    "GUILD_MEMBERS",
                     "GUILD_BANS",
                     "GUILD_EMOJIS_AND_STICKERS",
-                    "GUILD_INVITES",
-                    "GUILD_MEMBERS",
-                    "GUILD_MESSAGES",
-                    "GUILD_VOICE_STATES",
+                    "GUILD_INTEGRATIONS",
                     "GUILD_WEBHOOKS",
-                    "GUILDS",
-                    "MESSAGE_CONTENT"
+                    "GUILD_INVITES",
+                    "GUILD_VOICE_STATES",
+                    "GUILD_MESSAGES",
+                    "GUILD_MESSAGE_REACTIONS",
+                    "DIRECT_MESSAGES",
+                    "MESSAGE_CONTENT",
+                    "GUILD_SCHEDULED_EVENTS",
+                    "AUTO_MODERATION_CONFIGURATION",
+                    "AUTO_MODERATION_EXECUTION"
                 ],
                 maxShards: "auto",
                 presence:  {
