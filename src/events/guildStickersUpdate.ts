@@ -12,11 +12,11 @@ export default new ClientEvent("guildStickersUpdate", async function guildSticke
     const eventsUpdate = await LogEvent.getType(guild.id, LogEvents.STICKER_DELETE);
     if (eventsCreate.length === 0 && eventsDelete.length === 0 && eventsUpdate.length === 0) return;
 
-    const addedStickers = stickers.filter(s => !oldStickers.find(os => os.id === s.id));
-    const removedStickers = oldStickers.filter(s => !stickers.find(os => os.id === s.id));
-    const updatedStickers = stickers.filter(s => !addedStickers.find(os => os.id === s.id) && JSON.stringify(s) !== JSON.stringify(oldStickers.find(os => os.id === s.id)));
+    const addedStickers = stickers.filter(s => !oldStickers.some(os => os.id === s.id));
+    const removedStickers = oldStickers.filter(s => !stickers.some(os => os.id === s.id));
+    const updatedStickers = stickers.filter(s => !addedStickers.some(os => os.id === s.id) && JSON.stringify(s) !== JSON.stringify(oldStickers.find(os => os.id === s.id)));
 
-    if (eventsCreate.length > 0 && addedStickers.length > 0) {
+    if (eventsCreate.length !== 0 && addedStickers.length !== 0) {
         const embeds: Array<EmbedOptions> = [];
         for (const sticker of addedStickers) {
             embeds.push(Util.makeEmbed(true)
@@ -41,8 +41,8 @@ export default new ClientEvent("guildStickersUpdate", async function guildSticke
                 actionType: AuditLogActionTypes.STICKER_CREATE,
                 limit:      50
             });
-            const ids = addedStickers.map(s => s.id);
-            const entry = auditLog.entries.find(e => e.targetID !== null && ids.includes(e.targetID));
+            const ids = new Set(addedStickers.map(s => s.id));
+            const entry = auditLog.entries.find(e => e.targetID !== null && ids.has(e.targetID));
             if (entry?.user && (entry.createdAt.getTime() + 5e3) > Date.now()) {
                 const embed = Util.makeEmbed(true)
                     .setTitle("Sticker Created: Blame")
@@ -58,7 +58,7 @@ export default new ClientEvent("guildStickersUpdate", async function guildSticke
         }
     }
 
-    if (eventsDelete.length > 0 && removedStickers.length > 0) {
+    if (eventsDelete.length !== 0 && removedStickers.length !== 0) {
         const embeds: Array<EmbedOptions> = [];
         for (const sticker of removedStickers) {
             embeds.push(Util.makeEmbed(true)
@@ -82,8 +82,8 @@ export default new ClientEvent("guildStickersUpdate", async function guildSticke
                 actionType: AuditLogActionTypes.STICKER_DELETE,
                 limit:      50
             });
-            const ids = removedStickers.map(s => s.id);
-            const entry = auditLog.entries.find(e => e.targetID !== null && ids.includes(e.targetID));
+            const ids = new Set(removedStickers.map(s => s.id));
+            const entry = auditLog.entries.find(e => e.targetID !== null && ids.has(e.targetID));
             if (entry?.user && (entry.createdAt.getTime() + 5e3) > Date.now()) {
                 const embed = Util.makeEmbed(true)
                     .setTitle("Sticker Deleted: Blame")
@@ -98,7 +98,7 @@ export default new ClientEvent("guildStickersUpdate", async function guildSticke
         }
     }
 
-    if (eventsUpdate.length > 0 && updatedStickers.length > 0) {
+    if (eventsUpdate.length !== 0 && updatedStickers.length !== 0) {
         const embeds: Array<EmbedOptions> = [];
         for (const sticker of removedStickers) {
             const old = oldStickers.find(e => e.id === sticker.id)!;
@@ -165,8 +165,8 @@ export default new ClientEvent("guildStickersUpdate", async function guildSticke
                     actionType: AuditLogActionTypes.STICKER_UPDATE,
                     limit:      50
                 });
-                const ids = updatedStickers.map(s => s.id);
-                const entry = auditLog.entries.find(e => e.targetID !== null && ids.includes(e.targetID));
+                const ids = new Set(updatedStickers.map(s => s.id));
+                const entry = auditLog.entries.find(e => e.targetID !== null && ids.has(e.targetID));
                 if (entry?.user && (entry.createdAt.getTime() + 5e3) > Date.now()) {
                     const embed = Util.makeEmbed(true)
                         .setTitle("Sticker Updated: Blame")

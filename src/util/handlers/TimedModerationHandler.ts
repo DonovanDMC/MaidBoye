@@ -9,7 +9,7 @@ import GuildConfig from "../../db/Models/GuildConfig.js";
 import type { ModLogData } from "../../db/Models/ModLog.js";
 import ModLog, { ModLogType } from "../../db/Models/ModLog.js";
 import { Colors } from "../Constants.js";
-import { randomUUID } from "crypto";
+import { randomUUID } from "node:crypto";
 
 export default class TimedModerationHandler {
     private static client: MaidBoye;
@@ -63,15 +63,14 @@ export default class TimedModerationHandler {
                 case TimedType.BAN: {
                     const unban = await guild.removeBan(target.id, `Timed Unban (${blame?.tag ?? "Unknown"})`).then(() => true, () => false);
                     if (check) {
-                        if (!unban) await ModLogHandler.executeWebhook(guild, gConfig, null, ModLogType.UNBAN, 0, Colors.red, `I failed to automatically unban <@!${target.id}>..`, "Automatic Unban Failed");
-                        else await ModLogHandler.createEntry({
+                        await (!unban ? ModLogHandler.executeWebhook(guild, gConfig, null, ModLogType.UNBAN, 0, Colors.red, `I failed to automatically unban <@!${target.id}>..`, "Automatic Unban Failed") : ModLogHandler.createEntry({
                             type:   ModLogType.UNBAN,
                             guild,
                             gConfig,
                             blame:  null,
                             reason: "Timed Action",
                             target
-                        });
+                        }));
                     }
                     await this.remove(row.id);
                     break;
@@ -86,15 +85,14 @@ export default class TimedModerationHandler {
 
                     const unmute = await member.edit({ communicationDisabledUntil: null }).then(() => true, () => false);
                     if (check) {
-                        if (!unmute) await ModLogHandler.executeWebhook(guild, gConfig, null, ModLogType.UNMUTE, 0, Colors.red, `I failed to automatically unmute <@!${target.id}>..`, "Automatic Unmute Failed");
-                        else await ModLogHandler.createEntry({
+                        await (!unmute ? ModLogHandler.executeWebhook(guild, gConfig, null, ModLogType.UNMUTE, 0, Colors.red, `I failed to automatically unmute <@!${target.id}>..`, "Automatic Unmute Failed") : ModLogHandler.createEntry({
                             type:   ModLogType.UNMUTE,
                             guild,
                             gConfig,
                             blame:  null,
                             reason: "Timed Action",
                             target: member
-                        });
+                        }));
                         continue;
                     }
                     await this.remove(row.id);

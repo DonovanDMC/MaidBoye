@@ -29,7 +29,7 @@ const app = express()
             maxAge:   8.64e7,
             secure:   true,
             httpOnly: true,
-            domain:   /\d+\.\d+\.\d+\.\d+/.test(Config.apiHost) ? Config.apiHost : `.${Config.apiHost}`
+            domain:   /(?:\d+\.){3}\d+/.test(Config.apiHost) ? Config.apiHost : `.${Config.apiHost}`
         },
         resave:            false,
         saveUninitialized: true

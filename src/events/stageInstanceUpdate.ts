@@ -21,8 +21,8 @@ export default new ClientEvent("stageInstanceUpdate", async function stageInstan
                 `Stage Instance: <#${stage.channelID}>`,
                 "This stage instace's scheduled event was updated."
             ])
-            .addField("Old Scheduled Event", oldStage.scheduledEventID === null ? "None" : (oldEvent = stage.guild.scheduledEvents.get(oldStage.scheduledEventID)) === undefined ? `Unknown Name (${oldStage.scheduledEventID})` : `**${oldEvent.name}** (${oldStage.scheduledEventID})`, false)
-            .addField("New Scheduled Event", stage.scheduledEventID === null ? "None" : stage.scheduledEvent === undefined ? `Unknown Name (${stage.scheduledEventID})` : `**${stage.scheduledEvent.name}** (${stage.scheduledEventID})`, false)
+            .addField("Old Scheduled Event", oldStage.scheduledEventID === null ? "None" : ((oldEvent = stage.guild.scheduledEvents.get(oldStage.scheduledEventID)) === undefined ? `Unknown Name (${oldStage.scheduledEventID})` : `**${oldEvent.name}** (${oldStage.scheduledEventID})`), false)
+            .addField("New Scheduled Event", stage.scheduledEventID === null ? "None" : (stage.scheduledEvent === undefined ? `Unknown Name (${stage.scheduledEventID})` : `**${stage.scheduledEvent.name}** (${stage.scheduledEventID})`), false)
             .toJSON()
         );
     }

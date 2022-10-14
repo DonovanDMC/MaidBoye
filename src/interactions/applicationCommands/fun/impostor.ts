@@ -22,7 +22,7 @@ export default new Command(import.meta.url, "impostor")
                 "。　　　　•　    　ﾟ　　。",
                 " 　　.　　　.　　　  　　.　　　　　。　　   。　.",
                 " 　.　　      。　        ඞ   。　    .    •",
-                `    •                ${!text ? `<@!${user}>` : user === interaction.user.id ? text : `<@!${user}> ${text}`} was ${Math.random() > .5 ? "not The" : "An"} Impostor.   。  .`,
+                `    •                ${!text ? `<@!${user}>` : (user === interaction.user.id ? text : `<@!${user}> ${text}`)} was ${Math.random() > .5 ? "not The" : "An"} Impostor.   。  .`,
                 "　 　　。　　 　　　　ﾟ　　　.　    　　　."
             ].join("\n"),
             allowedMentions: {

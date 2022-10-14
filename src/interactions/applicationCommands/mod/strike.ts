@@ -3,7 +3,7 @@ import Util from "../../../util/Util.js";
 import Strike, { StrikeType } from "../../../db/Models/Strike.js";
 import UserConfig from "../../../db/Models/UserConfig.js";
 import { ApplicationCommandOptionTypes } from "oceanic.js";
-import { randomUUID } from "crypto";
+import { randomUUID } from "node:crypto";
 
 export default new Command(import.meta.url, "strike")
     .setDescription("Add a strike or several to a user")

@@ -9,7 +9,7 @@ import { assert } from "tsafe";
 import { Timer } from "@uwu-codes/utils";
 import type { ModuleImport } from "@uwu-codes/types";
 import { MessageFlags } from "oceanic.js";
-import { readdir } from "fs/promises";
+import { readdir } from "node:fs/promises";
 
 const thisDirectory = new URL(".", import.meta.url).pathname.slice(0, -1);
 export default class Components {
@@ -19,6 +19,8 @@ export default class Components {
     }
 
     static get(cmd: string | null, action: string) {
+        // this isn't using an actual array
+        // eslint-disable-next-line unicorn/no-array-method-this-argument
         return this.list[this.findIndex(cmd, action)];
     }
 
@@ -37,8 +39,7 @@ export default class Components {
         }
         const component = this.get(data.command, data.action);
         assert(component, `failed to find valid handler for "${data.command || "null"}$${data.action}" component`);
-        if ("guildID" in interaction) await component.handleGuild(interaction as ComponentInteraction<ValidLocation.GUILD>, data);
-        else await component.handleDM(interaction as ComponentInteraction<ValidLocation.PIVATE>, data);
+        await ("guildID" in interaction ? component.handleGuild(interaction as ComponentInteraction<ValidLocation.GUILD>, data) : component.handleDM(interaction as ComponentInteraction<ValidLocation.PIVATE>, data));
     }
 
     static async loadAll(dir = thisDirectory) {

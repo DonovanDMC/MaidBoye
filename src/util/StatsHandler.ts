@@ -5,8 +5,8 @@ import db from "../db/index.js";
 import { assert, is } from "tsafe";
 import shortUUID from "short-uuid";
 import { ApplicationCommandTypes, GatewayOPCodes, InteractionTypes } from "oceanic.js";
-import { hostname } from "os";
-import { randomUUID } from "crypto";
+import { hostname } from "node:os";
+import { randomUUID } from "node:crypto";
 
 export default class StatsHandler {
     private static pendingDB: Array<StatCreationData> = [];
@@ -16,13 +16,13 @@ export default class StatsHandler {
 
     static async processPending() {
         if (!db.ready) return false;
-        if (this.pendingRedis.length > 0) {
+        if (this.pendingRedis.length !== 0) {
             const m = db.redis.multi();
             for (const stat of this.pendingRedis) m.incr(stat);
             await m.exec();
             this.pendingRedis = [];
         }
-        if (this.pendingDB.length > 0) {
+        if (this.pendingDB.length !== 0) {
             for (const stat of this.pendingDB) await Stat.create(stat);
             this.pendingDB = [];
         }
@@ -112,7 +112,7 @@ export default class StatsHandler {
             this.pendingRedis.push(...rstats);
             return {
                 promise() {
-                    return Promise.resolve(undefined);
+                    return Promise.resolve();
                 }
             };
         } else {

@@ -8,7 +8,7 @@ import Debug from "../Debug.js";
 import Util from "../Util.js";
 import Config from "../../config/index.js";
 import { Strings, Timer } from "@uwu-codes/utils";
-import { readdir } from "fs/promises";
+import { readdir } from "node:fs/promises";
 
 export type CommandTypes = "default" | "user" | "message";
 export default class CommandHandler {
@@ -48,9 +48,12 @@ export default class CommandHandler {
     static getCommand(type: "message", name: string): MessageCommand | null;
     static getCommand(type: CommandTypes, name: string) {
         switch (type) {
-            case "default": return this.commandMap.get(name) ?? null;
-            case "user": return this.userCommandMap.get(name) ?? null;
-            case "message": return this.messageCommandMap.get(name) ?? null;
+            case "default": { return this.commandMap.get(name) ?? null;
+            }
+            case "user": { return this.userCommandMap.get(name) ?? null;
+            }
+            case "message": { return this.messageCommandMap.get(name) ?? null;
+            }
         }
     }
 
@@ -61,7 +64,7 @@ export default class CommandHandler {
         const loadWhitelist: Array<string> | null = null;
         const categories = (await readdir(Config.commandsDirectory)).map(cmd => `${Config.commandsDirectory}/${cmd}`);
         for (const category of categories) {
-            if (whitelistCategories.length && whitelistCategories.every(c => !category.endsWith(c))) {
+            if (whitelistCategories.length !== 0 && whitelistCategories.every(c => !category.endsWith(c))) {
                 skippedCategories++;
                 Logger.getLogger("CommandHandler").debug(`Skipping category "${category.split("/").pop()!}"`);
                 continue;

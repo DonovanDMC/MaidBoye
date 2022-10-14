@@ -9,7 +9,7 @@ import { assert } from "tsafe";
 import type { ModuleImport } from "@uwu-codes/types";
 import { Timer } from "@uwu-codes/utils";
 import type { ApplicationCommandOptions, InteractionOptionsWithValue } from "oceanic.js";
-import { readdir } from "fs/promises";
+import { readdir } from "node:fs/promises";
 
 // load must be called from a different file
 export default class Settings {
@@ -42,7 +42,7 @@ export default class Settings {
     }
 
     static getAll() {
-        return Array.from(this.list);
+        return [...this.list];
     }
 
     static getByID(id: number) {
@@ -67,12 +67,12 @@ export default class Settings {
     }
 
     static getPages() {
-        return Array.from(this.pages);
+        return [...this.pages];
     }
 
     static async handleInteraction(interaction: CommandInteraction<ValidLocation.GUILD>, gConfig: GuildConfig) {
         const opt = interaction.data.options.raw[0];
-        if ("options" in opt && opt.options && opt.options.length > 0 && interaction.guildID) {
+        if ("options" in opt && opt.options && opt.options.length !== 0 && interaction.guildID) {
             const setting = this.getByInteractionName(opt.name);
             if (setting) await setting.handleInteraction(interaction, gConfig, (opt.options[0] as InteractionOptionsWithValue).value);
         }
@@ -84,7 +84,7 @@ export default class Settings {
         for (const { name: file } of files) {
             Debug("settings:load", `Loading "${file}"`);
             const start = Timer.getTime();
-            let set = await import(new URL(`./${file}`, import.meta.url).pathname) as ModuleImport<typeof EmptySetting>;
+            let set = await import(new URL(file, import.meta.url).pathname) as ModuleImport<typeof EmptySetting>;
             if ("default" in set) set = set.default;
             const inst = new set();
             [inst.id, inst.page] = this.register(inst);

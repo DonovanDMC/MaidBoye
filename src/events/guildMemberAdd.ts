@@ -22,7 +22,7 @@ export default new ClientEvent("guildMemberAdd", async function guildMemberAddEv
             `Pending: **${member.pending ? "Yes" : "No"}**`,
             "",
             "**Badges**:",
-            ...(flags.length ? flags.map(f => `${Config.emojis.default.dot} ${UserFlagNames[UserFlags[f]]}`) : ["- None"]),
+            ...(flags.length !== 0 ? flags.map(f => `${Config.emojis.default.dot} ${UserFlagNames[UserFlags[f]]}`) : ["- None"]),
             ...(member.id === "242843345402069002" ? [`${Config.emojis.default.dot} ${Config.emojis.custom.don} Developer`] : [])
         ].join("\n"), false);
 

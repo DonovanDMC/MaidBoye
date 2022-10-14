@@ -68,12 +68,12 @@ export default new ClientEvent("guildRoleUpdate", async function guildRoleUpdate
             const newPermissions = Object.entries(role.permissions.json).filter(([,b]) => b === true).map(([a]) => a) as Array<PermissionName>;
             const addedPermissions = [] as Array<PermissionName>;
             const removedPermissions = [] as Array<PermissionName>;
-            oldPermissions.forEach(p => {
+            for (const p of oldPermissions) {
                 if (!newPermissions.includes(p)) removedPermissions.push(p);
-            });
-            newPermissions.forEach(p => {
+            }
+            for (const p of newPermissions) {
                 if (!oldPermissions.includes(p)) addedPermissions.push(p);
-            });
+            }
             embeds.push(Util.makeEmbed(true)
                 .setTitle("Role Updated")
                 .setColor(Colors.gold)

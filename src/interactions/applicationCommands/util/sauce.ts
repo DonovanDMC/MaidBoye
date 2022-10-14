@@ -65,8 +65,12 @@ export default new Command(import.meta.url, "sauce")
                 return interaction.reply({ content: `We found these sources via direct md5 lookup on e621\nLookup: <${url}>\n\nResults:\nhttps://e621.net/posts/${post.id}\n${post.sources.map(v => `<${v}>`).join("\n")}` });
             }
 
-            case "yiffy2": return interaction.reply({ content: `We found these sources via direct md5 lookup on YiffyAPI V2\nLookup: <${url}>\n\nResults:\n${(Array.isArray(sourceOverride) ? sourceOverride : [sourceOverride!]).map((v, i) => i === 0 ? v : `<${v}>`).join("\n")}` });
-            case "saucenao": return interaction.reply({ content: `We found these sources via a reverse image search on saucenao (simularity: ${saucePercent}%)\nLookup: <${url}>\n\nResults:\n${(Array.isArray(sourceOverride) ? sourceOverride : [sourceOverride!]).map((v, i) => (i === 0 ? v : `<${v}>`).replace(/posts\/show/, "posts" /* legacy */)).join("\n")}` });
+            case "yiffy2": {
+                return interaction.reply({ content: `We found these sources via direct md5 lookup on YiffyAPI V2\nLookup: <${url}>\n\nResults:\n${(Array.isArray(sourceOverride) ? sourceOverride : [sourceOverride!]).map((v, i) => i === 0 ? v : `<${v}>`).join("\n")}` });
+            }
+            case "saucenao": {
+                return interaction.reply({ content: `We found these sources via a reverse image search on saucenao (simularity: ${saucePercent}%)\nLookup: <${url}>\n\nResults:\n${(Array.isArray(sourceOverride) ? sourceOverride : [sourceOverride!]).map((v, i) => (i === 0 ? v : `<${v}>`).replace(/posts\/show/, "posts" /* legacy */)).join("\n")}` });
+            }
             default: {
                 StatsHandler.track("SAUCE_FAIL", simularity, tried);
                 return interaction.reply({ content: `We tried our best, but couldn't find anything...\nAttempted Methods: \`${tried.join("`, `") || "`NONE`"}\`\n\nNote: We automatically remove any saucenao results with less than 75% simularity to avoid false positives, to set your own thresold, use the \`simularity\` option.` });

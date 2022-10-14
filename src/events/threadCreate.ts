@@ -26,7 +26,7 @@ export default new ClientEvent("threadCreate", async function threadCreateEvent(
             `Auto Archive Duration: **${Time.ms(thread.threadMetadata.autoArchiveDuration * 1000, { words: true })}**`,
             `Create Timestamp: ${thread.threadMetadata.createTimestamp === null ? "**Unknown**" : Util.formatDiscordTime(thread.threadMetadata.createTimestamp, "short-datetime")}`,
             `Locked: **${thread.threadMetadata.locked ? "Yes" : "No"}**`,
-            `Invitable: **${thread.type === ChannelTypes.PRIVATE_THREAD ? thread.threadMetadata.invitable ? "Yes" : "No" : "N/A"}**`
+            `Invitable: **${thread.type === ChannelTypes.PRIVATE_THREAD ? (thread.threadMetadata.invitable ? "Yes" : "No") : "N/A"}**`
         ].join("\n"), false);
 
     if (thread.guild.clientMember.permissions.has("VIEW_AUDIT_LOG")) {

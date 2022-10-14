@@ -47,14 +47,14 @@ export default class E621Thumbnail {
     }
 
     static hasPending(message: string, post?: number) {
-        return this.pendingList.find(p => p[0] === message && (!post || p[1] === post)) !== undefined;
+        return this.pendingList.some(p => p[0] === message && (!post || p[1] === post)) !== undefined;
     }
 
     static removePending(message: string) {
         if (this.hasPending(message)) {
             const p = this.pendingList.filter(l => l[0] === message);
-            p.forEach(l => this.pendingList.splice(this.pendingList.indexOf(l), 1));
-            return p.length > 0;
+            for (const l of p) this.pendingList.splice(this.pendingList.indexOf(l), 1);
+            return p.length !== 0;
         } else return false;
     }
 }

@@ -9,7 +9,7 @@ import {
     JsonErrorCodes,
     Sticker
 } from "oceanic.js";
-import { basename } from "path";
+import { basename } from "node:path";
 
 export default new Command(import.meta.url, "steal")
     .setDescription("Steal an emoji for this server, or create one from a url")
@@ -110,7 +110,7 @@ export default new Command(import.meta.url, "steal")
             case "emoji-or-url": {
                 assert(emojiOrURL);
                 let match: RegExpExecArray | null;
-                if ((match = /<(a)?:.{2,32}:([\d]{15,21})>/.exec(emojiOrURL.trim()))) url = `https://cdn.discordapp.com/emojis/${match[2]}.${match[1] === "a" ? "gif" : "png"}`;
+                if ((match = /<(a)?:.{2,32}:(\d{15,21})>/.exec(emojiOrURL.trim()))) url = `https://cdn.discordapp.com/emojis/${match[2]}.${match[1] === "a" ? "gif" : "png"}`;
                 else if (Strings.validateURL(emojiOrURL)) url = emojiOrURL;
                 break;
             }

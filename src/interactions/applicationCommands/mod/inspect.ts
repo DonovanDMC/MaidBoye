@@ -15,7 +15,7 @@ import { ApplicationCommandOptionTypes, InteractionTypes, MessageActionRow, User
 export async function mainMenu(this: MaidBoye, interaction: CommandInteraction<ValidLocation.GUILD> | ComponentInteraction<ValidLocation.GUILD>, user: User) {
     const strikes = await Strike.getForUser(interaction.guildID, user.id, "DESC");
     const warnings = await Warning.getForUser(interaction.guildID, user.id, "DESC");
-    const modlog = (await ModLog.getForUser(interaction.guildID, user.id)).filter(m => ![ModLogType.WARNING, ModLogType.DELETE_WARNING, ModLogType.CLEAR_WARNINGS].includes(m.type), "DESC");
+    const modlog = (await ModLog.getForUser(interaction.guildID, user.id)).filter(m => ![ModLogType.WARNING, ModLogType.DELETE_WARNING, ModLogType.CLEAR_WARNINGS].includes(m.type));
     await (interaction.type === InteractionTypes.APPLICATION_COMMAND ? interaction.editOriginal.bind(interaction) : interaction.editParent.bind(interaction))(Util.replaceContent({
         embeds: Util.makeEmbed(true, interaction.user)
             .setTitle(`Inspection: ${user.tag}`)
@@ -84,6 +84,8 @@ export async function strikeHistory(this: MaidBoye, interaction: CommandInteract
 }
 
 export async function modHistory(this: MaidBoye, interaction: CommandInteraction<ValidLocation.GUILD> | ComponentInteraction<ValidLocation.GUILD>, user: User, page: number) {
+    // this isn't using an actual array
+    // eslint-disable-next-line unicorn/no-array-method-this-argument
     const modlog = (await ModLog.getForUser(interaction.guildID, user.id)).filter(m => ![ModLogType.WARNING, ModLogType.DELETE_WARNING, ModLogType.CLEAR_WARNINGS].includes(m.type), "DESC");
     const pages = chunk(modlog, 5);
     await (interaction.type === InteractionTypes.APPLICATION_COMMAND ? interaction.editOriginal.bind(interaction) : interaction.editParent.bind(interaction))(Util.replaceContent({
@@ -202,10 +204,18 @@ export default new Command(import.meta.url, "inspect")
     }))
     .setExecutor(async function(interaction, { user, section }) {
         switch (section) {
-            case "strikes": return strikeHistory.call(this, interaction, user, 1);
-            case "mod": return modHistory.call(this, interaction, user, 1);
-            case "warnings": return warningHistory.call(this, interaction, user, 1);
-            case "home": return mainMenu.call(this, interaction, user);
+            case "strikes": {
+                return strikeHistory.call(this, interaction, user, 1);
+            }
+            case "mod": {
+                return modHistory.call(this, interaction, user, 1);
+            }
+            case "warnings": {
+                return warningHistory.call(this, interaction, user, 1);
+            }
+            case "home": {
+                return mainMenu.call(this, interaction, user);
+            }
         }
     });
 

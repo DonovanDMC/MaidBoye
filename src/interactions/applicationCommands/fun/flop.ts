@@ -30,7 +30,7 @@ export default new Command(import.meta.url, "flop")
         return "command-images-check";
     })
     .setExecutor(async function(interaction, { user, text }) {
-        const r = strings(interaction.user.id, user && text ? `<@!${user}> ${text}` : user ? `<@!${user}>` : text!);
+        const r = strings(interaction.user.id, user && text ? `<@!${user}> ${text}` : (user ? `<@!${user}>` : text!));
 
         const img = await Yiffy.furry.flop("json", 1);
 

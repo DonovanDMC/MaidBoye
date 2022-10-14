@@ -28,7 +28,7 @@ export default new Command(import.meta.url, "poke")
         return interaction.defer();
     })
     .setExecutor(async function(interaction, { user, text }) {
-        const r = strings(interaction.user.id, user && text ? `<@!${user}> ${text}` : user ? `<@!${user}>` : text!);
+        const r = strings(interaction.user.id, user && text ? `<@!${user}> ${text}` : (user ? `<@!${user}>` : text!));
 
         return interaction.reply({
             embeds: Util.makeEmbed(true, interaction.user)

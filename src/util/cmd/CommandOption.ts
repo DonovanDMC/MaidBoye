@@ -145,7 +145,9 @@ export default class CommandOption<T extends ApplicationCommandOptionTypes = App
                 break;
             }
 
-            default: return null as never;
+            default: {
+                return null as never;
+            }
         }
 
         return res as O;
@@ -171,7 +173,7 @@ export default class CommandOption<T extends ApplicationCommandOptionTypes = App
         return this;
     }
 
-    setMinMax(min: number | undefined, max: number | undefined) {
+    setMinMax(min?: number, max?: number) {
         this.max = max;
         this.min = min;
         return this;

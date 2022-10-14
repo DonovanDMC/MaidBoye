@@ -187,10 +187,14 @@ export default class ModLog {
             case ModLogType.WARNING:
             case ModLogType.DELETE_WARNING:
             case ModLogType.CLEAR_WARNINGS:
-            case ModLogType.STRIKE: return client.getUser(this.targetID);
+            case ModLogType.STRIKE: {
+                return client.getUser(this.targetID);
+            }
 
             case ModLogType.LOCK:
-            case ModLogType.UNLOCK: return client.getChannel<AnyGuildTextChannel>(this.targetID);
+            case ModLogType.UNLOCK: {
+                return client.getChannel<AnyGuildTextChannel>(this.targetID);
+            }
 
             default: {
                 process.emitWarning(`unhandled getTarget type ${this.type as number} for ModLog entry ${this.id}`);

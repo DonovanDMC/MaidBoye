@@ -16,9 +16,15 @@ export default new ClientEvent("autoModerationActionExecution", async function a
     channel = channel === null ? null : (await this.getGuildChannel(channel.id))!;
     let actionInfo = "";
     switch (options.action.type) {
-        case AutoModerationActionTypes.BLOCK_MESSAGE: actionInfo = `${AutoModerationActionTypeNames[options.action.type]}`; break;
-        case AutoModerationActionTypes.SEND_ALERT_MESSAGE: actionInfo = `${AutoModerationActionTypeNames[options.action.type]} - <#${options.action.metadata.channelID}>`; break;
-        case AutoModerationActionTypes.TIMEOUT: actionInfo = `${AutoModerationActionTypeNames[options.action.type]} - ${Time.ms(options.action.metadata.durationSeconds * 1000, { words: true })}`; break;
+        case AutoModerationActionTypes.BLOCK_MESSAGE: {
+            actionInfo = `${AutoModerationActionTypeNames[options.action.type]}`; break;
+        }
+        case AutoModerationActionTypes.SEND_ALERT_MESSAGE: {
+            actionInfo = `${AutoModerationActionTypeNames[options.action.type]} - <#${options.action.metadata.channelID}>`; break;
+        }
+        case AutoModerationActionTypes.TIMEOUT: {
+            actionInfo = `${AutoModerationActionTypeNames[options.action.type]} - ${Time.ms(options.action.metadata.durationSeconds * 1000, { words: true })}`; break;
+        }
     }
     const embed = Util.makeEmbed(true)
         .setTitle("Auto Moderation Action Executed")

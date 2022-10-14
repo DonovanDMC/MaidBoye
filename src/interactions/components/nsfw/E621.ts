@@ -14,15 +14,27 @@ export default class YiffComponent extends BaseComponent {
         const tags = await E621TagsState.get(data.tags);
         if (tags === null) throw new Error(`Failed to retrieve tags for e621-nav (${JSON.stringify(data)})`);
         const uConfig = await UserConfig.get(interaction.user.id);
-        if (!tags.find(t => t.startsWith("order:"))) tags.push(`order:${orders[data.order]}`);
+        if (!tags.some(t => t.startsWith("order:"))) tags.push(`order:${orders[data.order]}`);
         const q = await E621.posts.search({ tags, limit: 100 });
         const posts = filterPosts(q, uConfig.preferences.e621NoVideo, uConfig.preferences.e621NoFlash);
         let index = data.index;
         switch (data.dir) {
-            case -2: index = 0; break;
-            case -1: index--; break;
-            case 1: index++; break;
-            case 2: index = posts.length - 1; break;
+            case -2: {
+                index = 0;
+                break;
+            }
+            case -1: {
+                index--;
+                break;
+            }
+            case 1: {
+                index++;
+                break;
+            }
+            case 2: {
+                index = posts.length - 1;
+                break;
+            }
         }
         if (index < 0) index = posts.length - 1;
         if (index > (posts.length - 1)) index = 0;

@@ -17,7 +17,7 @@ export default new ClientEvent("channelCreate", async function channelCreateEven
             `Name: **${channel.name}**`,
             `Type: **${ChannelTypeNames[channel.type]}**`,
             `Parent: **${channel.parentID === null ? "[NONE]" : `<#${channel.parentID}>`}**`,
-            `NSFW: **${"nsfw" in channel ? channel.nsfw ? "Yes" : "No" : "N/A"}**`,
+            `NSFW: **${"nsfw" in channel ? (channel.nsfw ? "Yes" : "No") : "N/A"}**`,
             `SlowMode: **${"rateLimitPerUser" in channel ? Time.ms(channel.rateLimitPerUser * 1000, { words: true }) : ""}**`
         ].join("\n"), false);
 

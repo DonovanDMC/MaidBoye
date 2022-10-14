@@ -3,14 +3,14 @@ import type { BulkDeleteReport } from "../../util/@types/misc.js";
 import EncryptionHandler from "../../util/handlers/EncryptionHandler.js";
 import { PermissionsByName } from "../../util/Names.js";
 import { Router } from "express";
-import { access, readFile } from "fs/promises";
+import { access, readFile } from "node:fs/promises";
 
 const app = Router();
 
 app.route("/:id")
     .get(async(req,res) => {
         if (await access(`${Config.bulkDeleteDir}/${req.params.id}.json`).then(() => true, () => false)) {
-            const { channel: [channelID, channelName], createdAt, expiresAt, guild: [guildID, guildName], messageCount, messages } = JSON.parse(await readFile(`${Config.bulkDeleteDir}/${req.params.id}.json`, "utf-8")) as BulkDeleteReport;
+            const { channel: [channelID, channelName], createdAt, expiresAt, guild: [guildID, guildName], messageCount, messages } = JSON.parse(await readFile(`${Config.bulkDeleteDir}/${req.params.id}.json`, "utf8")) as BulkDeleteReport;
             const text = [
                 "-- Begin Bulk Deletion Report --",
                 `Created At: ${new Date(createdAt).toUTCString()}`,

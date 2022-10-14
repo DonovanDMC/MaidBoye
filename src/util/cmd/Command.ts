@@ -150,7 +150,7 @@ export default class Command<T extends Record<string, unknown> = Record<string, 
 
     toJSON(): CreateChatInputApplicationCommandOptions {
         const options: Array<ApplicationCommandOptions> = [];
-        if (this.options.length) options.push(...this.options);
+        if (this.options.length !== 0) options.push(...this.options);
         if (this.optionsGetter) options.push(...this.optionsGetter());
         return {
             defaultMemberPermissions: this.defaultMemberPermissions.reduce((a, b) => a | Permissions[b], 0n).toString(),

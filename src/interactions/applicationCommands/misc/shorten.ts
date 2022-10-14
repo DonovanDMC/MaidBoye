@@ -25,8 +25,7 @@ export default new Command(import.meta.url, "shorten")
             flags:   MessageFlags.EPHEMERAL,
             content: "H-hey! That wasn't a valid url.."
         });
-        if (ephemeralUser) return interaction.defer(MessageFlags.EPHEMERAL);
-        else return interaction.defer();
+        return ephemeralUser ? interaction.defer(MessageFlags.EPHEMERAL) : interaction.defer();
     })
     .setCooldown(3e3)
     .setExecutor(async function(interaction, { url, code }) {

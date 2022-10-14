@@ -80,8 +80,7 @@ export default class UserConfig {
     static async get(id: string, createIfNotExists = true) {
         const { rows: [res] } = await db.query<UserConfigData>(`SELECT * FROM ${this.TABLE} WHERE id = $1`, [id]);
         if (!res) {
-            if (!createIfNotExists) return null;
-            else return this.create({ id });
+            return !createIfNotExists ? null : this.create({ id });
         }
         return new UserConfig(res);
     }
@@ -133,6 +132,33 @@ export default class UserConfig {
     }
 
     async setDefaultYiffType(type: YiffTypes) {
+        let typeString: keyof typeof PreferenceBits;
+        switch (type) {
+            case "gay": {
+                typeString = "DEFAULT_YIFF_TYPE_GAY";
+                break;
+            }
+
+            case "straight": {
+                typeString = "DEFAULT_YIFF_TYPE_STRAIGHT";
+                break;
+            }
+
+            case "lesbian": {
+                typeString = "DEFAULT_YIFF_TYPE_LESBIAN";
+                break;
+            }
+
+            case "gynomorph": {
+                typeString = "DEFAULT_YIFF_TYPE_GYNOMORPH";
+                break;
+            }
+
+            case "andromorph": {
+                typeString = "DEFAULT_YIFF_TYPE_ANDROMORPH";
+                break;
+            }
+        }
         const preferences = String(
             Util.addBits(
                 Util.removeBits(
@@ -143,13 +169,7 @@ export default class UserConfig {
                     PreferenceBits.DEFAULT_YIFF_TYPE_GYNOMORPH,
                     PreferenceBits.DEFAULT_YIFF_TYPE_ANDROMORPH
                 ),
-                PreferenceBits[
-                    type === "straight" ?
-                        "DEFAULT_YIFF_TYPE_STRAIGHT" : type === "lesbian" ?
-                            "DEFAULT_YIFF_TYPE_LESBIAN" : type === "gynomorph" ?
-                                "DEFAULT_YIFF_TYPE_GYNOMORPH" : type === "andromorph" ?
-                                    "DEFAULT_YIFF_TYPE_ANDROMORPH" : "DEFAULT_YIFF_TYPE_GAY"
-                ])
+                PreferenceBits[typeString])
         );
 
         return this.edit({ preferences });
@@ -166,8 +186,8 @@ export default class UserConfig {
                 ),
                 PreferenceBits[
                     type === "image" ?
-                        "E621_THUMBNAIL_TYPE_IMAGE" : type === "gif" ?
-                            "E621_THUMBNAIL_TYPE_GIF" : "E621_THUMBNAIL_TYPE_NONE"
+                        "E621_THUMBNAIL_TYPE_IMAGE" : (type === "gif" ?
+                            "E621_THUMBNAIL_TYPE_GIF" : "E621_THUMBNAIL_TYPE_NONE")
                 ])
         );
 

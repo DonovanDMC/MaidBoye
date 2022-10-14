@@ -6,7 +6,7 @@ import Warning from "../../../db/Models/Warning.js";
 import UserConfig from "../../../db/Models/UserConfig.js";
 import { Strings } from "@uwu-codes/utils";
 import { ApplicationCommandOptionTypes } from "oceanic.js";
-import { randomUUID } from "crypto";
+import { randomUUID } from "node:crypto";
 
 export default new Command(import.meta.url, "warn")
     .setDescription("Warn a user for something they're doing")

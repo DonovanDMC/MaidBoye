@@ -21,7 +21,7 @@ import {
     readdir,
     readFile,
     writeFile
-} from "fs/promises";
+} from "node:fs/promises";
 
 export default class MaidBoye extends Client {
     cpuUsage = 0;
@@ -73,8 +73,7 @@ export default class MaidBoye extends Client {
         else {
             const guild = this.guilds.get(guildID)!;
             const current = guild.members.get(userID);
-            if (current && forceRest === false) return current;
-            else return guild.fetchMembers({ userIDs: [userID] }).then(([member]) => member).catch(() => null);
+            return current && forceRest === false ? current : guild.fetchMembers({ userIDs: [userID] }).then(([member]) => member).catch(() => null);
         }
     }
 
@@ -128,8 +127,7 @@ export default class MaidBoye extends Client {
         }
         writeFile(`${Config.dataDir}/commands.json`, JSON.stringify(commands), "utf8").catch(() => null);
         const regStart = Timer.getTime();
-        if (Config.useGuildCommands) await this.application.bulkEditGuildCommands(Config.developmentGuild, commands).catch(this.handleRegistrationError.bind(this, commands));
-        else await this.application.bulkEditGlobalCommands(commands).catch(this.handleRegistrationError.bind(this, commands));
+        await (Config.useGuildCommands ? this.application.bulkEditGuildCommands(Config.developmentGuild, commands).catch(this.handleRegistrationError.bind(this, commands)) : this.application.bulkEditGlobalCommands(commands).catch(this.handleRegistrationError.bind(this, commands)));
         const regEnd = Timer.getTime();
         Logger.getLogger("CommandRegistration").info(`Registered ${commands.length} commands in ${Timer.calc(regStart, regEnd, 3, false)}`);
     }

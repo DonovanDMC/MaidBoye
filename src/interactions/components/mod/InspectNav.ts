@@ -14,10 +14,18 @@ export default class InspectNavComponent extends BaseComponent {
         if (user === null) return interaction.editParent({ content: "H-hey! I couldn't find the user.." });
 
         switch (section) {
-            case "strikes": return strikeHistory.call(client, interaction, user, page);
-            case "mod": return modHistory.call(client, interaction, user, page);
-            case "warnings": return warningHistory.call(client, interaction, user, page);
-            case "home": return mainMenu.call(client, interaction, user);
+            case "strikes": {
+                return strikeHistory.call(client, interaction, user, page);
+            }
+            case "mod": {
+                return modHistory.call(client, interaction, user, page);
+            }
+            case "warnings": {
+                return warningHistory.call(client, interaction, user, page);
+            }
+            case "home": {
+                return mainMenu.call(client, interaction, user);
+            }
         }
     }
 }

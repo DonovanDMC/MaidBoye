@@ -243,7 +243,7 @@ export const PermissionNames = {
     [String(Permissions.EMBED_LINKS)]:                         "Embed Links",
     [String(Permissions.ATTACH_FILES)]:                        "Attach Files",
     [String(Permissions.READ_MESSAGE_HISTORY)]:                "Read Message History",
-    [String(Permissions.MENTION_EVERYONE)]:                    "Mention @\u200beveryone, @\u200bhere, and All Roles",
+    [String(Permissions.MENTION_EVERYONE)]:                    "Mention @\u200Beveryone, @\u200Bhere, and All Roles",
     [String(Permissions.USE_EXTERNAL_EMOJIS)]:                 "Use External Emojis",
     [String(Permissions.VIEW_GUILD_INSIGHTS)]:                 "View Server Insights",
     [String(Permissions.CONNECT)]:                             "Connect",

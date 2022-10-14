@@ -1,5 +1,5 @@
 import Config from "../../config/index.js";
-import { createCipheriv, createDecipheriv, randomBytes, scryptSync } from "crypto";
+import { createCipheriv, createDecipheriv, randomBytes, scryptSync } from "node:crypto";
 
 export default class EncryptionHandler {
     static algorithm = "aes256";

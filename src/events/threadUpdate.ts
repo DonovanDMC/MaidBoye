@@ -16,7 +16,7 @@ export default new ClientEvent("threadUpdate", async function threadUpdateEvent(
     const newFlags = Util.getFlagsArray(ChannelFlags, thread.flags);
     const addedFlags = newFlags.filter(flag => !oldFlags.includes(flag));
     const removedFlags = oldFlags.filter(flag => !newFlags.includes(flag));
-    if (addedFlags.length > 0 || removedFlags.length > 0) {
+    if (addedFlags.length !== 0 || removedFlags.length !== 0) {
         embeds.push(Util.makeEmbed(true)
             .setTitle("Thread Updated")
             .setColor(Colors.gold)

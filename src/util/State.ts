@@ -38,11 +38,26 @@ export class State {
             let value: unknown;
             if (val === "NULL") value = null;
             else switch (types[index]) {
-                case "undefined": value = undefined; break;
-                case "boolean": value = Boolean(val); break;
-                case "number": value = Number(val); break;
-                case "bigint": value = BigInt(val); break;
-                default: value = val; break;
+                case "undefined": {
+                    value = undefined;
+                    break;
+                }
+                case "boolean": {
+                    value = Boolean(val);
+                    break;
+                }
+                case "number": {
+                    value = Number(val);
+                    break;
+                }
+                case "bigint": {
+                    value = BigInt(val);
+                    break;
+                }
+                default: {
+                    value = val;
+                    break;
+                }
             }
             return { [names[index] || `unknown${index}`]: value };
         }).reduce((a, b) => ({ ...a, ...b }), {}) as BaseState & T;
@@ -90,9 +105,9 @@ export class State {
     }
 
     encode() {
-        Object.keys(this.extraValues).forEach(key => {
+        for (const key of Object.keys(this.extraValues)) {
             if (["user", "cmd", "action"].includes(key)) throw new Error(`Provided extra "${key}" for ${this.command || "NONE"}/${this.action} overrides a deault value`);
-        });
+        }
         void this.saveNamesAndTypes(this.extraKeys, this.extraTypes);
         return State.encode([
             this.user,
@@ -119,7 +134,7 @@ export class State {
 
     /** @deprecated use with(key, value) */
     withExtra(extra: Record<string, string | number | bigint | boolean | null>) {
-        Object.entries(extra).forEach(([key, value]) => this.with(key, value));
+        for (const [key, value] of Object.entries(extra)) this.with(key, value);
         return this;
     }
 }

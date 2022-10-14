@@ -39,15 +39,15 @@ export default new ClientEvent("guildMemberUpdate", async function guildMemberUp
 
     const removedRoles = [] as Array<Role>;
     const addedRoles = [] as Array<Role>;
-    oldMember.roles.forEach(r => {
+    for (const r of oldMember.roles) {
         if (!member.roles.includes(r)) removedRoles.push(member.guild.roles.get(r)!);
-    });
-    member.roles.forEach(r => {
+    }
+    for (const r of member.roles) {
         if (!oldMember.roles.includes(r)) addedRoles.push(member.guild.roles.get(r)!);
-    });
+    }
 
     let rolesChanged = false;
-    if (removedRoles.length > 0 || addedRoles.length > 0) {
+    if (removedRoles.length !== 0 || addedRoles.length !== 0) {
         rolesChanged = true;
         embeds.push(Util.makeEmbed(true)
             .setTitle("Member Updated")

@@ -6,5 +6,5 @@ const E621 = new E6({
     authKey:   Config.e621APIKey,
     userAgent: Config.userAgent
 });
-export const filterPosts = (posts: Array<Post>, noVideo: boolean, noFlash: boolean) => posts.filter(p => !Object.values(p.tags).reduce((a, b) => a.concat(b)).find(t => ["cub", "young"].includes(t)) || (noVideo && p.file.ext === "webm") || (noFlash && p.file.ext === "swf"));
+export const filterPosts = (posts: Array<Post>, noVideo: boolean, noFlash: boolean) => posts.filter(p => !Object.values(p.tags).reduce((a, b) => a.concat(b)).some(t => ["cub", "young"].includes(t)) || (noVideo && p.file.ext === "webm") || (noFlash && p.file.ext === "swf"));
 export default E621;

@@ -14,9 +14,15 @@ export default new ClientEvent("autoModerationRuleCreate", async function autoMo
     const actions: Array<string> = [];
     for (const action of rule.actions) {
         switch (action.type) {
-            case AutoModerationActionTypes.BLOCK_MESSAGE: actions.push(`${Config.emojis.default.dot} ${AutoModerationActionTypeNames[action.type]}`); break;
-            case AutoModerationActionTypes.SEND_ALERT_MESSAGE: actions.push(`${Config.emojis.default.dot} ${AutoModerationActionTypeNames[action.type]} - <#${action.metadata.channelID}>`); break;
-            case AutoModerationActionTypes.TIMEOUT: actions.push(`${Config.emojis.default.dot} ${AutoModerationActionTypeNames[action.type]} - ${Time.ms(action.metadata.durationSeconds * 1000, { words: true })}`); break;
+            case AutoModerationActionTypes.BLOCK_MESSAGE: {
+                actions.push(`${Config.emojis.default.dot} ${AutoModerationActionTypeNames[action.type]}`); break;
+            }
+            case AutoModerationActionTypes.SEND_ALERT_MESSAGE: {
+                actions.push(`${Config.emojis.default.dot} ${AutoModerationActionTypeNames[action.type]} - <#${action.metadata.channelID}>`); break;
+            }
+            case AutoModerationActionTypes.TIMEOUT: {
+                actions.push(`${Config.emojis.default.dot} ${AutoModerationActionTypeNames[action.type]} - ${Time.ms(action.metadata.durationSeconds * 1000, { words: true })}`); break;
+            }
         }
     }
 
@@ -51,8 +57,8 @@ export default new ClientEvent("autoModerationRuleCreate", async function autoMo
             `Enabled: **${rule.enabled ? "Yes" : "No"}**`,
             `Creator: **${creator.tag}** (${creator.mention})`,
             `Event Type: **${AutoModerationEventTypeNames[rule.eventType]}**`,
-            `Exempt Channels: ${rule.exemptChannels.length ? rule.exemptChannels.map(c => `<#${c}>`).join(", ") : "None"}`,
-            `Exempt Roles: ${rule.exemptRoles.length ? rule.exemptRoles.map(r => `<@&${r}>`).join(", ") : "None"}`,
+            `Exempt Channels: ${rule.exemptChannels.length !== 0 ? rule.exemptChannels.map(c => `<#${c}>`).join(", ") : "None"}`,
+            `Exempt Roles: ${rule.exemptRoles.length !== 0 ? rule.exemptRoles.map(r => `<@&${r}>`).join(", ") : "None"}`,
             "Trigger:",
             ...trigger,
             "Actions:",

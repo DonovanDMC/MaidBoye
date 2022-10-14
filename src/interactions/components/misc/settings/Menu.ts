@@ -12,7 +12,7 @@ import type { MessageActionRow, User } from "oceanic.js";
 
 export function formatEmbed(page: number, gConfig: GuildConfig, author: User) {
     const settings = Settings.getPage(page);
-    assert(settings && settings.length, "failed to find any settings to display");
+    assert(settings && settings.length !== 0, "failed to find any settings to display");
     return Util.makeEmbed(true, author)
         .setTitle("Server Settings")
         .setDescription(
@@ -30,7 +30,7 @@ export function formatEmbed(page: number, gConfig: GuildConfig, author: User) {
 
 export function changePage(page: number, interaction: ComponentInteraction<ValidLocation.GUILD>, gConfig: GuildConfig) {
     const settings = Settings.getPage(page);
-    assert(settings && settings.length, "failed to find any settings to display");
+    assert(settings && settings.length !== 0, "failed to find any settings to display");
     return interaction.editParent(Util.replaceContent({
         embeds: [
             formatEmbed(page,  gConfig, interaction.user)

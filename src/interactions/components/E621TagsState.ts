@@ -1,5 +1,5 @@
 import db from "../../db/index.js";
-import { createHash } from "crypto";
+import { createHash } from "node:crypto";
 
 export default class E621TagsState {
     static async get(id: string) {

@@ -8,7 +8,7 @@ import { assert } from "tsafe";
 import { Timer } from "@uwu-codes/utils";
 import type { ModuleImport } from "@uwu-codes/types";
 import type { InteractionOptionsInteger, InteractionOptionsNumber, InteractionOptionsString } from "oceanic.js";
-import { readdir } from "fs/promises";
+import { readdir } from "node:fs/promises";
 
 export type AnyAutocompleteFocus = InteractionOptionsString | InteractionOptionsInteger | InteractionOptionsNumber;
 const thisDirectory = new URL(".", import.meta.url).pathname.slice(0, -1);
@@ -19,6 +19,8 @@ export default class Autocomplete {
     }
 
     static get(cmd: string, option: string) {
+        // this isn't using an actual array
+        // eslint-disable-next-line unicorn/no-array-method-this-argument
         return this.list[this.findIndex(cmd, option)];
     }
 
@@ -31,8 +33,7 @@ export default class Autocomplete {
         if (focused === null) throw new Error(`failed to find focused option for autocomplete interaction ${interaction.data.name}`);
         const autocomplete = this.get(interaction.data.name, focused.name);
         assert(autocomplete, `failed to find valid handler for "${interaction.data.name}$${focused.name}" autocomplete`);
-        if ("guildID" in interaction) await autocomplete.handleGuild(interaction, focused);
-        else await autocomplete.handleDM(interaction, focused);
+        await ("guildID" in interaction ? autocomplete.handleGuild(interaction, focused) : autocomplete.handleDM(interaction, focused));
     }
 
     static async loadAll(dir = thisDirectory) {

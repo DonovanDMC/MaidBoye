@@ -19,7 +19,7 @@ import * as Oceanic from "oceanic.js";
 import { parse, strip } from "dashargs";
 import { ButtonColors, ComponentBuilder } from "@oceanicjs/builders";
 import type { MessageActionRow } from "oceanic.js";
-import { inspect } from "util";
+import { inspect } from "node:util";
 
 async function format(obj: unknown) {
     if (obj instanceof Promise) obj = await obj;
@@ -77,7 +77,7 @@ export default new ClientEvent("messageCreate", async function messageCreateEven
                         if (out.length >= 750) {
                             try {
                                 file = inspect(JSON.parse(out), { depth: 1 });
-                            } catch (e) {
+                            } catch {
                                 file = out;
                             }
                             out = "see attached file";

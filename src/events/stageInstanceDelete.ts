@@ -15,7 +15,7 @@ export default new ClientEvent("stageInstanceDelete", async function stageInstan
         .addField("Stage Instance Info", [
             `Channel: <#${stage.channelID}>`,
             `Privacy Level: ${StageInstancePrivacyLevelNames[stage.privacyLevel]}`,
-            `Scheduled Event: ${stage.scheduledEventID === null ? "None" : stage.scheduledEvent === undefined ? `Unknown Name (${stage.scheduledEventID})` : `**${stage.scheduledEvent.name}** (${stage.scheduledEventID})`}`,
+            `Scheduled Event: ${stage.scheduledEventID === null ? "None" : (stage.scheduledEvent === undefined ? `Unknown Name (${stage.scheduledEventID})` : `**${stage.scheduledEvent.name}** (${stage.scheduledEventID})`)}`,
             `Topic: ${stage.topic ?? "None"}`
         ].join("\n"), false);
 

@@ -51,7 +51,7 @@ export default abstract class BooleanPreference extends BasePreference {
         return typeof value === "boolean";
     }
     override formatValue(value: boolean) {
-        return `\`${this.type === Type.YES_NO ? value ? "Yes" : "No" : value ? "Enabled" : "Disabled"}\``;
+        return `\`${this.type === Type.YES_NO ? (value ? "Yes" : "No") : (value ? "Enabled" : "Disabled")}\``;
     }
 
     override async handleInteraction(interaction: CommandInteraction, uConfig: UserConfig, value: boolean) {

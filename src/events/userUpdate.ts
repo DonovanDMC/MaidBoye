@@ -46,7 +46,7 @@ export default new ClientEvent("userUpdate", async function userUpdateEvent(user
     const newFlags = Util.getFlagsArray(UserFlags, user.publicFlags);
     const addedFlags = newFlags.filter(f => !oldFlags.includes(f));
     const removedFlags = oldFlags.filter(f => !newFlags.includes(f));
-    if (addedFlags.length > 0 || removedFlags.length > 0) {
+    if (addedFlags.length !== 0 || removedFlags.length !== 0) {
         embeds.push(Util.makeEmbed(true)
             .setTitle("User Updated")
             .setColor(Colors.gold)

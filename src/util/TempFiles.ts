@@ -1,7 +1,7 @@
 import Config from "../config/index.js";
 import { fetch, FormData, File } from "undici";
 import { fileTypeFromBuffer } from "file-type";
-import { randomBytes } from "crypto";
+import { randomBytes } from "node:crypto";
 
 export default class TempFiles {
     static async add(file: Buffer) {

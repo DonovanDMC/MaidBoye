@@ -11,7 +11,7 @@ import {
 } from "oceanic.js";
 import chunk from "chunk";
 import { Strings } from "@uwu-codes/utils";
-import { randomUUID } from "crypto";
+import { randomUUID } from "node:crypto";
 
 
 export interface LogEventData {

@@ -140,9 +140,15 @@ export default new Command(import.meta.url, "modlog")
                     case "set": {
                         assert(setting && settingValue);
                         switch (setting) {
-                            case "case-editing-enabled": await gConfig.setSetting("MODLOG_CASE_EDITING_ENABLED", settingValue); break;
-                            case "case-deleting-enabled": await gConfig.setSetting("MODLOG_CASE_DELETING_ENABLED", settingValue); break;
-                            case "modify-others-cases-enabled": await gConfig.setSetting("MODLOG_MODIFY_OTHERS_CASES_ENABLED", settingValue); break;
+                            case "case-editing-enabled": {
+                                await gConfig.setSetting("MODLOG_CASE_EDITING_ENABLED", settingValue); break;
+                            }
+                            case "case-deleting-enabled": {
+                                await gConfig.setSetting("MODLOG_CASE_DELETING_ENABLED", settingValue); break;
+                            }
+                            case "modify-others-cases-enabled": {
+                                await gConfig.setSetting("MODLOG_MODIFY_OTHERS_CASES_ENABLED", settingValue); break;
+                            }
                         }
                         break;
                     }

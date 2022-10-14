@@ -130,7 +130,7 @@ export default new Command(import.meta.url, "logging")
                     }));
                 }
 
-                if (current > 0 && events.find(ev => ev.event === event && ev.channelID === channel.id)) {
+                if (current > 0 && events.some(ev => ev.event === event && ev.channelID === channel.id)) {
                     return interaction.reply(Util.replaceContent({
                         content: `H-hey! This server already has logging for **${Util.readableConstant(LogEvents[event])}** enabled in <#${channel.id}>..`
                     }));
@@ -152,7 +152,7 @@ export default new Command(import.meta.url, "logging")
 
                 if (("appPermissions" in channel ? channel.appPermissions : channel.permissionsOf(this.user.id)).has("MANAGE_WEBHOOKS")) {
                     const webhooks = (await this.rest.webhooks.getForChannel(channel.id)).filter(hook => hook.name !== null && hook.token !== undefined);
-                    if (webhooks.length > 0) {
+                    if (webhooks.length !== 0) {
                         components.addSelectMenu({
                             customID: State.new(interaction.user.id, "logging", "select-webhook").with("channel", channel.id).with("event", event).encode(),
                             options:  webhooks.map(hook => ({ label: hook.name!, value: hook.id }))

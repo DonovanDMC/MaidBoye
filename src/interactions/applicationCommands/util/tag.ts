@@ -62,7 +62,7 @@ export default new Command(import.meta.url, "tag")
             .addOption(
                 new Command.Option(ApplicationCommandOptionTypes.INTEGER, "page")
                     .setDescription("The page of tags to list")
-                    .setMinMax(1, undefined)
+                    .setMinMax(1)
             )
     )
     .addOption(

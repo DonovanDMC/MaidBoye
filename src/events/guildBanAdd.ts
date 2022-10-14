@@ -20,9 +20,7 @@ export default new ClientEvent("guildBanAdd", async function guildBanAddEvent(gu
         });
         if (auditLog) {
             const entry = auditLog.entries[0];
-            if (entry?.user && (entry.createdAt.getTime() + 5e3) > Date.now()) {
-                if (entry.reason) embed.addField("Reason", entry.reason, false);
-            }
+            if (entry?.user && (entry.createdAt.getTime() + 5e3) > Date.now() && entry.reason) embed.addField("Reason", entry.reason, false);
         }
     }
 

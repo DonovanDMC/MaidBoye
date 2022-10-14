@@ -11,8 +11,14 @@ export default class SettingsMenuComponent extends BaseComponent {
     override async handleGuild(interaction: ComponentInteraction<ValidLocation.GUILD>, data: BaseState & { dir: 0 | 1; page: number; }) {
         const gConfig = await GuildConfig.get(interaction.guildID);
         switch (data.dir) {
-            case 0: --data.page; break;
-            case 1: ++data.page; break;
+            case 0: {
+                --data.page;
+                break;
+            }
+            case 1: {
+                ++data.page;
+                break;
+            }
         }
         if (data.page < 0) data.page = Settings.getPageCount() - 1;
         if (data.page > (Settings.getPageCount() - 1)) data.page = 0;

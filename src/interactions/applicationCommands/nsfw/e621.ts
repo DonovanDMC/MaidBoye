@@ -45,7 +45,7 @@ export default new Command(import.meta.url, "e621")
     .setExecutor(async function(interaction, { tags, order }, gConfig, uConfig) {
         tags = tags.slice(0, 40);
         const state = await E621TagsState.store(tags);
-        if (!tags.find(t => t.startsWith("order:"))) tags.push(`order:${order}`);
+        if (!tags.some(t => t.startsWith("order:"))) tags.push(`order:${order}`);
         const q = await E621.posts.search({ tags, limit: 100 });
         const posts = filterPosts(q, uConfig.preferences.e621NoVideo, uConfig.preferences.e621NoFlash);
         if (posts.length === 0) return interaction.reply({ content: `Search returned no results.${q.length === posts.length ? "" : ` (${q.length} posts were filtered out due to Discord ToS)`}` });

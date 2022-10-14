@@ -5,7 +5,7 @@ import PrivateConfig from "./private/private.js";
 import emojis from "./json/emojis.json" assert { type: "json" };
 import pkg from "../../package.json" assert { type: "json" };
 import { ClientOptions, Permissions, UpdatePresenceOptions, ActivityTypes } from "oceanic.js";
-import { readFile } from "fs/promises";
+import { readFile } from "node:fs/promises";
 
 const host = await readFile("/data/hostname", "utf8").then(val => val.trim(), () => null);
 export default class Config extends PrivateConfig {
@@ -129,6 +129,8 @@ export default class Config extends PrivateConfig {
         return "maidboye";
     }
     static get dbPassword() {
+        // we need to explicitly return undefined
+        // eslint-disable-next-line unicorn/no-useless-undefined
         return undefined;
     }
     static get dbSSL() {
@@ -149,6 +151,8 @@ export default class Config extends PrivateConfig {
         return "default";
     }
     static get redisPassword() {
+        // we need to explicitly return undefined
+        // eslint-disable-next-line unicorn/no-useless-undefined
         return undefined;
     }
     static get redisDb() {
@@ -243,7 +247,7 @@ export default class Config extends PrivateConfig {
     }
 
     static get jsonDirectory() {
-        return new URL("./json", import.meta.url).pathname;
+        return new URL("json", import.meta.url).pathname;
     }
 
     /* s3 */

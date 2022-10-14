@@ -12,7 +12,7 @@ import { ButtonColors, ComponentBuilder } from "@oceanicjs/builders";
 
 export function formatEmbed(page: number, uConfig: UserConfig, author: User) {
     const preferences = Preferences.getPage(page);
-    assert(preferences && preferences.length, "failed to find any preferences to display");
+    assert(preferences && preferences.length !== 0, "failed to find any preferences to display");
     return Util.makeEmbed(true, author)
         .setTitle("User Preferences")
         .setDescription(
@@ -30,7 +30,7 @@ export function formatEmbed(page: number, uConfig: UserConfig, author: User) {
 
 export function changePage(page: number, interaction: ComponentInteraction<ValidLocation.BOTH>, uConfig: UserConfig) {
     const preferences = Preferences.getPage(page);
-    assert(preferences && preferences.length, "failed to find any preferences to display");
+    assert(preferences && preferences.length !== 0, "failed to find any preferences to display");
     return interaction.editParent(Util.replaceContent({
         embeds: [
             formatEmbed(page, uConfig, interaction.user)

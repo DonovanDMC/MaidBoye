@@ -9,7 +9,6 @@ import Config from "../config/index.js";
 import type { OkPacket } from "../db/index.js";
 import db from "../db/index.js";
 import type { YiffTypes } from "../db/Models/UserConfig.js";
-import type { JSONResponse } from "yiffy";
 import type { Post } from "e621";
 import {
     CategoryChannel,
@@ -34,9 +33,9 @@ import type {
 import type { ModuleImport } from "@uwu-codes/types";
 import { ButtonColors, ComponentBuilder, EmbedBuilder } from "@oceanicjs/builders";
 import { Strings } from "@uwu-codes/utils";
-import { access } from "fs/promises";
-import { request } from "https";
-import { AssertionError } from "assert";
+import { access } from "node:fs/promises";
+import { request } from "node:https";
+import { AssertionError } from "node:assert";
 
 export type CompareResult = "higher" | "lower" | "same" | "invalid" | "unknown";
 export default class Util {
@@ -68,7 +67,7 @@ export default class Util {
      * @returns {T}
      */
     static addBits<T extends bigint | number = bigint | number>(current: T, ...toAdd: Array<T>) {
-        toAdd.forEach(val => current = (current | val) as T);
+        for (const val of toAdd) current = (current | val) as T;
         return current;
     }
 
@@ -122,8 +121,7 @@ export default class Util {
 
     static ensurePresent<T extends ErrorConstructor>(condition?: unknown, message?: string, errorConstructor?: T): asserts condition {
         if (!condition) {
-            if (errorConstructor) throw new errorConstructor(message);
-            else throw new AssertionError({ message });
+            throw (errorConstructor ? new errorConstructor(message) : new AssertionError({ message }));
         }
     }
 
@@ -154,7 +152,7 @@ export default class Util {
                         let j: Parameters<typeof resolve>[0];
                         try {
                             j = JSON.parse(Buffer.concat(data).toString()) as typeof j;
-                        } catch (e) {
+                        } catch {
                             j = Buffer.concat(data);
                         }
 
@@ -174,14 +172,16 @@ export default class Util {
             ms = true;
         }
         if (ms) time = Math.floor(time / 1000);
-        return `<t:${time}:${flag === "short-time" ? "t" :
-            flag === "long-time" ? "T" :
-                flag === "short-date" ? "d" :
-                    flag === "long-date" ? "D" :
-                        flag === "short-datetime" ? "f" :
-                            flag === "long-datetime" ? "F" :
-                                flag === "relative" ? "R" :
-                                    "f"}>`;
+        const shortFlags = {
+            "short-time":     "t",
+            "long-time":      "T",
+            "short-date":     "d",
+            "long-date":      "D",
+            "short-datetime": "f",
+            "long-datetime":  "F",
+            "relative":       "R"
+        };
+        return `<t:${time}:${shortFlags[flag]}>`;
     }
 
     static async genericEdit<D extends Record<string, unknown>>(table: string, id: number | string, data: D): Promise<boolean> {
@@ -215,7 +215,7 @@ export default class Util {
                 if (!nsfw) {
                     const img = await Yiffy.furry.cuddle("json", 1);
                     url = img.url;
-                    if (img.sources.length) source = img.sources[0];
+                    if (img.sources.length !== 0) source = img.sources[0];
                 } else {
                     const post = await this.getE621Image("cuddling");
                     if (post === null) return this.getImage(type, false);
@@ -231,7 +231,7 @@ export default class Util {
                 if (!nsfw) {
                     const img = await Yiffy.furry.hug("json", 1);
                     url = img.url;
-                    if (img.sources.length) source = img.sources[0];
+                    if (img.sources.length !== 0) source = img.sources[0];
                 } else {
                     const post = await this.getE621Image("hug");
                     if (post === null) return this.getImage(type, false);
@@ -247,7 +247,7 @@ export default class Util {
                 if (!nsfw) {
                     const img = await Yiffy.furry.lick("json", 1);
                     url = img.url;
-                    if (img.sources.length) source = img.sources[0];
+                    if (img.sources.length !== 0) source = img.sources[0];
                 } else {
                     const post = await this.getE621Image("~penis_lick ~cunnilingus");
                     if (post === null) return this.getImage(type, false);
@@ -263,7 +263,7 @@ export default class Util {
                 if (!nsfw) {
                     const img = await Yiffy.furry.kiss("json", 1);
                     url = img.url;
-                    if (img.sources.length) source = img.sources[0];
+                    if (img.sources.length !== 0) source = img.sources[0];
                 } else {
                     const post = await this.getE621Image("kissing");
                     if (post === null) return this.getImage(type, false);
@@ -298,11 +298,16 @@ export default class Util {
 
     static async getYiff(type: YiffTypes) {
         switch (type) {
-            case "straight": return Yiffy.furry.yiff.straight("json", 1);
-            case "lesbian": return Yiffy.furry.yiff.lesbian("json", 1);
-            case "gynomorph": return Yiffy.furry.yiff.gynomorph("json", 1);
-            case "andromorph": return Yiffy.furry.yiff.andromorph("json", 1);
-            default: return Yiffy.furry.yiff.gay("json", 1);
+            case "straight": { return Yiffy.furry.yiff.straight("json", 1);
+            }
+            case "lesbian": { return Yiffy.furry.yiff.lesbian("json", 1);
+            }
+            case "gynomorph": { return Yiffy.furry.yiff.gynomorph("json", 1);
+            }
+            case "andromorph": { return Yiffy.furry.yiff.andromorph("json", 1);
+            }
+            default: { return Yiffy.furry.yiff.gay("json", 1);
+            }
         }
     }
 
@@ -327,6 +332,7 @@ export default class Util {
         };
         switch (cmd) {
             case "bunny": case "cat": case "dog": case "duck": case "fox": case "koala": case "otter": case "owl": case "panda": case "snek": case "turtle": case "wah": case "wolf": {
+                // eslint-disable-next-line unicorn/no-nested-ternary
                 const img = await CheweyAPI[cmd === "bunny" ? "rabbit" : cmd === "snek" ? "snake" : cmd === "wah" ? "redPanda" : cmd]();
                 void (interaction.type === InteractionTypes.APPLICATION_COMMAND ? interaction.reply.bind(interaction) : interaction.editParent.bind(interaction))({
                     embeds: Util.makeEmbed(true, interaction.user)
@@ -355,9 +361,7 @@ export default class Util {
             }
 
             case "birb": case "dikdik": case "fursuit": {
-                let img: JSONResponse;
-                if (cmd === "birb" || cmd === "dikdik") img = await Yiffy.animals[cmd]("json", 1);
-                else img = await Yiffy.furry[cmd]("json", 1);
+                const img = await (cmd === "birb" || cmd === "dikdik" ? Yiffy.animals[cmd]("json", 1) : Yiffy.furry[cmd]("json", 1));
                 void (interaction.type === InteractionTypes.APPLICATION_COMMAND ? interaction.reply.bind(interaction) : interaction.editParent.bind(interaction))({
                     embeds: Util.makeEmbed(true, interaction.user)
                         .setTitle(titles[cmd])
@@ -407,7 +411,7 @@ export default class Util {
         return bits.every(b => (val & b) === b);
     }
 
-    static async import<T = unknown>(path: string, options?: ImportCallOptions) {
+    static async import<T extends object = never>(path: string, options?: ImportCallOptions) {
         const res = await import(`${path}?${Date.now()}`, options) as ModuleImport<T>;
         return "default" in res ? res.default : res;
     }
@@ -415,8 +419,7 @@ export default class Util {
     static isNSFW(channel: AnyChannel | Uncached) {
         if (channel instanceof GuildChannel) {
             if (channel instanceof CategoryChannel || channel instanceof StageChannel) return false;
-            if (channel instanceof ThreadChannel) return channel.parent?.nsfw ?? false;
-            else return channel.nsfw;
+            return channel instanceof ThreadChannel ? channel.parent?.nsfw ?? false : channel.nsfw;
         } else {
             if (!("type" in channel) || channel.type === ChannelTypes.DM) return true;
             else if (channel.type === ChannelTypes.GROUP_DM) return false;
@@ -443,7 +446,7 @@ export default class Util {
      * @returns {T}
      */
     static removeBits<T extends bigint | number = bigint | number>(current: T, ...toRemove: Array<T>) {
-        if (Array.isArray(toRemove)) toRemove.forEach(val => current = (current & ~val) as T);
+        if (Array.isArray(toRemove)) for (const val of toRemove) current = (current & ~val) as T;
         return current;
     }
 

@@ -11,32 +11,30 @@ export default new ClientEvent("guildMemberRemove", async function guildMemberRe
     if (user instanceof Member) user = user.user;
     const flags = Util.getFlagsArray(UserFlags, user.publicFlags);
     const eventsRemove = await LogEvent.getType(guild.id, LogEvents.MEMBER_REMOVE);
-    if (eventsRemove.length > 0) {
-        if (eventsRemove.length > 0) {
-            const embed = Util.makeEmbed(true)
-                .setTitle("Member Remove")
-                .setColor(Colors.green)
-                .addField("Member Info", [
-                    `User: **${user.tag}** (${user.mention})`,
-                    `Nickname: ${member === null ? "[Unknown]" : member.nick ?? "[None]"}`,
-                    `Roles: ${member === null ? "[Unknown]" : member.roles.map(r => `<@&${r}>`).join(" ") || "[None]"}`,
-                    `Created At: ${Util.formatDiscordTime(user.createdAt, "short-datetime", true)}`,
-                    `Joined At: ${member && "joinedAt" in member && member.joinedAt !== null ? Util.formatDiscordTime(member.joinedAt, "short-datetime", true) : "Unknown"}`,
-                    `Pending: **${member && member.pending ? "Yes" : "No"}**`,
-                    "",
-                    "**Badges**:",
-                    ...(flags.length ? flags.map(f => `${Config.emojis.default.dot} ${UserFlagNames[UserFlags[f]]}`) : ["- None"]),
-                    ...(user.id === "242843345402069002" ? [`${Config.emojis.default.dot} ${Config.emojis.custom.don} Developer`] : [])
-                ].join("\n"), false);
+    if (eventsRemove.length !== 0 && eventsRemove.length !== 0) {
+        const embed = Util.makeEmbed(true)
+            .setTitle("Member Remove")
+            .setColor(Colors.green)
+            .addField("Member Info", [
+                `User: **${user.tag}** (${user.mention})`,
+                `Nickname: ${member === null ? "[Unknown]" : member.nick ?? "[None]"}`,
+                `Roles: ${member === null ? "[Unknown]" : member.roles.map(r => `<@&${r}>`).join(" ") || "[None]"}`,
+                `Created At: ${Util.formatDiscordTime(user.createdAt, "short-datetime", true)}`,
+                `Joined At: ${member && "joinedAt" in member && member.joinedAt !== null ? Util.formatDiscordTime(member.joinedAt, "short-datetime", true) : "Unknown"}`,
+                `Pending: **${member && member.pending ? "Yes" : "No"}**`,
+                "",
+                "**Badges**:",
+                ...(flags.length !== 0 ? flags.map(f => `${Config.emojis.default.dot} ${UserFlagNames[UserFlags[f]]}`) : ["- None"]),
+                ...(user.id === "242843345402069002" ? [`${Config.emojis.default.dot} ${Config.emojis.custom.don} Developer`] : [])
+            ].join("\n"), false);
 
-            for (const log of eventsRemove) {
-                await log.execute(this, { embeds: embed.toJSON(true) });
-            }
+        for (const log of eventsRemove) {
+            await log.execute(this, { embeds: embed.toJSON(true) });
         }
     }
 
     const eventsKick = await LogEvent.getType(guild.id, LogEvents.MEMBER_KICK);
-    if (eventsKick.length > 0) {
+    if (eventsKick.length !== 0) {
         const embed = Util.makeEmbed(true)
             .setTitle("Member Kicked")
             .setColor(Colors.orange)
@@ -49,7 +47,7 @@ export default new ClientEvent("guildMemberRemove", async function guildMemberRe
                 `Pending: **${member && member.pending ? "Yes" : "No"}**`,
                 "",
                 "**Badges**:",
-                ...(flags.length ? flags.map(f => `${Config.emojis.default.dot} ${UserFlagNames[UserFlags[f]]}`) : ["- None"]),
+                ...(flags.length !== 0 ? flags.map(f => `${Config.emojis.default.dot} ${UserFlagNames[UserFlags[f]]}`) : ["- None"]),
                 ...(user.id === "242843345402069002" ? [`${Config.emojis.default.dot} ${Config.emojis.custom.don} Developer`] : [])
             ].join("\n"), false);
 

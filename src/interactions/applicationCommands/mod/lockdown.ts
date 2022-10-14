@@ -45,11 +45,11 @@ export default new Command(import.meta.url, "lockdown")
                     type:   OverwriteTypes.ROLE
                 }).catch((err: Error) => {
                     errors.push(err);
-                    original.splice(original.length - 1, 1);
+                    original.splice(-1, 1);
                 });
             }
         }
-        if (original.length > 0) await db.redis.set(`lockdown:${interaction.guildID}`, JSON.stringify(original));
+        if (original.length !== 0) await db.redis.set(`lockdown:${interaction.guildID}`, JSON.stringify(original));
         else if (errors.length === 0) return interaction.reply({ content: "No channels were locked" });
         const { caseID } = await ModLogHandler.createEntry({
             type:  ModLogType.LOCKDOWN,

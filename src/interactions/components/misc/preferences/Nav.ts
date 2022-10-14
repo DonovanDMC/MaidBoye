@@ -11,8 +11,14 @@ export default class PreferencesMenuComponent extends BaseComponent {
     override async handle(interaction: ComponentInteraction, data: BaseState & { dir: 0 | 1; page: number; }) {
         const uConfig = await UserConfig.get(interaction.user.id);
         switch (data.dir) {
-            case 0: --data.page; break;
-            case 1: ++data.page; break;
+            case 0: {
+                --data.page;
+                break;
+            }
+            case 1: {
+                ++data.page;
+                break;
+            }
         }
         if (data.page < 0) data.page = Preferences.getPageCount() - 1;
         if (data.page > (Preferences.getPageCount() - 1)) data.page = 0;

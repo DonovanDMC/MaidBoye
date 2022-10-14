@@ -10,7 +10,7 @@ export default new ClientEvent("threadMembersUpdate", async function threadMembe
     if (eventsAdd.length === 0 && eventsRemove.length === 0) return;
 
     if (!(thread instanceof ThreadChannel)) thread = await this.rest.channels.get<AnyThreadChannel>(thread.id);
-    if (eventsAdd.length > 0 && addedMembers.length > 0) {
+    if (eventsAdd.length !== 0 && addedMembers.length !== 0) {
         const embeds: Array<EmbedOptions> = [];
         for (const { userID } of addedMembers) {
             const member = (await this.getMember(thread.guildID, userID))!;
@@ -30,7 +30,7 @@ export default new ClientEvent("threadMembersUpdate", async function threadMembe
         }
     }
 
-    if (eventsRemove.length > 0 && removedMembers.length > 0) {
+    if (eventsRemove.length !== 0 && removedMembers.length !== 0) {
         const embeds: Array<EmbedOptions> = [];
         for (const { userID } of removedMembers) {
             const member = (await this.getMember(thread.guildID, userID))!;

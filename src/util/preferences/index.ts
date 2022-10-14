@@ -11,7 +11,7 @@ import { assert } from "tsafe";
 import { Timer } from "@uwu-codes/utils";
 import type { ModuleImport } from "@uwu-codes/types";
 import type { ApplicationCommandOptionsWithOptions, InteractionOptionsWithValue } from "oceanic.js";
-import { readdir } from "fs/promises";
+import { readdir } from "node:fs/promises";
 
 export default class Preferences {
     private static list: Array<BasePreference> = [];
@@ -55,7 +55,7 @@ export default class Preferences {
 
     static async handleInteraction(interaction: CommandInteraction<ValidLocation.BOTH>, uConfig: UserConfig) {
         const opt = interaction.data.options.raw[0];
-        if ("options" in opt && opt.options && opt.options.length > 0) {
+        if ("options" in opt && opt.options && opt.options.length !== 0) {
             const preference = this.getByInteractionName(opt.name);
             if (preference) {
                 await preference.handleInteraction(interaction, uConfig, (opt.options[0] as InteractionOptionsWithValue).value);
@@ -69,7 +69,7 @@ export default class Preferences {
         for (const { name: file } of files) {
             Debug("preferemces:load", `Loading "${file}"`);
             const start = Timer.getTime();
-            let set = await import(new URL(`./${file}`, import.meta.url).pathname) as ModuleImport<typeof EmptyPreference>;
+            let set = await import(new URL(file, import.meta.url).pathname) as ModuleImport<typeof EmptyPreference>;
             if ("default" in set) set = set.default;
             const inst = new set();
             [inst.id, inst.page] = this.register(inst);
@@ -79,24 +79,25 @@ export default class Preferences {
     }
 
     static parse(val: bigint) {
+        let defaultYiffType: YiffTypes = Config.yiffTypes[0];
+        if (Util.hasBits(val, PreferenceBits.DEFAULT_YIFF_TYPE_GAY)) defaultYiffType = "gay";
+        else if (Util.hasBits(val, PreferenceBits.DEFAULT_YIFF_TYPE_STRAIGHT)) defaultYiffType = "straight";
+        else if (Util.hasBits(val, PreferenceBits.DEFAULT_YIFF_TYPE_LESBIAN)) defaultYiffType = "lesbian";
+        else if (Util.hasBits(val, PreferenceBits.DEFAULT_YIFF_TYPE_GYNOMORPH)) defaultYiffType = "gynomorph";
+        else if (Util.hasBits(val, PreferenceBits.DEFAULT_YIFF_TYPE_ANDROMORPH)) defaultYiffType = "andromorph";
+
+        let e621ThumbnailType: E621ThumbnailType = Config.e621ThumbnailTypes[0];
+        if (Util.hasBits(val, PreferenceBits.E621_THUMBNAIL_TYPE_NONE)) e621ThumbnailType = "none";
+        else if (Util.hasBits(val, PreferenceBits.E621_THUMBNAIL_TYPE_IMAGE)) e621ThumbnailType = "image";
+        else if (Util.hasBits(val, PreferenceBits.E621_THUMBNAIL_TYPE_GIF)) e621ThumbnailType = "gif";
         return {
             disableSnipes:           Util.hasBits(val, PreferenceBits.DISABLE_SNIPES),
             disableMarriageRequests: Util.hasBits(val, PreferenceBits.DISABLE_MARRIAGE_REQUESTS),
             ephemeral:               Util.hasBits(val, PreferenceBits.EPHEMERAL),
-            // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
-            defaultYiffType:         (Util.hasBits(val, PreferenceBits.DEFAULT_YIFF_TYPE_GAY) ?
-                "gay" : Util.hasBits(val, PreferenceBits.DEFAULT_YIFF_TYPE_STRAIGHT) ?
-                    "straight" : Util.hasBits(val, PreferenceBits.DEFAULT_YIFF_TYPE_LESBIAN) ?
-                        "lesbian" : Util.hasBits(val, PreferenceBits.DEFAULT_YIFF_TYPE_GYNOMORPH) ?
-                            "gynomorph" : Util.hasBits(val, PreferenceBits.DEFAULT_YIFF_TYPE_ANDROMORPH) ?
-                                "andromorph" : Config.yiffTypes[0]) as YiffTypes,
-            // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
-            e621ThumbnailType: (Util.hasBits(val, PreferenceBits.E621_THUMBNAIL_TYPE_NONE) ?
-                "none" : Util.hasBits(val, PreferenceBits.E621_THUMBNAIL_TYPE_IMAGE) ?
-                    "image" : Util.hasBits(val, PreferenceBits.E621_THUMBNAIL_TYPE_GIF) ?
-                        "gif" : Config.e621ThumbnailTypes[0]) as E621ThumbnailType,
-            e621NoVideo: Util.hasBits(val, PreferenceBits.E621_NO_VIDEO),
-            e621NoFlash: Util.hasBits(val, PreferenceBits.E621_NO_FLASH)
+            defaultYiffType,
+            e621ThumbnailType,
+            e621NoVideo:             Util.hasBits(val, PreferenceBits.E621_NO_VIDEO),
+            e621NoFlash:             Util.hasBits(val, PreferenceBits.E621_NO_FLASH)
         };
     }
 

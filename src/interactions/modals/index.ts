@@ -9,7 +9,7 @@ import { assert } from "tsafe";
 import { Timer } from "@uwu-codes/utils";
 import { MessageFlags } from "oceanic.js";
 import type { ModuleImport } from "@uwu-codes/types";
-import { readdir } from "fs/promises";
+import { readdir } from "node:fs/promises";
 
 const thisDirectory = new URL(".", import.meta.url).pathname.slice(0, -1);
 export default class Modals {
@@ -19,6 +19,8 @@ export default class Modals {
     }
 
     static get(cmd: string | null, action: string) {
+        // this isn't using an actual array
+        // eslint-disable-next-line unicorn/no-array-method-this-argument
         return this.list[this.findIndex(cmd, action)];
     }
 
@@ -43,8 +45,7 @@ export default class Modals {
         }
         const modal = this.get(data.command, data.action);
         assert(modal, `failed to find valid handler for "${data.command || "null"}$${data.action}" modal`);
-        if ("guildID" in interaction) await modal.handleGuild(interaction, components, data);
-        else await modal.handleDM(interaction, components, data);
+        await ("guildID" in interaction ? modal.handleGuild(interaction, components, data) : modal.handleDM(interaction, components, data));
     }
 
     static async loadAll(dir = thisDirectory) {

@@ -15,21 +15,18 @@ Object.defineProperty(AutocompleteInteraction.prototype, "reply", {
 
 Object.defineProperty(CommandInteraction.prototype, "reply", {
     async value(this: CommandInteraction, data: InteractionContent) {
-        if (this.acknowledged) await this.createFollowup(data);
-        else await this.createMessage(data);
+        await (this.acknowledged ? this.createFollowup(data) : this.createMessage(data));
     }
 });
 
 Object.defineProperty(ComponentInteraction.prototype, "reply", {
     async value(this: ComponentInteraction, data: InteractionContent) {
-        if (this.acknowledged) await this.createFollowup(data);
-        else await this.createMessage(data);
+        await (this.acknowledged ? this.createFollowup(data) : this.createMessage(data));
     }
 });
 
 Object.defineProperty(ModalSubmitInteraction.prototype, "reply", {
     async value(this: ModalSubmitInteraction, data: InteractionContent) {
-        if (this.acknowledged) await this.createFollowup(data);
-        else await this.createMessage(data);
+        await (this.acknowledged ? this.createFollowup(data) : this.createMessage(data));
     }
 });

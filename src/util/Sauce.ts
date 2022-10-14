@@ -20,9 +20,9 @@ export const autoMimeTypes = [
 export default async function Sauce(input: string, simularity = 75, skipCheck = false) {
     // I could include file extensions, but I couldn't be bothered since I only need the md5
     // E621 - e621.net
-    const e621Regex = /(?:https?:\/\/)?static\d\.(?:e621|e926)\.net\/data\/(?:sample\/)?(?:[a-z\d]{2}\/){2}([a-z\d]+)\.[a-z]+/;
+    const e621Regex = /(?:https?:\/\/)?static\d\.(?:e621|e926)\.net\/data\/(?:sample\/)?(?:[\da-z]{2}\/){2}([\da-z]+)\.[\da-z]+/;
     // YiffyAPI V2 - v2.yiff.res
-    const yiffyRegex_2 = /(?:https?:\/\/)?(?:v2\.yiff\.media|yiff\.media\/V2)\/(?:.*\/)+([a-z\d]+)\.[a-z]+/;
+    const yiffyRegex_2 = /(?:https?:\/\/)?(?:v2\.yiff\.media|yiff\.media\/V2)\/(?:.*\/)+([\da-z]+)\.[\da-z]+/;
     let post: Post | null = null,
         method: typeof tried[number] | null = null,
         sourceOverride: string | Array<string> | undefined,
@@ -71,9 +71,9 @@ export default async function Sauce(input: string, simularity = 75, skipCheck = 
         // saucenao is fucky and their api sucks
         if (!method) {
             const sa = await SauceNAO(input, [29, 40, 41, 42]).catch(() => null);
-            if (sa !== null && Array.isArray(sa) && sa.length > 0) {
+            if (sa !== null && Array.isArray(sa) && sa.length !== 0) {
                 const top = sa.sort((a, b)=> a.header.similarity - b.header.similarity).find(v => v.header.similarity >= simularity);
-                if (top && top.data.ext_urls.length > 0) {
+                if (top && top.data.ext_urls.length !== 0) {
                     method = "saucenao";
                     saucePercent = top.header.similarity;
                     sourceOverride = top.data.ext_urls;

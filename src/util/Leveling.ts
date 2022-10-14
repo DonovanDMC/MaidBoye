@@ -64,7 +64,7 @@ export default class Leveling {
                 };
             }
         }
-        const keys = (await Utility.getKeys(db.redis, `leveling:${user || "*"}:${guild || "*"}`, 100000)).filter(key => /^leveling:[\d]{15,21}:[\d]{15,21}$/.test(key));
+        const keys = (await Utility.getKeys(db.redis, `leveling:${user || "*"}:${guild || "*"}`, 100000)).filter(key => /^leveling(?::\d{15,21}){2}$/.test(key));
         let values: Array<{ guild: string; user: string; xp: { leftover: number; level: number; needed: number; total: number; }; }> = [];
         // mget has issues when dealing with tons of keys
         for (const keySet of chunk(keys, 50000)) {
@@ -86,7 +86,7 @@ export default class Leveling {
     }
 
     static async getLeaderboardSize(guild: string | null) {
-        return (await Utility.getKeys(db.redis, `leveling:*:${guild || "*"}`, 100000)).filter(key => /^leveling:[\d]{15,21}:[\d]{15,21}$/.test(key)).length;
+        return (await Utility.getKeys(db.redis, `leveling:*:${guild || "*"}`, 100000)).filter(key => /^leveling(?::\d{15,21}){2}$/.test(key)).length;
     }
 
     static async getUserRank(user: string, guild: string | null) {
@@ -108,7 +108,7 @@ export default class Leveling {
             Debug("leveling", `${interaction.user.tag} (${interaction.user.id}, ${interaction.guildID}) leveled up from ${oldLevel} to ${level}`);
             const gConfig = await GuildConfig.get(interaction.guildID);
             const roles = gConfig.levelingRoles.filter(([role, reqLevel]) => this.calcExp(reqLevel).level <= xp && !interaction.member.roles.includes(role)).map(([role]) => role);
-            if (roles.length) {
+            if (roles.length !== 0) {
                 for (const role of roles) {
                     Debug("leveling:roles", `Adding the role ${role} to ${interaction.user.tag} (${interaction.user.id}, ${interaction.guildID}) for leveling up from ${oldLevel} to ${level}`);
                     await interaction.member.addRole(role, `Leveling (${oldLevel} -> ${level})`).catch(() => {
@@ -119,7 +119,7 @@ export default class Leveling {
             if (gConfig.settings.announceLevelUp) {
                 let m: Message;
                 if (interaction.channel.permissionsOf(interaction.client.user.id).has("SEND_MESSAGES")) {
-                    if (interaction.channel.permissionsOf(interaction.channel.client.user.id).has("EMBED_LINKS")) m = await interaction.createFollowup({
+                    m = await (interaction.channel.permissionsOf(interaction.channel.client.user.id).has("EMBED_LINKS") ? interaction.createFollowup({
                         embeds: Util.makeEmbed(true, interaction.user)
                             .setTitle("Level Up!")
                             .setDescription(`<@!${interaction.user.id}> leveled up from **${oldLevel}** to **${level}**!`, roles.length === 0 ? [] : [
@@ -128,11 +128,10 @@ export default class Leveling {
                                 ...roles.map(r => `- <@&${r}>`)
                             ])
                             .toJSON(true)
-                    });
-                    else m = await interaction.createFollowup({
+                    }) : interaction.createFollowup({
                         content:         `Congrats <@!${interaction.user.id}> on leveling up from **${oldLevel}** to **${level}**!${roles.length === 0 ? "" : `\n\nRoles Gained:\n${roles.map(r => `- <@&${r}>`).join("\n")}`}`,
                         allowedMentions: { users: false, roles: false }
-                    });
+                    }));
                     setTimeout(async() => {
                         if ((m.flags & MessageFlags.EPHEMERAL) !== MessageFlags.EPHEMERAL) {
                             await m.delete().catch(() => null);

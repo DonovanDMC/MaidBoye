@@ -29,7 +29,7 @@ export default new Command(import.meta.url, "kiss")
     })
     .setGuildLookup(true)
     .setExecutor(async function(interaction, { user, text }, gConfig) {
-        const r = strings(interaction.user.id, user && text ? `<@!${user}> ${text}` : user ? `<@!${user}>` : text!);
+        const r = strings(interaction.user.id, user && text ? `<@!${user}> ${text}` : (user ? `<@!${user}>` : text!));
 
         const embed = Util.makeEmbed(true, interaction.user)
             .setTitle("Smooch!")

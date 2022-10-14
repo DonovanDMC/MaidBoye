@@ -110,13 +110,13 @@ export default new ClientEvent("guildUpdate", async function guildUpdateEvent(gu
 
         const addedFeatures = [] as Array<GuildFeature>;
         const removedFeatures = [] as Array<GuildFeature>;
-        oldGuild.features.forEach(f => {
+        for (const f of oldGuild.features) {
             if (!guild.features.includes(f)) removedFeatures.push(f);
-        });
-        guild.features.forEach(f => {
+        }
+        for (const f of guild.features) {
             if (!oldGuild.features.includes(f)) addedFeatures.push(f);
-        });
-        if (addedFeatures.length > 0 || removedFeatures.length > 0) {
+        }
+        if (addedFeatures.length !== 0 || removedFeatures.length !== 0) {
             embeds.push(Util.makeEmbed(true)
                 .setTitle("Server Updated")
                 .setColor(Colors.gold)
@@ -270,8 +270,8 @@ export default new ClientEvent("guildUpdate", async function guildUpdateEvent(gu
                 .setTitle("Server Updated")
                 .setColor(Colors.gold)
                 .setDescription("This server's region was changed.")
-                .addField("Old Region", oldGuild.region === null ? "Default" : oldGuild.region === undefined ? "Unknown" : oldGuild.region, false)
-                .addField("New Region", guild.region === null ? "Default" : guild.region === undefined ? "Unknown" : guild.region, false)
+                .addField("Old Region", oldGuild.region === null ? "Default" : (oldGuild.region === undefined ? "Unknown" : oldGuild.region), false)
+                .addField("New Region", guild.region === null ? "Default" : (guild.region === undefined ? "Unknown" : guild.region), false)
                 .toJSON()
             );
         }
@@ -306,13 +306,13 @@ export default new ClientEvent("guildUpdate", async function guildUpdateEvent(gu
 
         const addedSystemChannelFlags = [] as Array<keyof typeof SystemChannelFlags>;
         const removedSystemChannelFlags = [] as Array<keyof typeof SystemChannelFlags>;
-        oldSystemChannelFlags.forEach(f => {
+        for (const f of oldSystemChannelFlags) {
             if (!newSystemChannelFlags.includes(f)) removedSystemChannelFlags.push(f);
-        });
-        newSystemChannelFlags.forEach(f => {
+        }
+        for (const f of newSystemChannelFlags) {
             if (!oldSystemChannelFlags.includes(f)) addedSystemChannelFlags.push(f);
-        });
-        if (addedSystemChannelFlags.length > 0 || removedSystemChannelFlags.length > 0) {
+        }
+        if (addedSystemChannelFlags.length !== 0 || removedSystemChannelFlags.length !== 0) {
             embeds.push(Util.makeEmbed(true)
                 .setTitle("Server Updated")
                 .setColor(Colors.gold)
@@ -383,13 +383,13 @@ export default new ClientEvent("guildUpdate", async function guildUpdateEvent(gu
                 }
                 const addedChannels = [] as Array<WelcomeScreenChannel>;
                 const removedchannels = [] as Array<WelcomeScreenChannel>;
-                oldGuild.welcomeScreen.welcomeChannels.forEach(ch => {
-                    if (!guild.welcomeScreen!.welcomeChannels.includes(ch)) removedchannels.push(ch);
-                });
-                guild.welcomeScreen.welcomeChannels.forEach(ch => {
-                    if (!oldGuild.welcomeScreen!.welcomeChannels.includes(ch)) addedChannels.push(ch);
-                });
-                if (addedChannels.length > 0 || removedchannels.length > 0) {
+                for (const ch of oldGuild.welcomeScreen.welcomeChannels) {
+                    if (!guild.welcomeScreen.welcomeChannels.includes(ch)) removedchannels.push(ch);
+                }
+                for (const ch of guild.welcomeScreen.welcomeChannels) {
+                    if (!oldGuild.welcomeScreen.welcomeChannels.includes(ch)) addedChannels.push(ch);
+                }
+                if (addedChannels.length !== 0 || removedchannels.length !== 0) {
                     embeds.push(Util.makeEmbed(true)
                         .setTitle("Server Updated")
                         .setColor(Colors.gold)

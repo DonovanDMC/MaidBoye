@@ -34,7 +34,7 @@ import type {
 import Warning from "../../db/Models/Warning.js";
 import { Time } from "@uwu-codes/utils";
 import { Guild, Member, User } from "oceanic.js";
-import { randomUUID } from "crypto";
+import { randomUUID } from "node:crypto";
 
 export default class ModLogHandler {
     static client: MaidBoye;
@@ -89,16 +89,16 @@ export default class ModLogHandler {
     static async createEntry(options: UnbanOptions | UnmuteOptions | LockOptions | UnlockOptions | LockdownOptions | UnlockdownOptions | DeleteWarningOptions | ClearWarningsOptions | StrikeOptions): Promise<CreateEntryResultNeither>;
     static async createEntry(options: AnyOptions) {
         const { type, gConfig, guild, blame, reason } = options;
-        const check = await this.check(options.gConfig);
+        const check = await this.check(gConfig);
         if ("target" in options && (options.target instanceof User || options.target instanceof Member)) await UserConfig.createIfNotExists(options.target.id);
         const caseID = await ModLog.getNextID(gConfig.id);
         const data: ModLogCreationData = {
             type:      ModLogType.BAN,
             case_id:   caseID,
-            guild_id:  options.guild.id,
+            guild_id:  guild.id,
             target_id: "target" in options ? options.target.id : null,
-            blame_id:  options.blame?.id,
-            reason:    options.reason
+            blame_id:  blame?.id,
+            reason
         };
         let text: string, color: number, timed: Timed | null = null, strike: Strike | null = null;
         switch (type) {
@@ -281,7 +281,8 @@ export default class ModLogHandler {
                 break;
             }
 
-            default: throw new Error(`Unhandled modlog type: ${type as number} (${JSON.stringify(options)})`);
+            default: { throw new Error(`Unhandled modlog type: ${type as number} (${JSON.stringify(options)})`);
+            }
         }
 
         const msg = await this.executeWebhook(guild, gConfig, blame, ModLogType.BAN, caseID, color, text);
@@ -315,15 +316,15 @@ export default class ModLogHandler {
         };
         if (!(await this.check(gConfig))) return null;
         return this.client.rest.webhooks.execute(gConfig.modlog.webhook!.id, gConfig.modlog.webhook!.token, {
-            ...{
-                embeds: Util.makeEmbed(false)
-                    .setAuthor(guild.name, guild.iconURL() ?? undefined)
-                    .setTitle(title || `${titles[type] || `Unknown Case Type (${type})`} | Case #${caseID}`)
-                    .setDescription(description)
-                    .setColor(color)
-                    .setFooter(`Action Performed ${!blame ? "Automatically" : `By ${blame.tag}`}`, blame === null ? Config.botIcon : blame.avatarURL())
-                    .toJSON(true)
-            },
+
+            embeds: Util.makeEmbed(false)
+                .setAuthor(guild.name, guild.iconURL() ?? undefined)
+                .setTitle(title || `${titles[type] || `Unknown Case Type (${type})`} | Case #${caseID}`)
+                .setDescription(description)
+                .setColor(color)
+                .setFooter(`Action Performed ${!blame ? "Automatically" : `By ${blame.tag}`}`, blame === null ? Config.botIcon : blame.avatarURL())
+                .toJSON(true)
+            ,
             wait: true
         }).catch(() => null);
     }
