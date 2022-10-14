@@ -1,8 +1,8 @@
 diff --git a/node_modules/oceanic.js/dist/lib/structures/Guild.js b/node_modules/oceanic.js/dist/lib/structures/Guild.js
-index d0a909f..48d1e13 100644
+index fc7a6f5..11051d8 100644
 --- a/node_modules/oceanic.js/dist/lib/structures/Guild.js
 +++ b/node_modules/oceanic.js/dist/lib/structures/Guild.js
-@@ -297,24 +297,7 @@ class Guild extends Base_1.default {
+@@ -293,24 +293,7 @@ class Guild extends Base_1.default {
      }
      // true = `memberCount`
      updateMemberLimit(toAdd) {
