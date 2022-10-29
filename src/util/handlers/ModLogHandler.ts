@@ -244,7 +244,7 @@ export default class ModLogHandler {
                     blame_id: blame?.id || null,
                     type:     StrikeType.WARNING
                 });
-                color = Colors.red;
+                color = Colors.yellow;
                 break;
             }
 
@@ -285,7 +285,7 @@ export default class ModLogHandler {
             }
         }
 
-        const msg = await this.executeWebhook(guild, gConfig, blame, ModLogType.BAN, caseID, color, text);
+        const msg = await this.executeWebhook(guild, gConfig, blame, type, caseID, color, text);
 
         data.channel_id = msg?.channelID;
         data.message_id = msg?.id;
@@ -316,7 +316,6 @@ export default class ModLogHandler {
         };
         if (!(await this.check(gConfig))) return null;
         return this.client.rest.webhooks.execute(gConfig.modlog.webhook!.id, gConfig.modlog.webhook!.token, {
-
             embeds: Util.makeEmbed(false)
                 .setAuthor(guild.name, guild.iconURL() ?? undefined)
                 .setTitle(title || `${titles[type] || `Unknown Case Type (${type})`} | Case #${caseID}`)
