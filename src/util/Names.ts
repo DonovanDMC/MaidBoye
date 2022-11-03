@@ -2,7 +2,6 @@ import Config from "../config/index.js";
 import {
     GuildFeature,
     PermissionName,
-    SortOrderModes,
     GatewayOPCodes,
     InteractionTypes,
     ApplicationCommandTypes,
@@ -34,7 +33,8 @@ import {
     AutoModerationKeywordPresetTypes,
     AutoModerationEventTypes,
     IntegrationExpireBehaviors,
-    StickerFormatTypes
+    StickerFormatTypes,
+    SortOrderTypes
 } from "oceanic.js";
 const { badges, serverFeatures } = Config.emojis;
 
@@ -70,6 +70,7 @@ export const GuildFeatureNames: Record<GuildFeature, string> = {
     COMMUNITY:                                 `${serverFeatures.community} Community`,
     CREATOR_MONETIZABLE:                       "Creator Monetizable",
     CREATOR_MONETIZABLE_DISABLED:              "Creator Monetizable Disabled",
+    DEVELOPER_SUPPORT_SERVER:                  "Developer Support Server",
     DISCOVERABLE:                              `${serverFeatures.discoverable} Discoverable`,
     DISCOVERABLE_DISABLED:                     "Discoverable Disabled",
     ENABLED_DISCOVERABLE_BEFORE:               "Enabled Discoverable Before",
@@ -121,6 +122,7 @@ export const GuildFeatureDescriptions: Record<GuildFeature, string | null> = {
     COMMUNITY:                                 "Guild can enable welcome screen, Membership Screening, stage channels and discovery, and receives community updates",
     CREATOR_MONETIZABLE:                       null,
     CREATOR_MONETIZABLE_DISABLED:              null,
+    DEVELOPER_SUPPORT_SERVER:                  null,
     DISCOVERABLE:                              "Guild is able to be discovered in the directory",
     DISCOVERABLE_DISABLED:                     "Guild is not able to be discovered in the directory, and it cannot be enabled", // *
     ENABLED_DISCOVERABLE_BEFORE:               "Guild has previously been discoverable in the directory, but is not currently", // *
@@ -409,9 +411,9 @@ export const GatewayOPCodeNames = {
     [GatewayOPCodes.HEARTBEAT_ACK]:         "Heartbeat Acknowledgement"
 };
 
-export const SortOrderModeNames = {
-    [SortOrderModes.RECENT_ACTIVITY]: "Recent Activity",
-    [SortOrderModes.CREATION_TIME]:   "Creation Time"
+export const SortOrderTypeNames = {
+    [SortOrderTypes.LATEST_ACTIVITY]: "Latest Activity",
+    [SortOrderTypes.CREATION_DATE]:   "Creation Date"
 };
 
 export const AutoModerationActionTypeNames = {

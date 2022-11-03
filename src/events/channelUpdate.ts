@@ -2,7 +2,7 @@ import ClientEvent from "../util/ClientEvent.js";
 import LogEvent, { LogEvents } from "../db/Models/LogEvent.js";
 import Util from "../util/Util.js";
 import { Colors } from "../util/Constants.js";
-import { SortOrderModeNames, VideoQualityModeNames } from "../util/Names.js";
+import { SortOrderTypeNames, VideoQualityModeNames } from "../util/Names.js";
 import { AuditLogActionTypes, ChannelTypes, EmbedOptions } from "oceanic.js";
 import { Time } from "@uwu-codes/utils";
 
@@ -213,8 +213,8 @@ export default new ClientEvent("channelUpdate", async function channelUpdateEven
                 `Channel: <#${channel.id}>`,
                 "This channel's default sort order was updated."
             ])
-            .addField("Old Order", oldChannel.defaultSortOrder === null ? "Default" : SortOrderModeNames[oldChannel.defaultSortOrder], false)
-            .addField("New Order", channel.defaultSortOrder === null ? "Default" : SortOrderModeNames[channel.defaultSortOrder], false)
+            .addField("Old Order", oldChannel.defaultSortOrder === null ? "Default" : SortOrderTypeNames[oldChannel.defaultSortOrder], false)
+            .addField("New Order", channel.defaultSortOrder === null ? "Default" : SortOrderTypeNames[channel.defaultSortOrder], false)
             .toJSON()
         );
     }

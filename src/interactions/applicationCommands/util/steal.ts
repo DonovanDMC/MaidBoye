@@ -6,7 +6,7 @@ import {
     ApplicationCommandOptionTypes,
     DiscordRESTError,
     GuildEmoji,
-    JsonErrorCodes,
+    JSONErrorCodes,
     Sticker
 } from "oceanic.js";
 import { basename } from "node:path";
@@ -141,9 +141,9 @@ export default new Command(import.meta.url, "steal")
                 } catch (err) {
                     assert(is<Error>(err));
                     if (err instanceof DiscordRESTError) {
-                        if (err.code === JsonErrorCodes.INVALID_FORM_BODY || err.code === JsonErrorCodes.FILE_UPLOADED_EXCEEDS_MAXIMUM_SIZE) return interaction.reply({ content: "H-hey! The file was too large, please try again with a smaller file..\n(try 256kb or less)" });
-                        if (err.code === JsonErrorCodes.MAXIMUM_NUMBER_OF_EMOJIS) return interaction.reply({ content: "H-hey! This server already has the maximum amount of emojis.." });
-                        if (err.code === JsonErrorCodes.MAXIMUM_NUMBER_OF_ANIMATED_EMOJIS) return interaction.reply({ content: "H-hey! This server already has the maximum amount of animated emojis.." });
+                        if (err.code === JSONErrorCodes.INVALID_FORM_BODY || err.code === JSONErrorCodes.FILE_UPLOADED_EXCEEDS_MAXIMUM_SIZE) return interaction.reply({ content: "H-hey! The file was too large, please try again with a smaller file..\n(try 256kb or less)" });
+                        if (err.code === JSONErrorCodes.MAXIMUM_NUMBER_OF_EMOJIS) return interaction.reply({ content: "H-hey! This server already has the maximum amount of emojis.." });
+                        if (err.code === JSONErrorCodes.MAXIMUM_NUMBER_OF_ANIMATED_EMOJIS) return interaction.reply({ content: "H-hey! This server already has the maximum amount of animated emojis.." });
                     }
                     return interaction.reply({ content: `H-hey! An error occured while creating the emoji..\n${err.name}: ${err.message}` });
                 }
@@ -167,8 +167,8 @@ export default new Command(import.meta.url, "steal")
                 } catch (err) {
                     assert(is<Error>(err));
                     if (err instanceof DiscordRESTError) {
-                        if (err.code === JsonErrorCodes.INVALID_FORM_BODY || err.code === JsonErrorCodes.FILE_UPLOADED_EXCEEDS_MAXIMUM_SIZE) return interaction.reply({ content: "H-hey! The file was too large, please try again with a smaller file..\n(try 512kb or less)" });
-                        if (err.code === JsonErrorCodes.MAXIMUM_NUMBER_OF_STICKERS) return interaction.reply({ content: "H-hey! This server already has the maximum amount of stickers.." });
+                        if (err.code === JSONErrorCodes.INVALID_FORM_BODY || err.code === JSONErrorCodes.FILE_UPLOADED_EXCEEDS_MAXIMUM_SIZE) return interaction.reply({ content: "H-hey! The file was too large, please try again with a smaller file..\n(try 512kb or less)" });
+                        if (err.code === JSONErrorCodes.MAXIMUM_NUMBER_OF_STICKERS) return interaction.reply({ content: "H-hey! This server already has the maximum amount of stickers.." });
                     }
                     return interaction.reply({ content: `H-hey! An error occured while creating the sticker..\n${err.name}: ${err.message}` });
                 }

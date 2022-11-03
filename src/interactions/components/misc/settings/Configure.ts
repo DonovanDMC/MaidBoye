@@ -10,8 +10,8 @@ export default class SettingsMenuComponent extends BaseComponent {
     command = "settings";
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     override async handleGuild(interaction: SelectMenuComponentInteraction<ValidLocation.GUILD>, data: BaseState) {
-        const set = Settings.getByInteractionName(interaction.data.values[0]);
-        assert(set, `invalid setting recieved in pick (${interaction.data.values[0]})`);
+        const set = Settings.getByInteractionName(interaction.data.values.getStrings()[0]);
+        assert(set, `invalid setting recieved in pick (${interaction.data.values.getStrings()[0]})`);
         const gConfig = await GuildConfig.get(interaction.guildID);
         await set.open(interaction, gConfig);
     }

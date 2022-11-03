@@ -16,6 +16,6 @@ export default class PreferencesPickComponent extends BaseComponent {
         const pref = Preferences.getByID(data.preference);
         assert(pref, `invalid preference recieved in pick (${data.preference})`);
         const uConfig = await UserConfig.get(interaction.user.id);
-        await pref.handlePick(interaction, uConfig, interaction.data.componentType === ComponentTypes.BUTTON ? data.value! : interaction.data.values[0]);
+        await pref.handlePick(interaction, uConfig, interaction.data.componentType === ComponentTypes.BUTTON ? data.value! : interaction.data.values.getStrings()[0]);
     }
 }

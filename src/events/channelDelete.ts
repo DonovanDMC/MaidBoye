@@ -7,6 +7,7 @@ import { AuditLogActionTypes } from "oceanic.js";
 import { Time } from "@uwu-codes/utils";
 
 export default new ClientEvent("channelDelete", async function channelDeleteEvent(channel) {
+    if (!("guildID" in channel)) return;
     const events = await LogEvent.getType(channel.guildID, LogEvents.CHANNEL_DELETE);
     if (events.length === 0) return;
 

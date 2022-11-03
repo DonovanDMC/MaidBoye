@@ -9,7 +9,7 @@ export default class LoggingSelectWebhookComponent extends BaseComponent {
     command = "logging";
 
     override async handleGuild(interaction: SelectMenuComponentInteraction<ValidLocation.GUILD>, { channel, event }: BaseState & { channel: string; event: LogEvents; }) {
-        const webhook = await interaction.client.rest.webhooks.get(interaction.data.values[0]);
+        const webhook = await interaction.client.rest.webhooks.get(interaction.data.values.getStrings()[0]);
         if (!webhook.token) return interaction.editParent({
             content: "Something broke.."
         });

@@ -10,8 +10,8 @@ export default class PreferencesMenuComponent extends BaseComponent {
     command = "preferences";
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     override async handle(interaction: SelectMenuComponentInteraction, data: BaseState) {
-        const pref = Preferences.getByInteractionName(interaction.data.values[0]);
-        assert(pref, `invalid preference recieved in pick (${interaction.data.values[0]})`);
+        const pref = Preferences.getByInteractionName(interaction.data.values.getStrings()[0]);
+        assert(pref, `invalid preference recieved in pick (${interaction.data.values.getStrings()[0]})`);
         const uConfig = await UserConfig.get(interaction.user.id);
         await pref.open(interaction, uConfig);
     }

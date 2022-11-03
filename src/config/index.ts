@@ -54,10 +54,11 @@ export default class Config extends PrivateConfig {
                 everyone:    false,
                 repliedUser: false
             },
-            auth:               `Bot ${this.clientToken}`,
-            defaultImageFormat: "png",
-            defaultImageSize:   4096,
-            gateway:            {
+            disableMemberLimitScaling: true,
+            auth:                      `Bot ${this.clientToken}`,
+            defaultImageFormat:        "png",
+            defaultImageSize:          4096,
+            gateway:                   {
                 autoReconnect: true,
                 concurrency:   "auto",
                 intents:       [
@@ -85,6 +86,7 @@ export default class Config extends PrivateConfig {
                     }],
                     status: "dnd"
                 }
+
             }
         };
     }

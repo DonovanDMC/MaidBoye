@@ -44,7 +44,7 @@ export const Colors = {
     cyan:       0x00FFFF,
     teal:       0x008080,
     blue:       0x0000FF,
-    yellow:     0xFFD700
+    yellow:     0xFFD700,
     random() {
         return Math.floor(Math.random() * 0xFFFFFF);
     }

@@ -7,7 +7,7 @@ import {
     ApplicationCommandOptionTypes,
     DiscordRESTError,
     ExecuteWebhookOptions,
-    JsonErrorCodes
+    JSONErrorCodes
 } from "oceanic.js";
 import chunk from "chunk";
 import { Strings } from "@uwu-codes/utils";
@@ -191,8 +191,8 @@ export default class LogEvent {
             }
             await client.rest.webhooks.execute(this.webhook.id, this.webhook.token, options);
         } catch (err) {
-            console.log(err instanceof DiscordRESTError && (err.code === JsonErrorCodes.UNKNOWN_WEBHOOK || err.code === JsonErrorCodes.INVALID_WEBHOOK_TOKEN));
-            await LoggingWebhookFailureHandler.tick(this, err instanceof DiscordRESTError && (err.code === JsonErrorCodes.UNKNOWN_WEBHOOK || err.code === JsonErrorCodes.INVALID_WEBHOOK_TOKEN));
+            console.log(err instanceof DiscordRESTError && (err.code === JSONErrorCodes.UNKNOWN_WEBHOOK || err.code === JSONErrorCodes.INVALID_WEBHOOK_TOKEN));
+            await LoggingWebhookFailureHandler.tick(this, err instanceof DiscordRESTError && (err.code === JSONErrorCodes.UNKNOWN_WEBHOOK || err.code === JSONErrorCodes.INVALID_WEBHOOK_TOKEN));
         }
     }
 }

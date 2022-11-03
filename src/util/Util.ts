@@ -192,17 +192,19 @@ export default class Util {
         return res.rowCount >= 1;
     }
 
-    static getFlags<T extends string, N extends number | bigint>(list: Record<T, N>, flags: N) {
+    static getFlags<T extends string, N extends number | bigint>(list: Record<T, N>, flags: N, skipEnumReverseKeys = true) {
         const res = {} as Record<T, boolean>;
         for (const [key, value] of Object.entries(list) as Array<[T, N]>) {
+            if (skipEnumReverseKeys && /\d/.test(key)) continue;
             res[key] = (flags & value) === value;
         }
         return res;
     }
 
-    static getFlagsArray<T extends string, N extends number | bigint>(list: Record<T, N>, flags: N) {
+    static getFlagsArray<T extends string, N extends number | bigint>(list: Record<T, N>, flags: N, skipEnumReverseKeys = true) {
         const res = [] as Array<T>;
         for (const [key, value] of Object.entries(list) as Array<[T, N]>) {
+            if (skipEnumReverseKeys && /\d/.test(key)) continue;
             if ((flags & value) === value) res.push(key);
         }
         return res;

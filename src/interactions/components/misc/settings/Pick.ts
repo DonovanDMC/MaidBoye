@@ -16,6 +16,6 @@ export default class SettingsPickComponent extends BaseComponent {
         const set = Settings.getByID(data.setting);
         assert(set, `invalid setting recieved in pick (${data.setting})`);
         const gConfig = await GuildConfig.get(interaction.guildID);
-        await set.handlePick(interaction, gConfig, interaction.data.componentType === ComponentTypes.BUTTON ? data.value! : interaction.data.values[0]);
+        await set.handlePick(interaction, gConfig, interaction.data.componentType === ComponentTypes.BUTTON ? data.value! : interaction.data.values.getStrings()[0]);
     }
 }
