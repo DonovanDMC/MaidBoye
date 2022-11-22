@@ -110,7 +110,7 @@ export default class ModLogHandler {
                     `Target: <@!${target.id}> (\`${target.tag}\`)`,
                     `Reason: ${reason}`,
                     `Message Delete Hours: **${deleteSeconds * 60}**`,
-                    `Time: ${!timed ? "Permanent" : `${Time.ms(time, { words: true, seconds: true })} (expiry: ${Util.formatDiscordTime(timed.expiresAt.getTime(), "long-datetime")})`}`
+                    `Time: ${timed ? `${Time.ms(time, { words: true, seconds: true })} (expiry: ${Util.formatDiscordTime(timed.expiresAt.getTime(), "long-datetime")})` : "Permanent"}`
                 ].join("\n");
                 strike = await Strike.create({
                     id:       randomUUID(),
@@ -152,7 +152,7 @@ export default class ModLogHandler {
                 text = [
                     `Target: <@!${target.id}> (\`${target.tag}\`)`,
                     `Reason: ${reason}`,
-                    `Time: ${!timed ? "Permanent" : `${Time.ms(time, { words: true, seconds: true })} (expiry: ${Util.formatDiscordTime(timed.expiresAt.getTime(), "long-datetime")})`}`
+                    `Time: ${timed ? `${Time.ms(time, { words: true, seconds: true })} (expiry: ${Util.formatDiscordTime(timed.expiresAt.getTime(), "long-datetime")})` : "Permanent"}`
                 ].join("\n");
                 strike = await Strike.create({
                     id:       randomUUID(),
@@ -321,7 +321,7 @@ export default class ModLogHandler {
                 .setTitle(title || `${titles[type] || `Unknown Case Type (${type})`} | Case #${caseID}`)
                 .setDescription(description)
                 .setColor(color)
-                .setFooter(`Action Performed ${!blame ? "Automatically" : `By ${blame.tag}`}`, blame === null ? Config.botIcon : blame.avatarURL())
+                .setFooter(`Action Performed ${blame ? `By ${blame.tag}` : "Automatically"}`, blame === null ? Config.botIcon : blame.avatarURL())
                 .toJSON(true)
             ,
             wait: true

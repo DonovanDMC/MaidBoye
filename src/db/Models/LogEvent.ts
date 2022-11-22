@@ -140,7 +140,7 @@ export default class LogEvent {
 
     static async get(id: string) {
         const { rows: [res] } = await db.query<LogEventData>(`SELECT * FROM ${this.TABLE} WHERE id = $1`, [id]);
-        return !res ? null : new LogEvent(res);
+        return res ? new LogEvent(res) : null;
     }
 
     static async getAll(guild: string) {

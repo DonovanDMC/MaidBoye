@@ -62,7 +62,7 @@ export default class Strike {
 
     static async get(id: string) {
         const { rows: [res] } = await db.query<StrikeData>(`SELECT * FROM ${this.TABLE} WHERE id = $1`, [id]);
-        return !res ? null : new Strike(res);
+        return res ? new Strike(res) : null;
     }
 
     static async getCountForUser(guild: string, user: string) {

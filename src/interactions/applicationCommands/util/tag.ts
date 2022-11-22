@@ -18,13 +18,13 @@ async function getTag(client: MaidBoye, name: string, info: GuildConfig["tags"][
         `Created By: ${creator === null ? `<@!${info.createdBy}>` : creator.tag}`,
         `Created At: ${Util.formatDiscordTime(info.createdAt, "long-datetime")}`,
         ...(WithContent ? ["Content:", Strings.truncateWords(info.content, 750)] : []),
-        ...(!(info.modifiedAt && info.modifiedBy && info.previousContent) ? [] : [
+        ...((info.modifiedAt && info.modifiedBy && info.previousContent) ? [
             "",
             "-- Last Modification --",
             `Modified By: ${modifier === null ? info.modifiedBy : `**${modifier.tag}** (<@!${modifier.id}>)`}`,
             `Modified At: ${Util.formatDiscordTime(info.modifiedAt, "long-datetime", true)}`,
             ...(WithContent ? ["Previous Content:", Strings.truncateWords(info.previousContent, 750)] : [])
-        ])
+        ] : [])
     ].join("\n");
 }
 

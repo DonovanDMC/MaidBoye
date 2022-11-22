@@ -7,7 +7,7 @@ import Preferences from "../../../../util/preferences/index.js";
 import UserConfig from "../../../../db/Models/UserConfig.js";
 import Config from "../../../../config/index.js";
 import { assert } from "tsafe";
-import type { MessageActionRow, User } from "oceanic.js";
+import { ComponentTypes, MessageActionRow, User } from "oceanic.js";
 import { ButtonColors, ComponentBuilder } from "@oceanicjs/builders";
 
 export function formatEmbed(page: number, uConfig: UserConfig, author: User) {
@@ -62,9 +62,10 @@ export function changePage(page: number, interaction: ComponentInteraction<Valid
                     label:       s.name,
                     value:       s.interactionsName,
                     description: s.shortDescription,
-                    emoji:       !s.emoji ? undefined : ComponentBuilder.emojiToPartial(s.emoji, s.emojiType)
+                    emoji:       s.emoji ? ComponentBuilder.emojiToPartial(s.emoji, s.emojiType) : undefined
                 })),
-                placeholder: "Select A Preference To Configure"
+                placeholder: "Select A Preference To Configure",
+                type:        ComponentTypes.STRING_SELECT
             })
             .toJSON()
     }));

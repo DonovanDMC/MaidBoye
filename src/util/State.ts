@@ -62,10 +62,12 @@ export class State {
             return { [names[index] || `unknown${index}`]: value };
         }).reduce((a, b) => ({ ...a, ...b }), {}) as BaseState & T;
         const id = Number(d.action.slice(-1));
-        if (!isNaN(id)) {
+        if (isNaN(id)) {
+            d.id = 0;
+        } else {
             d.action = d.action.slice(0, -1);
             d.id = id ?? 0;
-        } else d.id = 0;
+        }
         return d;
     }
 

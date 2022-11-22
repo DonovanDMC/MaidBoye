@@ -59,7 +59,7 @@ export default new Command(import.meta.url, "kick")
                 });
                 return interaction.reply({
                     allowedMentions: { users: false },
-                    content:         `Successfully kicked ${member.mention}, ***${reason}*** - Case #${caseID}${!entry.channelID ? "" : ` (<#${entry.channelID}>)`}${dmError ? `\nFailed To DM Member: \`${dmError.name}: ${dmError.message}\`` : ""}`
+                    content:         `Successfully kicked ${member.mention}, ***${reason}*** - Case #${caseID}${entry.channelID ? ` (<#${entry.channelID}>)` : ""}${dmError ? `\nFailed To DM Member: \`${dmError.name}: ${dmError.message}\`` : ""}`
                 });
             });
     });

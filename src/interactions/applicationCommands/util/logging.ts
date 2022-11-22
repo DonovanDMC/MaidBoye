@@ -6,6 +6,7 @@ import { State } from "../../../util/State.js";
 import {
     AnyGuildTextChannelWithoutThreads,
     ApplicationCommandOptionTypes,
+    ComponentTypes,
     InteractionResolvedChannel,
     MessageActionRow,
     MessageFlags,
@@ -155,7 +156,8 @@ export default new Command(import.meta.url, "logging")
                     if (webhooks.length !== 0) {
                         components.addSelectMenu({
                             customID: State.new(interaction.user.id, "logging", "select-webhook").with("channel", channel.id).with("event", event).encode(),
-                            options:  webhooks.map(hook => ({ label: hook.name!, value: hook.id }))
+                            options:  webhooks.map(hook => ({ label: hook.name!, value: hook.id })),
+                            type:     ComponentTypes.STRING_SELECT
                         });
                     }
                 }

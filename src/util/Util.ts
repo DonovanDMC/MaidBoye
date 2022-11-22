@@ -214,15 +214,15 @@ export default class Util {
         switch (type) {
             case "cuddle": {
                 let url: string, source: string | null = null;
-                if (!nsfw) {
-                    const img = await Yiffy.furry.cuddle("json", 1);
-                    url = img.url;
-                    if (img.sources.length !== 0) source = img.sources[0];
-                } else {
+                if (nsfw) {
                     const post = await this.getE621Image("cuddling");
                     if (post === null) return this.getImage(type, false);
                     url = post.file.url;
                     source = `https://e621.net/posts/${post.id}`;
+                } else {
+                    const img = await Yiffy.furry.cuddle("json", 1);
+                    url = img.url;
+                    if (img.sources.length !== 0) source = img.sources[0];
                 }
 
                 return { url, source };
@@ -230,15 +230,15 @@ export default class Util {
 
             case "hug": {
                 let url: string, source: string | null = null;
-                if (!nsfw) {
-                    const img = await Yiffy.furry.hug("json", 1);
-                    url = img.url;
-                    if (img.sources.length !== 0) source = img.sources[0];
-                } else {
+                if (nsfw) {
                     const post = await this.getE621Image("hug");
                     if (post === null) return this.getImage(type, false);
                     url = post.file.url;
                     source = `https://e621.net/posts/${post.id}`;
+                } else {
+                    const img = await Yiffy.furry.hug("json", 1);
+                    url = img.url;
+                    if (img.sources.length !== 0) source = img.sources[0];
                 }
 
                 return { url, source };
@@ -246,15 +246,15 @@ export default class Util {
 
             case "lick": {
                 let url: string, source: string | null = null;
-                if (!nsfw) {
-                    const img = await Yiffy.furry.lick("json", 1);
-                    url = img.url;
-                    if (img.sources.length !== 0) source = img.sources[0];
-                } else {
+                if (nsfw) {
                     const post = await this.getE621Image("~penis_lick ~cunnilingus");
                     if (post === null) return this.getImage(type, false);
                     url = post.file.url;
                     source = `https://e621.net/posts/${post.id}`;
+                } else {
+                    const img = await Yiffy.furry.lick("json", 1);
+                    url = img.url;
+                    if (img.sources.length !== 0) source = img.sources[0];
                 }
 
                 return { url, source };
@@ -262,15 +262,15 @@ export default class Util {
 
             case "kiss": {
                 let url: string, source: string | null = null;
-                if (!nsfw) {
-                    const img = await Yiffy.furry.kiss("json", 1);
-                    url = img.url;
-                    if (img.sources.length !== 0) source = img.sources[0];
-                } else {
+                if (nsfw) {
                     const post = await this.getE621Image("kissing");
                     if (post === null) return this.getImage(type, false);
                     url = post.file.url;
                     source = `https://e621.net/posts/${post.id}`;
+                } else {
+                    const img = await Yiffy.furry.kiss("json", 1);
+                    url = img.url;
+                    if (img.sources.length !== 0) source = img.sources[0];
                 }
 
                 return { url, source };
@@ -430,7 +430,7 @@ export default class Util {
     }
 
     static makeEmbed(defaults?: boolean, author?: User | Member, json?: EmbedOptions) {
-        const embed = !json ? new EmbedBuilder() : EmbedBuilder.loadFromJSON(json);
+        const embed = json ? EmbedBuilder.loadFromJSON(json) : new EmbedBuilder();
         if (defaults) embed.setColor(Colors.bot).setTimestamp("now").setFooter("UwU", Config.botIcon);
         if (author && author instanceof User || author instanceof Member) embed.setAuthor(author.tag, author.avatarURL());
         return embed;

@@ -8,7 +8,7 @@ import Settings from "../../../../util/settings/index.js";
 import Config from "../../../../config/index.js";
 import { assert } from "tsafe";
 import { ButtonColors, ComponentBuilder } from "@oceanicjs/builders";
-import type { MessageActionRow, User } from "oceanic.js";
+import { ComponentTypes, MessageActionRow, User } from "oceanic.js";
 
 export function formatEmbed(page: number, gConfig: GuildConfig, author: User) {
     const settings = Settings.getPage(page);
@@ -62,9 +62,10 @@ export function changePage(page: number, interaction: ComponentInteraction<Valid
                     label:       s.name,
                     value:       s.interactionsName,
                     description: s.shortDescription,
-                    emoji:       !s.emoji ? undefined : ComponentBuilder.emojiToPartial(s.emoji, s.emojiType)
+                    emoji:       s.emoji ? ComponentBuilder.emojiToPartial(s.emoji, s.emojiType) : undefined
                 })),
-                placeholder: "Select A Setting To Configure"
+                placeholder: "Select A Setting To Configure",
+                type:        ComponentTypes.STRING_SELECT
             })
             .toJSON()
     }));

@@ -16,12 +16,14 @@ export default class E621Thumbnail {
     // so we don't override if we've already navigated away
     private static pendingList: Array<[string, number]> = [];
     static addPending(message: string, post: number) {
-        if (!this.hasPending(message, post)) {
+        if (this.hasPending(message, post)) {
+            return false;
+        } else {
             // remove pending for any other post ids
             if (this.hasPending(message)) this.removePending(message);
             this.pendingList.push([message, post]);
             return true;
-        } else return false;
+        }
     }
 
     static async create(url: string, md5: string, type: Exclude<E621ThumbnailType, "none">) {

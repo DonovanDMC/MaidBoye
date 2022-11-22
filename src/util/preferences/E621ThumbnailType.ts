@@ -8,7 +8,7 @@ import CommandOption from "../cmd/CommandOption.js";
 import type UserConfig from "../../db/Models/UserConfig.js";
 import { ButtonColors, ComponentBuilder } from "@oceanicjs/builders";
 import { assert } from "tsafe";
-import { ApplicationCommandOptionTypes, MessageActionRow } from "oceanic.js";
+import { ApplicationCommandOptionTypes, ComponentTypes, MessageActionRow } from "oceanic.js";
 
 export default class E621ThumbnailTypePreference extends BasePreference {
     description = "The thumbnail type for webm posts in the `e621` command. This overrides server settings.";
@@ -128,7 +128,8 @@ export default class E621ThumbnailTypePreference extends BasePreference {
                             emoji: ComponentBuilder.emojiToPartial(Config.emojis.default.none, "default")
                         }
                     ],
-                    placeholder: "Select An Option"
+                    placeholder: "Select An Option",
+                    type:        ComponentTypes.STRING_SELECT
                 })
                 .toJSON()
         }));

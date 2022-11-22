@@ -65,7 +65,7 @@ export default class Warning {
 
     static async get(id: string) {
         const { rows: [res] } = await db.query<WarningData>(`SELECT * FROM ${this.TABLE} WHERE id = $1`, [id]);
-        return !res ? null : new Warning(res);
+        return res ? new Warning(res) : null;
     }
 
     static async getForUser(guild: string, user: string, order: "ASC" | "DESC" = "ASC") {

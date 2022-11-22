@@ -41,6 +41,6 @@ export default new Command(import.meta.url, "strike")
         const count = await Strike.getCountForUser(interaction.guildID, member.id);
         return interaction.reply({
             allowedMentions: { users: false },
-            content:         `Successfully added **${amount}** strike${amount !== 1 ? "s" : ""} to ${member.mention}, they now have **${count}** strike${count !== 1 ? "s" : ""}`
+            content:         `Successfully added **${amount}** strike${amount === 1 ? "" : "s"} to ${member.mention}, they now have **${count}** strike${count === 1 ? "" : "s"}`
         });
     });

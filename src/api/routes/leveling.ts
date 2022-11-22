@@ -6,8 +6,8 @@ const app = Router();
 app.route("/guilds/:guild")
     .get(async(req, res) => {
         const lb = await Leveling.getLeaderboard(req.params.guild, -1);
-        let limit = !req.query.limit ? 1000 : Number(req.query.limit);
-        let page = !req.query.page ? 1 : Number(req.query.page);
+        let limit = req.query.limit ? Number(req.query.limit) : 1000;
+        let page = req.query.page ? Number(req.query.page) : 1;
         if (limit < 1) limit = 1;
         if (limit > 2500) limit = 2500;
         if (page < 1) page = 1;
@@ -33,8 +33,8 @@ app.route("/users/:user")
 app.route("/")
     .get(async(req, res) => {
         const lb = await Leveling.getLeaderboard(null, -1);
-        let limit = !req.query.limit ? 1000 : Number(req.query.limit);
-        let page = !req.query.page ? 1 : Number(req.query.page);
+        let limit = req.query.limit ? Number(req.query.limit) : 1000;
+        let page = req.query.page ? Number(req.query.page) : 1;
         if (limit < 1) limit = 1;
         if (limit > 2500) limit = 2500;
         if (page < 1) page = 1;

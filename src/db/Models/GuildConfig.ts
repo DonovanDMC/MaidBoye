@@ -97,7 +97,7 @@ export default class GuildConfig {
     static async get(id: string, createIfNotExists = true) {
         const { rows: [res] } = await db.query<GuildConfigData>(`SELECT * FROM ${this.TABLE} WHERE id = $1`, [id]);
         if (!res) {
-            return !createIfNotExists ? null : this.create({ id });
+            return createIfNotExists ? this.create({ id }) : null;
         }
         return new GuildConfig(res);
     }

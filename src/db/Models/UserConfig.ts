@@ -80,7 +80,7 @@ export default class UserConfig {
     static async get(id: string, createIfNotExists = true) {
         const { rows: [res] } = await db.query<UserConfigData>(`SELECT * FROM ${this.TABLE} WHERE id = $1`, [id]);
         if (!res) {
-            return !createIfNotExists ? null : this.create({ id });
+            return createIfNotExists ? this.create({ id }) : null;
         }
         return new UserConfig(res);
     }
@@ -99,7 +99,7 @@ export default class UserConfig {
     static async getXP(user: string, guild?: string) {
         await this.createIfNotExists(user);
         const { rows: [res] } = await db.query<{ levels: Record<string, number>; }>(`SELECT levels FROM ${this.TABLE} WHERE id = $1`, [user]);
-        return !guild ? res.levels : res.levels[guild] || 0;
+        return guild ? res.levels[guild] || 0 : res.levels;
     }
 
     private load(data: UserConfigData) {

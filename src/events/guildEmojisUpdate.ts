@@ -28,7 +28,7 @@ export default new ClientEvent("guildEmojisUpdate", async function guildEmojisUp
                     `Animated: **${emoji.animated ? "Yes" : "No"}**`,
                     `Managed: **${emoji.managed ? "Yes" : "No"}**`,
                     `Require Colons: **${emoji.requireColons ? "Yes" : "No"}**`,
-                    `Role Requirement: **${emoji.roles.length !== 0 ? emoji.roles.map(r => `<@&${r}>`).join(", ") : "No Requirements"}**`
+                    `Role Requirement: **${emoji.roles.length === 0 ? "No Requirements" : emoji.roles.map(r => `<@&${r}>`).join(", ")}**`
                 ].join("\n"), false)
                 .setImage(`${Routes.CDN_URL}${Routes.CUSTOM_EMOJI(emoji.id)}`)
                 .toJSON()
@@ -70,7 +70,7 @@ export default new ClientEvent("guildEmojisUpdate", async function guildEmojisUp
                     `Animated: **${emoji.animated ? "Yes" : "No"}**`,
                     `Managed: **${emoji.managed ? "Yes" : "No"}**`,
                     `Require Colons: **${emoji.requireColons ? "Yes" : "No"}**`,
-                    `Role Requirement: **${emoji.roles.length !== 0 ? emoji.roles.map(r => `<@&${r}>`).join(", ") : "No Requirements"}**`
+                    `Role Requirement: **${emoji.roles.length === 0 ? "No Requirements" : emoji.roles.map(r => `<@&${r}>`).join(", ")}**`
                 ].join("\n"), false)
                 .toJSON()
             );

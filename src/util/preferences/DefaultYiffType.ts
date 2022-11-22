@@ -9,7 +9,7 @@ import type UserConfig from "../../db/Models/UserConfig.js";
 import { ButtonColors, ComponentBuilder } from "@oceanicjs/builders";
 import { Strings } from "@uwu-codes/utils";
 import { assert } from "tsafe";
-import { ApplicationCommandOptionTypes, MessageActionRow } from "oceanic.js";
+import { ApplicationCommandOptionTypes, ComponentTypes, MessageActionRow } from "oceanic.js";
 
 export default class DefaultYiffTypePreference extends BasePreference {
     description = "The default yiff type for the `yiff` command. This overrides server settings.";
@@ -108,7 +108,8 @@ export default class DefaultYiffTypePreference extends BasePreference {
                         label: Strings.ucwords(type),
                         value: type
                     })),
-                    placeholder: "Select An Option"
+                    placeholder: "Select An Option",
+                    type:        ComponentTypes.STRING_SELECT
                 })
                 .toJSON()
         }));

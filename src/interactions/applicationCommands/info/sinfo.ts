@@ -32,7 +32,7 @@ export async function generateSections(this: MaidBoye, interaction: CommandInter
                     `${Config.emojis.default.dot} ID: **${interaction.guildID}**`,
                     `${Config.emojis.default.dot} Owner: ${owner}`,
                     `${Config.emojis.default.dot} Creation Date: ${Util.formatDiscordTime(interaction.guild.createdAt, "long-datetime", true)}`,
-                    `${Config.emojis.default.dot} Boosts: **${interaction.guild.premiumSubscriptionCount || "None"}**${!interaction.guild.premiumSubscriptionCount ? "" : ` (**${PremiumTierNames[interaction.guild.premiumTier]}**)`}`,
+                    `${Config.emojis.default.dot} Boosts: **${interaction.guild.premiumSubscriptionCount || "None"}**${interaction.guild.premiumSubscriptionCount ? ` (**${PremiumTierNames[interaction.guild.premiumTier]}**)` : ""}`,
                     `${Config.emojis.default.dot} Large: **${interaction.guild.large ? "Yes" : "No"}**`,
                     `${Config.emojis.default.dot} Verification Level: **${VerificationLevelNames[interaction.guild.verificationLevel]}**`,
                     `${Config.emojis.default.dot} 2FA Requirement: **${MFALevelNames[interaction.guild.mfaLevel]}**`,
@@ -105,9 +105,9 @@ export async function generateSections(this: MaidBoye, interaction: CommandInter
                     `${Config.emojis.default.dot} You: ${interaction.guild.channels.filter(c => c.permissionsOf(interaction.user.id).has("VIEW_CHANNEL")).length}/${interaction.guild.channels.size}`,
                     `${Config.emojis.default.dot} Me: ${interaction.guild.channels.filter(c => c.permissionsOf(this.user.id).has("VIEW_CHANNEL")).length}/${interaction.guild.channels.size}`,
                     "",
-                    `${Config.emojis.default.dot} Rules Channel: ${!interaction.guild.rulesChannelID ? "**NONE**" : `<#${interaction.guild.rulesChannelID}>`}`,
-                    `${Config.emojis.default.dot} System Channel: ${!interaction.guild.systemChannelID ? "**NONE**" : `<#${interaction.guild.systemChannelID}>`}`,
-                    `${Config.emojis.default.dot} Public Updates Channel: ${!interaction.guild.publicUpdatesChannelID ? "**NONE**" : `<#${interaction.guild.publicUpdatesChannelID}>`}`
+                    `${Config.emojis.default.dot} Rules Channel: ${interaction.guild.rulesChannelID ? `<#${interaction.guild.rulesChannelID}>` : "**NONE**"}`,
+                    `${Config.emojis.default.dot} System Channel: ${interaction.guild.systemChannelID ? `<#${interaction.guild.systemChannelID}>` : "**NONE**"}`,
+                    `${Config.emojis.default.dot} Public Updates Channel: ${interaction.guild.publicUpdatesChannelID ? `<#${interaction.guild.publicUpdatesChannelID}>` : "**NONE**"}`
                 )
                 .setThumbnail(icon ?? "")
                 .toJSON(true),

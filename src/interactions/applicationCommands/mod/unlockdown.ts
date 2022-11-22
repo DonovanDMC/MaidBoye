@@ -31,7 +31,7 @@ export default new Command(import.meta.url, "unlockdown")
         let changes = 0;
         for (const channel of channels) {
             const og = original.find(([id]) => id === channel.id);
-            const [oldAllow, oldDeny] = !og ? [0n, 0n] : [BigInt(og[1]), BigInt(og[2])];
+            const [oldAllow, oldDeny] = og ? [BigInt(og[1]), BigInt(og[2])] : [0n, 0n];
             const overwrite = channel.permissionOverwrites.get(interaction.guildID);
             if (overwrite) {
                 let allow = overwrite.allow, deny = overwrite.deny;

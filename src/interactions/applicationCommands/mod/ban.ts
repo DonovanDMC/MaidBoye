@@ -90,7 +90,7 @@ export default new Command(import.meta.url, "ban")
                 });
                 return interaction.reply({
                     allowedMentions: { users: false },
-                    content:         `${time === 0 ? `Successfully permanently banned ${user.mention}` : `Successfully banned ${user.mention} until ${Util.formatDiscordTime(Date.now() + (time * 1000), "long-datetime", true)}`}, ***${reason}*** - Case #${caseID}${!entry.channelID ? "" : ` (<#${entry.channelID}>)`}${dmError ? `\nFailed To DM Member: \`${dmError.name}: ${dmError.message}\`` : ""}`
+                    content:         `${time === 0 ? `Successfully permanently banned ${user.mention}` : `Successfully banned ${user.mention} until ${Util.formatDiscordTime(Date.now() + (time * 1000), "long-datetime", true)}`}, ***${reason}*** - Case #${caseID}${entry.channelID ? ` (<#${entry.channelID}>)` : ""}${dmError ? `\nFailed To DM Member: \`${dmError.name}: ${dmError.message}\`` : ""}`
                 });
             });
     });

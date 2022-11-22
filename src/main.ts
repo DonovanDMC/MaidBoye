@@ -69,17 +69,18 @@ export default class MaidBoye extends Client {
     }
 
     async getMember(guildID: string, userID: string, forceRest = false) {
-        if (!this.guilds.has(guildID)) return this.rest.guilds.getMember(guildID, userID).catch(() => null);
-        else {
+        if (this.guilds.has(guildID)) {
             const guild = this.guilds.get(guildID)!;
             const current = guild.members.get(userID);
             return current && forceRest === false ? current : guild.fetchMembers({ userIDs: [userID] }).then(([member]) => member).catch(() => null);
+        } else {
+            return this.rest.guilds.getMember(guildID, userID).catch(() => null);
         }
     }
 
     async getUser(id: string, forceRest = false) {
         const current = this.users.get(id);
-        if (current && forceRest === false) return current;
+        if (current && !forceRest) return current;
         return this.rest.users.get(id).catch(() => null);
     }
 

@@ -95,12 +95,12 @@ export default class ModLog {
 
     static async get(id: string) {
         const { rows: [res] } = await db.query<ModLogData>(`SELECT * FROM ${this.TABLE} WHERE id = $1`, [id]);
-        return !res ? null :  new ModLog(res);
+        return res ? new ModLog(res) :  null;
     }
 
     static async getCase(guild: string, caseID: number) {
         const { rows: [res] } = await db.query<ModLogData>(`SELECT * FROM ${this.TABLE} WHERE guild_id = $1 AND case_id = $2`, [guild, caseID]);
-        return !res ? null : new ModLog(res);
+        return res ? new ModLog(res) : null;
     }
 
     static async getCaseIDs(guild: string, order: "ASC" | "DESC" = "ASC", withDeleted = false) {
@@ -120,7 +120,7 @@ export default class ModLog {
 
     static async getFromMessage(guild: string, message: string) {
         const { rows: [res] } = await db.query<ModLogData>(`SELECT * FROM ${this.TABLE} WHERE guild_id = $1 AND message_id = $2`, [guild, message]);
-        return !res ? null : new ModLog(res);
+        return res ? new ModLog(res) : null;
     }
 
     static async getNextID(guild: string) {

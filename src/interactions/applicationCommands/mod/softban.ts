@@ -67,7 +67,7 @@ export default new Command(import.meta.url, "softban")
                 });
                 return interaction.reply({
                     allowedMentions: { users: false },
-                    content:         `Successfully softbanned ${member.mention}, ***${reason}*** - Case #${caseID}${!entry.channelID ? "" : ` (<#${entry.channelID}>)`}${dmError ? `\nFailed To DM Member: \`${dmError.name}: ${dmError.message}\`` : ""}`
+                    content:         `Successfully softbanned ${member.mention}, ***${reason}*** - Case #${caseID}${entry.channelID ? ` (<#${entry.channelID}>)` : ""}${dmError ? `\nFailed To DM Member: \`${dmError.name}: ${dmError.message}\`` : ""}`
                 });
             });
     });

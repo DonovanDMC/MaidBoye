@@ -105,7 +105,7 @@ export default class Stat {
 
     static async get(id: string) {
         const { rows: [res] } = await db.query<StatData>(`SELECT * FROM ${this.TABLE} WHERE id = $1`, [id]);
-        return !res ? null : new Stat(res);
+        return res ? new Stat(res) : null;
     }
 
     private load(data: StatData) {

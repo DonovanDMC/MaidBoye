@@ -56,7 +56,7 @@ export default class Timed {
 
     static async get(id: string) {
         const { rows: [res] } = await db.query<TimedData>(`SELECT * FROM ${this.TABLE} WHERE id = $1`, [id]);
-        return !res ? null : new Timed(res);
+        return res ? new Timed(res) : null;
     }
 
     private load(data: TimedData) {

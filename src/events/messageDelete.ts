@@ -21,11 +21,11 @@ export default new ClientEvent("messageDelete", async function messageDeleteEven
             content: EncryptionHandler.encrypt(msg.content),
             author:  msg.author.id,
             time:    Date.now(),
-            ref:     !msg.referencedMessage ? null : {
+            ref:     msg.referencedMessage ? {
                 link:    msg.referencedMessage.jumpLink,
                 author:  msg.referencedMessage.author.id,
                 content: EncryptionHandler.encrypt(msg.referencedMessage.content)
-            }
+            } : null
         }))
         .ltrim(`snipe:delete:${msg.channelID}`, 0, 2)
         .expire(`snipe:delete:${msg.channelID}`, 21600)

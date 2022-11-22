@@ -141,7 +141,7 @@ export default new ClientEvent("interactionCreate", async function interactionCr
                     if (cmd.doUserLookup) uConfig = await UserConfig.get(interaction.user.id);
 
                     const opt = await cmd.parseOptions.call(this, interaction, cmd);
-                    const ephemeralUser = !uConfig ? await UserConfig.getEphemeral(interaction.user.id) : uConfig.preferences.ephemeral;
+                    const ephemeralUser = uConfig ? uConfig.preferences.ephemeral : await UserConfig.getEphemeral(interaction.user.id);
                     const ack = await processAck.call(this, cmd, interaction, ephemeralUser, opt);
                     if (ack === false) return;
 
@@ -162,7 +162,7 @@ export default new ClientEvent("interactionCreate", async function interactionCr
                     let gConfig: GuildConfig | null = null, uConfig: UserConfig | null = null;
                     if (cmd.doGuildLookup && "guildID" in interaction) gConfig = await GuildConfig.get(interaction.guildID);
                     if (cmd.doUserLookup) uConfig = await UserConfig.get(interaction.user.id);
-                    const ephemeralUser = !uConfig ? await UserConfig.getEphemeral(interaction.user.id) : uConfig.preferences.ephemeral;
+                    const ephemeralUser = uConfig ? uConfig.preferences.ephemeral : await UserConfig.getEphemeral(interaction.user.id);
                     const ack = await processAck.call(this, cmd, interaction, ephemeralUser);
                     if (ack === false) return;
 
@@ -184,7 +184,7 @@ export default new ClientEvent("interactionCreate", async function interactionCr
                     let gConfig: GuildConfig | null = null, uConfig: UserConfig | null = null;
                     if (cmd.doGuildLookup && "guildID" in interaction) gConfig = await GuildConfig.get(interaction.guildID);
                     if (cmd.doUserLookup) uConfig = await UserConfig.get(interaction.user.id);
-                    const ephemeralUser = !uConfig ? await UserConfig.getEphemeral(interaction.user.id) : uConfig.preferences.ephemeral;
+                    const ephemeralUser = uConfig ? uConfig.preferences.ephemeral : await UserConfig.getEphemeral(interaction.user.id);
                     const ack = await processAck.call(this, cmd, interaction, ephemeralUser);
                     if (ack === false) return;
                     // generics do weird things

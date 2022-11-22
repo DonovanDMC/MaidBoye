@@ -24,7 +24,7 @@ export default new ClientEvent("guildMemberRemove", async function guildMemberRe
                 `Pending: **${member && member.pending ? "Yes" : "No"}**`,
                 "",
                 "**Badges**:",
-                ...(flags.length !== 0 ? flags.map(f => `${Config.emojis.default.dot} ${UserFlagNames[UserFlags[f]]}`) : ["- None"]),
+                ...(flags.length === 0 ? ["- None"] : flags.map(f => `${Config.emojis.default.dot} ${UserFlagNames[UserFlags[f]]}`)),
                 ...(user.id === "242843345402069002" ? [`${Config.emojis.default.dot} ${Config.emojis.custom.don} Developer`] : [])
             ].join("\n"), false);
 
@@ -47,7 +47,7 @@ export default new ClientEvent("guildMemberRemove", async function guildMemberRe
                 `Pending: **${member && member.pending ? "Yes" : "No"}**`,
                 "",
                 "**Badges**:",
-                ...(flags.length !== 0 ? flags.map(f => `${Config.emojis.default.dot} ${UserFlagNames[UserFlags[f]]}`) : ["- None"]),
+                ...(flags.length === 0 ? ["- None"] : flags.map(f => `${Config.emojis.default.dot} ${UserFlagNames[UserFlags[f]]}`)),
                 ...(user.id === "242843345402069002" ? [`${Config.emojis.default.dot} ${Config.emojis.custom.don} Developer`] : [])
             ].join("\n"), false);
 

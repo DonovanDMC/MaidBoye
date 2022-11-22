@@ -1,3 +1,6 @@
 {
-	"upgrade": true
+  "upgrade": true,
+  "reject": [
+    "tslog"
+  ]
 }

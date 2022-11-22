@@ -36,7 +36,7 @@ export default new Command(import.meta.url, "unlock")
             allow = overwrite.allow;
             deny = overwrite.deny;
             if (!(deny & lockPermissions)) return interaction.reply({ content: `H-hey! ${channel.id === interaction.channel.id ? "This" : "That"} that channel isn't locked..` });
-            const [oldAllow, oldDeny] = (await db.redis.get(`lock:${interaction.channel.id}`).then(res => !res ? [0n, 0n] : (JSON.parse(res) as Array<string>).map(BigInt)));
+            const [oldAllow, oldDeny] = (await db.redis.get(`lock:${interaction.channel.id}`).then(res => res ? (JSON.parse(res) as Array<string>).map(BigInt) : [0n, 0n]));
             for (const perm of lockPermissionsList) {
                 if (deny & perm && !(oldDeny & perm)) deny &= ~perm;
                 if (oldAllow & perm) allow |= perm;

@@ -122,7 +122,7 @@ export default new Command(import.meta.url, "selfroles")
                 return interaction.reply({
                     embeds: Util.makeEmbed(true, interaction.user)
                         .setTitle(modPerms.length === 0 ? "Confirmation" : "Warning: Role Contains Moderator Permissions")
-                        .setDescription(`Are you sure you want to make <@&${role}> self assignable?\nIt has ${perms === 1 ? "**1** permission" : `**${perms}** total permissions`}, **${modPerms.length}** of which are moderator permissions.${modPerms.length !== 0 ? `\n\nModerator Permissions:\n${modPerms.map(p =>  `- **${PermissionsByName[p]}**`).join("\n")}` : ""}`)
+                        .setDescription(`Are you sure you want to make <@&${role}> self assignable?\nIt has ${perms === 1 ? "**1** permission" : `**${perms}** total permissions`}, **${modPerms.length}** of which are moderator permissions.${modPerms.length === 0 ? "" : `\n\nModerator Permissions:\n${modPerms.map(p =>  `- **${PermissionsByName[p]}**`).join("\n")}`}`)
                         .setColor(modPerms.length === 0 ? Colors.orange : Colors.red)
                         .toJSON(true),
                     components: new ComponentBuilder<MessageActionRow>()

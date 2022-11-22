@@ -55,16 +55,18 @@ export const UserFlagNames: Record<UserFlags, string> = {
     [UserFlags.VERIFIED_DEVELOPER]:    `${badges.verifiedDeveloper} Verified Bot Developer`,
     [UserFlags.CERTIFIED_MODERATOR]:   `${badges.certifiedModerator} Certified Moderator`,
     [UserFlags.BOT_HTTP_INTERACTIONS]: `${badges.botHTTPInteractions} HTTP Interactions Bot`,
-    [UserFlags.SPAMMER]:               `${badges.spammer} Spammer`
+    [UserFlags.SPAMMER]:               `${badges.spammer} Spammer`,
+    [UserFlags.ACTIVE_DEVELOPER]:      "Active Developer"
 };
 
 export function getFeatureName(feature: GuildFeature) {
-    return `${GuildFeatureNames[feature]}${!GuildFeatureDescriptions[feature] ? "" : `[*](${Config.apiURL}/features/${feature})`}`;
+    return `${GuildFeatureNames[feature]}${GuildFeatureDescriptions[feature] ? `[*](${Config.apiURL}/features/${feature})` : ""}`;
 }
 export const GuildFeatureNames: Record<GuildFeature, string> = {
     AUTO_MODERATION:                           "Auto Moderation",
     ANIMATED_BANNER:                           `${serverFeatures.animatedBanner} Animated Banner`,
     ANIMATED_ICON:                             `${serverFeatures.animatedIcon} Animated Icon`,
+    APPLICATION_COMMAND_PERMISSIONS_V2:        "Application Command Permissions V2",
     BANNER:                                    `${serverFeatures.banner} Banner`,
     BOT_DEVELOPER_EARLY_ACCESS:                "Bot Developer Early Access",
     COMMUNITY:                                 `${serverFeatures.community} Community`,
@@ -96,7 +98,6 @@ export const GuildFeatureNames: Record<GuildFeature, string> = {
     PARTNERED:                                 `${serverFeatures.partnered} Partnered`,
     PREVIEW_ENABLED:                           `${serverFeatures.previewEnabled} Preview Enabled`,
     PREVIOUSLY_DISCOVERABLE:                   `${serverFeatures.previouslyDiscoverable} Previously Discoverable`,
-    PRIVATE_THREADS:                           `${serverFeatures.privateThreads} Private Threads`,
     ROLE_ICONS:                                `${serverFeatures.roleIcons} Role Icons`,
     ROLE_SUBSCRIPTIONS_AVAILABLE_FOR_PURCHASE: "Role Subscriptions Available For Purchase",
     ROLE_SUBSCRIPTIONS_ENABLED:                `${serverFeatures.roleSubscriptionsEnabled} Role Subscriptions Enabled`,
@@ -117,6 +118,7 @@ export const GuildFeatureDescriptions: Record<GuildFeature, string | null> = {
     AUTO_MODERATION:                           "Guild has set up auto moderation rules",
     ANIMATED_BANNER:                           "Guild has access to set an animated guild banner image",
     ANIMATED_ICON:                             "Guild has access to set an animated guild icon",
+    APPLICATION_COMMAND_PERMISSIONS_V2:        "Guild has enabled application command permissions v2. // *",
     BANNER:                                    "Guild has access to set a guild banner image",
     BOT_DEVELOPER_EARLY_ACCESS:                "Bot Developer Early Access",
     COMMUNITY:                                 "Guild can enable welcome screen, Membership Screening, stage channels and discovery, and receives community updates",
@@ -148,7 +150,6 @@ export const GuildFeatureDescriptions: Record<GuildFeature, string | null> = {
     PARTNERED:                                 "Guild is partnered",
     PREVIEW_ENABLED:                           "Guild can be previewed before joining via Membership Screening or the directory",
     PREVIOUSLY_DISCOVERABLE:                   "Guild has previously been discoverable, but is not currently", // *
-    PRIVATE_THREADS:                           "Guild has access to create private threads",
     ROLE_ICONS:                                "Guild is able to set role icons",
     ROLE_SUBSCRIPTIONS_AVAILABLE_FOR_PURCHASE: "Guild has role subscriptions that can be purchased", // *
     ROLE_SUBSCRIPTIONS_ENABLED:                "Guild has access to role subscriptions", // *

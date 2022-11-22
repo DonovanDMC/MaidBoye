@@ -72,7 +72,11 @@ export default new ClientEvent("messageCreate", async function messageCreateEven
                     const t = Timer.calc(start, end, 3, false);
 
                     if (flags.has("delete") || flags.has("d")) await msg.delete().catch(() => null);
-                    if (!(flags.has("silent") || flags.has("s"))) {
+                    if (flags.has("silent") || flags.has("s")) {
+                        Logger.getLogger("Eval").info("Silent Eval Return (formatted):", f);
+                        Logger.getLogger("Eval").info("Silent Eval Return (raw):", res);
+                        Logger.getLogger("Eval").info("Silent Eval Time:", t);
+                    } else {
                         let file: string | undefined, out = String(flags.has("raw") || flags.has("r") ? res : f);
                         if (out.length >= 750) {
                             try {
@@ -110,10 +114,6 @@ export default new ClientEvent("messageCreate", async function messageCreateEven
                                 name:     "output.txt"
                             }] : undefined
                         });
-                    } else {
-                        Logger.getLogger("Eval").info("Silent Eval Return (formatted):", f);
-                        Logger.getLogger("Eval").info("Silent Eval Return (raw):", res);
-                        Logger.getLogger("Eval").info("Silent Eval Time:", t);
                     }
                     break;
                 }

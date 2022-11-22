@@ -60,7 +60,7 @@ export default class Leveling {
             if (cache) {
                 return {
                     values: JSON.parse(cache) as typeof values,
-                    total:  !cacheTotal ? await this.getLeaderboardSize(guild) : Number(cacheTotal)
+                    total:  cacheTotal ? Number(cacheTotal) : await this.getLeaderboardSize(guild)
                 };
             }
         }
@@ -76,8 +76,8 @@ export default class Leveling {
         }
         values = values.sort((a, b) => b.xp.total - a.xp.total).slice(...(page === -1 ? [undefined, undefined] : [(page - 1) * Config.lbPerPage, page * Config.lbPerPage]));
         if (page !== -1) {
-            await db.redis.setex(`leveling:leaderboard:${guild || "global"}:${page}`, !guild ? Config.lbGlobalCacheTime : Config.lbServerCacheTime, JSON.stringify(values));
-            await db.redis.setex(`leveling:leaderboard:${guild || "global"}:total`, !guild ? Config.lbGlobalCacheTime : Config.lbServerCacheTime, keys.length);
+            await db.redis.setex(`leveling:leaderboard:${guild || "global"}:${page}`, guild ? Config.lbServerCacheTime : Config.lbGlobalCacheTime, JSON.stringify(values));
+            await db.redis.setex(`leveling:leaderboard:${guild || "global"}:total`, guild ? Config.lbServerCacheTime : Config.lbGlobalCacheTime, keys.length);
         }
         return {
             values,
