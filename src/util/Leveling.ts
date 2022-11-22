@@ -6,7 +6,7 @@ import GuildConfig from "../db/Models/GuildConfig.js";
 import Config from "../config/index.js";
 import { Utility } from "@uwu-codes/utils";
 import chunk from "chunk";
-import { GuildCommandInteraction, Message, MessageFlags } from "oceanic.js";
+import { AnyGuildTextChannel, GuildCommandInteraction, Message, Interaction } from "oceanic.js";
 
 export default class Leveling {
 
@@ -95,49 +95,49 @@ export default class Leveling {
         return { rank: index === -1 ? -1 : index + 1, total };
     }
 
-    static async run(interaction: GuildCommandInteraction) {
-        if (interaction.user.bot) return;
-        const d = await db.redis.exists(`leveling:${interaction.user.id}:${interaction.guildID}:cooldown`);
+    static async run(input: GuildCommandInteraction | Message<AnyGuildTextChannel>) {
+        const user = input instanceof Interaction ? input.user : input.author;
+        if (user.bot) return;
+        const d = await db.redis.exists(`leveling:${user.id}:${input.guildID}:cooldown`);
         if (d) return;
-        await db.redis.setex(`leveling:${interaction.user.id}:${interaction.channel.guildID}:cooldown`, 60, "");
-        const oldXP = await UserConfig.getXP(interaction.user.id, interaction.guildID);
+        await db.redis.setex(`leveling:${user.id}:${input.channel.guildID}:cooldown`, 60, "");
+        const oldXP = await UserConfig.getXP(user.id, input.guildID);
         const { level: oldLevel } = this.calcLevel(oldXP);
-        const xp = await UserConfig.addXP(interaction.user.id, interaction.guildID);
+        const xp = await UserConfig.addXP(user.id, input.guildID);
         const { level } = this.calcLevel(xp);
         if (level > oldLevel) {
-            Debug("leveling", `${interaction.user.tag} (${interaction.user.id}, ${interaction.guildID}) leveled up from ${oldLevel} to ${level}`);
-            const gConfig = await GuildConfig.get(interaction.guildID);
-            const roles = gConfig.levelingRoles.filter(([role, reqLevel]) => this.calcExp(reqLevel).level <= xp && !interaction.member.roles.includes(role)).map(([role]) => role);
+            Debug("leveling", `${user.tag} (${user.id}, ${input.guildID}) leveled up from ${oldLevel} to ${level}`);
+            const gConfig = await GuildConfig.get(input.guildID);
+            const roles = gConfig.levelingRoles.filter(([role, reqLevel]) => this.calcExp(reqLevel).level <= xp && !input.member.roles.includes(role)).map(([role]) => role);
             if (roles.length !== 0) {
                 for (const role of roles) {
-                    Debug("leveling:roles", `Adding the role ${role} to ${interaction.user.tag} (${interaction.user.id}, ${interaction.guildID}) for leveling up from ${oldLevel} to ${level}`);
-                    await interaction.member.addRole(role, `Leveling (${oldLevel} -> ${level})`).catch(() => {
-                        Debug("leveling:roles", `failed to add the role ${role} to ${interaction.user.tag} (${interaction.user.id}, ${interaction.guildID})`);
+                    Debug("leveling:roles", `Adding the role ${role} to ${user.tag} (${user.id}, ${input.guildID}) for leveling up from ${oldLevel} to ${level}`);
+                    await input.member.addRole(role, `Leveling (${oldLevel} -> ${level})`).catch(() => {
+                        Debug("leveling:roles", `failed to add the role ${role} to ${user.tag} (${user.id}, ${input.guildID})`);
                     });
                 }
             }
             if (gConfig.settings.announceLevelUp) {
                 let m: Message;
-                if (interaction.channel.permissionsOf(interaction.client.user.id).has("SEND_MESSAGES")) {
-                    m = await (interaction.channel.permissionsOf(interaction.channel.client.user.id).has("EMBED_LINKS") ? interaction.createFollowup({
-                        embeds: Util.makeEmbed(true, interaction.user)
+                if (input.channel.permissionsOf(input.client.user.id).has("SEND_MESSAGES")) {
+                    const   content = input.channel.permissionsOf(input.channel.client.user.id).has("EMBED_LINKS") ? {
+                        embeds: Util.makeEmbed(true, user)
                             .setTitle("Level Up!")
-                            .setDescription(`<@!${interaction.user.id}> leveled up from **${oldLevel}** to **${level}**!`, roles.length === 0 ? [] : [
+                            .setDescription(`<@!${user.id}> leveled up from **${oldLevel}** to **${level}**!`, roles.length === 0 ? [] : [
                                 "",
                                 "Roles Gained:",
                                 ...roles.map(r => `- <@&${r}>`)
                             ])
                             .toJSON(true)
-                    }) : interaction.createFollowup({
-                        content:         `Congrats <@!${interaction.user.id}> on leveling up from **${oldLevel}** to **${level}**!${roles.length === 0 ? "" : `\n\nRoles Gained:\n${roles.map(r => `- <@&${r}>`).join("\n")}`}`,
+                    } : {
+                        content:         `Congrats <@!${user.id}> on leveling up from **${oldLevel}** to **${level}**!${roles.length === 0 ? "" : `\n\nRoles Gained:\n${roles.map(r => `- <@&${r}>`).join("\n")}`}`,
                         allowedMentions: { users: false, roles: false }
-                    }));
+                    };
+                    m = await (input instanceof Interaction ? input.createFollowup(content) : input.channel.createMessage(content));
                     setTimeout(async() => {
-                        if ((m.flags & MessageFlags.EPHEMERAL) !== MessageFlags.EPHEMERAL) {
-                            await m.delete().catch(() => null);
-                        }
+                        await m.delete().catch(() => null);
                     }, 2e4);
-                } else void interaction.user.createDM().then(ch => ch.createMessage({ content: `You leveled up in **${interaction.channel.guild.name}** from **${oldLevel}** to **${level}**\n${roles.length === 0 ? "" : `\n\nRoles Gained:\n${roles.map(r => `- ${interaction.channel.guild.roles.get(r)?.name || `<@&${r}>`}`).join("\n")}`}\n\n(I sent this here because I couldn't create messages in the channel you leveled up in)` }));
+                } else void user.createDM().then(ch => ch.createMessage({ content: `You leveled up in **${input.channel.guild.name}** from **${oldLevel}** to **${level}**\n${roles.length === 0 ? "" : `\n\nRoles Gained:\n${roles.map(r => `- ${input.channel.guild.roles.get(r)?.name || `<@&${r}>`}`).join("\n")}`}\n\n(I sent this here because I couldn't create messages in the channel you leveled up in)` }));
             }
         }
     }

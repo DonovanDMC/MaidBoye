@@ -6,6 +6,7 @@ import RequestProxy from "../util/RequestProxy.js";
 import { Colors } from "../util/Constants.js";
 import { State } from "../util/State.js";
 import Logger from "../util/Logger.js";
+import Leveling from "../util/Leveling.js";
 import {
     Internal,
     Strings,
@@ -18,7 +19,7 @@ import {
 import * as Oceanic from "oceanic.js";
 import { parse, strip } from "dashargs";
 import { ButtonColors, ComponentBuilder } from "@oceanicjs/builders";
-import type { MessageActionRow } from "oceanic.js";
+import type { AnyGuildTextChannel, MessageActionRow , Message } from "oceanic.js";
 import { inspect } from "node:util";
 
 async function format(obj: unknown) {
@@ -44,6 +45,9 @@ const evalVariables: Record<string, unknown> = {
 };
 
 export default new ClientEvent("messageCreate", async function messageCreateEvent(msg) {
+    if (msg.channel && "guildID" in msg.channel && msg.channel.guildID) {
+        await Leveling.run(msg as Message<AnyGuildTextChannel>);
+    }
     if (Config.developers.includes(msg.author.id)) {
         const [prefix, command, ...args] = msg.content.split(" ");
 
