@@ -153,7 +153,7 @@ export default class Command<T extends Record<string, unknown> = Record<string, 
         if (this.options.length !== 0) options.push(...this.options);
         if (this.optionsGetter) options.push(...this.optionsGetter());
         return {
-            defaultMemberPermissions: this.defaultMemberPermissions.reduce((a, b) => a | Permissions[b], 0n).toString(),
+            defaultMemberPermissions: this.defaultMemberPermissions.length === 0 ? null : this.defaultMemberPermissions.reduce((a, b) => a | Permissions[b], 0n).toString(),
             description:              this.description,
             descriptionLocalizations: {}, // @TODO description localizations
             dmPermission:             this.validLocation === ValidLocation.GUILD ? false : true,
