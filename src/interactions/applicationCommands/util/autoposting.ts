@@ -119,7 +119,7 @@ export default new Command(import.meta.url, "autoposting")
                 content: `H-hey! <#${channel.id}> is not a valid textable channel..`
             });
         }
-        if (time && !ValidAutoPostingTimes.includes(time)) {
+        if (time && !ValidAutoPostingTimes.includes(time as 5)) {
             return interaction.reply({
                 content: `H-hey! **${time}** is not a valid autoposting time..`
             });

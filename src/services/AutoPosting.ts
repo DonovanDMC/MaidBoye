@@ -1,6 +1,6 @@
 import Config from "../config/index.js";
 import Service from "../util/Service.js";
-import AutoPostingEntry, { AutoPostingTypes, ValidAutoPostingTimes } from "../db/Models/AutoPostingEntry.js";
+import AutoPostingEntry, { AutoPostingTime, AutoPostingTypes, ValidAutoPostingTimes } from "../db/Models/AutoPostingEntry.js";
 import Yiffy from "../util/req/Yiffy.js";
 import CheweyAPI from "../util/req/CheweyAPI.js";
 import db from "../db/index.js";
@@ -53,12 +53,21 @@ export default class AutoPostingService extends Service {
         setInterval(this.run.bind(this), 1e3);
     }
 
+    static async forceRun(time: AutoPostingTime) {
+        return ServicesManager.send("auto-posting", "RUN", time);
+    }
+
     static register() {
         return ServicesManager.register("auto-posting", import.meta.url);
     }
 
-    protected async handleMessage() {
-        throw new Error("Not Implemented");
+    protected async handleMessage(op: string, data: unknown) {
+        if (op === "RUN" && typeof data === "number") {
+            const entries = await AutoPostingEntry.getTime(data as 5);
+            for (const entry of entries) {
+                await this.execute(entry);
+            }
+        }
     }
 
     async execute(entry: AutoPostingEntry) {

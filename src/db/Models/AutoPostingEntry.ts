@@ -84,7 +84,7 @@ export const AutoPostingCategoryChoices: Array<ApplicationCommandOptionsChoice<A
     name:  category === "FURRY_NSFW" ? "Furry NSFW" : Util.readableConstant(category),
     value: category
 }));
-export const ValidAutoPostingTimes = [5, 10, 15, 30, 60];
+export const ValidAutoPostingTimes = [5, 10, 15, 30, 60] as const;
 export type AutoPostingTime = typeof ValidAutoPostingTimes[number];
 export default class AutoPostingEntry {
     static MAX_ENTRIES = 30;
