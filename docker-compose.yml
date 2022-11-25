@@ -19,7 +19,7 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-      keydb:
+      redis:
         condition: service_healthy
     hostname: maidboye.bots.containers.local
     networks:
@@ -48,18 +48,18 @@ services:
       default:
         ipv4_address: 172.19.3.3
 
-  keydb:
-    image: eqalpha/keydb:alpine
-    container_name: keydb.maidboye
+  redis:
+    image: redis:alpine
+    container_name: redis.maidboye
     profiles:
       - all
       - db
-    command: keydb-server --save 10 1 --loglevel warning
+    command: redis-server --save 10 1 --loglevel warning
     volumes:
-      - ./data/keydb:/data
+      - ./data/redis:/data
     restart: unless-stopped
     healthcheck:
-      test: keydb-cli ping
+      test: redis-cli ping
       interval: 10s
       timeout: 5s
     networks:
