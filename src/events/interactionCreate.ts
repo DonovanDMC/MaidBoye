@@ -13,7 +13,15 @@ import Leveling from "../util/Leveling.js";
 import StatsHandler from "../util/StatsHandler.js";
 import { PermissionNames } from "../util/Names.js";
 import Modals from "../interactions/modals/index.js";
-import { ApplicationCommandTypes, InteractionTypes, MessageFlags } from "oceanic.js";
+import Logger from "../util/Logger.js";
+import {
+    ApplicationCommandTypes,
+    InteractionOptionsSubCommand,
+    InteractionOptionsSubCommandGroup,
+    InteractionOptionsWithValue,
+    InteractionTypes,
+    MessageFlags
+} from "oceanic.js";
 
 async function processRestrictions(this: MaidBoye, cmd: AnyCommand, interaction: CommandInteraction) {
     if (cmd.restrictions.includes("beta") && !Config.isDevelopment) {
@@ -108,12 +116,38 @@ async function processAck(this: MaidBoye, cmd: AnyCommand, interaction: CommandI
     return true;
 }
 
+function stringifyArguments(interaction: CommandInteraction) {
+    if (interaction.data.options.raw.length === 0) {
+        return null;
+    }
+
+    let args: Array<InteractionOptionsWithValue> | undefined;
+    const [sub, subGroup] = interaction.data.options.getSubCommand() ?? [];
+    let str = `${subGroup ? `${subGroup} ` : ""}${sub ? `${sub} ` : ""}`;
+    if (subGroup) {
+        args = ((interaction.data.options.raw[0] as InteractionOptionsSubCommandGroup).options?.[0] as InteractionOptionsSubCommand).options;
+    } else if (sub) {
+        args = (interaction.data.options.raw[0] as InteractionOptionsSubCommand).options;
+    } else {
+        args = interaction.data.options.raw as Array<InteractionOptionsWithValue>;
+    }
+
+    if (args) {
+        for (const arg of args) {
+            str += `${arg.name}: ${String(arg.value)} `;
+        }
+    }
+
+    return str.trim();
+}
+
 export default new ClientEvent("interactionCreate", async function interactionCreate(interaction) {
     StatsHandler.track("INTERACTION", interaction.type, interaction.type === InteractionTypes.APPLICATION_COMMAND ? interaction.data.type : null, [`shard:${"guild" in interaction  && interaction.guild ? interaction.guild.shard.id : 0}`]);
     switch (interaction.type) {
         case InteractionTypes.APPLICATION_COMMAND: {
             switch (interaction.data.type) {
                 case ApplicationCommandTypes.CHAT_INPUT: {
+                    Logger.getLogger("CommandHandler").info(`Command "${interaction.data.name}" ran by ${interaction.user.tag} (${interaction.user.id}) with ${interaction.data.options.raw.length === 0 ? "no arguments" : `the arguments "${stringifyArguments(interaction)!}"`}`);
                     const cmd = CommandHandler.getCommand("default", interaction.data.name);
                     if (!cmd) {
                         return interaction.reply({
