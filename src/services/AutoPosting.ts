@@ -307,7 +307,7 @@ export default class AutoPostingService extends Service {
         }
 
         // can't use components because we're using a webhook
-        await entry.execute(this.client, {
+        const messageID = await entry.execute(this.client, {
             embeds: new EmbedBuilder()
                 .setTitle(AutoPostingTitles[entry.type])
                 .setFooter("Automatically Posted")
@@ -321,6 +321,10 @@ export default class AutoPostingService extends Service {
                 ])
                 .toJSON(true)
         });
+        console.log(messageID);
+        if (messageID !== null) {
+            await this.masterCommand("ATTEMPT_CROSSPOST", { channelID: entry.channelID, messageID });
+        }
     }
 
     async run() {

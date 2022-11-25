@@ -52,6 +52,34 @@ export default abstract class Service {
         }
     }
 
+    async masterCommand<T = unknown>(op: string, data: unknown | string, responsive: true): Promise<T>;
+    async masterCommand(op: string, data?: unknown, responsive?: false): Promise<void>;
+    async masterCommand<T = unknown>(op: string, data?: unknown, responsive = false): Promise<T | void> {
+        const id = randomUUID();
+        parentPort!.postMessage({
+            id,
+            event: ServiceEvents.MASTER_COMMAND,
+            data:  { op, data },
+            responsive
+        });
+
+        if (responsive) {
+            return new Promise((resolve, reject) => {
+                const t = setTimeout(() => {
+                    this.cb.delete(id);
+                    reject(new Error("Sending message to master timed out."));
+                }, 30000);
+                this.cb.set(id, {
+                    resolve(val) {
+                        clearTimeout(t);
+                        resolve((val as ServiceMessage).data as T);
+                    },
+                    reject
+                });
+            });
+        }
+    }
+
     ready() {
         parentPort!.postMessage({
             event: ServiceEvents.READY,

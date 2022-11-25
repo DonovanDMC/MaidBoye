@@ -24,6 +24,7 @@ import {
 } from "node:fs/promises";
 
 export default class MaidBoye extends Client {
+    static INSTANCE: MaidBoye;
     cpuUsage = 0;
     events = new Map<string, ClientEvent>();
     firstReady = false;
@@ -33,6 +34,7 @@ export default class MaidBoye extends Client {
     server: typeof api;
     constructor(initTime: bigint) {
         super(Config.clientOptions);
+        MaidBoye.INSTANCE = this;
         this.initTime = initTime;
         this.presenceUpdateInterval = null;
     }

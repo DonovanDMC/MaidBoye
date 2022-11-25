@@ -200,12 +200,14 @@ export default class AutoPostingEntry {
     async execute(client: Client, options: ExecuteWebhookOptions) {
         if (AutoPostingNSFW.includes(this.type) && !(await this.checkNSFW(client))) {
             Logger.getLogger("AutoPosting").warn(`AutoPosting of "${Util.readableConstant(AutoPostingTypes[this.type])}" has been disabled because the NSFW check failed.`);
-            return;
+            return null;
         }
         try {
-            await client.rest.webhooks.execute(this.webhook.id, this.webhook.token, { ...options, wait: true });
+            return (await client.rest.webhooks.execute(this.webhook.id, this.webhook.token, { ...options, wait: true })).id;
         } catch (err) {
+            Logger.getLogger("AutoPostingExecution").error(`Failed to execute autoposting entry ${this.id} for guild ${this.guildID} (type: ${Util.readableConstant(AutoPostingTypes[this.type])}):`, err);
             await AutoPostingWebhookFailureHandler.tick(this, err instanceof DiscordRESTError && (err.code === JSONErrorCodes.UNKNOWN_WEBHOOK || err.code === JSONErrorCodes.INVALID_WEBHOOK_TOKEN));
+            return null;
         }
     }
 }

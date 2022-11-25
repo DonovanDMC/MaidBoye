@@ -1,5 +1,8 @@
 import Logger from "./Logger.js";
 import Debug from "./Debug.js";
+import MaidBoye from "../main.js";
+import Config from "../config/index.js";
+import { ChannelTypes } from "oceanic.js";
 import { randomUUID } from "node:crypto";
 import { Worker } from "node:worker_threads";
 
@@ -43,10 +46,8 @@ export default class ServicesManager {
             }
 
             case ServiceEvents.WORKER_COMMAND: {
-                const op = (message.data as { op: string; }).op;
-                const data = (message.data as { data?: unknown; }).data;
-                const toname = (message.data as { name: string; }).name;
-                const res = await this.send(toname, op, data, message.responsive as true);
+                const { data, name: toname, op } = (message.data as { data?: unknown; name: string; op: string; });
+                const res = await this.send(toname, op, data, message.responsive as true, name);
                 if (message.responsive) {
                     worker.postMessage({
                         data:       res,
@@ -61,7 +62,7 @@ export default class ServicesManager {
             case ServiceEvents.MASTER_COMMAND: {
                 const op = (message.data as { op: string; }).op;
                 const data = (message.data as { data?: unknown; }).data;
-                const res = await this.handleMessage(worker, op, data);
+                const res = await this.handleMessage(worker, name, op, data);
                 if (message.responsive) {
                     worker.postMessage({
                         data:       res,
@@ -79,8 +80,14 @@ export default class ServicesManager {
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    static async handleMessage(worker: Worker, op: string, data?: unknown): Promise<unknown> {
-        throw new Error("Not Implemented");
+    static async handleMessage(worker: Worker, from: string, op: string, data?: unknown): Promise<void> {
+        if (from === "auto-posting" && op === "ATTEMPT_CROSSPOST") {
+            const { channelID, messageID } = data as { channelID: string; messageID: string; };
+            const channel = await MaidBoye.INSTANCE.getGuildChannel(channelID);
+            if (channel && channel.type === ChannelTypes.GUILD_ANNOUNCEMENT && channel.permissionsOf(Config.clientID).has("MANAGE_MESSAGES")) {
+                await MaidBoye.INSTANCE.rest.channels.crosspostMessage(channelID, messageID);
+            }
+        }
     }
 
     static async register(name: string, path: string | URL, timeout = 30000) {
@@ -125,9 +132,9 @@ export default class ServicesManager {
         });
     }
 
-    static async send<T = unknown>(name: string, op: string, data: unknown | string, responsive: true): Promise<T>;
-    static async send(name: string, op: string, data?: unknown, responsive?: false): Promise<void>;
-    static async send<T = unknown>(name: string, op: string, data?: unknown, responsive = false): Promise<T | void> {
+    static async send<T = unknown>(name: string, op: string, data: unknown | string, responsive: true, from?: string): Promise<T>;
+    static async send(name: string, op: string, data?: unknown, responsive?: false, from?: string): Promise<void>;
+    static async send<T = unknown>(name: string, op: string, data?: unknown, responsive = false, from?: string): Promise<T | void> {
         if (this.serviceStatuses.get(name) !== "ready") {
             throw new Error(`Attempted to send message to service "${name}" that is not ready.`);
         }
@@ -137,7 +144,8 @@ export default class ServicesManager {
             id,
             event: ServiceEvents.WORKER_COMMAND,
             data:  { op, data },
-            responsive
+            responsive,
+            from
         });
 
         if (responsive) {
