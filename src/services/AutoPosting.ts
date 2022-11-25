@@ -338,20 +338,20 @@ export default class AutoPostingService extends Service {
 
     async run() {
         const now = new Date();
-        let time: number | undefined;
+        const times: Array<number> = [];
         for (const t of ValidAutoPostingTimes) {
-            if ((time = now.getMinutes() % t) === 0 && now.getSeconds() === 0) {
-                time = t;
-                break;
-            } else {
-                time = undefined;
+            if ((now.getMinutes() % t) === 0 && now.getSeconds() === 0) {
+                times.push(t);
             }
         }
 
-        if (time) {
-            const entries = await AutoPostingEntry.getTime(time as 5);
-            for (const entry of entries) {
-                await this.execute(entry);
+        if (times.length !== 0) {
+            for (const time of times) {
+                Logger.getLogger("AutoPosting").info(`Running "${time} minutes"`);
+                const entries = await AutoPostingEntry.getTime(time as 5);
+                for (const entry of entries) {
+                    await this.execute(entry);
+                }
             }
         }
     }
