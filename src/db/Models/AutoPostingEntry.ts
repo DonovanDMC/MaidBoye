@@ -81,7 +81,7 @@ export const AutoPostingCategories = {
     FURRY_NSFW: AutoPostingNSFW
 };
 export const AutoPostingCategoryChoices: Array<ApplicationCommandOptionsChoice<ApplicationCommandOptionTypes.STRING>> = Object.keys(AutoPostingCategories).map(category => ({
-    name:  Util.readableConstant(category),
+    name:  category === "FURRY_NSFW" ? "Furry NSFW" : Util.readableConstant(category),
     value: category
 }));
 export const ValidAutoPostingTimes = [5, 10, 15, 30, 60];
