@@ -31,7 +31,7 @@ export default class Config extends PrivateConfig {
     }
 
     static get useGuildCommands() {
-        return false;
+        return this.isDevelopment;
     }
 
     static get userAgent() {

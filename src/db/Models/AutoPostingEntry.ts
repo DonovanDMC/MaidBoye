@@ -76,8 +76,8 @@ export const AutoPostingNSFW = [
     AutoPostingTypes.STRAIGHT_YIFF
 ];
 export const AutoPostingCategories = {
-    ANIMALS:    [AutoPostingTypes.BIRB | AutoPostingTypes.BLEP | AutoPostingTypes.BUNNY | AutoPostingTypes.CAT | AutoPostingTypes.DIKDIK | AutoPostingTypes.DOG | AutoPostingTypes.DUCK | AutoPostingTypes.FOX | AutoPostingTypes.KOALA | AutoPostingTypes.OTTER | AutoPostingTypes.OWL | AutoPostingTypes.PANDA | AutoPostingTypes.SNEK | AutoPostingTypes.TURTLE | AutoPostingTypes.RED_PANDA | AutoPostingTypes.WOLF],
-    FURRY:      [AutoPostingTypes.FURSUIT | AutoPostingTypes.HOLD | AutoPostingTypes.HOWL | AutoPostingTypes.HUG | AutoPostingTypes.KISS | AutoPostingTypes.LICK],
+    ANIMALS:    [AutoPostingTypes.BIRB, AutoPostingTypes.BLEP, AutoPostingTypes.BUNNY, AutoPostingTypes.CAT, AutoPostingTypes.DIKDIK, AutoPostingTypes.DOG, AutoPostingTypes.DUCK, AutoPostingTypes.FOX, AutoPostingTypes.KOALA | AutoPostingTypes.OTTER, AutoPostingTypes.OWL, AutoPostingTypes.PANDA, AutoPostingTypes.SNEK, AutoPostingTypes.TURTLE, AutoPostingTypes.RED_PANDA, AutoPostingTypes.WOLF],
+    FURRY:      [AutoPostingTypes.FURSUIT, AutoPostingTypes.HOLD, AutoPostingTypes.HOWL, AutoPostingTypes.HUG, AutoPostingTypes.KISS, AutoPostingTypes.LICK],
     FURRY_NSFW: AutoPostingNSFW
 };
 export const AutoPostingCategoryChoices: Array<ApplicationCommandOptionsChoice<ApplicationCommandOptionTypes.STRING>> = Object.keys(AutoPostingCategories).map(category => ({
