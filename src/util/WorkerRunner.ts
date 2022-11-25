@@ -4,8 +4,8 @@ import type { ModuleImport } from "@uwu-codes/types";
 import { workerData } from "node:worker_threads";
 if (import.meta.url.endsWith(".ts")) {
     tsNode.register({
-        esm:           true,
-        transpileOnly: true
+        esm: true,
+        swc: true
     });
 }
 const data = workerData as { name: string; path: string; };
