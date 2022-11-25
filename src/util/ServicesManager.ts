@@ -95,7 +95,7 @@ export default class ServicesManager {
             path = path.pathname;
         }
         Logger.getLogger("Services").info(`Registering service "${name}". Attempt: ${(this.exitCounts.get(name) ?? 0) + 1}`);
-        const worker = new Worker(new URL("WorkerRunner.ts", import.meta.url), { workerData: { name, path } });
+        const worker = new Worker(new URL(`WorkerRunner${import.meta.url.endsWith(".ts") ? ".ts" : ".js"}`, import.meta.url), { workerData: { name, path } });
         worker
             .on("message", this._handleMessage.bind(this, worker))
             .on("exit", code => {
