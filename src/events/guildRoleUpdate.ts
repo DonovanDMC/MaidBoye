@@ -6,7 +6,9 @@ import { PermissionsByName } from "../util/Names.js";
 import { AuditLogActionTypes, EmbedOptions, Permission, PermissionName } from "oceanic.js";
 
 export default new ClientEvent("guildRoleUpdate", async function guildRoleUpdateEvent(role, oldRole) {
-    if (oldRole === null) return;
+    if (oldRole === null) {
+        return;
+    }
     const events = await LogEvent.getType(role.guildID, LogEvents.ROLE_UPDATE);
     for (const log of events) {
         const embeds: Array<EmbedOptions> = [];
@@ -69,10 +71,14 @@ export default new ClientEvent("guildRoleUpdate", async function guildRoleUpdate
             const addedPermissions = [] as Array<PermissionName>;
             const removedPermissions = [] as Array<PermissionName>;
             for (const p of oldPermissions) {
-                if (!newPermissions.includes(p)) removedPermissions.push(p);
+                if (!newPermissions.includes(p)) {
+                    removedPermissions.push(p);
+                }
             }
             for (const p of newPermissions) {
-                if (!oldPermissions.includes(p)) addedPermissions.push(p);
+                if (!oldPermissions.includes(p)) {
+                    addedPermissions.push(p);
+                }
             }
             embeds.push(Util.makeEmbed(true)
                 .setTitle("Role Updated")
@@ -91,7 +97,9 @@ export default new ClientEvent("guildRoleUpdate", async function guildRoleUpdate
             );
         }
 
-        if (embeds.length === 0) continue;
+        if (embeds.length === 0) {
+            continue;
+        }
 
         if (role.guild.clientMember.permissions.has("VIEW_AUDIT_LOG")) {
             const auditLog = await role.guild.getAuditLog({
@@ -104,7 +112,9 @@ export default new ClientEvent("guildRoleUpdate", async function guildRoleUpdate
                     .setTitle("Member Update: Blame")
                     .setColor(Colors.gold)
                     .setDescription(`**${entry.user.tag}** (${entry.user.mention})`);
-                if (entry.reason) embed.addField("Reason", entry.reason, false);
+                if (entry.reason) {
+                    embed.addField("Reason", entry.reason, false);
+                }
                 embeds.push(embed.toJSON());
             }
         }

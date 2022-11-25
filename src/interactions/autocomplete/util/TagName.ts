@@ -11,7 +11,9 @@ export default class TagNameAutocomplete extends BaseAutocomplete {
     override async handleGuild(interaction: AutocompleteInteraction<ValidLocation.GUILD>, focused: AnyAutocompleteFocus) {
         assert(typeof focused.value === "string");
         const gConfig = await GuildConfig.get(interaction.guildID);
-        if (gConfig.tagNames.length === 0) return interaction.result([]);
+        if (gConfig.tagNames.length === 0) {
+            return interaction.result([]);
+        }
         return interaction.result(gConfig.tagNames.map(t => ({ name: t, value: t })));
     }
 }

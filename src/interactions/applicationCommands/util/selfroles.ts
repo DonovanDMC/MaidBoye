@@ -63,7 +63,9 @@ export default new Command(import.meta.url, "selfroles")
     .setExecutor(async function(interaction, { type: [type], role }, gConfig) {
         switch (type) {
             case "list": {
-                if (gConfig.selfroles.length === 0) return interaction.reply({ content: "H-hey! This server doesn't have any self assignable roles.." });
+                if (gConfig.selfroles.length === 0) {
+                    return interaction.reply({ content: "H-hey! This server doesn't have any self assignable roles.." });
+                }
                 return interaction.reply({
                     embeds: Util.makeEmbed(true, interaction.user)
                         .setTitle("Self Roles List")
@@ -73,29 +75,41 @@ export default new Command(import.meta.url, "selfroles")
             }
 
             case "join": {
-                if (!role || !gConfig.selfroles.includes(role)) return interaction.reply({ content: "H-hey! That selection was invalid.." });
+                if (!role || !gConfig.selfroles.includes(role)) {
+                    return interaction.reply({ content: "H-hey! That selection was invalid.." });
+                }
                 const r = interaction.guild.roles.find(rl => rl.id === role);
                 if (!r) {
                     gConfig.selfroles.splice(gConfig.selfroles.indexOf(role), 1);
                     await gConfig.edit({ selfroles: gConfig.selfroles });
                     return interaction.reply({ content: "H-hey! I couldn't find the role you selected.." });
                 }
-                if (interaction.member.roles.includes(role)) return interaction.reply({ content: "H-hey! You already have that role.." });
-                if (Util.compareRoleToMember(r, interaction.guild.clientMember) !== "lower") return interaction.reply({ content: "H-hey! I can't assign that role as it's higher than or as high as my highest role.. Please contact a server administrator" });
+                if (interaction.member.roles.includes(role)) {
+                    return interaction.reply({ content: "H-hey! You already have that role.." });
+                }
+                if (Util.compareRoleToMember(r, interaction.guild.clientMember) !== "lower") {
+                    return interaction.reply({ content: "H-hey! I can't assign that role as it's higher than or as high as my highest role.. Please contact a server administrator" });
+                }
                 await interaction.member.addRole(role, `SelfRoles: ${interaction.user.tag} (${interaction.user.id})`);
                 return interaction.reply({ content: `Congrats, you now have the <@&${role}> role` });
             }
 
             case "leave": {
-                if (!role || !gConfig.selfroles.includes(role)) return interaction.reply({ content: "H-hey! That selection was invalid.." });
+                if (!role || !gConfig.selfroles.includes(role)) {
+                    return interaction.reply({ content: "H-hey! That selection was invalid.." });
+                }
                 const r = interaction.guild.roles.find(rl => rl.id === role);
                 if (!r) {
                     gConfig.selfroles.splice(gConfig.selfroles.indexOf(role), 1);
                     await gConfig.edit({ selfroles: gConfig.selfroles });
                     return interaction.reply({ content: "H-hey! I couldn't find the role you selected.." });
                 }
-                if (!interaction.member.roles.includes(role)) return interaction.reply({ content: "H-hey! You don't have that role.." });
-                if (Util.compareRoleToMember(r, interaction.guild.clientMember) !== "lower") return interaction.reply({ content: "H-hey! I can't remove that role as it's higher than or as high as my highest role.. Please contact a server administrator" });
+                if (!interaction.member.roles.includes(role)) {
+                    return interaction.reply({ content: "H-hey! You don't have that role.." });
+                }
+                if (Util.compareRoleToMember(r, interaction.guild.clientMember) !== "lower") {
+                    return interaction.reply({ content: "H-hey! I can't remove that role as it's higher than or as high as my highest role.. Please contact a server administrator" });
+                }
                 await interaction.member.removeRole(role, `SelfRoles: ${interaction.user.tag} (${interaction.user.id})`);
                 return interaction.reply({
                     allowedMentions: { roles: false },
@@ -104,18 +118,30 @@ export default new Command(import.meta.url, "selfroles")
             }
 
             case "add": {
-                if (!interaction.member.permissions.has("MANAGE_ROLES")) return interaction.reply({ content: `H-hey! You need the **${PermissionsByName.MANAGE_ROLES}** permission..` });
+                if (!interaction.member.permissions.has("MANAGE_ROLES")) {
+                    return interaction.reply({ content: `H-hey! You need the **${PermissionsByName.MANAGE_ROLES}** permission..` });
+                }
                 const r = interaction.guild.roles.find(rl => rl.id === role);
-                if (!role || !r) return interaction.reply({ content: "H-hey! I couldn't find the role you selected.." });
-                if (gConfig.selfroles.includes(role)) return interaction.reply({ content: "H-hey! That role is already self assignable.." });
-                if (Util.compareRoleToMember(r, interaction.guild.clientMember)  !== "lower") return interaction.reply({ content: "H-hey! That role is higher than or as high as my highest role, please fix that before trying to make it self assignable.." });
-                if (Util.compareRoleToMember(r, interaction.member)  !== "lower") return interaction.reply({ content: "H-hey! That role is higher than or as high as your highest role, you cannot make it assignable.." });
+                if (!role || !r) {
+                    return interaction.reply({ content: "H-hey! I couldn't find the role you selected.." });
+                }
+                if (gConfig.selfroles.includes(role)) {
+                    return interaction.reply({ content: "H-hey! That role is already self assignable.." });
+                }
+                if (Util.compareRoleToMember(r, interaction.guild.clientMember)  !== "lower") {
+                    return interaction.reply({ content: "H-hey! That role is higher than or as high as my highest role, please fix that before trying to make it self assignable.." });
+                }
+                if (Util.compareRoleToMember(r, interaction.member)  !== "lower") {
+                    return interaction.reply({ content: "H-hey! That role is higher than or as high as your highest role, you cannot make it assignable.." });
+                }
                 const modPerms: Array<ModeratorPermissions> = [];
                 let perms = 0;
                 for (const perm of AllPermissions) {
                     if (r.permissions.has(perm)) {
                         perms++;
-                        if (moderatorPermissions.includes(perm as ModeratorPermissions)) modPerms.push(perm as ModeratorPermissions);
+                        if (moderatorPermissions.includes(perm as ModeratorPermissions)) {
+                            modPerms.push(perm as ModeratorPermissions);
+                        }
                     }
                 }
 
@@ -141,15 +167,21 @@ export default new Command(import.meta.url, "selfroles")
             }
 
             case "remove": {
-                if (!interaction.member.permissions.has("MANAGE_ROLES")) return interaction.reply({ content: `H-hey! You need the **${PermissionsByName.MANAGE_ROLES}** permission..` });
-                if (!role) return interaction.reply({ content: "H-hey! I couldn't find the role you selected.." });
+                if (!interaction.member.permissions.has("MANAGE_ROLES")) {
+                    return interaction.reply({ content: `H-hey! You need the **${PermissionsByName.MANAGE_ROLES}** permission..` });
+                }
+                if (!role) {
+                    return interaction.reply({ content: "H-hey! I couldn't find the role you selected.." });
+                }
                 const r = interaction.guild.roles.find(rl => rl.id === role);
                 if (!r) {
                     gConfig.selfroles.splice(gConfig.selfroles.indexOf(role), 1);
                     await gConfig.edit({ selfroles: gConfig.selfroles });
                     return interaction.reply({ content: "H-hey! I couldn't find the role you selected, so it has automatically been removed.." });
                 }
-                if (!gConfig.selfroles.includes(role)) return interaction.reply({ content: "H-hey! That role isn't self assignable.." });
+                if (!gConfig.selfroles.includes(role)) {
+                    return interaction.reply({ content: "H-hey! That role isn't self assignable.." });
+                }
                 if (Util.compareRoleToMember(r,interaction.guild.clientMember) !== "lower") {
                     gConfig.selfroles.splice(gConfig.selfroles.indexOf(role), 1);
                     await gConfig.edit({ selfroles: gConfig.selfroles });

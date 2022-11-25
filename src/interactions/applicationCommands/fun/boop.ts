@@ -24,10 +24,12 @@ export default new Command(import.meta.url, "boop")
         text: interaction.data.options.getString("text")
     }))
     .setAck(async function(interaction, { user, text }) {
-        if (!user && !text) return interaction.reply({
-            flags:   MessageFlags.EPHEMERAL,
-            content: "H-hey! You have to specify a user or some text.."
-        });
+        if (!user && !text) {
+            return interaction.reply({
+                flags:   MessageFlags.EPHEMERAL,
+                content: "H-hey! You have to specify a user or some text.."
+            });
+        }
         return interaction.defer();
     })
     .setExecutor(async function(interaction, { user, text }, gConfig) {
@@ -38,10 +40,12 @@ export default new Command(import.meta.url, "boop")
             .setDescription(r[Math.floor(Math.random() * r.length)]);
 
         if (gConfig.settings.commandImages) {
-            if (!interaction.channel.permissionsOf(this.user.id).has("ATTACH_FILES")) return interaction.reply({
-                flags:   MessageFlags.EPHEMERAL,
-                content: "H-hey! This server has the **Command Images** setting enabled, but I cannot attach files.. Please correct this."
-            });
+            if (!interaction.channel.permissionsOf(this.user.id).has("ATTACH_FILES")) {
+                return interaction.reply({
+                    flags:   MessageFlags.EPHEMERAL,
+                    content: "H-hey! This server has the **Command Images** setting enabled, but I cannot attach files.. Please correct this."
+                });
+            }
             const img = await Yiffy.furry.boop("json", 1);
             embed.setImage(img.url);
         }

@@ -27,7 +27,9 @@ export default new Command(import.meta.url, "yiff")
     }))
     .setCooldown(1e4)
     .setExecutor(async function(interaction, { type }) {
-        if (!type) type = (await UserConfig.get(interaction.user.id)).preferences.defaultYiffType;
+        if (!type) {
+            type = (await UserConfig.get(interaction.user.id)).preferences.defaultYiffType;
+        }
         const img = await Util.getYiff(type);
         return interaction.reply({
             embeds: Util.makeEmbed(true, interaction.user)

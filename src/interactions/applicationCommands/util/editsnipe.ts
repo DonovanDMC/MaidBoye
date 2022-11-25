@@ -20,10 +20,12 @@ export default new Command(import.meta.url, "editsnipe")
     .setValidLocation(ValidLocation.GUILD)
     .setExecutor(async function(interaction, { channel }) {
         const snipe = await db.redis.lpop(`snipe:edit:${channel}`);
-        if (snipe === null) return interaction.reply({
-            content: "H-hey! No snipes were found..",
-            flags:   MessageFlags.EPHEMERAL
-        });
+        if (snipe === null) {
+            return interaction.reply({
+                content: "H-hey! No snipes were found..",
+                flags:   MessageFlags.EPHEMERAL
+            });
+        }
         const d = JSON.parse(snipe) as EditSnipe;
         const len = await db.redis.llen(`snipe:edit:${channel}`);
         return interaction.reply({

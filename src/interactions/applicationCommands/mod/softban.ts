@@ -38,10 +38,18 @@ export default new Command(import.meta.url, "softban")
     .setAck("ephemeral")
     .setGuildLookup(true)
     .setExecutor(async function(interaction, { member, reason, dm, deleteHours }, gConfig) {
-        if (member.id === interaction.user.id) return interaction.reply({ content: "H-hey! You can't softban yourself.." });
-        if (member.id === interaction.guild.ownerID) return interaction.reply({ content: "H-hey! You can't softban the server owner.." });
-        if (Util.compareMemberToMember(member, interaction.member) !== "lower") return interaction.reply({ content: "H-hey! That member's highest role is higher than or as high as your highest role, you cannot softban them.." });
-        if (Util.compareMemberToMember(member, interaction.channel.guild.clientMember) !== "lower") return interaction.reply({ content: "H-hey! That member's highest role is higher than or as high as my highest role, I cannot softban them.." });
+        if (member.id === interaction.user.id) {
+            return interaction.reply({ content: "H-hey! You can't softban yourself.." });
+        }
+        if (member.id === interaction.guild.ownerID) {
+            return interaction.reply({ content: "H-hey! You can't softban the server owner.." });
+        }
+        if (Util.compareMemberToMember(member, interaction.member) !== "lower") {
+            return interaction.reply({ content: "H-hey! That member's highest role is higher than or as high as your highest role, you cannot softban them.." });
+        }
+        if (Util.compareMemberToMember(member, interaction.channel.guild.clientMember) !== "lower") {
+            return interaction.reply({ content: "H-hey! That member's highest role is higher than or as high as my highest role, I cannot softban them.." });
+        }
         const deleteSeconds = deleteHours * 60 * 60;
         reason = Strings.truncateWords(reason, 500);
 
@@ -52,10 +60,12 @@ export default new Command(import.meta.url, "softban")
             }))
             .then(async() => {
                 let dmError: Error | undefined;
-                if (dm && !member.bot) await (await member.user.createDM()).createMessage({
-                    allowedMentions: { users: false },
-                    content:         `You were softbanned from ${interaction.guild.name}${gConfig.settings.dmBlame ? ` by **${interaction.member.mention}**` : ""}\nReason:\n\`\`\`\n${reason}\`\`\``
-                }).catch((err: Error) => dmError = err);
+                if (dm && !member.bot) {
+                    await (await member.user.createDM()).createMessage({
+                        allowedMentions: { users: false },
+                        content:         `You were softbanned from ${interaction.guild.name}${gConfig.settings.dmBlame ? ` by **${interaction.member.mention}**` : ""}\nReason:\n\`\`\`\n${reason}\`\`\``
+                    }).catch((err: Error) => dmError = err);
+                }
                 const { caseID, entry } = await ModLogHandler.createEntry({
                     type:   ModLogType.SOFTBAN,
                     guild:  interaction.guild,

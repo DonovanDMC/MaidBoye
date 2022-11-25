@@ -10,10 +10,16 @@ export default class ModlogResetConfirmationComponent extends BaseComponent {
     command = "modlog";
 
     override async handleGuild(interaction: ComponentInteraction<ValidLocation.GUILD>, { hook }: BaseState & { hook: string; }) {
-        if (!interaction.member.permissions.has("MANAGE_GUILD")) return interaction.editParent(Util.replaceContent({ content: `H-hey! You don't have permission to use that <@!${interaction.user.id}>...` }));
+        if (!interaction.member.permissions.has("MANAGE_GUILD")) {
+            return interaction.editParent(Util.replaceContent({ content: `H-hey! You don't have permission to use that <@!${interaction.user.id}>...` }));
+        }
         const gConfig = await GuildConfig.get(interaction.guildID);
-        if (!(await ModLogHandler.check(gConfig))) return interaction.editParent(Util.replaceContent({ content: "H-hey! The modlog isn't enabled.." }));
-        if (gConfig.modlog.webhook?.id !== hook) return interaction.editParent(Util.replaceContent({ content: "H-hey! Something about the modlog has changed, try again." }));
+        if (!(await ModLogHandler.check(gConfig))) {
+            return interaction.editParent(Util.replaceContent({ content: "H-hey! The modlog isn't enabled.." }));
+        }
+        if (gConfig.modlog.webhook?.id !== hook) {
+            return interaction.editParent(Util.replaceContent({ content: "H-hey! Something about the modlog has changed, try again." }));
+        }
 
     }
 }

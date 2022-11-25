@@ -7,7 +7,9 @@ import { AuditLogActionTypes } from "oceanic.js";
 
 export default new ClientEvent("guildScheduledEventCreate", async function guildScheduledEventCreateEvent(event) {
     const events = await LogEvent.getType(event.guildID, LogEvents.SCHEDULED_EVENT_CREATE);
-    if (events.length === 0) return;
+    if (events.length === 0) {
+        return;
+    }
 
     const embed = Util.makeEmbed(true)
         .setTitle("Scheduled Event Created")
@@ -23,7 +25,9 @@ export default new ClientEvent("guildScheduledEventCreate", async function guild
             `Scheduled End Time: **${event.scheduledEndTime === null ? "None" : Util.formatDiscordTime(event.scheduledEndTime, "short-datetime", true)}**`,
             `Status: **${GuildScheduledEventStatusNames[event.status]}**`
         ].join("\n"), false);
-    if (event.image) embed.setImage(event.imageURL()!);
+    if (event.image) {
+        embed.setImage(event.imageURL()!);
+    }
 
     if (event.guild.clientMember.permissions.has("VIEW_AUDIT_LOG")) {
         const auditLog = await event.guild.getAuditLog({
@@ -33,7 +37,9 @@ export default new ClientEvent("guildScheduledEventCreate", async function guild
         const entry = auditLog.entries.find(e => e.targetID === event.id);
         if (entry?.user && (entry.createdAt.getTime() + 5e3) > Date.now()) {
             embed.addField("Blame", `**${entry.user.tag}** (${entry.user.tag})`, false);
-            if (entry.reason) embed.addField("Reason", entry.reason, false);
+            if (entry.reason) {
+                embed.addField("Reason", entry.reason, false);
+            }
         }
     }
 

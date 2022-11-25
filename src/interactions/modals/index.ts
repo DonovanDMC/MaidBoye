@@ -49,7 +49,9 @@ export default class Modals {
     }
 
     static async loadAll(dir = thisDirectory) {
-        if (dir === `${thisDirectory}/structure`) return;
+        if (dir === `${thisDirectory}/structure`) {
+            return;
+        }
         const files = (await readdir(dir, { withFileTypes: true }));
         for (const file of files) {
             if (file.isDirectory()) {
@@ -57,13 +59,17 @@ export default class Modals {
                 continue;
             }
             // ignore all files in base directory
-            if (dir === thisDirectory) continue;
+            if (dir === thisDirectory) {
+                continue;
+            }
             Debug("modals:load", `Loading "${`${dir}/${file.name}`.replace(thisDirectory, "").slice(1)}"`);
             const start = Timer.getTime();
             let inst: BaseModal;
             try {
                 let modal = await import(`${dir}/${file.name}`) as ModuleImport<typeof EmptyModal>;
-                if ("default" in modal) modal = modal.default;
+                if ("default" in modal) {
+                    modal = modal.default;
+                }
                 inst = new modal();
                 [inst.id] = this.register(inst);
             } catch (err) {
@@ -82,7 +88,9 @@ export default class Modals {
 		modal["handle"] === BaseModal.prototype["handle"] &&
 		modal.handleDM === BaseModal.prototype.handleDM &&
 		modal.handleGuild === BaseModal.prototype.handleGuild;
-        if (noOverride) throw new Error(`Modal "${modal.command || "null"}-${modal.action}" does not override at least one handle method.`);
+        if (noOverride) {
+            throw new Error(`Modal "${modal.command || "null"}-${modal.action}" does not override at least one handle method.`);
+        }
         const id = this.list.push(modal) - 1;
         Debug("modals:register", `Registered modal "${modal.command || "null"}-${modal.action}" (id: ${id})`);
         return [id] as [id: number];

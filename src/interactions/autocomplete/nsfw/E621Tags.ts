@@ -12,14 +12,17 @@ export default class E621TagsAutocomplete extends BaseAutocomplete {
         assert(typeof focused.value === "string");
         const tags = focused.value.split(" ");
         const currentValue = tags[tags.length - 1];
-        if (!currentValue || currentValue.length < 3) return interaction.result(focused.value === "" ? [
-            { name: "(NONE)", value: "" }
-        ] : [
-            { name: focused.value, value: focused.value }
-        ]);
-        else {
+        if (!currentValue || currentValue.length < 3) {
+            return interaction.result(focused.value === "" ? [
+                { name: "(NONE)", value: "" }
+            ] : [
+                { name: focused.value, value: focused.value }
+            ]);
+        } else {
             const auto = await E621.tags.getAutocomplete(currentValue);
-            if (auto === null) return interaction.result([{ name: focused.value, value: focused.value }]);
+            if (auto === null) {
+                return interaction.result([{ name: focused.value, value: focused.value }]);
+            }
             const valueWithoutLast = focused.value.slice(0, focused.value.indexOf(currentValue)).trim();
             return interaction.result([
                 { name: focused.value, value: focused.value },

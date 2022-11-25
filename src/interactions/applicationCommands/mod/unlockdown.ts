@@ -23,7 +23,9 @@ export default new Command(import.meta.url, "unlockdown")
     .setGuildLookup(true)
     .setExecutor(async function(interaction, { reason }, gConfig) {
         const old = await db.redis.get(`lockdown:${interaction.guildID}`);
-        if (!old) return interaction.reply({ content: "H-hey! This server hasn't been locked down.." });
+        if (!old) {
+            return interaction.reply({ content: "H-hey! This server hasn't been locked down.." });
+        }
         reason = Strings.truncateWords(reason, 500);
         const channels = interaction.guild.channels.filter(({ type }) => TextableGuildChannels.includes(type as typeof TextableGuildChannels[number])) ;
         const original = JSON.parse(old) as Array<[id: string, allow: string, deny: string]>;
@@ -35,11 +37,17 @@ export default new Command(import.meta.url, "unlockdown")
             const overwrite = channel.permissionOverwrites.get(interaction.guildID);
             if (overwrite) {
                 let allow = overwrite.allow, deny = overwrite.deny;
-                if (!(deny & lockPermissions)) continue;
+                if (!(deny & lockPermissions)) {
+                    continue;
+                }
                 changes++;
                 for (const perm of lockPermissionsList) {
-                    if (deny & perm && !(oldDeny & perm)) deny &= ~perm;
-                    if (oldAllow & perm) allow |= perm;
+                    if (deny & perm && !(oldDeny & perm)) {
+                        deny &= ~perm;
+                    }
+                    if (oldAllow & perm) {
+                        allow |= perm;
+                    }
                 }
                 await channel.editPermission(interaction.guildID, {
                     allow,
@@ -53,7 +61,9 @@ export default new Command(import.meta.url, "unlockdown")
             }
         }
         await db.redis.del(`lockdown:${interaction.guildID}`);
-        if (changes === 0 && errors.length === 0) return interaction.reply({ content: "No channels were unlocked" });
+        if (changes === 0 && errors.length === 0) {
+            return interaction.reply({ content: "No channels were unlocked" });
+        }
         const { caseID } = await ModLogHandler.createEntry({
             type:  ModLogType.UNLOCKDOWN,
             guild: interaction.guild,

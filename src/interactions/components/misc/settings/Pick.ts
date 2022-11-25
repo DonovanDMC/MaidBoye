@@ -12,7 +12,9 @@ export default class SettingsPickComponent extends BaseComponent {
     command = "settings";
 
     override async handleGuild(interaction: ComponentInteraction<ValidLocation.GUILD>, data: BaseState & { setting: number; value?: string | number; }) {
-        if (interaction.data.componentType === ComponentTypes.BUTTON) assert(data.value !== undefined, `no value present in pick (${data.setting})`);
+        if (interaction.data.componentType === ComponentTypes.BUTTON) {
+            assert(data.value !== undefined, `no value present in pick (${data.setting})`);
+        }
         const set = Settings.getByID(data.setting);
         assert(set, `invalid setting recieved in pick (${data.setting})`);
         const gConfig = await GuildConfig.get(interaction.guildID);

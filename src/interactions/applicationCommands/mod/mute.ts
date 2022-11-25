@@ -50,11 +50,21 @@ export default new Command(import.meta.url, "mute")
     .setAck("ephemeral")
     .setGuildLookup(true)
     .setExecutor(async function(interaction, { member, reason, days, hours, minutes, dm }, gConfig) {
-        if (member.id === interaction.user.id) return interaction.reply({ content: "H-hey! You can't mute yourself.." });
-        if (member.id === interaction.guild.ownerID) return interaction.reply({ content: "H-hey! You can't mute the server owner.." });
-        if (Util.compareMemberToMember(member, interaction.member) !== "lower") return interaction.reply({ content: "H-hey! That member's highest role is higher than or as high as your highest role, you cannot mute them.." });
-        if (Util.compareMemberToMember(member, interaction.channel.guild.clientMember) !== "lower") return interaction.reply({ content: "H-hey! That member's highest role is higher than or as high as my highest role, I cannot mute them.." });
-        if (member.communicationDisabledUntil !== null) return interaction.reply({ content: "H-hey! That member is already muted.." });
+        if (member.id === interaction.user.id) {
+            return interaction.reply({ content: "H-hey! You can't mute yourself.." });
+        }
+        if (member.id === interaction.guild.ownerID) {
+            return interaction.reply({ content: "H-hey! You can't mute the server owner.." });
+        }
+        if (Util.compareMemberToMember(member, interaction.member) !== "lower") {
+            return interaction.reply({ content: "H-hey! That member's highest role is higher than or as high as your highest role, you cannot mute them.." });
+        }
+        if (Util.compareMemberToMember(member, interaction.channel.guild.clientMember) !== "lower") {
+            return interaction.reply({ content: "H-hey! That member's highest role is higher than or as high as my highest role, I cannot mute them.." });
+        }
+        if (member.communicationDisabledUntil !== null) {
+            return interaction.reply({ content: "H-hey! That member is already muted.." });
+        }
         const time = (((days * 24) + hours) * 60 + minutes) * 60;
         reason = Strings.truncateWords(reason, 500);
 
@@ -67,10 +77,12 @@ export default new Command(import.meta.url, "mute")
             }))
             .then(async() => {
                 let dmError: Error | undefined;
-                if (dm && !member.bot) await (await member.user.createDM()).createMessage({
-                    allowedMentions: { users: false },
-                    content:         `You were muted in ${interaction.guild.name}${gConfig.settings.dmBlame ? ` by **${interaction.member.mention}**` : ""}\nReason:\n\`\`\`\n${reason}\`\`\`\nExpires: ${time === 0 ? "**Never**" : Util.formatDiscordTime(Date.now() + (time * 1000), "long-datetime", true)}`
-                }).catch((err: Error) => dmError = err);
+                if (dm && !member.bot) {
+                    await (await member.user.createDM()).createMessage({
+                        allowedMentions: { users: false },
+                        content:         `You were muted in ${interaction.guild.name}${gConfig.settings.dmBlame ? ` by **${interaction.member.mention}**` : ""}\nReason:\n\`\`\`\n${reason}\`\`\`\nExpires: ${time === 0 ? "**Never**" : Util.formatDiscordTime(Date.now() + (time * 1000), "long-datetime", true)}`
+                    }).catch((err: Error) => dmError = err);
+                }
                 const { caseID, entry } = await ModLogHandler.createEntry({
                     type:   ModLogType.MUTE,
                     guild:  interaction.guild,

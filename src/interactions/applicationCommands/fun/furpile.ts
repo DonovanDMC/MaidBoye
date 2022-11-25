@@ -19,10 +19,12 @@ export default new Command(import.meta.url, "furpile")
         user: interaction.data.options.getUserOption("user", true)?.value
     }))
     .setAck(async function(interaction, options) {
-        if (interaction.user.id === options.user) return interaction.reply({
-            content: "H-hey! You can't start a furpile on yourself..",
-            flags:   MessageFlags.EPHEMERAL
-        });
+        if (interaction.user.id === options.user) {
+            return interaction.reply({
+                content: "H-hey! You can't start a furpile on yourself..",
+                flags:   MessageFlags.EPHEMERAL
+            });
+        }
         return interaction.defer();
     })
     .setExecutor(async function(interaction, { user }) {

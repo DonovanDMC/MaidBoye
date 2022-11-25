@@ -5,11 +5,15 @@ import { Colors } from "../util/Constants.js";
 import { AuditLogActionTypes, EmbedOptions, Guild, Routes } from "oceanic.js";
 
 export default new ClientEvent("guildEmojisUpdate", async function guildEmojisUpdateEvent(guild, emojis, oldEmojis) {
-    if (oldEmojis === null) return;
+    if (oldEmojis === null) {
+        return;
+    }
     const eventsCreate = await LogEvent.getType(guild.id, LogEvents.EMOJI_CREATE);
     const eventsDelete = await LogEvent.getType(guild.id, LogEvents.EMOJI_DELETE);
     const eventsUpdate = await LogEvent.getType(guild.id, LogEvents.EMOJI_UPDATE);
-    if (eventsCreate.length === 0 && eventsDelete.length === 0 && eventsUpdate.length === 0) return;
+    if (eventsCreate.length === 0 && eventsDelete.length === 0 && eventsUpdate.length === 0) {
+        return;
+    }
 
     const addedEmojis = emojis.filter(e => !oldEmojis.some(oe => oe.id === e.id));
     const removedEmojis = oldEmojis.filter(e => !emojis.some(oe => oe.id === e.id));
@@ -47,7 +51,9 @@ export default new ClientEvent("guildEmojisUpdate", async function guildEmojisUp
                     .setTitle("Emoji Created: Blame")
                     .setColor(Colors.gold)
                     .setDescription(`**${entry.user.tag}** (${entry.user.mention})`);
-                if (entry.reason) embed.addField("Reason", entry.reason, false);
+                if (entry.reason) {
+                    embed.addField("Reason", entry.reason, false);
+                }
                 embeds.push(embed.toJSON());
             }
         }
@@ -88,7 +94,9 @@ export default new ClientEvent("guildEmojisUpdate", async function guildEmojisUp
                     .setTitle("Emoji Deleted: Blame")
                     .setColor(Colors.gold)
                     .setDescription(`**${entry.user.tag}** (${entry.user.mention})`);
-                if (entry.reason) embed.addField("Reason", entry.reason, false);
+                if (entry.reason) {
+                    embed.addField("Reason", entry.reason, false);
+                }
                 embeds.push(embed.toJSON());
             }
         }
@@ -135,7 +143,9 @@ export default new ClientEvent("guildEmojisUpdate", async function guildEmojisUp
                 );
             }
         }
-        if (embeds.length === 0) return;
+        if (embeds.length === 0) {
+            return;
+        }
 
         if (guild instanceof Guild && guild.clientMember.permissions.has("VIEW_AUDIT_LOG")) {
             const auditLog = await guild.getAuditLog({
@@ -149,7 +159,9 @@ export default new ClientEvent("guildEmojisUpdate", async function guildEmojisUp
                     .setTitle("Emoji Updated: Blame")
                     .setColor(Colors.gold)
                     .setDescription(`**${entry.user.tag}** (${entry.user.mention})`);
-                if (entry.reason) embed.addField("Reason", entry.reason, false);
+                if (entry.reason) {
+                    embed.addField("Reason", entry.reason, false);
+                }
                 embeds.push(embed.toJSON());
             }
         }

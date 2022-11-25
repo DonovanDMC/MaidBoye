@@ -5,9 +5,13 @@ import { Colors } from "../util/Constants.js";
 import { AuditLogActionTypes, EmbedOptions, Role } from "oceanic.js";
 
 export default new ClientEvent("guildMemberUpdate", async function guildMemberUpdateEvent(member, oldMember) {
-    if (oldMember === null) return;
+    if (oldMember === null) {
+        return;
+    }
     const events = await LogEvent.getType(member.guildID, LogEvents.MEMBER_UPDATE);
-    if (events.length === 0) return;
+    if (events.length === 0) {
+        return;
+    }
 
     const embeds: Array<EmbedOptions> = [];
     if (member.avatar !== oldMember.avatar) {
@@ -20,7 +24,9 @@ export default new ClientEvent("guildMemberUpdate", async function guildMemberUp
                 "",
                 `${member.avatar === null ? "[Avatar Removed]" : `[New Avatar](${member.avatarURL()})`} ([global](${member.user.avatarURL()}))`
             ]);
-        if (member.avatar !== null) embed.setImage(member.avatarURL());
+        if (member.avatar !== null) {
+            embed.setImage(member.avatarURL());
+        }
         embeds.push(embed.toJSON());
     }
 
@@ -40,10 +46,14 @@ export default new ClientEvent("guildMemberUpdate", async function guildMemberUp
     const removedRoles = [] as Array<Role>;
     const addedRoles = [] as Array<Role>;
     for (const r of oldMember.roles) {
-        if (!member.roles.includes(r)) removedRoles.push(member.guild.roles.get(r)!);
+        if (!member.roles.includes(r)) {
+            removedRoles.push(member.guild.roles.get(r)!);
+        }
     }
     for (const r of member.roles) {
-        if (!oldMember.roles.includes(r)) addedRoles.push(member.guild.roles.get(r)!);
+        if (!oldMember.roles.includes(r)) {
+            addedRoles.push(member.guild.roles.get(r)!);
+        }
     }
 
     let rolesChanged = false;
@@ -133,7 +143,9 @@ export default new ClientEvent("guildMemberUpdate", async function guildMemberUp
             .toJSON());
     }
 
-    if (embeds.length === 0) return;
+    if (embeds.length === 0) {
+        return;
+    }
 
     if (member.guild.clientMember.permissions.has("VIEW_AUDIT_LOG")) {
         const auditLog = await member.guild.getAuditLog({
@@ -146,7 +158,9 @@ export default new ClientEvent("guildMemberUpdate", async function guildMemberUp
                 .setTitle("Member Update: Blame")
                 .setColor(Colors.gold)
                 .setDescription(`**${entry.user.tag}** (${entry.user.mention})`);
-            if (entry.reason) embed.addField("Reason", entry.reason, false);
+            if (entry.reason) {
+                embed.addField("Reason", entry.reason, false);
+            }
             embeds.push(embed.toJSON());
         }
 
@@ -161,7 +175,9 @@ export default new ClientEvent("guildMemberUpdate", async function guildMemberUp
                     .setTitle("Member Roles Update: Blame")
                     .setColor(Colors.gold)
                     .setDescription(`**${entryRoles.user.tag}** (${entryRoles.user.mention})`);
-                if (entryRoles.reason) embed.addField("Reason", entryRoles.reason, false);
+                if (entryRoles.reason) {
+                    embed.addField("Reason", entryRoles.reason, false);
+                }
                 embeds.push(embed.toJSON());
             }
         }

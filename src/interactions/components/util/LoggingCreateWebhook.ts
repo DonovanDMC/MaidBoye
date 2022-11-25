@@ -29,8 +29,8 @@ export default class LoggingCreateWebhookComponent extends BaseComponent {
                     value:    "https://i.maid.gay/icon.png"
                 })
                 .toJSON(),
-            customID: State.new(interaction.user.id, "logging", "webhook-name").with("channel", channel).with("event", event).encode(),
-            title:    "Webhook Name"
+            customID: State.new(interaction.user.id, "logging", "webhook").with("channel", channel).with("event", event).encode(),
+            title:    "Webhook"
         });
         await interaction.editOriginal(Util.replaceContent({
             content: "See the modal."

@@ -21,7 +21,9 @@ import {
 import { Time } from "@uwu-codes/utils";
 
 export default new ClientEvent("guildUpdate", async function guildUpdateEvent(guild, oldGuild) {
-    if (oldGuild === null) return;
+    if (oldGuild === null) {
+        return;
+    }
     const events = await LogEvent.getType(guild.id, LogEvents.GUILD_UPDATE);
     for (const log of events) {
         const embeds: Array<EmbedOptions> = [];
@@ -57,7 +59,9 @@ export default new ClientEvent("guildUpdate", async function guildUpdateEvent(gu
                     "",
                     guild.banner === null ? "[Banner Removed]" : `[New Banner](${guild.bannerURL()!})`
                 ]);
-            if (guild.banner !== null) embed.setImage(guild.bannerURL()!);
+            if (guild.banner !== null) {
+                embed.setImage(guild.bannerURL()!);
+            }
             embeds.push(embed.toJSON());
         }
 
@@ -92,7 +96,9 @@ export default new ClientEvent("guildUpdate", async function guildUpdateEvent(gu
                     "",
                     guild.discoverySplash === null ? "[Discovery Splash Removed]" : `[New Discovery Splash](${guild.discoverySplashURL()!})`
                 ]);
-            if (guild.discoverySplash !== null) embed.setImage(guild.discoverySplashURL()!);
+            if (guild.discoverySplash !== null) {
+                embed.setImage(guild.discoverySplashURL()!);
+            }
             embeds.push(embed.toJSON());
         }
 
@@ -111,10 +117,14 @@ export default new ClientEvent("guildUpdate", async function guildUpdateEvent(gu
         const addedFeatures = [] as Array<GuildFeature>;
         const removedFeatures = [] as Array<GuildFeature>;
         for (const f of oldGuild.features) {
-            if (!guild.features.includes(f)) removedFeatures.push(f);
+            if (!guild.features.includes(f)) {
+                removedFeatures.push(f);
+            }
         }
         for (const f of guild.features) {
-            if (!oldGuild.features.includes(f)) addedFeatures.push(f);
+            if (!oldGuild.features.includes(f)) {
+                addedFeatures.push(f);
+            }
         }
         if (addedFeatures.length !== 0 || removedFeatures.length !== 0) {
             embeds.push(Util.makeEmbed(true)
@@ -142,7 +152,9 @@ export default new ClientEvent("guildUpdate", async function guildUpdateEvent(gu
                     "",
                     guild.icon === null ? "[Icon Removed]" : `[New Icon](${guild.iconURL()!})`
                 ]);
-            if (guild.icon !== null) embed.setImage(guild.iconURL()!);
+            if (guild.icon !== null) {
+                embed.setImage(guild.iconURL()!);
+            }
             embeds.push(embed.toJSON());
         }
 
@@ -296,7 +308,9 @@ export default new ClientEvent("guildUpdate", async function guildUpdateEvent(gu
                     "",
                     guild.splash === null ? "[Splash Removed]" : `[Splash Banner](${guild.splashURL()!})`
                 ]);
-            if (guild.splash !== null) embed.setImage(guild.splashURL()!);
+            if (guild.splash !== null) {
+                embed.setImage(guild.splashURL()!);
+            }
             embeds.push(embed.toJSON());
         }
 
@@ -307,10 +321,14 @@ export default new ClientEvent("guildUpdate", async function guildUpdateEvent(gu
         const addedSystemChannelFlags = [] as Array<keyof typeof SystemChannelFlags>;
         const removedSystemChannelFlags = [] as Array<keyof typeof SystemChannelFlags>;
         for (const f of oldSystemChannelFlags) {
-            if (!newSystemChannelFlags.includes(f)) removedSystemChannelFlags.push(f);
+            if (!newSystemChannelFlags.includes(f)) {
+                removedSystemChannelFlags.push(f);
+            }
         }
         for (const f of newSystemChannelFlags) {
-            if (!oldSystemChannelFlags.includes(f)) addedSystemChannelFlags.push(f);
+            if (!oldSystemChannelFlags.includes(f)) {
+                addedSystemChannelFlags.push(f);
+            }
         }
         if (addedSystemChannelFlags.length !== 0 || removedSystemChannelFlags.length !== 0) {
             embeds.push(Util.makeEmbed(true)
@@ -384,10 +402,14 @@ export default new ClientEvent("guildUpdate", async function guildUpdateEvent(gu
                 const addedChannels = [] as Array<WelcomeScreenChannel>;
                 const removedchannels = [] as Array<WelcomeScreenChannel>;
                 for (const ch of oldGuild.welcomeScreen.welcomeChannels) {
-                    if (!guild.welcomeScreen.welcomeChannels.includes(ch)) removedchannels.push(ch);
+                    if (!guild.welcomeScreen.welcomeChannels.includes(ch)) {
+                        removedchannels.push(ch);
+                    }
                 }
                 for (const ch of guild.welcomeScreen.welcomeChannels) {
-                    if (!oldGuild.welcomeScreen.welcomeChannels.includes(ch)) addedChannels.push(ch);
+                    if (!oldGuild.welcomeScreen.welcomeChannels.includes(ch)) {
+                        addedChannels.push(ch);
+                    }
                 }
                 if (addedChannels.length !== 0 || removedchannels.length !== 0) {
                     embeds.push(Util.makeEmbed(true)
@@ -428,7 +450,9 @@ export default new ClientEvent("guildUpdate", async function guildUpdateEvent(gu
             );
         }
 
-        if (embeds.length === 0) continue;
+        if (embeds.length === 0) {
+            continue;
+        }
 
         if (guild.clientMember.permissions.has("VIEW_AUDIT_LOG")) {
             const auditLog = await guild.getAuditLog({
@@ -441,7 +465,9 @@ export default new ClientEvent("guildUpdate", async function guildUpdateEvent(gu
                     .setTitle("Server Update: Blame")
                     .setColor(Colors.gold)
                     .setDescription(`**${entry.user.tag}** (${entry.user.mention})`);
-                if (entry.reason) embed.addField("Reason", entry.reason, false);
+                if (entry.reason) {
+                    embed.addField("Reason", entry.reason, false);
+                }
                 embeds.push(embed.toJSON());
             }
         }

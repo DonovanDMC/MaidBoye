@@ -10,7 +10,9 @@ export default class SelfrolesConfirmRemoveComponent extends BaseComponent {
 
     override async handleGuild(interaction: ComponentInteraction<ValidLocation.GUILD>, { role }: BaseState & { role: string; }) {
         // just in case someone opens a menu then loses permissions
-        if (!interaction.member.permissions.has("MANAGE_ROLES")) return interaction.editParent(Util.replaceContent({ content: `H-hey! You don't have permission to use that <@!${interaction.user.id}>...` }));
+        if (!interaction.member.permissions.has("MANAGE_ROLES")) {
+            return interaction.editParent(Util.replaceContent({ content: `H-hey! You don't have permission to use that <@!${interaction.user.id}>...` }));
+        }
         const gConfig = await GuildConfig.get(interaction.guildID);
         // components never expire and multiple can be opened
         if (gConfig.selfroles.includes(role)) {

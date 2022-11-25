@@ -7,7 +7,9 @@ import { AuditLogActionTypes, Guild } from "oceanic.js";
 
 export default new ClientEvent("integrationCreate", async function integrationCreateEvent(guild, integration) {
     const events = await LogEvent.getType(guild.id, LogEvents.INTEGRATION_CREATE);
-    if (events.length === 0) return;
+    if (events.length === 0) {
+        return;
+    }
 
     const embed = Util.makeEmbed(true)
         .setTitle("Integration Created")
@@ -34,7 +36,9 @@ export default new ClientEvent("integrationCreate", async function integrationCr
         const entry = auditLog.entries.find(e => e.targetID === integration.id);
         if (entry?.user && (entry.createdAt.getTime() + 5e3) > Date.now()) {
             embed.addField("Blame", `**${entry.user.tag}** (${entry.user.tag})`, false);
-            if (entry.reason) embed.addField("Reason", entry.reason, false);
+            if (entry.reason) {
+                embed.addField("Reason", entry.reason, false);
+            }
         }
     }
 

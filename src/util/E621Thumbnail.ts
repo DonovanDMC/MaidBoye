@@ -20,7 +20,9 @@ export default class E621Thumbnail {
             return false;
         } else {
             // remove pending for any other post ids
-            if (this.hasPending(message)) this.removePending(message);
+            if (this.hasPending(message)) {
+                this.removePending(message);
+            }
             this.pendingList.push([message, post]);
             return true;
         }
@@ -33,7 +35,9 @@ export default class E621Thumbnail {
             Key:    name
         }).promise().then(() => true, () => false);
         console.log(url, md5, type, prev);
-        if (prev) return `${Config.thumbsURL}/${name}`;
+        if (prev) {
+            return `${Config.thumbsURL}/${name}`;
+        }
         const thumb = await genThumbnail(url, type, {
             gifLength:            1,
             gifOptimizationLevel: 3
@@ -55,8 +59,12 @@ export default class E621Thumbnail {
     static removePending(message: string) {
         if (this.hasPending(message)) {
             const p = this.pendingList.filter(l => l[0] === message);
-            for (const l of p) this.pendingList.splice(this.pendingList.indexOf(l), 1);
+            for (const l of p) {
+                this.pendingList.splice(this.pendingList.indexOf(l), 1);
+            }
             return p.length !== 0;
-        } else return false;
+        } else {
+            return false;
+        }
     }
 }

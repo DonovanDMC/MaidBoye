@@ -7,9 +7,13 @@ import { AuditLogActionTypes, ChannelTypes, EmbedOptions } from "oceanic.js";
 import { Time } from "@uwu-codes/utils";
 
 export default new ClientEvent("channelUpdate", async function channelUpdateEvent(channel, oldChannel) {
-    if (oldChannel === null) return;
+    if (oldChannel === null) {
+        return;
+    }
     const events = await LogEvent.getType(channel.guildID, LogEvents.CHANNEL_UPDATE);
-    if (events.length === 0) return;
+    if (events.length === 0) {
+        return;
+    }
 
 
     const embeds: Array<EmbedOptions> = [];
@@ -247,7 +251,9 @@ export default new ClientEvent("channelUpdate", async function channelUpdateEven
         );
     }
 
-    if (embeds.length === 0) return;
+    if (embeds.length === 0) {
+        return;
+    }
 
     if (channel.guild.clientMember.permissions.has("VIEW_AUDIT_LOG")) {
         const auditLog = await channel.guild.getAuditLog({
@@ -260,7 +266,9 @@ export default new ClientEvent("channelUpdate", async function channelUpdateEven
                 .setTitle("Channel Update: Blame")
                 .setColor(Colors.gold)
                 .setDescription(`**${entry.user.tag}** (${entry.user.mention})`);
-            if (entry.reason) embed.addField("Reason", entry.reason, false);
+            if (entry.reason) {
+                embed.addField("Reason", entry.reason, false);
+            }
             embeds.push(embed.toJSON());
         }
 

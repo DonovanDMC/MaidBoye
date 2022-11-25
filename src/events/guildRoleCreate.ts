@@ -6,7 +6,9 @@ import { AuditLogActionTypes } from "oceanic.js";
 
 export default new ClientEvent("guildRoleCreate", async function guildRoleCreateEvent(role) {
     const events = await LogEvent.getType(role.guildID, LogEvents.ROLE_CREATE);
-    if (events.length === 0) return;
+    if (events.length === 0) {
+        return;
+    }
 
     const embed = Util.makeEmbed(true)
         .setTitle("Role Created")
@@ -29,7 +31,9 @@ export default new ClientEvent("guildRoleCreate", async function guildRoleCreate
         const entry = auditLog.entries.find(e => e.targetID === role.id);
         if (entry?.user && (entry.createdAt.getTime() + 5e3) > Date.now()) {
             embed.addField("Blame", `**${entry.user.tag}** (${entry.user.tag})`, false);
-            if (entry.reason) embed.addField("Reason", entry.reason, false);
+            if (entry.reason) {
+                embed.addField("Reason", entry.reason, false);
+            }
         }
     }
 

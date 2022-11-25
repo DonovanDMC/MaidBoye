@@ -23,7 +23,9 @@ export default new Command(import.meta.url, "lockdown")
     .setGuildLookup(true)
     .setExecutor(async function(interaction, { reason }, gConfig) {
         const old = await db.redis.get(`lockdown:${interaction.guildID}`);
-        if (old) return interaction.reply({ content: "H-hey! This server has already been locked down.." });
+        if (old) {
+            return interaction.reply({ content: "H-hey! This server has already been locked down.." });
+        }
         reason = Strings.truncateWords(reason, 500);
         const channels = interaction.guild.channels.filter(({ type }) => TextableGuildChannels.includes(type as typeof TextableGuildChannels[number])) as Array<AnyGuildTextChannelWithoutThreads>;
         const original: Array<[id: string, allow: string, deny: string]> = [];
@@ -31,12 +33,15 @@ export default new Command(import.meta.url, "lockdown")
         for (const channel of channels) {
             const overwrite = channel.permissionOverwrites.get(interaction.guildID) ?? { allow: 0n, deny: 0n };
             // skip if send is already denied
-            if (overwrite.deny & Permissions.SEND_MESSAGES) continue;
-            else {
+            if (overwrite.deny & Permissions.SEND_MESSAGES) {
+                continue;
+            } else {
                 let allow = overwrite.allow;
                 original.push([channel.id, overwrite.allow.toString(), overwrite.deny.toString()]);
                 for (const perm of lockPermissionsList) {
-                    if (allow & perm) allow &= ~perm;
+                    if (allow & perm) {
+                        allow &= ~perm;
+                    }
                 }
                 await channel.editPermission(interaction.guildID, {
                     allow,
@@ -49,8 +54,11 @@ export default new Command(import.meta.url, "lockdown")
                 });
             }
         }
-        if (original.length !== 0) await db.redis.set(`lockdown:${interaction.guildID}`, JSON.stringify(original));
-        else if (errors.length === 0) return interaction.reply({ content: "No channels were locked" });
+        if (original.length !== 0) {
+            await db.redis.set(`lockdown:${interaction.guildID}`, JSON.stringify(original));
+        } else if (errors.length === 0) {
+            return interaction.reply({ content: "No channels were locked" });
+        }
         const { caseID } = await ModLogHandler.createEntry({
             type:  ModLogType.LOCKDOWN,
             guild: interaction.guild,

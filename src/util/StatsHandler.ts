@@ -15,15 +15,21 @@ export default class StatsHandler {
     static ShortSessionID = shortUUID().fromUUID(this.SessionID);
 
     static async processPending() {
-        if (!db.ready) return false;
+        if (!db.ready) {
+            return false;
+        }
         if (this.pendingRedis.length !== 0) {
             const m = db.redis.multi();
-            for (const stat of this.pendingRedis) m.incr(stat);
+            for (const stat of this.pendingRedis) {
+                m.incr(stat);
+            }
             await m.exec();
             this.pendingRedis = [];
         }
         if (this.pendingDB.length !== 0) {
-            for (const stat of this.pendingDB) await Stat.create(stat);
+            for (const stat of this.pendingDB) {
+                await Stat.create(stat);
+            }
             this.pendingDB = [];
         }
 
@@ -81,7 +87,9 @@ export default class StatsHandler {
             case "SHARD_RESUME": {
                 assert(is<StatProperties["SHARD_READY" | "SHARD_DISCONNECT" | "SHARD_RESUME"]>(args));
                 props.shard_id = args[0];
-                if (type === "SHARD_DISCONNECT") props.close_code = args[1];
+                if (type === "SHARD_DISCONNECT") {
+                    props.close_code = args[1];
+                }
                 break;
             }
 
@@ -103,7 +111,9 @@ export default class StatsHandler {
             }
         }
         let tags: Array<string> = [];
-        if (Array.isArray(args[args.length - 1])) tags = args[args.length - 1] as Array<string>;
+        if (Array.isArray(args[args.length - 1])) {
+            tags = args[args.length - 1] as Array<string>;
+        }
         tags.push(`env:${Config.isDevelopment ? "development" : "production"}`, `env:${Config.isDocker ? "docker" : "other"}`, `host:${hostname()}`);
         props.type = StatType[type];
         void Stat.create(props);
@@ -111,12 +121,16 @@ export default class StatsHandler {
             const p = new Promise((resolve, reject) => {
                 void Stat.create(props).then(() => {
                     const m = db.redis.multi();
-                    for (const stat of rstats) m.incr(stat);
+                    for (const stat of rstats) {
+                        m.incr(stat);
+                    }
                     void m.exec((err, res) => {
                         if (err) {
                             this.pendingRedis.push(...rstats);
                             reject(err);
-                        } else resolve(res);
+                        } else {
+                            resolve(res);
+                        }
                     });
                 })
                     .catch(err => {

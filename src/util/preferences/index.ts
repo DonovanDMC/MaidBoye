@@ -70,7 +70,9 @@ export default class Preferences {
             Debug("preferemces:load", `Loading "${file}"`);
             const start = Timer.getTime();
             let set = await import(new URL(file, import.meta.url).pathname) as ModuleImport<typeof EmptyPreference>;
-            if ("default" in set) set = set.default;
+            if ("default" in set) {
+                set = set.default;
+            }
             const inst = new set();
             [inst.id, inst.page] = this.register(inst);
             const end = Timer.getTime();
@@ -80,16 +82,26 @@ export default class Preferences {
 
     static parse(val: bigint) {
         let defaultYiffType: YiffTypes = Config.yiffTypes[0];
-        if (Util.hasBits(val, PreferenceBits.DEFAULT_YIFF_TYPE_GAY)) defaultYiffType = "gay";
-        else if (Util.hasBits(val, PreferenceBits.DEFAULT_YIFF_TYPE_STRAIGHT)) defaultYiffType = "straight";
-        else if (Util.hasBits(val, PreferenceBits.DEFAULT_YIFF_TYPE_LESBIAN)) defaultYiffType = "lesbian";
-        else if (Util.hasBits(val, PreferenceBits.DEFAULT_YIFF_TYPE_GYNOMORPH)) defaultYiffType = "gynomorph";
-        else if (Util.hasBits(val, PreferenceBits.DEFAULT_YIFF_TYPE_ANDROMORPH)) defaultYiffType = "andromorph";
+        if (Util.hasBits(val, PreferenceBits.DEFAULT_YIFF_TYPE_GAY)) {
+            defaultYiffType = "gay";
+        } else if (Util.hasBits(val, PreferenceBits.DEFAULT_YIFF_TYPE_STRAIGHT)) {
+            defaultYiffType = "straight";
+        } else if (Util.hasBits(val, PreferenceBits.DEFAULT_YIFF_TYPE_LESBIAN)) {
+            defaultYiffType = "lesbian";
+        } else if (Util.hasBits(val, PreferenceBits.DEFAULT_YIFF_TYPE_GYNOMORPH)) {
+            defaultYiffType = "gynomorph";
+        } else if (Util.hasBits(val, PreferenceBits.DEFAULT_YIFF_TYPE_ANDROMORPH)) {
+            defaultYiffType = "andromorph";
+        }
 
         let e621ThumbnailType: E621ThumbnailType = Config.e621ThumbnailTypes[0];
-        if (Util.hasBits(val, PreferenceBits.E621_THUMBNAIL_TYPE_NONE)) e621ThumbnailType = "none";
-        else if (Util.hasBits(val, PreferenceBits.E621_THUMBNAIL_TYPE_IMAGE)) e621ThumbnailType = "image";
-        else if (Util.hasBits(val, PreferenceBits.E621_THUMBNAIL_TYPE_GIF)) e621ThumbnailType = "gif";
+        if (Util.hasBits(val, PreferenceBits.E621_THUMBNAIL_TYPE_NONE)) {
+            e621ThumbnailType = "none";
+        } else if (Util.hasBits(val, PreferenceBits.E621_THUMBNAIL_TYPE_IMAGE)) {
+            e621ThumbnailType = "image";
+        } else if (Util.hasBits(val, PreferenceBits.E621_THUMBNAIL_TYPE_GIF)) {
+            e621ThumbnailType = "gif";
+        }
         return {
             disableSnipes:           Util.hasBits(val, PreferenceBits.DISABLE_SNIPES),
             disableMarriageRequests: Util.hasBits(val, PreferenceBits.DISABLE_MARRIAGE_REQUESTS),
@@ -102,14 +114,22 @@ export default class Preferences {
     }
 
     static register<T extends BasePreference>(preference: T) {
-        if (preference.shortDescription.length > 50) throw new Error(`short description for preference "${preference.name}" is over 50 characters`);
-        if (preference.description.length > 100) throw new Error(`description for preference "${preference.name}" is over 100 characters`);
+        if (preference.shortDescription.length > 50) {
+            throw new Error(`short description for preference "${preference.name}" is over 50 characters`);
+        }
+        if (preference.description.length > 100) {
+            throw new Error(`description for preference "${preference.name}" is over 100 characters`);
+        }
         assert(this.get(preference.name) === undefined, new Error(`duplicate preference (${preference.name})`).stack);
         const id = this.list.push(preference) - 1;
         let pageID = this.pages.length  - 1;
-        if (pageID < 0) pageID = 0;
+        if (pageID < 0) {
+            pageID = 0;
+        }
         let page = this.pages[pageID];
-        if (!page) page = [];
+        if (!page) {
+            page = [];
+        }
         if (page.length >= 3) {
             pageID++;
             page = [];

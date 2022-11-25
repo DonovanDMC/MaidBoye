@@ -6,11 +6,15 @@ import { StickerFormatTypeNames, StickerTypeNames } from "../util/Names.js";
 import { AuditLogActionTypes, EmbedOptions, Guild, Routes } from "oceanic.js";
 
 export default new ClientEvent("guildStickersUpdate", async function guildStickersUpdateEvent(guild, stickers, oldStickers) {
-    if (oldStickers === null) return;
+    if (oldStickers === null) {
+        return;
+    }
     const eventsCreate = await LogEvent.getType(guild.id, LogEvents.STICKER_CREATE);
     const eventsDelete = await LogEvent.getType(guild.id, LogEvents.STICKER_DELETE);
     const eventsUpdate = await LogEvent.getType(guild.id, LogEvents.STICKER_DELETE);
-    if (eventsCreate.length === 0 && eventsDelete.length === 0 && eventsUpdate.length === 0) return;
+    if (eventsCreate.length === 0 && eventsDelete.length === 0 && eventsUpdate.length === 0) {
+        return;
+    }
 
     const addedStickers = stickers.filter(s => !oldStickers.some(os => os.id === s.id));
     const removedStickers = oldStickers.filter(s => !stickers.some(os => os.id === s.id));
@@ -48,7 +52,9 @@ export default new ClientEvent("guildStickersUpdate", async function guildSticke
                     .setTitle("Sticker Created: Blame")
                     .setColor(Colors.gold)
                     .setDescription(`**${entry.user.tag}** (${entry.user.mention})`);
-                if (entry.reason) embed.addField("Reason", entry.reason, false);
+                if (entry.reason) {
+                    embed.addField("Reason", entry.reason, false);
+                }
                 embeds.push(embed.toJSON());
             }
         }
@@ -89,7 +95,9 @@ export default new ClientEvent("guildStickersUpdate", async function guildSticke
                     .setTitle("Sticker Deleted: Blame")
                     .setColor(Colors.gold)
                     .setDescription(`**${entry.user.tag}** (${entry.user.mention})`);
-                if (entry.reason) embed.addField("Reason", entry.reason, false);
+                if (entry.reason) {
+                    embed.addField("Reason", entry.reason, false);
+                }
                 embeds.push(embed.toJSON());
             }
         }
@@ -158,7 +166,9 @@ export default new ClientEvent("guildStickersUpdate", async function guildSticke
                 );
             }
 
-            if (embeds.length === 0) return;
+            if (embeds.length === 0) {
+                return;
+            }
 
             if (guild instanceof Guild && guild.clientMember.permissions.has("VIEW_AUDIT_LOG")) {
                 const auditLog = await guild.getAuditLog({
@@ -172,7 +182,9 @@ export default new ClientEvent("guildStickersUpdate", async function guildSticke
                         .setTitle("Sticker Updated: Blame")
                         .setColor(Colors.gold)
                         .setDescription(`**${entry.user.tag}** (${entry.user.mention})`);
-                    if (entry.reason) embed.addField("Reason", entry.reason, false);
+                    if (entry.reason) {
+                        embed.addField("Reason", entry.reason, false);
+                    }
                     embeds.push(embed.toJSON());
                 }
             }

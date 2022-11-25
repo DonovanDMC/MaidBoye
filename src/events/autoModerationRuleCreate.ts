@@ -9,7 +9,9 @@ import { Time } from "@uwu-codes/utils";
 
 export default new ClientEvent("autoModerationRuleCreate", async function autoModerationRuleCreateEvent(rule) {
     const events = await LogEvent.getType(rule.guildID, LogEvents.AUTOMOD_RULE_CREATE);
-    if (events.length === 0) return;
+    if (events.length === 0) {
+        return;
+    }
 
     const actions: Array<string> = [];
     for (const action of rule.actions) {
@@ -35,9 +37,15 @@ export default new ClientEvent("autoModerationRuleCreate", async function autoMo
 
         case AutoModerationTriggerTypes.KEYWORD_PRESET: {
             trigger.push("```diff");
-            if (rule.triggerMetadata.presets) trigger.push(...rule.triggerMetadata.presets.map(p => `- ${AutoModerationKeywordPresetTypeNames[p]}`));
-            if (rule.triggerMetadata.allowList) trigger.push(...rule.triggerMetadata.allowList.map(k => `+ ${k}`));
-            if (trigger.length === 2) trigger.push("No Config");
+            if (rule.triggerMetadata.presets) {
+                trigger.push(...rule.triggerMetadata.presets.map(p => `- ${AutoModerationKeywordPresetTypeNames[p]}`));
+            }
+            if (rule.triggerMetadata.allowList) {
+                trigger.push(...rule.triggerMetadata.allowList.map(k => `+ ${k}`));
+            }
+            if (trigger.length === 2) {
+                trigger.push("No Config");
+            }
             trigger.push("```");
             break;
         }
@@ -73,7 +81,9 @@ export default new ClientEvent("autoModerationRuleCreate", async function autoMo
         const entry = auditLog.entries.find(e => e.targetID === rule.id);
         if (entry?.user && (entry.createdAt.getTime() + 5e3) > Date.now()) {
             embed.addField("Blame", `**${entry.user.tag}** (${entry.user.tag})`, false);
-            if (entry.reason) embed.addField("Reason", entry.reason, false);
+            if (entry.reason) {
+                embed.addField("Reason", entry.reason, false);
+            }
         }
     }
 

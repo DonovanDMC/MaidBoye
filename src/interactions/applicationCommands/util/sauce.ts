@@ -52,13 +52,17 @@ export default new Command(import.meta.url, "sauce")
             sauce = await Sauce(file.url, simularity);
         }
 
-        if (sauce === null) return interaction.reply({ content: "Something failed.." });
+        if (sauce === null) {
+            return interaction.reply({ content: "Something failed.." });
+        }
         const { method, tried, post, saucePercent, sourceOverride, snRateLimited, url } = sauce;
         if (snRateLimited) {
             StatsHandler.track("SAUCE_RATELIMITED", simularity, tried);
             return interaction.reply({ content: `SauceNAO is ratelimiting us, so we couldn't try SauceNAO, but we tried these instead, and couldn't find anything: \`${tried.join("`, `") || "`NONE`"}\`` });
         }
-        if (method) StatsHandler.track("SAUCE_SUCCESS", simularity, method);
+        if (method) {
+            StatsHandler.track("SAUCE_SUCCESS", simularity, method);
+        }
         switch (method) {
             case "e621": {
                 assert(post);

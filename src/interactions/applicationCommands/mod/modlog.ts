@@ -94,40 +94,48 @@ export default new Command(import.meta.url, "modlog")
     .setAck("ephemeral")
     .setGuildLookup(true)
     .setExecutor(async function(interaction, { type: [type, configType], channel, setting, settingValue, caseID, reason }, gConfig) {
-        if (gConfig.modlog.enabled && gConfig.modlog.webhook === null) await gConfig.resetModLog();
+        if (gConfig.modlog.enabled && gConfig.modlog.webhook === null) {
+            await gConfig.resetModLog();
+        }
         switch (type) {
             case "config": {
                 assert(configType);
                 switch (configType) {
                     case "setup": {
                         assert(channel);
-                        if (await ModLogHandler.check(gConfig)) return interaction.reply({ content: "H-hey! The modlog has already been set up. Reset it before changing it" });
+                        if (await ModLogHandler.check(gConfig)) {
+                            return interaction.reply({ content: "H-hey! The modlog has already been set up. Reset it before changing it" });
+                        }
                         break;
                     }
 
                     case "reset": {
-                        if (!(await ModLogHandler.check(gConfig))) return interaction.reply({ content: "H-hey! The modlog is not enabled.." });
+                        if (!(await ModLogHandler.check(gConfig))) {
+                            return interaction.reply({ content: "H-hey! The modlog is not enabled.." });
+                        }
                         if (gConfig.modlog.webhook) {
                             const hook = await this.rest.webhooks.get(gConfig.modlog.webhook.id, gConfig.modlog.webhook.token);
-                            if (hook) return interaction.reply({
-                                embeds: Util.makeEmbed(true, interaction.user)
-                                    .setTitle("Delete Webhook")
-                                    .setDescription(`The webhook **${hook.name || hook.id}** that was used for the modlog is managed by us, would you like to delete it?`)
-                                    .setThumbnail(hook.avatarURL() || "https://cdn.discordapp.com/embed/avatars/0.png")
-                                    .toJSON(true),
-                                components: new ComponentBuilder<MessageActionRow>()
-                                    .addInteractionButton({
-                                        customID: State.new(interaction.user.id, "modlog", "reset-confirm").with("hook", hook.id).encode(),
-                                        label:    "Yes",
-                                        style:    ButtonColors.GREEN
-                                    })
-                                    .addInteractionButton({
-                                        customID: State.cancel(interaction.user.id),
-                                        label:    "No",
-                                        style:    ButtonColors.RED
-                                    })
-                                    .toJSON()
-                            });
+                            if (hook) {
+                                return interaction.reply({
+                                    embeds: Util.makeEmbed(true, interaction.user)
+                                        .setTitle("Delete Webhook")
+                                        .setDescription(`The webhook **${hook.name || hook.id}** that was used for the modlog is managed by us, would you like to delete it?`)
+                                        .setThumbnail(hook.avatarURL() || "https://cdn.discordapp.com/embed/avatars/0.png")
+                                        .toJSON(true),
+                                    components: new ComponentBuilder<MessageActionRow>()
+                                        .addInteractionButton({
+                                            customID: State.new(interaction.user.id, "modlog", "reset-confirm").with("hook", hook.id).encode(),
+                                            label:    "Yes",
+                                            style:    ButtonColors.GREEN
+                                        })
+                                        .addInteractionButton({
+                                            customID: State.cancel(interaction.user.id),
+                                            label:    "No",
+                                            style:    ButtonColors.RED
+                                        })
+                                        .toJSON()
+                                });
+                            }
                         }
                         await gConfig.resetModLog();
                         return interaction.reply({ content: "The modlog has been reset." });
@@ -159,14 +167,26 @@ export default new Command(import.meta.url, "modlog")
             case "edit-case": {
                 assert(caseID && reason);
                 reason = Strings.truncate(reason, 500);
-                if (!(await ModLogHandler.check(gConfig))) return interaction.reply({ content: "H-hey! The modlog isn't enabled in this server, so cases can't be edited" });
-                if (!interaction.member.permissions.has("ADMINISTRATOR") && !gConfig.modlog.caseEditingEnabled) return interaction.reply({ content: "H-hey! Case editing is disabled in this server" });
+                if (!(await ModLogHandler.check(gConfig))) {
+                    return interaction.reply({ content: "H-hey! The modlog isn't enabled in this server, so cases can't be edited" });
+                }
+                if (!interaction.member.permissions.has("ADMINISTRATOR") && !gConfig.modlog.caseEditingEnabled) {
+                    return interaction.reply({ content: "H-hey! Case editing is disabled in this server" });
+                }
                 const modCase = await ModLog.getCase(interaction.guildID, caseID);
-                if (!modCase) return interaction.reply({ content: "H-hey! I couldn't find that case.." });
-                if (modCase.deleted) return interaction.reply({ content: "H-hey! That case has been deleted.." });
+                if (!modCase) {
+                    return interaction.reply({ content: "H-hey! I couldn't find that case.." });
+                }
+                if (modCase.deleted) {
+                    return interaction.reply({ content: "H-hey! That case has been deleted.." });
+                }
                 // we also enforce this for administrators as any edits would look as if they were specifically from us
-                if (modCase.blameID === null || modCase.blameID === this.user.id) return interaction.reply({ content: "Cases for automatic actions cannot be edited." });
-                if (!interaction.member.permissions.has("ADMINISTRATOR") && modCase.blameID !== interaction.member.id && gConfig.modlog.modifyOthersCasesEnabled) return interaction.reply({ content: "H-hey! You can't edit cases that aren't yours" });
+                if (modCase.blameID === null || modCase.blameID === this.user.id) {
+                    return interaction.reply({ content: "Cases for automatic actions cannot be edited." });
+                }
+                if (!interaction.member.permissions.has("ADMINISTRATOR") && modCase.blameID !== interaction.member.id && gConfig.modlog.modifyOthersCasesEnabled) {
+                    return interaction.reply({ content: "H-hey! You can't edit cases that aren't yours" });
+                }
                 let messageUpdated = false;
                 if (gConfig.modlog.webhook) {
                     const msg = await modCase.getMessage(this);
@@ -175,8 +195,12 @@ export default new Command(import.meta.url, "modlog")
                             embeds: Util.makeEmbed(false, undefined, msg.embeds[0])
                                 .setDescription(
                                     msg.embeds[0].description!.split("\n").map(line => {
-                                        if (line.startsWith("Reason: ")) return `Reason: **${reason || "[None Provided]"}**`;
-                                        if (line.startsWith("Last Edit")) return;
+                                        if (line.startsWith("Reason: ")) {
+                                            return `Reason: **${reason || "[None Provided]"}**`;
+                                        }
+                                        if (line.startsWith("Last Edit")) {
+                                            return;
+                                        }
                                         return line;
                                     }).filter(Boolean).join("\n"),
                                     `Last Edit: by <@!${interaction.user.id}> at ${Util.formatDiscordTime(Date.now(), "short-datetime", true)}`
@@ -191,12 +215,22 @@ export default new Command(import.meta.url, "modlog")
 
             case "delete-case": {
                 assert(caseID);
-                if (!(await ModLogHandler.check(gConfig))) return interaction.reply({ content: "H-hey! The modlog isn't enabled in this server, so cases can't be deleted" });
-                if (!interaction.member.permissions.has("ADMINISTRATOR") && !gConfig.modlog.caseDeletingEnabled) return interaction.reply({ content: "H-hey! Case deleting is disabled in this server" });
+                if (!(await ModLogHandler.check(gConfig))) {
+                    return interaction.reply({ content: "H-hey! The modlog isn't enabled in this server, so cases can't be deleted" });
+                }
+                if (!interaction.member.permissions.has("ADMINISTRATOR") && !gConfig.modlog.caseDeletingEnabled) {
+                    return interaction.reply({ content: "H-hey! Case deleting is disabled in this server" });
+                }
                 const modCase = await ModLog.getCase(interaction.guildID, caseID);
-                if (!modCase) return interaction.reply({ content: "H-hey! I couldn't find that case.." });
-                if (modCase.deleted) return interaction.reply({ content: "H-hey! That case has been deleted.." });
-                if (!interaction.member.permissions.has("ADMINISTRATOR") && modCase.blameID !== interaction.member.id && gConfig.modlog.modifyOthersCasesEnabled) return interaction.reply({ content: "H-hey! You can't delete cases that aren't yours" });
+                if (!modCase) {
+                    return interaction.reply({ content: "H-hey! I couldn't find that case.." });
+                }
+                if (modCase.deleted) {
+                    return interaction.reply({ content: "H-hey! That case has been deleted.." });
+                }
+                if (!interaction.member.permissions.has("ADMINISTRATOR") && modCase.blameID !== interaction.member.id && gConfig.modlog.modifyOthersCasesEnabled) {
+                    return interaction.reply({ content: "H-hey! You can't delete cases that aren't yours" });
+                }
                 let messageDeleted = false;
                 if (gConfig.modlog.webhook) {
                     const msg = await modCase.getMessage(this);

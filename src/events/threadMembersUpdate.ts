@@ -7,9 +7,13 @@ import { AnyThreadChannel, EmbedOptions, ThreadChannel } from "oceanic.js";
 export default new ClientEvent("threadMembersUpdate", async function threadMembersUpdateEvent(thread, addedMembers, removedMembers) {
     const eventsAdd = await LogEvent.getType(thread.guildID, LogEvents.THREAD_MEMBER_ADD);
     const eventsRemove = await LogEvent.getType(thread.guildID, LogEvents.THREAD_MEMBER_REMOVE);
-    if (eventsAdd.length === 0 && eventsRemove.length === 0) return;
+    if (eventsAdd.length === 0 && eventsRemove.length === 0) {
+        return;
+    }
 
-    if (!(thread instanceof ThreadChannel)) thread = await this.rest.channels.get<AnyThreadChannel>(thread.id);
+    if (!(thread instanceof ThreadChannel)) {
+        thread = await this.rest.channels.get<AnyThreadChannel>(thread.id);
+    }
     if (eventsAdd.length !== 0 && addedMembers.length !== 0) {
         const embeds: Array<EmbedOptions> = [];
         for (const { userID } of addedMembers) {

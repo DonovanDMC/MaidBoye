@@ -86,21 +86,31 @@ export default new Command(import.meta.url, "levelroles")
         switch (type) {
             case "add": {
                 assert(role && level);
-                if (gConfig.levelingRolesList.length >= 25) return interaction.reply({
-                    content: "H-hey! This server already has the maximum amount of leveling roles.."
-                });
-                if (gConfig.levelingRolesLevelMap[level]?.includes(role.id)) return interaction.reply({
-                    content: "H-hey! That role has already been added for that level.."
-                });
-                if (gConfig.levelingRolesRoleMap[role.id]) return interaction.reply({
-                    content: `H-hey! That role has already been added to the level **${gConfig.levelingRolesRoleMap[role.id]!}**..`
-                });
-                if (Util.compareRoleToMember(role, interaction.member) !== "lower") return interaction.reply({
-                    content: "H-hey! You have to chose a role that's lower than your top role.."
-                });
-                if (Util.compareRoleToMember(role, interaction.channel.guild.clientMember) !== "lower") return interaction.reply({
-                    content: "H-hey! I have to chose a role that's lower than my top role.."
-                });
+                if (gConfig.levelingRolesList.length >= 25) {
+                    return interaction.reply({
+                        content: "H-hey! This server already has the maximum amount of leveling roles.."
+                    });
+                }
+                if (gConfig.levelingRolesLevelMap[level]?.includes(role.id)) {
+                    return interaction.reply({
+                        content: "H-hey! That role has already been added for that level.."
+                    });
+                }
+                if (gConfig.levelingRolesRoleMap[role.id]) {
+                    return interaction.reply({
+                        content: `H-hey! That role has already been added to the level **${gConfig.levelingRolesRoleMap[role.id]!}**..`
+                    });
+                }
+                if (Util.compareRoleToMember(role, interaction.member) !== "lower") {
+                    return interaction.reply({
+                        content: "H-hey! You have to chose a role that's lower than your top role.."
+                    });
+                }
+                if (Util.compareRoleToMember(role, interaction.channel.guild.clientMember) !== "lower") {
+                    return interaction.reply({
+                        content: "H-hey! I have to chose a role that's lower than my top role.."
+                    });
+                }
                 await gConfig.addLevelingRole(role.id, level);
                 // await db.query(`UPDATE ${GuildConfig.TABLE} SET leveling_roles=ARRAY[${[...gConfig.levelingRoles, [role.id, level]].map(([r, l]) => `ROW('${r}', ${l})::LEVELING_ROLE`).join(", ")}], updated_at=CURRENT_TIMESTAMP(3) WHERE id = $1`, [interaction.guildID]);
                 return interaction.reply({
@@ -113,12 +123,16 @@ export default new Command(import.meta.url, "levelroles")
 
             case "remove" : {
                 assert(role);
-                if (gConfig.levelingRoles.length === 0) return interaction.reply({
-                    content: "H-hey! This server has no leveling roles.."
-                });
-                if (!gConfig.levelingRolesRoleMap[role.id]) return interaction.reply({
-                    content: "H-hey! That role hasn't been added to any level.."
-                });
+                if (gConfig.levelingRoles.length === 0) {
+                    return interaction.reply({
+                        content: "H-hey! This server has no leveling roles.."
+                    });
+                }
+                if (!gConfig.levelingRolesRoleMap[role.id]) {
+                    return interaction.reply({
+                        content: "H-hey! That role hasn't been added to any level.."
+                    });
+                }
                 await gConfig.removeLevelingRole(role.id);
                 return interaction.reply({
                     content: `Removed <@&${role.id}> from the level **${gConfig.levelingRolesRoleMap[role.id]!}**`
@@ -126,9 +140,11 @@ export default new Command(import.meta.url, "levelroles")
             }
 
             case "list": {
-                if (gConfig.levelingRoles.length === 0) return interaction.reply({
-                    content: "H-hey! This server has no leveling roles.."
-                });
+                if (gConfig.levelingRoles.length === 0) {
+                    return interaction.reply({
+                        content: "H-hey! This server has no leveling roles.."
+                    });
+                }
                 const page = await getPage.call(this, interaction, gConfig, 1);
                 return interaction.reply(page);
             }

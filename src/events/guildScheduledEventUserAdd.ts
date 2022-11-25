@@ -5,11 +5,17 @@ import { Colors } from "../util/Constants.js";
 import { GuildScheduledEvent, User } from "oceanic.js";
 
 export default new ClientEvent("guildScheduledEventUserAdd", async function guildScheduledEventUserAddEvent(event, user) {
-    if (!(event instanceof GuildScheduledEvent)) return;
+    if (!(event instanceof GuildScheduledEvent)) {
+        return;
+    }
     const events = await LogEvent.getType(event.guildID, LogEvents.SCHEDULED_EVENT_USER_ADD);
-    if (events.length === 0) return;
+    if (events.length === 0) {
+        return;
+    }
 
-    if (!(user instanceof User)) user = (await this.getUser(user.id))!;
+    if (!(user instanceof User)) {
+        user = (await this.getUser(user.id))!;
+    }
     const embed = Util.makeEmbed(true)
         .setTitle("Scheduled Event User Added")
         .setColor(Colors.green)

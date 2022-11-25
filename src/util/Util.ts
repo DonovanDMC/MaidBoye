@@ -47,11 +47,15 @@ export default class Util {
             limit: 100
         });
         if (posts.length === 0) {
-            if (lastScoreTry === 50) return null;
+            if (lastScoreTry === 50) {
+                return null;
+            }
             try {
                 return this.getE621Image(tags, lastScoreTry - 50);
             } catch (err) {
-                if (err instanceof RangeError) return null;
+                if (err instanceof RangeError) {
+                    return null;
+                }
                 throw err;
             }
         }
@@ -67,56 +71,102 @@ export default class Util {
      * @returns {T}
      */
     static addBits<T extends bigint | number = bigint | number>(current: T, ...toAdd: Array<T>) {
-        for (const val of toAdd) current = (current | val) as T;
+        for (const val of toAdd) {
+            current = (current | val) as T;
+        }
         return current;
     }
 
     /** higher = from is higher than to */
     static compareMemberToMember(from: Member, to: Member | string): CompareResult {
-        if (!(to instanceof Member)) to = from.guild.members.get(to)!;
-        if (!to) return "invalid";
-        if (from.guild.ownerID === from.id) return "higher";
-        if (to.guild.ownerID === to.id) return "lower";
+        if (!(to instanceof Member)) {
+            to = from.guild.members.get(to)!;
+        }
+        if (!to) {
+            return "invalid";
+        }
+        if (from.guild.ownerID === from.id) {
+            return "higher";
+        }
+        if (to.guild.ownerID === to.id) {
+            return "lower";
+        }
         const a = this.getTopRole(from)?.position ?? -1;
         const b = this.getTopRole(to)?.position ?? -1;
-        if (a > b) return "higher";
-        else if (a < b) return "lower";
-        else if (a === b) return "same";
-        else return "unknown";
+        if (a > b) {
+            return "higher";
+        } else if (a < b) {
+            return "lower";
+        } else if (a === b) {
+            return "same";
+        } else {
+            return "unknown";
+        }
     }
 
     /** higher = current member's top role is higher than compared role */
     static compareMemberToRole(from: Member, to: Role | string): CompareResult {
-        if (!(to instanceof Role)) to = from.guild.roles.get(to)!;
-        if (!to) return "invalid";
-        if (from.guild.ownerID === to.id) return "lower";
+        if (!(to instanceof Role)) {
+            to = from.guild.roles.get(to)!;
+        }
+        if (!to) {
+            return "invalid";
+        }
+        if (from.guild.ownerID === to.id) {
+            return "lower";
+        }
         const a = this.getTopRole(from).position ?? -1;
-        if (a > to.position) return "higher";
-        else if (a < to.position) return "lower";
-        else if (a === to.position) return "same";
-        else return "unknown";
+        if (a > to.position) {
+            return "higher";
+        } else if (a < to.position) {
+            return "lower";
+        } else if (a === to.position) {
+            return "same";
+        } else {
+            return "unknown";
+        }
     }
 
     /** higher = current role is higher than compared member's top role */
     static compareRoleToMember(from: Role, to: Member | string): CompareResult {
-        if (!(to instanceof Member)) to = from.guild.members.get(to)!;
-        if (!to) return "invalid";
-        if (from.guild.ownerID === to.id) return "lower";
+        if (!(to instanceof Member)) {
+            to = from.guild.members.get(to)!;
+        }
+        if (!to) {
+            return "invalid";
+        }
+        if (from.guild.ownerID === to.id) {
+            return "lower";
+        }
         const pos = (this.getTopRole(to)?.position ?? -1);
-        if (from.position > pos) return "higher";
-        else if (from.position < pos) return "lower";
-        else if (from.position === pos) return "same";
-        else return "unknown";
+        if (from.position > pos) {
+            return "higher";
+        } else if (from.position < pos) {
+            return "lower";
+        } else if (from.position === pos) {
+            return "same";
+        } else {
+            return "unknown";
+        }
     }
 
     /** higher = current role is higher than compared role */
     static compareRoleToRole(from: Role, to: Role | string): CompareResult {
-        if (!(to instanceof Role)) to = from.guild.roles.get(to)!;
-        if (!to) return "invalid";
-        if (from.position > to.position) return "higher";
-        else if (from.position < to.position) return "lower";
-        else if (from.position === to.position) return "same";
-        else return "unknown";
+        if (!(to instanceof Role)) {
+            to = from.guild.roles.get(to)!;
+        }
+        if (!to) {
+            return "invalid";
+        }
+        if (from.position > to.position) {
+            return "higher";
+        } else if (from.position < to.position) {
+            return "lower";
+        } else if (from.position === to.position) {
+            return "same";
+        } else {
+            return "unknown";
+        }
     }
 
     static ensurePresent<T extends ErrorConstructor>(condition?: unknown, message?: string, errorConstructor?: T): asserts condition {
@@ -171,7 +221,9 @@ export default class Util {
             time = time.getTime();
             ms = true;
         }
-        if (ms) time = Math.floor(time / 1000);
+        if (ms) {
+            time = Math.floor(time / 1000);
+        }
         const shortFlags = {
             "short-time":     "t",
             "long-time":      "T",
@@ -185,7 +237,9 @@ export default class Util {
     }
 
     static async genericEdit<D extends Record<string, unknown>>(table: string, id: number | string, data: D): Promise<boolean> {
-        if (Object.hasOwn(data, "updated_at")) delete data.updated_at;
+        if (Object.hasOwn(data, "updated_at")) {
+            delete data.updated_at;
+        }
         const keys = Object.keys(data).filter(val => val !== undefined && val !== null);
         const values = Object.values(data).filter(val => val !== undefined && val !== null);
         const res = await db.query<OkPacket>(`UPDATE ${table} SET ${keys.map((j, index) => `${j}=$${index + 2}`).join(", ")}, updated_at=CURRENT_TIMESTAMP(3) WHERE id = $1`, [id, ...values]);
@@ -195,7 +249,9 @@ export default class Util {
     static getFlags<T extends string, N extends number | bigint>(list: Record<T, N>, flags: N, skipEnumReverseKeys = true) {
         const res = {} as Record<T, boolean>;
         for (const [key, value] of Object.entries(list) as Array<[T, N]>) {
-            if (skipEnumReverseKeys && /\d/.test(key)) continue;
+            if (skipEnumReverseKeys && /\d/.test(key)) {
+                continue;
+            }
             res[key] = (flags & value) === value;
         }
         return res;
@@ -204,8 +260,12 @@ export default class Util {
     static getFlagsArray<T extends string, N extends number | bigint>(list: Record<T, N>, flags: N, skipEnumReverseKeys = true) {
         const res = [] as Array<T>;
         for (const [key, value] of Object.entries(list) as Array<[T, N]>) {
-            if (skipEnumReverseKeys && /\d/.test(key)) continue;
-            if ((flags & value) === value) res.push(key);
+            if (skipEnumReverseKeys && /\d/.test(key)) {
+                continue;
+            }
+            if ((flags & value) === value) {
+                res.push(key);
+            }
         }
         return res;
     }
@@ -216,13 +276,17 @@ export default class Util {
                 let url: string, source: string | null = null;
                 if (nsfw) {
                     const post = await this.getE621Image("cuddling");
-                    if (post === null) return this.getImage(type, false);
+                    if (post === null) {
+                        return this.getImage(type, false);
+                    }
                     url = post.file.url;
                     source = `https://e621.net/posts/${post.id}`;
                 } else {
                     const img = await Yiffy.furry.cuddle("json", 1);
                     url = img.url;
-                    if (img.sources.length !== 0) source = img.sources[0];
+                    if (img.sources.length !== 0) {
+                        source = img.sources[0];
+                    }
                 }
 
                 return { url, source };
@@ -232,13 +296,17 @@ export default class Util {
                 let url: string, source: string | null = null;
                 if (nsfw) {
                     const post = await this.getE621Image("hug");
-                    if (post === null) return this.getImage(type, false);
+                    if (post === null) {
+                        return this.getImage(type, false);
+                    }
                     url = post.file.url;
                     source = `https://e621.net/posts/${post.id}`;
                 } else {
                     const img = await Yiffy.furry.hug("json", 1);
                     url = img.url;
-                    if (img.sources.length !== 0) source = img.sources[0];
+                    if (img.sources.length !== 0) {
+                        source = img.sources[0];
+                    }
                 }
 
                 return { url, source };
@@ -248,13 +316,17 @@ export default class Util {
                 let url: string, source: string | null = null;
                 if (nsfw) {
                     const post = await this.getE621Image("~penis_lick ~cunnilingus");
-                    if (post === null) return this.getImage(type, false);
+                    if (post === null) {
+                        return this.getImage(type, false);
+                    }
                     url = post.file.url;
                     source = `https://e621.net/posts/${post.id}`;
                 } else {
                     const img = await Yiffy.furry.lick("json", 1);
                     url = img.url;
-                    if (img.sources.length !== 0) source = img.sources[0];
+                    if (img.sources.length !== 0) {
+                        source = img.sources[0];
+                    }
                 }
 
                 return { url, source };
@@ -264,13 +336,17 @@ export default class Util {
                 let url: string, source: string | null = null;
                 if (nsfw) {
                     const post = await this.getE621Image("kissing");
-                    if (post === null) return this.getImage(type, false);
+                    if (post === null) {
+                        return this.getImage(type, false);
+                    }
                     url = post.file.url;
                     source = `https://e621.net/posts/${post.id}`;
                 } else {
                     const img = await Yiffy.furry.kiss("json", 1);
                     url = img.url;
-                    if (img.sources.length !== 0) source = img.sources[0];
+                    if (img.sources.length !== 0) {
+                        source = img.sources[0];
+                    }
                 }
 
                 return { url, source };
@@ -363,7 +439,7 @@ export default class Util {
             }
 
             case "birb": case "dikdik": case "fursuit": {
-                const img = await (cmd === "birb" || cmd === "dikdik" ? Yiffy.animals[cmd]("json", 1) : Yiffy.furry[cmd]("json", 1));
+                const img = await (cmd === "birb" || cmd === "dikdik" ? Yiffy.animals[cmd]() : Yiffy.furry[cmd]());
                 void (interaction.type === InteractionTypes.APPLICATION_COMMAND ? interaction.reply.bind(interaction) : interaction.editParent.bind(interaction))({
                     embeds: Util.makeEmbed(true, interaction.user)
                         .setTitle(titles[cmd])
@@ -420,19 +496,29 @@ export default class Util {
 
     static isNSFW(channel: AnyChannel | Uncached) {
         if (channel instanceof GuildChannel) {
-            if (channel instanceof CategoryChannel || channel instanceof StageChannel) return false;
+            if (channel instanceof CategoryChannel || channel instanceof StageChannel) {
+                return false;
+            }
             return channel instanceof ThreadChannel ? channel.parent?.nsfw ?? false : channel.nsfw;
         } else {
-            if (!("type" in channel) || channel.type === ChannelTypes.DM) return true;
-            else if (channel.type === ChannelTypes.GROUP_DM) return false;
-            else return false;
+            if (!("type" in channel) || channel.type === ChannelTypes.DM) {
+                return true;
+            } else if (channel.type === ChannelTypes.GROUP_DM) {
+                return false;
+            } else {
+                return false;
+            }
         }
     }
 
     static makeEmbed(defaults?: boolean, author?: User | Member, json?: EmbedOptions) {
         const embed = json ? EmbedBuilder.loadFromJSON(json) : new EmbedBuilder();
-        if (defaults) embed.setColor(Colors.bot).setTimestamp("now").setFooter("UwU", Config.botIcon);
-        if (author && author instanceof User || author instanceof Member) embed.setAuthor(author.tag, author.avatarURL());
+        if (defaults) {
+            embed.setColor(Colors.bot).setTimestamp("now").setFooter("UwU", Config.botIcon);
+        }
+        if (author && author instanceof User || author instanceof Member) {
+            embed.setAuthor(author.tag, author.avatarURL());
+        }
         return embed;
     }
 
@@ -448,7 +534,11 @@ export default class Util {
      * @returns {T}
      */
     static removeBits<T extends bigint | number = bigint | number>(current: T, ...toRemove: Array<T>) {
-        if (Array.isArray(toRemove)) for (const val of toRemove) current = (current & ~val) as T;
+        if (Array.isArray(toRemove)) {
+            for (const val of toRemove) {
+                current = (current & ~val) as T;
+            }
+        }
         return current;
     }
 

@@ -20,14 +20,22 @@ export default class Settings {
     }
 
     private static register<T extends BaseSetting>(setting: T) {
-        if (setting.shortDescription.length > 50) throw new Error(`short description for setting "${setting.name}" is over 50 characters`);
-        if (setting.description.length > 100) throw new Error(`description for setting "${setting.name}" is over 100 characters`);
+        if (setting.shortDescription.length > 50) {
+            throw new Error(`short description for setting "${setting.name}" is over 50 characters`);
+        }
+        if (setting.description.length > 100) {
+            throw new Error(`description for setting "${setting.name}" is over 100 characters`);
+        }
         assert(this.get(setting.name) === undefined, new Error(`duplicate setting (${setting.name})`).stack);
         const id = this.list.push(setting) - 1;
         let pageID = this.pages.length  - 1;
-        if (pageID < 0) pageID = 0;
+        if (pageID < 0) {
+            pageID = 0;
+        }
         let page = this.pages[pageID];
-        if (!page) page = [];
+        if (!page) {
+            page = [];
+        }
         if (page.length >= 3) {
             pageID++;
             page = [];
@@ -74,7 +82,9 @@ export default class Settings {
         const opt = interaction.data.options.raw[0];
         if ("options" in opt && opt.options && opt.options.length !== 0 && interaction.guildID) {
             const setting = this.getByInteractionName(opt.name);
-            if (setting) await setting.handleInteraction(interaction, gConfig, (opt.options[0] as InteractionOptionsWithValue).value);
+            if (setting) {
+                await setting.handleInteraction(interaction, gConfig, (opt.options[0] as InteractionOptionsWithValue).value);
+            }
         }
     }
 
@@ -85,7 +95,9 @@ export default class Settings {
             Debug("settings:load", `Loading "${file}"`);
             const start = Timer.getTime();
             let set = await import(new URL(file, import.meta.url).pathname) as ModuleImport<typeof EmptySetting>;
-            if ("default" in set) set = set.default;
+            if ("default" in set) {
+                set = set.default;
+            }
             const inst = new set();
             [inst.id, inst.page] = this.register(inst);
             const end = Timer.getTime();

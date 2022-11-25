@@ -15,10 +15,12 @@ export default new Command(import.meta.url, "avatar")
         user: interaction.data.options.getUser("user") || interaction.user
     }))
     .setAck((interaction, { user }, ephemeralUser) => {
-        if (!user) return interaction.reply({
-            flags:   MessageFlags.EPHEMERAL,
-            content: "H-hey! That wasn't a valid user.."
-        });
+        if (!user) {
+            return interaction.reply({
+                flags:   MessageFlags.EPHEMERAL,
+                content: "H-hey! That wasn't a valid user.."
+            });
+        }
         return ephemeralUser ? interaction.defer(MessageFlags.EPHEMERAL) : interaction.defer();
     })
     .setCooldown(3e3)
@@ -28,10 +30,12 @@ export default new Command(import.meta.url, "avatar")
             label: "Open Externally",
             url:   user.avatarURL()
         });
-        if (user.id === this.user.id) c.addURLButton({
-            label: "Open Sauce",
-            url:   Config.botSauce
-        });
+        if (user.id === this.user.id) {
+            c.addURLButton({
+                label: "Open Sauce",
+                url:   Config.botSauce
+            });
+        }
 
         return interaction.reply({
             embeds: Util.makeEmbed(true, interaction.user)

@@ -8,7 +8,9 @@ import { UserFlags } from "oceanic.js";
 
 export default new ClientEvent("guildMemberAdd", async function guildMemberAddEvent(member) {
     const events = await LogEvent.getType(member.guildID, LogEvents.MEMBER_ADD);
-    if (events.length === 0) return;
+    if (events.length === 0) {
+        return;
+    }
 
     const flags = Util.getFlagsArray(UserFlags, member.user.publicFlags);
     const embed = Util.makeEmbed(true)

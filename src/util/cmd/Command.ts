@@ -72,7 +72,9 @@ export default class Command<T extends Record<string, unknown> = Record<string, 
     ack: AcknowledgementFunction<T, G, U, V> | AckString = interaction => interaction.defer();
 
     addOption(option: CommandOption | ApplicationCommandOptions) {
-        if (option instanceof CommandOption) option = option.finalizeOption();
+        if (option instanceof CommandOption) {
+            option = option.finalizeOption();
+        }
         this.options.push(option);
         return this;
     }
@@ -150,8 +152,12 @@ export default class Command<T extends Record<string, unknown> = Record<string, 
 
     toJSON(): CreateChatInputApplicationCommandOptions {
         const options: Array<ApplicationCommandOptions> = [];
-        if (this.options.length !== 0) options.push(...this.options);
-        if (this.optionsGetter) options.push(...this.optionsGetter());
+        if (this.options.length !== 0) {
+            options.push(...this.options);
+        }
+        if (this.optionsGetter) {
+            options.push(...this.optionsGetter());
+        }
         return {
             defaultMemberPermissions: this.defaultMemberPermissions.length === 0 ? null : this.defaultMemberPermissions.reduce((a, b) => a | Permissions[b], 0n).toString(),
             description:              this.description,

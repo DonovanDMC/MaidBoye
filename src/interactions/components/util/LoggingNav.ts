@@ -15,8 +15,11 @@ export default class LoggingNavComponent extends BaseComponent {
     override async handleGuild(interaction: ComponentInteraction<ValidLocation.GUILD>, { channel, dir, page }: BaseState & { channel: string | null; dir: -1 | 1; page: number; }) {
         const events = (await LogEvent.getAll(interaction.guild.id)).filter(ev => channel ? ev.channelID === channel : true);
         const list = chunk(events, 10);
-        if (dir === -1) page--;
-        else page++;
+        if (dir === -1) {
+            page--;
+        } else {
+            page++;
+        }
         return interaction.editParent({
             embeds: Util.makeEmbed(true, interaction.user)
                 .setDescription(list[page - 1].map(ev => `**${Util.readableConstant(LogEvents[ev.event])}** in <#${ev.channelID}>`).join("\n"))

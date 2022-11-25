@@ -6,9 +6,13 @@ import { StageInstancePrivacyLevelNames } from "../util/Names.js";
 import { AuditLogActionTypes, EmbedOptions, GuildScheduledEvent } from "oceanic.js";
 
 export default new ClientEvent("stageInstanceUpdate", async function stageInstanceUpdateEvent(stage, oldStage) {
-    if (oldStage === null) return;
+    if (oldStage === null) {
+        return;
+    }
     const events = await LogEvent.getType(stage.guildID, LogEvents.STAGE_INSTANCE_UPDATE);
-    if (events.length === 0) return;
+    if (events.length === 0) {
+        return;
+    }
 
     const embeds: Array<EmbedOptions> = [];
 
@@ -66,12 +70,16 @@ export default new ClientEvent("stageInstanceUpdate", async function stageInstan
                 .setTitle("Stage Instance Update: Blame")
                 .setColor(Colors.gold)
                 .setDescription(`**${entry.user.tag}** (${entry.user.mention})`);
-            if (entry.reason) embed.addField("Reason", entry.reason, false);
+            if (entry.reason) {
+                embed.addField("Reason", entry.reason, false);
+            }
             embeds.push(embed.toJSON());
         }
     }
 
-    if (embeds.length === 0) return;
+    if (embeds.length === 0) {
+        return;
+    }
 
     for (const log of events) {
         await log.execute(this, { embeds });

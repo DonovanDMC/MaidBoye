@@ -1,6 +1,7 @@
 import db, { CountResult } from "../index.js";
 import type MaidBoye from "../../main.js";
-import LoggingWebhookFailureHandler from "../../util/handlers/LoggingWebhookFailureHandler.js";
+import WebhookFailureHandler from "../../util/handlers/LoggingWebhookFailureHandler.js";
+import Util from "../../util/Util.js";
 import { assert } from "tsafe";
 import {
     ApplicationCommandOptionsChoice,
@@ -10,7 +11,6 @@ import {
     JSONErrorCodes
 } from "oceanic.js";
 import chunk from "chunk";
-import { Strings } from "@uwu-codes/utils";
 import { randomUUID } from "node:crypto";
 
 
@@ -102,7 +102,7 @@ export const LogCategories = {
 };
 
 export const LogCategoriesChoices: Array<ApplicationCommandOptionsChoice<ApplicationCommandOptionTypes.STRING>> = Object.keys(LogCategories).map(category => ({
-    name:  Strings.ucwords(category.toLowerCase().replace(/_/g, " ")),
+    name:  Util.readableConstant(category),
     value: category
 }));
 
@@ -122,7 +122,7 @@ export default class LogEvent {
         token: string;
     };
     constructor(data: LogEventData) {
-        assert(data && data.id, "invalid id found in Stat");
+        assert(data && data.id, "invalid id found in LogEvent");
         this.id = data.id;
         this.load(data);
     }
@@ -191,8 +191,7 @@ export default class LogEvent {
             }
             await client.rest.webhooks.execute(this.webhook.id, this.webhook.token, options);
         } catch (err) {
-            console.log(err instanceof DiscordRESTError && (err.code === JSONErrorCodes.UNKNOWN_WEBHOOK || err.code === JSONErrorCodes.INVALID_WEBHOOK_TOKEN));
-            await LoggingWebhookFailureHandler.tick(this, err instanceof DiscordRESTError && (err.code === JSONErrorCodes.UNKNOWN_WEBHOOK || err.code === JSONErrorCodes.INVALID_WEBHOOK_TOKEN));
+            await WebhookFailureHandler.tick(this, err instanceof DiscordRESTError && (err.code === JSONErrorCodes.UNKNOWN_WEBHOOK || err.code === JSONErrorCodes.INVALID_WEBHOOK_TOKEN));
         }
     }
 }

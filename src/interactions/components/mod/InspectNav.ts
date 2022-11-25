@@ -11,7 +11,9 @@ export default class InspectNavComponent extends BaseComponent {
     override async handleGuild(interaction: ComponentInteraction<ValidLocation.GUILD>, { page, section, target }: BaseState & { page: number; section: "home" | "strikes" | "mod" | "warnings"; target: string; }) {
         const client = interaction.client as MaidBoye;
         const user = await client.getUser(target);
-        if (user === null) return interaction.editParent({ content: "H-hey! I couldn't find the user.." });
+        if (user === null) {
+            return interaction.editParent({ content: "H-hey! I couldn't find the user.." });
+        }
 
         switch (section) {
             case "strikes": {

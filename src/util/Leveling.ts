@@ -15,8 +15,11 @@ export default class Leveling {
             level: level < Config.levelingFlatRateStart ? level * Config.levelingStartRate : Config.levelingFlatRate,
             total: 0
         };
-        if (level <= Config.levelingFlatRateStart) for (let i = 0; i <= level; i++) k.total += i < Config.levelingFlatRateStart ? i * 100 : Config.levelingFlatRate;
-        else {
+        if (level <= Config.levelingFlatRateStart) {
+            for (let i = 0; i <= level; i++) {
+                k.total += i < Config.levelingFlatRateStart ? i * 100 : Config.levelingFlatRate;
+            }
+        } else {
             const { total: t } = this.calcExp(Config.levelingFlatRateStart);
             k.total = t + (level - Config.levelingFlatRateStart) * Config.levelingFlatRate;
         }
@@ -32,7 +35,9 @@ export default class Leveling {
                 if (e >= l) {
                     e -= l;
                     level++;
-                } else complete = true;
+                } else {
+                    complete = true;
+                }
             }
         } else {
             // leftover exp after Config.levelingFlatRateStart
@@ -97,9 +102,13 @@ export default class Leveling {
 
     static async run(input: GuildCommandInteraction | Message<AnyGuildTextChannel>) {
         const user = input instanceof Interaction ? input.user : input.author;
-        if (user.bot) return;
+        if (user.bot) {
+            return;
+        }
         const d = await db.redis.exists(`leveling:${user.id}:${input.guildID}:cooldown`);
-        if (d) return;
+        if (d) {
+            return;
+        }
         await db.redis.setex(`leveling:${user.id}:${input.channel.guildID}:cooldown`, 60, "");
         const oldXP = await UserConfig.getXP(user.id, input.guildID);
         const { level: oldLevel } = this.calcLevel(oldXP);
@@ -137,7 +146,9 @@ export default class Leveling {
                     setTimeout(async() => {
                         await m.delete().catch(() => null);
                     }, 2e4);
-                } else void user.createDM().then(ch => ch.createMessage({ content: `You leveled up in **${input.channel.guild.name}** from **${oldLevel}** to **${level}**\n${roles.length === 0 ? "" : `\n\nRoles Gained:\n${roles.map(r => `- ${input.channel.guild.roles.get(r)?.name || `<@&${r}>`}`).join("\n")}`}\n\n(I sent this here because I couldn't create messages in the channel you leveled up in)` }));
+                } else {
+                    void user.createDM().then(ch => ch.createMessage({ content: `You leveled up in **${input.channel.guild.name}** from **${oldLevel}** to **${level}**\n${roles.length === 0 ? "" : `\n\nRoles Gained:\n${roles.map(r => `- ${input.channel.guild.roles.get(r)?.name || `<@&${r}>`}`).join("\n")}`}\n\n(I sent this here because I couldn't create messages in the channel you leveled up in)` }));
+                }
             }
         }
     }

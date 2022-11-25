@@ -39,13 +39,15 @@ export default new Command(import.meta.url, "marry")
     })
     .setExecutor(async function(interaction, { member }, gConfig, uConfig) {
         const other = await UserConfig.get(member.id);
-        if (uConfig.marriagePartners.includes(member.id)) return interaction.reply({
-            content:         `H-hey! You're already married to <@!${member.id}>..`,
-            flags:           MessageFlags.EPHEMERAL,
-            allowedMentions: {
-                users: false
-            }
-        });
+        if (uConfig.marriagePartners.includes(member.id)) {
+            return interaction.reply({
+                content:         `H-hey! You're already married to <@!${member.id}>..`,
+                flags:           MessageFlags.EPHEMERAL,
+                allowedMentions: {
+                    users: false
+                }
+            });
+        }
 
         const img = await Yiffy.furry.propose("json", 1);
 

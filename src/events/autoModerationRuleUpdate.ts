@@ -6,9 +6,13 @@ import { AutoModerationActionTypeNames, AutoModerationEventTypeNames, AutoModera
 import { AuditLogActionTypes, AutoModerationTriggerTypes, EmbedOptions } from "oceanic.js";
 
 export default new ClientEvent("autoModerationRuleUpdate", async function autoModerationRuleUpdateEvent(rule, oldRule) {
-    if (oldRule === null) return;
+    if (oldRule === null) {
+        return;
+    }
     const events = await LogEvent.getType(rule.guildID, LogEvents.AUTOMOD_RULE_UPDATE);
-    if (events.length === 0) return;
+    if (events.length === 0) {
+        return;
+    }
 
     const embeds: Array<EmbedOptions> = [];
     if (JSON.stringify(rule.actions) !== JSON.stringify(oldRule.actions)) {
@@ -195,7 +199,9 @@ export default new ClientEvent("autoModerationRuleUpdate", async function autoMo
         );
     }
 
-    if (embeds.length === 0) return;
+    if (embeds.length === 0) {
+        return;
+    }
 
     if (rule.guild.clientMember.permissions.has("VIEW_AUDIT_LOG")) {
         const auditLog = await rule.guild.getAuditLog({
@@ -208,7 +214,9 @@ export default new ClientEvent("autoModerationRuleUpdate", async function autoMo
                 .setTitle("Member Update: Blame")
                 .setColor(Colors.gold)
                 .setDescription(`**${entry.user.tag}** (${entry.user.mention})`);
-            if (entry.reason) embed.addField("Reason", entry.reason, false);
+            if (entry.reason) {
+                embed.addField("Reason", entry.reason, false);
+            }
             embeds.push(embed.toJSON());
         }
     }

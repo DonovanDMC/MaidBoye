@@ -30,14 +30,18 @@ export default class Autocomplete {
 
     static async handleInteraction(interaction: AutocompleteInteraction) {
         const focused = interaction.data.options.getFocused(true);
-        if (focused === null) throw new Error(`failed to find focused option for autocomplete interaction ${interaction.data.name}`);
+        if (focused === null) {
+            throw new Error(`failed to find focused option for autocomplete interaction ${interaction.data.name}`);
+        }
         const autocomplete = this.get(interaction.data.name, focused.name);
         assert(autocomplete, `failed to find valid handler for "${interaction.data.name}$${focused.name}" autocomplete`);
         await ("guildID" in interaction ? autocomplete.handleGuild(interaction, focused) : autocomplete.handleDM(interaction, focused));
     }
 
     static async loadAll(dir = thisDirectory) {
-        if (dir === `${thisDirectory}/structure`) return;
+        if (dir === `${thisDirectory}/structure`) {
+            return;
+        }
         const files = (await readdir(dir, { withFileTypes: true }));
         for (const file of files) {
             if (file.isDirectory()) {
@@ -45,13 +49,17 @@ export default class Autocomplete {
                 continue;
             }
             // ignore all files in base directory
-            if (dir === thisDirectory) continue;
+            if (dir === thisDirectory) {
+                continue;
+            }
             Debug("autocomplete:load", `Loading "${`${dir}/${file.name}`.replace(thisDirectory, "").slice(1)}"`);
             const start = Timer.getTime();
             let inst: BaseAutocomplete;
             try {
                 let autocomplete = await import(`${dir}/${file.name}`) as ModuleImport<typeof EmptyAutocomplete>;
-                if ("default" in autocomplete) autocomplete = autocomplete.default;
+                if ("default" in autocomplete) {
+                    autocomplete = autocomplete.default;
+                }
                 inst = new autocomplete();
                 [inst.id] = this.register(inst);
             } catch (err) {
@@ -70,7 +78,9 @@ export default class Autocomplete {
 		autocomplete["handle"] === BaseAutocomplete.prototype["handle"] &&
 		autocomplete.handleDM === BaseAutocomplete.prototype.handleDM &&
 		autocomplete.handleGuild === BaseAutocomplete.prototype.handleGuild;
-        if (noOverride) throw new Error(`Autocomplete "${autocomplete.command}-${autocomplete.option}" does not override at least one handle method.`);
+        if (noOverride) {
+            throw new Error(`Autocomplete "${autocomplete.command}-${autocomplete.option}" does not override at least one handle method.`);
+        }
         const id = this.list.push(autocomplete) - 1;
         Debug("autocomplete:register", `Registered autocomplete "${autocomplete.command}-${autocomplete.option}" (id: ${id})`);
         return [id] as [id: number];

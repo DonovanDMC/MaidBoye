@@ -7,9 +7,13 @@ import { AuditLogActionTypes } from "oceanic.js";
 import { Time } from "@uwu-codes/utils";
 
 export default new ClientEvent("channelDelete", async function channelDeleteEvent(channel) {
-    if (!("guildID" in channel)) return;
+    if (!("guildID" in channel)) {
+        return;
+    }
     const events = await LogEvent.getType(channel.guildID, LogEvents.CHANNEL_DELETE);
-    if (events.length === 0) return;
+    if (events.length === 0) {
+        return;
+    }
 
     const embed = Util.makeEmbed(true)
         .setTitle("Channel Delete")
@@ -30,7 +34,9 @@ export default new ClientEvent("channelDelete", async function channelDeleteEven
         const entry = auditLog.entries.find(e => e.targetID === channel.id);
         if (entry?.user && (entry.createdAt.getTime() + 5e3) > Date.now()) {
             embed.addField("Blame", `**${entry.user.tag}** (${entry.user.tag})`, false);
-            if (entry.reason) embed.addField("Reason", entry.reason, false);
+            if (entry.reason) {
+                embed.addField("Reason", entry.reason, false);
+            }
         }
     }
 

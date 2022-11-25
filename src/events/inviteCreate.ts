@@ -7,9 +7,13 @@ import { AuditLogActionTypes } from "oceanic.js";
 import { Time } from "@uwu-codes/utils";
 
 export default new ClientEvent("inviteCreate", async function inviteCreateEvent(invite) {
-    if (invite.guildID === null) return;
+    if (invite.guildID === null) {
+        return;
+    }
     const events = await LogEvent.getType(invite.guildID, LogEvents.INVITE_CREATE);
-    if (events.length === 0) return;
+    if (events.length === 0) {
+        return;
+    }
 
     const embed = Util.makeEmbed(true)
         .setTitle("Invite Created")
@@ -34,7 +38,9 @@ export default new ClientEvent("inviteCreate", async function inviteCreateEvent(
         const entry = auditLog.entries.find(e => e.changes?.find(c => c.key === "code" && c.new_value === invite.code));
         if (entry?.user && (entry.createdAt.getTime() + 5e3) > Date.now()) {
             embed.addField("Blame", `**${entry.user.tag}** (${entry.user.tag})`, false);
-            if (entry.reason) embed.addField("Reason", entry.reason, false);
+            if (entry.reason) {
+                embed.addField("Reason", entry.reason, false);
+            }
         }
     }
 

@@ -13,9 +13,11 @@ export async function getPage(this: MaidBoye, interaction: CommandInteraction<Va
     const start = Timer.getTime();
     const { values: lb, total } = await Leveling.getLeaderboard(guildID, page);
     const end = Timer.getTime();
-    if (!total) return {
-        content: "There are no users in the leaderboard."
-    } as InteractionContent;
+    if (!total) {
+        return {
+            content: "There are no users in the leaderboard."
+        } as InteractionContent;
+    }
     return {
         embeds: Util.makeEmbed(true, interaction.user)
             .setTitle(`${type === "global" ? "Global" : "Server"} Leaderboard`)

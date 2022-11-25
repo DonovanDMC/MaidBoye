@@ -26,14 +26,23 @@ export default new Command(import.meta.url, "ship")
         const amount = Number((BigInt(first.id) + BigInt(first.id)) % 100n) + 1;
         const name = first.username.slice(0, Math.floor(Math.random() * 5) + 3) + second.username.slice(-(Math.floor(Math.random() * 5) + 3));
         let image: string;
-        if (amount === 100)    image = "100-percent";
-        else if (amount >= 80) image = "80-99-percent";
-        else if (amount >= 60) image = "60-79-percent";
-        else if (amount >= 40) image = "40-59-percent";
-        else if (amount >= 20) image = "20-39-percent";
-        else if (amount >= 2)  image = "2-19-percent";
-        else if (amount === 1) image = "1-percent";
-        else throw new Error(`Unexpected ship percentage "${amount}"`);
+        if (amount === 100)    {
+            image = "100-percent";
+        } else if (amount >= 80) {
+            image = "80-99-percent";
+        } else if (amount >= 60) {
+            image = "60-79-percent";
+        } else if (amount >= 40) {
+            image = "40-59-percent";
+        } else if (amount >= 20) {
+            image = "20-39-percent";
+        } else if (amount >= 2)  {
+            image = "2-19-percent";
+        } else if (amount === 1) {
+            image = "1-percent";
+        } else {
+            throw new Error(`Unexpected ship percentage "${amount}"`);
+        }
 
         const img = await Util.fluxpointGen({
             type:   "bitmap",

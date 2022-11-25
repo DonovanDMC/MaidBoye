@@ -34,7 +34,9 @@ export default async function Sauce(input: string, simularity = 75, skipCheck = 
     if (Strings.validateURL(input)) {
         if (skipCheck === false) {
             const head = await RequestProxy.head(input);
-            if (head.status !== 200 && head.status !== 204) throw new PreCheckError(`A pre-check failed when trying to fetch the image "${input}".\nA \`HEAD\` request returned a non 200 OK/204 No Content responses (${head.status} ${head.statusText})\n\nThis means we either can't access the file, the server is configured incorrectly, or the file does not exist.`);
+            if (head.status !== 200 && head.status !== 204) {
+                throw new PreCheckError(`A pre-check failed when trying to fetch the image "${input}".\nA \`HEAD\` request returned a non 200 OK/204 No Content responses (${head.status} ${head.statusText})\n\nThis means we either can't access the file, the server is configured incorrectly, or the file does not exist.`);
+            }
         }
 
         const e6 = e621Regex.exec(input);
@@ -42,7 +44,9 @@ export default async function Sauce(input: string, simularity = 75, skipCheck = 
         if (e6?.[1]) {
             tried.push("e621");
             post = await E621.posts.getByMD5(e6[1]);
-            if (post !== null) method = "e621";
+            if (post !== null) {
+                method = "e621";
+            }
         }
 
         if (y2?.[1] && !method) {
@@ -60,7 +64,9 @@ export default async function Sauce(input: string, simularity = 75, skipCheck = 
                 // dont
                 if (s && m?.[1]) {
                     post = await E621.posts.get(Number(m[1]));
-                    if (post !== null) method = "e621";
+                    if (post !== null) {
+                        method = "e621";
+                    }
                 } else {
                     method = "yiffy2";
                     sourceOverride = d.data.sources;
@@ -80,8 +86,11 @@ export default async function Sauce(input: string, simularity = 75, skipCheck = 
                 }
             }
 
-            if (sa === "RateLimited") snRateLimited = true;
-            else tried.push("saucenao"); // so we don't tell the user we both couldn't try & tried saucenao
+            if (sa === "RateLimited") {
+                snRateLimited = true;
+            } else {
+                tried.push("saucenao");
+            } // so we don't tell the user we both couldn't try & tried saucenao
         }
 
         return {
@@ -93,5 +102,7 @@ export default async function Sauce(input: string, simularity = 75, skipCheck = 
             snRateLimited,
             url: input
         };
-    } else return null;
+    } else {
+        return null;
+    }
 }

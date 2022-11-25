@@ -6,9 +6,13 @@ import { IntegrationExpireBehaviorNames } from "../util/Names.js";
 import { AuditLogActionTypes, EmbedOptions, Guild } from "oceanic.js";
 
 export default new ClientEvent("integrationUpdate", async function integrationUpdateEvent(guild, integration, oldIntegration) {
-    if (oldIntegration === null) return;
+    if (oldIntegration === null) {
+        return;
+    }
     const events = await LogEvent.getType(guild.id, LogEvents.INTEGRATION_DELETE);
-    if (events.length === 0) return;
+    if (events.length === 0) {
+        return;
+    }
 
     const embeds: Array<EmbedOptions> = [];
     if (integration.account.id !== oldIntegration.account.id) {
@@ -131,7 +135,9 @@ export default new ClientEvent("integrationUpdate", async function integrationUp
         );
     }
 
-    if (embeds.length === 0) return;
+    if (embeds.length === 0) {
+        return;
+    }
 
     if (guild instanceof Guild && guild.clientMember.permissions.has("VIEW_AUDIT_LOG")) {
         const auditLog = await guild.getAuditLog({
@@ -144,7 +150,9 @@ export default new ClientEvent("integrationUpdate", async function integrationUp
                 .setTitle("Integration Update: Blame")
                 .setColor(Colors.gold)
                 .setDescription(`**${entry.user.tag}** (${entry.user.mention})`);
-            if (entry.reason) embed.addField("Reason", entry.reason, false);
+            if (entry.reason) {
+                embed.addField("Reason", entry.reason, false);
+            }
             embeds.push(embed.toJSON());
         }
     }

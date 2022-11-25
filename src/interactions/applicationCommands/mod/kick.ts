@@ -32,10 +32,18 @@ export default new Command(import.meta.url, "kick")
     .setAck("ephemeral")
     .setGuildLookup(true)
     .setExecutor(async function(interaction, { member, reason, dm }, gConfig) {
-        if (member.id === interaction.user.id) return interaction.reply({ content: "H-hey! You can't kick yourself.." });
-        if (member.id === interaction.guild.ownerID) return interaction.reply({ content: "H-hey! You can't kick the server owner.." });
-        if (Util.compareMemberToMember(member, interaction.member) !== "lower") return interaction.reply({ content: "H-hey! That member's highest role is higher than or as high as your highest role, you cannot kick them.." });
-        if (Util.compareMemberToMember(member, interaction.channel.guild.clientMember) !== "lower") return interaction.reply({ content: "H-hey! That member's highest role is higher than or as high as my highest role, I cannot kick them.." });
+        if (member.id === interaction.user.id) {
+            return interaction.reply({ content: "H-hey! You can't kick yourself.." });
+        }
+        if (member.id === interaction.guild.ownerID) {
+            return interaction.reply({ content: "H-hey! You can't kick the server owner.." });
+        }
+        if (Util.compareMemberToMember(member, interaction.member) !== "lower") {
+            return interaction.reply({ content: "H-hey! That member's highest role is higher than or as high as your highest role, you cannot kick them.." });
+        }
+        if (Util.compareMemberToMember(member, interaction.channel.guild.clientMember) !== "lower") {
+            return interaction.reply({ content: "H-hey! That member's highest role is higher than or as high as my highest role, I cannot kick them.." });
+        }
         reason = Strings.truncateWords(reason, 500);
 
         return member.kick(reason)
@@ -45,10 +53,12 @@ export default new Command(import.meta.url, "kick")
             }))
             .then(async() => {
                 let dmError: Error | undefined;
-                if (dm && !member.bot) await (await member.user.createDM()).createMessage({
-                    allowedMentions: { users: false },
-                    content:         `You were kicked from ${interaction.guild.name}${gConfig.settings.dmBlame ? ` by ${interaction.member.mention}` : ""}\nReason:\n\`\`\`\n${reason}\`\`\``
-                }).catch((err: Error) => dmError = err);
+                if (dm && !member.bot) {
+                    await (await member.user.createDM()).createMessage({
+                        allowedMentions: { users: false },
+                        content:         `You were kicked from ${interaction.guild.name}${gConfig.settings.dmBlame ? ` by ${interaction.member.mention}` : ""}\nReason:\n\`\`\`\n${reason}\`\`\``
+                    }).catch((err: Error) => dmError = err);
+                }
                 const { caseID, entry } = await ModLogHandler.createEntry({
                     type:   ModLogType.KICK,
                     guild:  interaction.guild,

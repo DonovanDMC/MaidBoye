@@ -10,9 +10,11 @@ export default class LoggingRemoveComponent extends BaseComponent {
 
     override async handleGuild(interaction: ComponentInteraction<ValidLocation.GUILD>, { entry }: BaseState & { entry: string; }) {
         const event = await LogEvent.get(entry);
-        if (!event) return interaction.editParent(Util.replaceContent({
-            content: "Something broke.."
-        }));
+        if (!event) {
+            return interaction.editParent(Util.replaceContent({
+                content: "Something broke.."
+            }));
+        }
         await event.delete();
         return interaction.editParent(Util.replaceContent({
             content: `Removed logging of **${Util.readableConstant(LogEvents[event.event])}** in <#${event.channelID}>.`

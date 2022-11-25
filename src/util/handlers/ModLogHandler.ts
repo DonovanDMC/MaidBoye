@@ -90,7 +90,9 @@ export default class ModLogHandler {
     static async createEntry(options: AnyOptions) {
         const { type, gConfig, guild, blame, reason } = options;
         const check = await this.check(gConfig);
-        if ("target" in options && (options.target instanceof User || options.target instanceof Member)) await UserConfig.createIfNotExists(options.target.id);
+        if ("target" in options && (options.target instanceof User || options.target instanceof Member)) {
+            await UserConfig.createIfNotExists(options.target.id);
+        }
         const caseID = await ModLog.getNextID(gConfig.id);
         const data: ModLogCreationData = {
             type:      ModLogType.BAN,
@@ -104,7 +106,9 @@ export default class ModLogHandler {
         switch (type) {
             case ModLogType.BAN: {
                 const { target, time, deleteSeconds } = options;
-                if (time > 0) timed = await TimedModerationHandler.add(TimedType.BAN, guild.id, target.id, time);
+                if (time > 0) {
+                    timed = await TimedModerationHandler.add(TimedType.BAN, guild.id, target.id, time);
+                }
                 data.delete_seconds = deleteSeconds;
                 text = [
                     `Target: <@!${target.id}> (\`${target.tag}\`)`,
@@ -148,7 +152,9 @@ export default class ModLogHandler {
             case ModLogType.MUTE: {
                 const { target, time } = options;
                 // Discord only allows up to 28 days via api
-                if (time > 0) timed = await TimedModerationHandler.add(TimedType.MUTE, guild.id, target.id, time);
+                if (time > 0) {
+                    timed = await TimedModerationHandler.add(TimedType.MUTE, guild.id, target.id, time);
+                }
                 text = [
                     `Target: <@!${target.id}> (\`${target.tag}\`)`,
                     `Reason: ${reason}`,
@@ -289,8 +295,12 @@ export default class ModLogHandler {
 
         data.channel_id = msg?.channelID;
         data.message_id = msg?.id;
-        if (timed) data.timed_id = timed.id;
-        if (strike) data.strike_id = strike.id;
+        if (timed) {
+            data.timed_id = timed.id;
+        }
+        if (strike) {
+            data.strike_id = strike.id;
+        }
 
         const log = await ModLog.create(data);
 
@@ -314,7 +324,9 @@ export default class ModLogHandler {
             [ModLogType.CLEAR_WARNINGS]: "User Warnings Cleared",
             [ModLogType.STRIKE]:         "User Strike Given"
         };
-        if (!(await this.check(gConfig))) return null;
+        if (!(await this.check(gConfig))) {
+            return null;
+        }
         return this.client.rest.webhooks.execute(gConfig.modlog.webhook!.id, gConfig.modlog.webhook!.token, {
             embeds: Util.makeEmbed(false)
                 .setAuthor(guild.name, guild.iconURL() ?? undefined)

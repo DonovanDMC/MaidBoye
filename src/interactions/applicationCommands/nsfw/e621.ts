@@ -45,16 +45,22 @@ export default new Command(import.meta.url, "e621")
     .setExecutor(async function(interaction, { tags, order }, gConfig, uConfig) {
         tags = tags.slice(0, 40);
         const state = await E621TagsState.store(tags);
-        if (!tags.some(t => t.startsWith("order:"))) tags.push(`order:${order}`);
+        if (!tags.some(t => t.startsWith("order:"))) {
+            tags.push(`order:${order}`);
+        }
         const q = await E621.posts.search({ tags, limit: 100 });
         const posts = filterPosts(q, uConfig.preferences.e621NoVideo, uConfig.preferences.e621NoFlash);
-        if (posts.length === 0) return interaction.reply({ content: `Search returned no results.${q.length === posts.length ? "" : ` (${q.length} posts were filtered out due to Discord ToS)`}` });
+        if (posts.length === 0) {
+            return interaction.reply({ content: `Search returned no results.${q.length === posts.length ? "" : ` (${q.length} posts were filtered out due to Discord ToS)`}` });
+        }
         return makeMessage(interaction, orders.indexOf(order), 0, posts, state, uConfig.preferences.e621ThumbnailType);
     });
 
 export async function makeMessage(interaction: CommandInteraction | ComponentInteraction, order: number, index: number, posts: Array<Post>, state: string, thumbType: E621ThumbnailType) {
     const post = posts[index];
-    if (!post) throw new Error(`couldn't find post to display (total: ${posts.length}, index: ${index}, state: ${state})`);
+    if (!post) {
+        throw new Error(`couldn't find post to display (total: ${posts.length}, index: ${index}, state: ${state})`);
+    }
     const embed = Util.makeEmbed(true, interaction.user)
         .setTitle(`Artist: ${post.tags.artist.filter(t => !["sound_warning", "conditional_dnp"].includes(t)).join(", ")}`)
         .setFooter(`Post ${index + 1}/${posts.length} | Score: ${post.score.total} | Favorites: ${post.fav_count}`, Config.botIcon);
@@ -62,12 +68,19 @@ export async function makeMessage(interaction: CommandInteraction | ComponentInt
         embed.setDescription(`This post is a video. To fully view it, you must go to it on [e621](https://e621.net/posts/${post.id})`);
         if (thumbType !== "none") {
             embed.setImage("https://assets.maid.gay/loading.gif");
-            if (thumbType === "image") embed.setDescription(`${embed.getDescription()!}\n\n(note: generating image thumbnails can take 10+ seconds)`);
-            if (thumbType === "gif") embed.setDescription(`${embed.getDescription()!}\n\n(note: generating gif thumbnails can take 20+ seconds)`);
+            if (thumbType === "image") {
+                embed.setDescription(`${embed.getDescription()!}\n\n(note: generating image thumbnails can take 10+ seconds)`);
+            }
+            if (thumbType === "gif") {
+                embed.setDescription(`${embed.getDescription()!}\n\n(note: generating gif thumbnails can take 20+ seconds)`);
+            }
 
         }
-    } else if (post.file.ext === "swf") embed.setDescription(`This post is a flash animation. To fully view it, you must go to it on [e621](https://e621.net/posts/${post.id}) (and go back to 2020)`);
-    else embed.setImage(post.file.url);
+    } else if (post.file.ext === "swf") {
+        embed.setDescription(`This post is a flash animation. To fully view it, you must go to it on [e621](https://e621.net/posts/${post.id}) (and go back to 2020)`);
+    } else {
+        embed.setImage(post.file.url);
+    }
     await (interaction.type === InteractionTypes.APPLICATION_COMMAND ? interaction.editOriginal.bind(interaction) : interaction.editParent.bind(interaction))({
         embeds:     embed.toJSON(true),
         components: new ComponentBuilder<MessageActionRow>()

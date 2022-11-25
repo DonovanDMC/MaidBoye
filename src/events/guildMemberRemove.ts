@@ -8,7 +8,9 @@ import { AuditLogActionTypes, Guild, Member, UserFlags } from "oceanic.js";
 
 export default new ClientEvent("guildMemberRemove", async function guildMemberRemoveEvent(user, guild) {
     const member: Member | null = user instanceof Member ? user : null;
-    if (user instanceof Member) user = user.user;
+    if (user instanceof Member) {
+        user = user.user;
+    }
     const flags = Util.getFlagsArray(UserFlags, user.publicFlags);
     const eventsRemove = await LogEvent.getType(guild.id, LogEvents.MEMBER_REMOVE);
     if (eventsRemove.length !== 0 && eventsRemove.length !== 0) {
@@ -60,12 +62,16 @@ export default new ClientEvent("guildMemberRemove", async function guildMemberRe
             const entry = auditLog.entries.find(e => e.targetID === user.id);
             if (entry?.user && (entry.createdAt.getTime() + 5e3) > Date.now()) {
                 embed.addField("Blame", `${entry.user.tag} (${entry.user.id})`, false);
-                if (entry.reason) embed.addField("Reason", entry.reason, false);
+                if (entry.reason) {
+                    embed.addField("Reason", entry.reason, false);
+                }
                 ok = true;
             }
         }
 
-        if (!ok) return;
+        if (!ok) {
+            return;
+        }
 
         for (const log of eventsKick) {
             await log.execute(this, { embeds: embed.toJSON(true) });

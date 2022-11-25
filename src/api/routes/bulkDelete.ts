@@ -31,7 +31,9 @@ app.route("/:id")
                 "-- End Bulk Deletion Report --"
             ].join("\n");
             return res.status(200).header("Content-Type", "text/plain").end(text);
-        } else return res.status(404).end("Unknown Report.");
+        } else {
+            return res.status(404).end("Unknown Report.");
+        }
     });
 
 export default app;

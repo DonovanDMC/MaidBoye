@@ -64,7 +64,9 @@ export default class CommandOption<T extends ApplicationCommandOptionTypes = App
     }
 
     addOption(option: CommandOption | ApplicationCommandOptions) {
-        if (option instanceof CommandOption) option = option.finalizeOption();
+        if (option instanceof CommandOption) {
+            option = option.finalizeOption();
+        }
         this.options.push(option);
         return this;
     }

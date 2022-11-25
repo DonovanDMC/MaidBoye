@@ -22,10 +22,12 @@ export default new Command(import.meta.url, "hug")
         text: interaction.data.options.getString("text")
     }))
     .setAck(async function(interaction, { user, text }) {
-        if (!user && !text) return interaction.reply({
-            flags:   MessageFlags.EPHEMERAL,
-            content: "H-hey! You have to specify a user or some text.."
-        });
+        if (!user && !text) {
+            return interaction.reply({
+                flags:   MessageFlags.EPHEMERAL,
+                content: "H-hey! You have to specify a user or some text.."
+            });
+        }
         return interaction.defer();
     })
     .setGuildLookup(true)
@@ -40,7 +42,9 @@ export default new Command(import.meta.url, "hug")
         if (gConfig.settings.commandImages) {
             const { url, source } = await Util.getImage("hug", Util.isNSFW(interaction.channel));
             embed.setImage(url);
-            if (source) components.push(Util.getSourceComponent(source));
+            if (source) {
+                components.push(Util.getSourceComponent(source));
+            }
         }
 
         return interaction.reply({

@@ -23,8 +23,12 @@ import type { AnyGuildTextChannel, MessageActionRow , Message } from "oceanic.js
 import { inspect } from "node:util";
 
 async function format(obj: unknown) {
-    if (obj instanceof Promise) obj = await obj;
-    if (Array.isArray(obj)) return JSON.stringify(obj, (k, v: unknown) => typeof v === "bigint" ? `${v.toString()}n` : v);
+    if (obj instanceof Promise) {
+        obj = await obj;
+    }
+    if (Array.isArray(obj)) {
+        return JSON.stringify(obj, (k, v: unknown) => typeof v === "bigint" ? `${v.toString()}n` : v);
+    }
     return inspect(obj, { depth: 1, colors: false, showHidden: false });
 }
 
@@ -54,8 +58,11 @@ export default new ClientEvent("messageCreate", async function messageCreateEven
         if (new RegExp(`^<@!?${this.user.id}>`).test(prefix)) {
             switch (command) {
                 case "eval": {
-                // eslint-disable-next-line guard-for-in, @typescript-eslint/no-implied-eval, no-new-func -- typescript messes with variable names so we have to remake them
-                    for (const k in evalVariables) new Function("value", `${k} = value`)(evalVariables[k]);
+                    // eslint-disable-next-line guard-for-in
+                    for (const k in evalVariables) {
+                        // eslint-disable-next-line guard-for-in, @typescript-eslint/no-implied-eval, no-new-func -- typescript messes with variable names so we have to remake them
+                        new Function("value", `${k} = value`)(evalVariables[k]);
+                    }
                     let res: unknown;
                     const flags = parse(args.join(" "), {
                         parseArgs: false
@@ -75,7 +82,9 @@ export default new ClientEvent("messageCreate", async function messageCreateEven
                     const f = await format(res);
                     const t = Timer.calc(start, end, 3, false);
 
-                    if (flags.has("delete") || flags.has("d")) await msg.delete().catch(() => null);
+                    if (flags.has("delete") || flags.has("d")) {
+                        await msg.delete().catch(() => null);
+                    }
                     if (flags.has("silent") || flags.has("s")) {
                         Logger.getLogger("Eval").info("Silent Eval Return (formatted):", f);
                         Logger.getLogger("Eval").info("Silent Eval Return (raw):", res);
@@ -128,8 +137,14 @@ export default new ClientEvent("messageCreate", async function messageCreateEven
     if (new RegExp(`^<@!?${this.user.id}> `).test(msg.content)) {
         const [,...args] = msg.content.split(" ");
         const content = args.join(" ").toLowerCase();
-        if (content.startsWith("make me")) return this.rest.channels.createMessage(msg.channelID, { content: "Th-that's not my purpose.." });
-        if (content.startsWith("fuck me")) return this.rest.channels.createMessage(msg.channelID, { content: "I-I don't even know you.." });
-        if (content.startsWith("bend over")) return this.rest.channels.createMessage(msg.channelID, { content: "N-no ~w~" });
+        if (content.startsWith("make me")) {
+            return this.rest.channels.createMessage(msg.channelID, { content: "Th-that's not my purpose.." });
+        }
+        if (content.startsWith("fuck me")) {
+            return this.rest.channels.createMessage(msg.channelID, { content: "I-I don't even know you.." });
+        }
+        if (content.startsWith("bend over")) {
+            return this.rest.channels.createMessage(msg.channelID, { content: "N-no ~w~" });
+        }
     }
 });

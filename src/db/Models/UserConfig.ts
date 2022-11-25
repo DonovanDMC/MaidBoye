@@ -123,7 +123,9 @@ export default class UserConfig {
 
     async edit(data: UserConfigUpdateData) {
         const success = await Util.genericEdit(UserConfig.TABLE, this.id, Util.removeUndefinedKV(data));
-        if (success) this.load(Util.removeUndefinedKV({ ...this._data, ...data }));
+        if (success) {
+            this.load(Util.removeUndefinedKV({ ...this._data, ...data }));
+        }
         return success;
     }
 

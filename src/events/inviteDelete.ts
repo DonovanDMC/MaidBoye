@@ -7,9 +7,13 @@ import { AuditLogActionTypes, Invite } from "oceanic.js";
 import { Time } from "@uwu-codes/utils";
 
 export default new ClientEvent("inviteDelete", async function inviteDeleteEvent(invite) {
-    if (!invite.guild?.id) return;
+    if (!invite.guild?.id) {
+        return;
+    }
     const events = await LogEvent.getType(invite.guild.id, LogEvents.INVITE_DELETE);
-    if (events.length === 0) return;
+    if (events.length === 0) {
+        return;
+    }
 
     const embed = Util.makeEmbed(true)
         .setTitle("Invite Deleted")
@@ -36,7 +40,9 @@ export default new ClientEvent("inviteDelete", async function inviteDeleteEvent(
         const entry = auditLog.entries.find(e => e.changes?.find(c => c.key === "code" && c.new_value === invite.code));
         if (entry?.user && (entry.createdAt.getTime() + 5e3) > Date.now()) {
             embed.addField("Blame", `**${entry.user.tag}** (${entry.user.tag})`, false);
-            if (entry.reason) embed.addField("Reason", entry.reason, false);
+            if (entry.reason) {
+                embed.addField("Reason", entry.reason, false);
+            }
         }
     }
 

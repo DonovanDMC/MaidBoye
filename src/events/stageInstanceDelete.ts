@@ -7,7 +7,9 @@ import { AuditLogActionTypes } from "oceanic.js";
 
 export default new ClientEvent("stageInstanceDelete", async function stageInstanceDeleteEvent(stage) {
     const events = await LogEvent.getType(stage.guildID, LogEvents.STAGE_INSTANCE_DELETE);
-    if (events.length === 0) return;
+    if (events.length === 0) {
+        return;
+    }
 
     const embed = Util.makeEmbed(true)
         .setTitle("Stage Instance Deleted")
@@ -27,7 +29,9 @@ export default new ClientEvent("stageInstanceDelete", async function stageInstan
         const entry = auditLog.entries.find(e => e.targetID === stage.id);
         if (entry?.user && (entry.createdAt.getTime() + 5e3) > Date.now()) {
             embed.addField("Blame", `**${entry.user.tag}** (${entry.user.tag})`, false);
-            if (entry.reason) embed.addField("Reason", entry.reason, false);
+            if (entry.reason) {
+                embed.addField("Reason", entry.reason, false);
+            }
         }
     }
 

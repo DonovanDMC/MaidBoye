@@ -20,8 +20,12 @@ export default class PreferencesMenuComponent extends BaseComponent {
                 break;
             }
         }
-        if (data.page < 0) data.page = Preferences.getPageCount() - 1;
-        if (data.page > (Preferences.getPageCount() - 1)) data.page = 0;
+        if (data.page < 0) {
+            data.page = Preferences.getPageCount() - 1;
+        }
+        if (data.page > (Preferences.getPageCount() - 1)) {
+            data.page = 0;
+        }
         await changePage(data.page, interaction, uConfig);
     }
 }

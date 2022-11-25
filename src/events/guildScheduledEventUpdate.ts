@@ -6,9 +6,13 @@ import { GuildScheduledEventEntityTypeNames, GuildScheduledEventPrivacyLevelName
 import { AuditLogActionTypes, EmbedOptions } from "oceanic.js";
 
 export default new ClientEvent("guildScheduledEventUpdate", async function guildScheduledEventUpdateEvent(event, oldEvent) {
-    if (oldEvent === null) return;
+    if (oldEvent === null) {
+        return;
+    }
     const events = await LogEvent.getType(event.guildID, LogEvents.SCHEDULED_EVENT_UPDATE);
-    if (events.length === 0) return;
+    if (events.length === 0) {
+        return;
+    }
     const embeds: Array<EmbedOptions> = [];
 
     if (event.channelID !== oldEvent.channelID) {
@@ -75,7 +79,9 @@ export default new ClientEvent("guildScheduledEventUpdate", async function guild
                 `Event: **${event.name}** (${event.id})`,
                 `This event's cover image was ${event.image === null ? "removed" : "changed"}.`
             ]);
-        if (event.image) embed.setImage(event.imageURL()!);
+        if (event.image) {
+            embed.setImage(event.imageURL()!);
+        }
         embeds.push(embed.toJSON());
     }
 
@@ -160,7 +166,9 @@ export default new ClientEvent("guildScheduledEventUpdate", async function guild
                 .setTitle("Scheduled Event Update: Blame")
                 .setColor(Colors.gold)
                 .setDescription(`**${entry.user.tag}** (${entry.user.mention})`);
-            if (entry.reason) embed.addField("Reason", entry.reason, false);
+            if (entry.reason) {
+                embed.addField("Reason", entry.reason, false);
+            }
             embeds.push(embed.toJSON());
         }
     }

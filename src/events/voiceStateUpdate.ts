@@ -5,9 +5,13 @@ import { Colors } from "../util/Constants.js";
 import { AuditLogActionTypes, EmbedField, EmbedOptions } from "oceanic.js";
 
 export default new ClientEvent("voiceStateUpdate", async function voiceStateUpdateEvent(member, oldState) {
-    if (oldState === null || member.voiceState === null) return;
+    if (oldState === null || member.voiceState === null) {
+        return;
+    }
     const events = await LogEvent.getType(member.guildID, LogEvents.VOICE_STATE_UPDATE);
-    if (events.length === 0) return;
+    if (events.length === 0) {
+        return;
+    }
 
     const embeds: Array<EmbedOptions> = [];
 
@@ -123,11 +127,13 @@ export default new ClientEvent("voiceStateUpdate", async function voiceStateUpda
                 value:  `**${entryDeaf.user.tag}** (${entryDeaf.user.mention})`,
                 inline: false
             });
-            if (entryDeaf.reason) fields.push({
-                name:   "Reason",
-                value:  entryDeaf.reason,
-                inline: false
-            });
+            if (entryDeaf.reason) {
+                fields.push({
+                    name:   "Reason",
+                    value:  entryDeaf.reason,
+                    inline: false
+                });
+            }
             embeds[deafIndex].fields!.push(...fields);
         }
 
@@ -138,11 +144,13 @@ export default new ClientEvent("voiceStateUpdate", async function voiceStateUpda
                 value:  `**${entryMute.user.tag}** (${entryMute.user.mention})`,
                 inline: false
             });
-            if (entryMute.reason) fields.push({
-                name:   "Reason",
-                value:  entryMute.reason,
-                inline: false
-            });
+            if (entryMute.reason) {
+                fields.push({
+                    name:   "Reason",
+                    value:  entryMute.reason,
+                    inline: false
+                });
+            }
             embeds[deafIndex].fields!.push(...fields);
         }
     }

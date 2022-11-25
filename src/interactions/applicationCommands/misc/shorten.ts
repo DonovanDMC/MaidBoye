@@ -21,10 +21,12 @@ export default new Command(import.meta.url, "shorten")
         };
     })
     .setAck((interaction, { url }, ephemeralUser) => {
-        if ((!url || !url.startsWith("http"))) return interaction.createMessage({
-            flags:   MessageFlags.EPHEMERAL,
-            content: "H-hey! That wasn't a valid url.."
-        });
+        if ((!url || !url.startsWith("http"))) {
+            return interaction.createMessage({
+                flags:   MessageFlags.EPHEMERAL,
+                content: "H-hey! That wasn't a valid url.."
+            });
+        }
         return ephemeralUser ? interaction.defer(MessageFlags.EPHEMERAL) : interaction.defer();
     })
     .setCooldown(3e3)
@@ -39,9 +41,15 @@ export default new Command(import.meta.url, "shorten")
                 }))
             .catch(err => {
                 if (err instanceof APIError) {
-                    if (err.obj === "Invalid url proided.") return interaction.reply({ content: "H-hey! That url was invalid.." });
-                    else if (err.obj === "Code already in use.") return interaction.reply({ content: "H-hey! That code is already in use.." });
-                    else return interaction.reply({ content: `Our api returned an unknown error.. \`${err.message}\`${typeof err.obj === "string" ? "" : `, ${JSON.stringify(err.obj)}`}` });
-                } else throw err;
+                    if (err.obj === "Invalid url proided.") {
+                        return interaction.reply({ content: "H-hey! That url was invalid.." });
+                    } else if (err.obj === "Code already in use.") {
+                        return interaction.reply({ content: "H-hey! That code is already in use.." });
+                    } else {
+                        return interaction.reply({ content: `Our api returned an unknown error.. \`${err.message}\`${typeof err.obj === "string" ? "" : `, ${JSON.stringify(err.obj)}`}` });
+                    }
+                } else {
+                    throw err;
+                }
             });
     });

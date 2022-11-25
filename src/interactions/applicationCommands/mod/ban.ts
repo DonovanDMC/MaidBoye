@@ -56,12 +56,20 @@ export default new Command(import.meta.url, "ban")
     .setAck("ephemeral")
     .setGuildLookup(true)
     .setExecutor(async function(interaction, { user, reason, days, hours, minutes, dm, deleteHours }, gConfig) {
-        if (user.id === interaction.user.id) return interaction.reply({ content: "H-hey! You can't ban yourself.." });
-        if (user.id === interaction.guild.ownerID) return interaction.reply({ content: "H-hey! You can't ban the server owner.." });
+        if (user.id === interaction.user.id) {
+            return interaction.reply({ content: "H-hey! You can't ban yourself.." });
+        }
+        if (user.id === interaction.guild.ownerID) {
+            return interaction.reply({ content: "H-hey! You can't ban the server owner.." });
+        }
         const member = await this.getMember(interaction.guildID, user.id);
         if (member) {
-            if (Util.compareMemberToMember(member, interaction.member) !== "lower") return interaction.reply({ content: "H-hey! That member's highest role is higher than or as high as your highest role, you cannot ban them.." });
-            if (Util.compareMemberToMember(member, interaction.channel.guild.clientMember) !== "lower") return interaction.reply({ content: "H-hey! That member's highest role is higher than or as high as my highest role, I cannot ban them.." });
+            if (Util.compareMemberToMember(member, interaction.member) !== "lower") {
+                return interaction.reply({ content: "H-hey! That member's highest role is higher than or as high as your highest role, you cannot ban them.." });
+            }
+            if (Util.compareMemberToMember(member, interaction.channel.guild.clientMember) !== "lower") {
+                return interaction.reply({ content: "H-hey! That member's highest role is higher than or as high as my highest role, I cannot ban them.." });
+            }
         }
         const time = (((days * 24) + hours) * 60 + minutes) * 60;
         const deleteSeconds = deleteHours * 60 * 60;
@@ -74,10 +82,12 @@ export default new Command(import.meta.url, "ban")
             }))
             .then(async() => {
                 let dmError: Error | undefined;
-                if (dm && !user.bot) await (await user.createDM()).createMessage({
-                    allowedMentions: { users: false },
-                    content:         `You were banned from ${interaction.guild.name}${gConfig.settings.dmBlame ? ` by ${interaction.member.mention}` : ""}\nReason:\n\`\`\`\n${reason}\`\`\`\nExpires: ${time === 0 ? "**Never**" : Util.formatDiscordTime(Date.now() + (time * 1000), "long-datetime", true)}`
-                }).catch((err: Error) => dmError = err);
+                if (dm && !user.bot) {
+                    await (await user.createDM()).createMessage({
+                        allowedMentions: { users: false },
+                        content:         `You were banned from ${interaction.guild.name}${gConfig.settings.dmBlame ? ` by ${interaction.member.mention}` : ""}\nReason:\n\`\`\`\n${reason}\`\`\`\nExpires: ${time === 0 ? "**Never**" : Util.formatDiscordTime(Date.now() + (time * 1000), "long-datetime", true)}`
+                    }).catch((err: Error) => dmError = err);
+                }
                 const { caseID, entry } = await ModLogHandler.createEntry({
                     type:   ModLogType.BAN,
                     guild:  interaction.guild,

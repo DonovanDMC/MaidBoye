@@ -36,10 +36,14 @@ export default new Command(import.meta.url, "lock")
             allow = overwrite.allow;
             deny = overwrite.deny;
             // only yell at the user if all permissions have been denied already
-            if (overwrite.deny & lockPermissions) return interaction.reply({ content: `H-hey! ${channel.id === interaction.channelID ? "This" : "That"} channel is already locked..` });
+            if (overwrite.deny & lockPermissions) {
+                return interaction.reply({ content: `H-hey! ${channel.id === interaction.channelID ? "This" : "That"} channel is already locked..` });
+            }
             await db.redis.set(`lock:${interaction.channel.id}`, JSON.stringify([overwrite.allow.toString(), overwrite.deny.toString()]));
             for (const perm of lockPermissionsList) {
-                if (allow & perm) allow &= ~perm;
+                if (allow & perm) {
+                    allow &= ~perm;
+                }
             }
         }
 

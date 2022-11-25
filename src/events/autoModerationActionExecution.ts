@@ -7,12 +7,18 @@ import { AnyGuildTextChannel, AutoModerationActionTypes, Guild, User } from "oce
 import { Strings, Time } from "@uwu-codes/utils";
 
 export default new ClientEvent("autoModerationActionExecution", async function autoModerationActionExecutionEvent(guild, channel, user, options) {
-    if (!(guild instanceof Guild)) return;
+    if (!(guild instanceof Guild)) {
+        return;
+    }
     const events = await LogEvent.getType(guild.id, LogEvents.AUTOMOD_ACTION_EXECUTION);
-    if (events.length === 0) return;
+    if (events.length === 0) {
+        return;
+    }
 
     const rule = options.rule ?? guild.autoModerationRules.get(options.ruleID) ?? await guild.getAutoModerationRule(options.ruleID);
-    if (!(user instanceof User)) user = (await this.getUser(user.id))!;
+    if (!(user instanceof User)) {
+        user = (await this.getUser(user.id))!;
+    }
     channel = channel === null ? null : (await this.getGuildChannel(channel.id))!;
     let actionInfo = "";
     switch (options.action.type) {
@@ -39,7 +45,9 @@ export default new ClientEvent("autoModerationActionExecution", async function a
         .addField("Content", Strings.truncateWords(options.content, 1024), false)
         .addField("Matched Content", Strings.truncateWords(options.matchedContent, 1024), false);
 
-    if (options.matchedKeyword !== null) embed.addField("Matched Keyword", options.matchedKeyword, false);
+    if (options.matchedKeyword !== null) {
+        embed.addField("Matched Keyword", options.matchedKeyword, false);
+    }
 
     for (const log of events) {
         await log.execute(this, { embeds: embed.toJSON(true) });

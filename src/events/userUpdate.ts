@@ -5,13 +5,17 @@ import { Colors } from "../util/Constants.js";
 import { EmbedOptions, UserFlags } from "oceanic.js";
 
 export default new ClientEvent("userUpdate", async function userUpdateEvent(user, oldUser) {
-    if (oldUser === null) return;
+    if (oldUser === null) {
+        return;
+    }
     const guilds = this.guilds.filter(g => g.members.has(user.id));
     const events: Array<LogEvent> = [];
     for (const guild of guilds) {
         events.push(...(await LogEvent.getType(guild.id, LogEvents.USER_UPDATE)));
     }
-    if (events.length === 0) return;
+    if (events.length === 0) {
+        return;
+    }
 
     const embeds: Array<EmbedOptions> = [];
 
@@ -77,7 +81,9 @@ export default new ClientEvent("userUpdate", async function userUpdateEvent(user
         );
     }
 
-    if (embeds.length === 0) return;
+    if (embeds.length === 0) {
+        return;
+    }
 
     for (const log of events) {
         await log.execute(this, { embeds });

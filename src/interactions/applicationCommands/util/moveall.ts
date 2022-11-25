@@ -44,28 +44,40 @@ export default new Command(import.meta.url, "moveall")
             d = newChannel.permissionsOf(this.user.id),
             size = Number(newChannel.voiceMembers.size);
 
-        if (size === 0) return interaction.reply({
-            content: `H-hey! There aren't any users in <#${newChannel.id}> to move..`
-        });
-
-        for (const p of perms) {
-            if (!a.has(p)) return interaction.reply({
-                content: `H-hey! You must have access to join the channel you're moving people from.. You're missing **${p}**`
-            });
-            if (!b.has(p)) return interaction.reply({
-                content: `H-hey! I do not have access to the channel you wanted to move people from.. I'm missing **${p}**`
-            });
-            if (!c.has(p)) return interaction.reply({
-                content: `H-hey! You must have access to join the channel you're moving people to.. You're missing **${p}**`
-            });
-            if (!d.has(p)) return interaction.reply({
-                content: `H-hey! I do not have access to the channel you wanted to move people to.. I'm missing **${p}**`
+        if (size === 0) {
+            return interaction.reply({
+                content: `H-hey! There aren't any users in <#${newChannel.id}> to move..`
             });
         }
-        for (const [,member] of oldChannel.voiceMembers) await member.edit({
-            channelID: newChannel.id,
-            reason:    `MoveAll: ${interaction.user.tag} (${interaction.user.id})`
-        });
+
+        for (const p of perms) {
+            if (!a.has(p)) {
+                return interaction.reply({
+                    content: `H-hey! You must have access to join the channel you're moving people from.. You're missing **${p}**`
+                });
+            }
+            if (!b.has(p)) {
+                return interaction.reply({
+                    content: `H-hey! I do not have access to the channel you wanted to move people from.. I'm missing **${p}**`
+                });
+            }
+            if (!c.has(p)) {
+                return interaction.reply({
+                    content: `H-hey! You must have access to join the channel you're moving people to.. You're missing **${p}**`
+                });
+            }
+            if (!d.has(p)) {
+                return interaction.reply({
+                    content: `H-hey! I do not have access to the channel you wanted to move people to.. I'm missing **${p}**`
+                });
+            }
+        }
+        for (const [,member] of oldChannel.voiceMembers) {
+            await member.edit({
+                channelID: newChannel.id,
+                reason:    `MoveAll: ${interaction.user.tag} (${interaction.user.id})`
+            });
+        }
 
         return interaction.reply({
             content: `Moved **${size}** user${size === 1 ? "" : "s"} from <#${oldChannel.id}> to <#${newChannel.id}>`

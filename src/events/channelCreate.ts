@@ -8,7 +8,9 @@ import { Time } from "@uwu-codes/utils";
 
 export default new ClientEvent("channelCreate", async function channelCreateEvent(channel) {
     const events = await LogEvent.getType(channel.guildID, LogEvents.CHANNEL_CREATE);
-    if (events.length === 0) return;
+    if (events.length === 0) {
+        return;
+    }
 
     const embed = Util.makeEmbed(true)
         .setTitle("Channel Created")
@@ -29,7 +31,9 @@ export default new ClientEvent("channelCreate", async function channelCreateEven
         const entry = auditLog.entries.find(e => e.targetID === channel.id);
         if (entry?.user && (entry.createdAt.getTime() + 5e3) > Date.now()) {
             embed.addField("Blame", `**${entry.user.tag}** (${entry.user.tag})`, false);
-            if (entry.reason) embed.addField("Reason", entry.reason, false);
+            if (entry.reason) {
+                embed.addField("Reason", entry.reason, false);
+            }
         }
     }
 

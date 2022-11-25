@@ -125,10 +125,18 @@ export default class GuildConfig {
         this.levelingRoles = data.leveling_roles.slice(1, -1).match(/"\(\d{15,25},\d{1,4}\)"/g)?.map(m => [m.slice(2).split(",")[0], Number(m.slice(0, -2).split(",")[1])]) ?? [];
         this.tags          = data.tags;
         // make sure we reset the cached values when new data is loaded
-        if (this._levelingRolesRoleMap)  this._levelingRolesRoleMap = undefined;
-        if (this._levelingRolesLevelMap) this._levelingRolesLevelMap = undefined;
-        if (this._levelingRolesList)     this._levelingRolesList = undefined;
-        if (this._tagNames)              this._tagNames = undefined;
+        if (this._levelingRolesRoleMap)  {
+            this._levelingRolesRoleMap = undefined;
+        }
+        if (this._levelingRolesLevelMap) {
+            this._levelingRolesLevelMap = undefined;
+        }
+        if (this._levelingRolesList)     {
+            this._levelingRolesList = undefined;
+        }
+        if (this._tagNames)              {
+            this._tagNames = undefined;
+        }
     }
 
     async addLevelingRole(role: string, level: number) {
@@ -144,7 +152,9 @@ export default class GuildConfig {
 
     async edit(data: GuildConfigUpdateData) {
         const success = await Util.genericEdit(GuildConfig.TABLE, this.id, Util.removeUndefinedKV(data));
-        if (success) this.load(Util.removeUndefinedKV({ ...this._data, ...data }));
+        if (success) {
+            this.load(Util.removeUndefinedKV({ ...this._data, ...data }));
+        }
         return success;
     }
 
@@ -161,7 +171,9 @@ export default class GuildConfig {
             modlog_webhook_token:      null,
             modlog_webhook_channel_id: null
         });
-        if (this.modlog.webhook?.managed) await this.setSetting("WEBHOOK_MANAGED", false);
+        if (this.modlog.webhook?.managed) {
+            await this.setSetting("WEBHOOK_MANAGED", false);
+        }
     }
 
     async setModLog(id: string, token: string, channel: string, managed = false) {
@@ -170,7 +182,9 @@ export default class GuildConfig {
             modlog_webhook_token:      token,
             modlog_webhook_channel_id: channel
         });
-        if (this.modlog.webhook?.managed !== managed) await this.setSetting("WEBHOOK_MANAGED", managed);
+        if (this.modlog.webhook?.managed !== managed) {
+            await this.setSetting("WEBHOOK_MANAGED", managed);
+        }
     }
 
     async setSetting(type: Exclude<keyof typeof SettingsBits, ExcludedSettings>, value: boolean) {

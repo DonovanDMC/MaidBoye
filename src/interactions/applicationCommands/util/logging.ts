@@ -16,7 +16,9 @@ import { ButtonColors, ComponentBuilder } from "@oceanicjs/builders";
 import chunk from "chunk";
 
 export async function enableLogging(interaction: ComponentInteraction<ValidLocation.GUILD> | ModalSubmitInteraction<ValidLocation.GUILD>, channel: string, webhook: Webhook, event: LogEvents) {
-    if (!interaction.acknowledged) await interaction.defer(MessageFlags.EPHEMERAL);
+    if (!interaction.acknowledged) {
+        await interaction.defer(MessageFlags.EPHEMERAL);
+    }
     await LogEvent.create({
         event,
         channel_id:    channel,
@@ -27,13 +29,17 @@ export async function enableLogging(interaction: ComponentInteraction<ValidLocat
 
     if (event === LogEvents.ALL) {
         const all = (await LogEvent.getAll(interaction.guildID)).filter(ev => ev.channelID === channel);
-        for (const ev of all) await ev.delete();
+        for (const ev of all) {
+            await ev.delete();
+        }
     }
 
     const embed = Util.makeEmbed(true)
         .setTitle("Logging Enabled")
         .setDescription(`Logging of **${Util.readableConstant(LogEvents[event])}** has been enabled in this channel by ${interaction.user.mention}.`);
-    if (webhook.avatar) embed.setThumbnail(webhook.avatarURL()!);
+    if (webhook.avatar) {
+        embed.setThumbnail(webhook.avatarURL()!);
+    }
     await webhook.execute({
         embeds: embed.toJSON(true)
     });
@@ -103,12 +109,16 @@ export default new Command(import.meta.url, "logging")
     .setValidLocation(ValidLocation.GUILD)
     .setAck("ephemeral")
     .setExecutor(async function(interaction, { type, event: rawEvent, channel, entry }) {
-        if (channel && !TextableGuildChannels.includes(channel.type)) return interaction.reply({
-            content: `H-hey! <#${channel.id}> is not a valid textable channel..`
-        });
+        if (channel && !TextableGuildChannels.includes(channel.type)) {
+            return interaction.reply({
+                content: `H-hey! <#${channel.id}> is not a valid textable channel..`
+            });
+        }
         switch (type) {
             case "add": {
-                if (!channel) channel = interaction.channel as AnyGuildTextChannelWithoutThreads;
+                if (!channel) {
+                    channel = interaction.channel as AnyGuildTextChannelWithoutThreads;
+                }
                 const event = LogEvents[rawEvent!];
                 const total = await LogEvent.getCount(interaction.guild.id);
                 const events = await LogEvent.getAll(interaction.guild.id);
@@ -170,9 +180,11 @@ export default new Command(import.meta.url, "logging")
 
             case "clear": {
                 const events = (await LogEvent.getAll(interaction.guild.id)).filter(ev => channel?.id ? ev.channelID === channel.id : true);
-                if (events.length === 0) return interaction.reply({
-                    content: "H-hey! There aren't any entries to clear.."
-                });
+                if (events.length === 0) {
+                    return interaction.reply({
+                        content: "H-hey! There aren't any entries to clear.."
+                    });
+                }
 
                 return interaction.reply({
                     content:    `Are you sure you want to clear **${events.length}** logging entries${channel ? ` in <#${channel.id}>` : ""}?`,
@@ -193,9 +205,11 @@ export default new Command(import.meta.url, "logging")
 
             case "list": {
                 const events = (await LogEvent.getAll(interaction.guild.id)).filter(ev => channel?.id ? ev.channelID === channel.id : true);
-                if (events.length === 0) return interaction.reply({
-                    content: "H-hey! There aren't any entries to list.."
-                });
+                if (events.length === 0) {
+                    return interaction.reply({
+                        content: "H-hey! There aren't any entries to list.."
+                    });
+                }
                 const list = chunk(events, 10);
 
                 const page = 1;
@@ -229,9 +243,11 @@ export default new Command(import.meta.url, "logging")
 
             case "remove": {
                 const event = await LogEvent.get(entry!);
-                if (event === null) return interaction.reply({
-                    content: "H-hey! That entry doesn't exist.."
-                });
+                if (event === null) {
+                    return interaction.reply({
+                        content: "H-hey! That entry doesn't exist.."
+                    });
+                }
 
                 return interaction.reply({
                     content:    `Are you sure you want to remove the logging of **${Util.readableConstant(LogEvents[event.event])}** in <#${event.channelID}>?`,

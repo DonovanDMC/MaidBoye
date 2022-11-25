@@ -12,7 +12,9 @@ export default class PreferencesPickComponent extends BaseComponent {
     command = "preferences";
 
     override async handle(interaction: ComponentInteraction, data: BaseState & { preference: number; value?: string | number | null; }) {
-        if (interaction.data.componentType === ComponentTypes.BUTTON) assert(data.value !== undefined, `no value present in pick (${data.preference})`);
+        if (interaction.data.componentType === ComponentTypes.BUTTON) {
+            assert(data.value !== undefined, `no value present in pick (${data.preference})`);
+        }
         const pref = Preferences.getByID(data.preference);
         assert(pref, `invalid preference recieved in pick (${data.preference})`);
         const uConfig = await UserConfig.get(interaction.user.id);

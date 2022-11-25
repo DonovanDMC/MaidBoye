@@ -43,7 +43,9 @@ export default class Components {
     }
 
     static async loadAll(dir = thisDirectory) {
-        if (dir === `${thisDirectory}/structure`) return;
+        if (dir === `${thisDirectory}/structure`) {
+            return;
+        }
         const files = (await readdir(dir, { withFileTypes: true }));
         for (const file of files) {
             if (file.isDirectory()) {
@@ -51,13 +53,17 @@ export default class Components {
                 continue;
             }
             // ignore all files in base directory
-            if (dir === thisDirectory) continue;
+            if (dir === thisDirectory) {
+                continue;
+            }
             Debug("components:load", `Loading "${`${dir}/${file.name}`.replace(thisDirectory, "").slice(1)}"`);
             const start = Timer.getTime();
             let inst: BaseComponent;
             try {
                 let component = await import(`${dir}/${file.name}`) as ModuleImport<typeof EmptyComponent>;
-                if ("default" in component) component = component.default;
+                if ("default" in component) {
+                    component = component.default;
+                }
                 inst = new component();
                 [inst.id] = this.register(inst);
             } catch (err) {
@@ -76,7 +82,9 @@ export default class Components {
 		component["handle"] === BaseComponent.prototype["handle"] &&
 		component.handleDM === BaseComponent.prototype.handleDM &&
 		component.handleGuild === BaseComponent.prototype.handleGuild;
-        if (noOverride) throw new Error(`Component "${component.command || "null"}-${component.action}" does not override at least one handle method.`);
+        if (noOverride) {
+            throw new Error(`Component "${component.command || "null"}-${component.action}" does not override at least one handle method.`);
+        }
         const id = this.list.push(component) - 1;
         Debug("components:register", `Registered component "${component.command || "null"}-${component.action}" (id: ${id})`);
         return [id] as [id: number];

@@ -13,17 +13,21 @@ export default class LoggingWebhookFailureHandler {
 
     static async init(client: MaidBoye) {
         this.client = client;
-        Logger.getLogger("ModLogHandler").info("Initialized");
+        Logger.getLogger("LoggingWebhookFailureHandler").info("Initialized");
     }
 
     static async tick(log: LogEvent, bypassRequirements = false) {
         const dt = Date.now();
-        if (!this.client) return -1 as const;
+        if (!this.client) {
+            return -1 as const;
+        }
         this.list = this.list.filter(([t]) => t > dt);
         Logger.getLogger("LoggingWebhookFailureHandler").warn(`Failure for event "${LogEvents[log.event]}" (webhook: ${log.webhook.id}, channel: ${log.channelID}, guild: ${log.guildID})`);
         // eslint-disable-next-line prefer-const
         let [time = (dt + this.WINDOW_TIME), amount = null] = this.list.find(([, , d]) => log.id === d) ?? [];
-        if (bypassRequirements) amount = this.WINDOW_TOTAL;
+        if (bypassRequirements) {
+            amount = this.WINDOW_TOTAL;
+        }
         if (amount === null) {
             this.list.push([time, 1, log.id]);
             return 1;

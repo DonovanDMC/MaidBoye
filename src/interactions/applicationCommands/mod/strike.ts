@@ -25,10 +25,18 @@ export default new Command(import.meta.url, "strike")
     .setValidLocation(ValidLocation.GUILD)
     .setAck("ephemeral")
     .setExecutor(async function(interaction, { member, amount }) {
-        if (member.id === interaction.member.id) return interaction.reply({ content: "H-hey! You can't strike yourself!" });
-        if (Util.compareMemberToMember(member, interaction.member) !== "lower") return interaction.reply({ content: "H-hey! You can't strike people higher than you!" });
-        if (amount < 1) return interaction.reply({ content: "Y-you have to add at least one strike.." });
-        if (amount > 10) return interaction.reply({ content: "Y-you cannot add more than 10 strikes at a time.." });
+        if (member.id === interaction.member.id) {
+            return interaction.reply({ content: "H-hey! You can't strike yourself!" });
+        }
+        if (Util.compareMemberToMember(member, interaction.member) !== "lower") {
+            return interaction.reply({ content: "H-hey! You can't strike people higher than you!" });
+        }
+        if (amount < 1) {
+            return interaction.reply({ content: "Y-you have to add at least one strike.." });
+        }
+        if (amount > 10) {
+            return interaction.reply({ content: "Y-you cannot add more than 10 strikes at a time.." });
+        }
         await UserConfig.createIfNotExists(member.id);
         await Strike.create({
             user_id:  member.id,

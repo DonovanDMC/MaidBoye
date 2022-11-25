@@ -37,7 +37,9 @@ export default class TimedModerationHandler {
 
     static async process() {
         const d = new Date();
-        if (d.getMinutes() !== 0 || d.getSeconds() !== 0) return;
+        if (d.getMinutes() !== 0 || d.getSeconds() !== 0) {
+            return;
+        }
         await this.processExpiry();
         await this.processRenewal();
     }
@@ -45,7 +47,9 @@ export default class TimedModerationHandler {
     static async processExpiry() {
         const rows = (await db.query<TimedData>(`SELECT * FROM ${Timed.TABLE} WHERE expires_at <= CURRENT_TIMESTAMP(3)`)).rows.map(r => new Timed(r));
         for (const row of rows) {
-            if (this.processed.includes(row.id)) continue;
+            if (this.processed.includes(row.id)) {
+                continue;
+            }
             this.processed.push(row.id);
             Logger.getLogger("TimedModerationHandler").debug(`Processing timed entry "${row.id}" for the guild "${row.guildID}"`);
             const gConfig = await GuildConfig.get(row.guildID);
@@ -109,7 +113,9 @@ export default class TimedModerationHandler {
         const renewalDate = new Date(Date.now() - 1000 * 60 * 60 * 24 * 28);
         const rows = (await db.query<TimedData>(`SELECT * FROM ${Timed.TABLE} WHERE expires_at >= CURRENT_TIMESTAMP(3) AND type = $1 AND renewed_at <= $2`, [TimedType.MUTE, renewalCheck.toISOString()])).rows.map(r => new Timed(r));
         for (const row of rows) {
-            if (this.processed.includes(row.id)) continue;
+            if (this.processed.includes(row.id)) {
+                continue;
+            }
             this.processed.push(row.id);
             Logger.getLogger("TimedModerationHandler").debug(`Processing renewal of entry "${row.id}" for the guild "${row.guildID}"`);
             const gConfig = await GuildConfig.get(row.guildID);
@@ -127,18 +133,24 @@ export default class TimedModerationHandler {
             }
 
             const unmute = await member.edit({ communicationDisabledUntil: (renewalDate > row.expiresAt ? row.expiresAt : renewalDate).toISOString(), reason: `Mute Renewal (expiry: ${row.expiresAt.getDate()}/${row.expiresAt.getMonth() + 1}/${row.expiresAt.getFullYear()})` }).then(() => true, () => false);
-            if (check && !unmute) await ModLogHandler.executeWebhook(guild, gConfig, null, ModLogType.MUTE, 0, Colors.red, `I failed to renew <@!${target.id}>'s mute..`, "Unmute Renewal Failed");
+            if (check && !unmute) {
+                await ModLogHandler.executeWebhook(guild, gConfig, null, ModLogType.MUTE, 0, Colors.red, `I failed to renew <@!${target.id}>'s mute..`, "Unmute Renewal Failed");
+            }
             await row.edit({ renewed_at: new Date() });
         }
     }
 
     static async remove(id: string) {
-        if (this.processed.includes(id)) this.processed.splice(this.processed.indexOf(id), 1);
+        if (this.processed.includes(id)) {
+            this.processed.splice(this.processed.indexOf(id), 1);
+        }
         return db.delete(Timed.TABLE, id);
     }
 
     static stop() {
-        if (this.interval) clearInterval(this.interval);
+        if (this.interval) {
+            clearInterval(this.interval);
+        }
         this.interval = undefined;
         Logger.getLogger("TimedModerationHandler").info("Stopped");
     }

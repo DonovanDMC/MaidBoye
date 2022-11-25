@@ -136,12 +136,18 @@ export default new Command(import.meta.url, "tag")
     .setExecutor(async function(interaction, { type: [type], name, page, content }, gConfig) {
         switch (type) {
             case "list": {
-                if (gConfig.tagNames.length === 0) return interaction.reply({
-                    content: "H-hey! This server doesn't have any tags.."
-                });
+                if (gConfig.tagNames.length === 0) {
+                    return interaction.reply({
+                        content: "H-hey! This server doesn't have any tags.."
+                    });
+                }
                 const pages = Math.ceil(gConfig.tagNames.length / 10);
-                if (page > pages) return interaction.reply({ content: `H-hey! This server only has ${pages} page${pages === 1 ? "" : "s"} of tags..` });
-                if (page < 1) return interaction.reply({ content: "H-hey! Page needs to be greater than one.." });
+                if (page > pages) {
+                    return interaction.reply({ content: `H-hey! This server only has ${pages} page${pages === 1 ? "" : "s"} of tags..` });
+                }
+                if (page < 1) {
+                    return interaction.reply({ content: "H-hey! Page needs to be greater than one.." });
+                }
 
                 return interaction.reply(await getPage(interaction, gConfig, page));
             }
@@ -149,14 +155,18 @@ export default new Command(import.meta.url, "tag")
             case "get": {
                 assert(name);
                 name = name.toLowerCase();
-                if (!gConfig.tagNames.includes(name)) return interaction.reply({ content: `H-hey! I couldn't find a tag by the name of "${name}"..` });
+                if (!gConfig.tagNames.includes(name)) {
+                    return interaction.reply({ content: `H-hey! I couldn't find a tag by the name of "${name}"..` });
+                }
                 return interaction.reply({ content: gConfig.tags[name].content });
             }
 
             case "info": {
                 assert(name);
                 name = name.toLowerCase();
-                if (!gConfig.tagNames.includes(name)) return interaction.reply({ content: `H-hey! I couldn't find a tag by the name of "${name}"..` });
+                if (!gConfig.tagNames.includes(name)) {
+                    return interaction.reply({ content: `H-hey! I couldn't find a tag by the name of "${name}"..` });
+                }
                 const tag = await getTag(interaction.client as MaidBoye, name, gConfig.tags[name], gConfig.tagNames.indexOf(name) % 10, Math.ceil(gConfig.tagNames.indexOf(name) / 10) + 1, true);
                 return interaction.reply({
                     embeds: Util.makeEmbed(true, interaction.user)
@@ -167,12 +177,22 @@ export default new Command(import.meta.url, "tag")
             }
 
             case "create": {
-                if (!interaction.member.permissions.has("MANAGE_MESSAGES")) return interaction.reply({ content: "H-hey! You don't have permission to do that.." });
+                if (!interaction.member.permissions.has("MANAGE_MESSAGES")) {
+                    return interaction.reply({ content: "H-hey! You don't have permission to do that.." });
+                }
                 assert(name && content);
-                if (gConfig.tagNames.length >= 50) return interaction.reply({ content: "H-hey! This server already has the maximum amount of tags.." });
-                if (name.length > 50) return interaction.reply({ content: "H-hey! That name is too long.." });
-                if (content.length > 750) return interaction.reply({ content: "H-hey! Tags can only be 750 characters long.." });
-                if (gConfig.tagNames.includes(name)) return interaction.reply({ content: "H-hey! This server already has a tag with that name.." });
+                if (gConfig.tagNames.length >= 50) {
+                    return interaction.reply({ content: "H-hey! This server already has the maximum amount of tags.." });
+                }
+                if (name.length > 50) {
+                    return interaction.reply({ content: "H-hey! That name is too long.." });
+                }
+                if (content.length > 750) {
+                    return interaction.reply({ content: "H-hey! Tags can only be 750 characters long.." });
+                }
+                if (gConfig.tagNames.includes(name)) {
+                    return interaction.reply({ content: "H-hey! This server already has a tag with that name.." });
+                }
                 gConfig.tags[name] = {
                     content,
                     createdAt:       Date.now(),
@@ -186,10 +206,16 @@ export default new Command(import.meta.url, "tag")
             }
 
             case "modify": {
-                if (!interaction.member.permissions.has("MANAGE_MESSAGES")) return interaction.reply({ content: "H-hey! You don't have permission to do that.." });
+                if (!interaction.member.permissions.has("MANAGE_MESSAGES")) {
+                    return interaction.reply({ content: "H-hey! You don't have permission to do that.." });
+                }
                 assert(name && content);
-                if (!gConfig.tagNames.includes(name)) return interaction.reply({ content: "H-hey! This server doesnt have a tag with that name.." });
-                if (content.length > 750) return interaction.reply({ content: "H-hey! Tags can only be 750 characters long.." });
+                if (!gConfig.tagNames.includes(name)) {
+                    return interaction.reply({ content: "H-hey! This server doesnt have a tag with that name.." });
+                }
+                if (content.length > 750) {
+                    return interaction.reply({ content: "H-hey! Tags can only be 750 characters long.." });
+                }
                 gConfig.tags[name] = {
                     ...gConfig.tags[name]!,
                     content,
@@ -202,9 +228,13 @@ export default new Command(import.meta.url, "tag")
             }
 
             case "delete": {
-                if (!interaction.member.permissions.has("MANAGE_MESSAGES")) return interaction.reply({ content: "H-hey! You don't have permission to do that.." });
+                if (!interaction.member.permissions.has("MANAGE_MESSAGES")) {
+                    return interaction.reply({ content: "H-hey! You don't have permission to do that.." });
+                }
                 assert(name);
-                if (!gConfig.tagNames.includes(name)) return interaction.reply({ content: "H-hey! This server doesnt have a tag with that name.." });
+                if (!gConfig.tagNames.includes(name)) {
+                    return interaction.reply({ content: "H-hey! This server doesnt have a tag with that name.." });
+                }
                 delete gConfig.tags[name];
                 await gConfig.edit({ tags: gConfig.tags });
                 return interaction.reply({ content: `The tag "${name}" has been deleted` });

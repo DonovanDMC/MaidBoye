@@ -1,0 +1,90 @@
+import { ServiceEvents, ServiceMessage } from "./ServicesManager.js";
+import Debug from "./Debug.js";
+import { randomUUID } from "node:crypto";
+import { parentPort } from "node:worker_threads";
+
+export default abstract class Service {
+    private cb: Map<string, {
+        reject(reason?: unknown): void;
+        resolve(value?: unknown): void;
+    }> = new Map();
+    file: string;
+    name: string;
+    protected abstract handleMessage(op: string, data?: unknown): Promise<unknown>;
+    constructor(file: string, name: string) {
+        this.file = file;
+        this.name = name;
+    }
+
+    private async _handleMessage(message: ServiceMessage) {
+        Debug(`services:${this.name}`, `Received message from master: ${JSON.stringify(message)}`);
+        switch (message.event) {
+            case ServiceEvents.WORKER_COMMAND: {
+                const op = (message.data as { op: string; }).op;
+                const data = (message.data as { data?: unknown; }).data;
+                const res = await this.handleMessage(op, data);
+                if (message.responsive) {
+                    parentPort!.postMessage({
+                        data:       res,
+                        event:      ServiceEvents.RESPONSE,
+                        id:         randomUUID(),
+                        responseTo: message.id
+                    });
+                }
+                break;
+            }
+
+            case ServiceEvents.RESPONSE: {
+                if (!message.responseTo) {
+                    throw new Error("Response message without responseTo.");
+                }
+                const cb = this.cb.get(message.responseTo);
+                if (!message.responseTo) {
+                    throw new Error("Response message without callback id.");
+                }
+                if (!cb) {
+                    throw new Error("Response message without callback.");
+                }
+                this.cb.delete(message.responseTo);
+                cb.resolve(message.data);
+                break;
+            }
+        }
+    }
+
+    ready() {
+        parentPort!.postMessage({
+            event: ServiceEvents.READY,
+            id:    randomUUID()
+        });
+        parentPort!.on("message", this._handleMessage.bind(this));
+    }
+
+    async sendToMaster<T = unknown>(event: ServiceEvents, data: unknown | undefined, responsive: true): Promise<T>;
+    async sendToMaster(event: ServiceEvents, data?: unknown, responsive?: false): Promise<void>;
+    async sendToMaster<T = unknown>(event: ServiceEvents, data?: unknown, responsive?: boolean): Promise<T | void> {
+        const id = randomUUID();
+        parentPort!.postMessage({
+            event,
+            data,
+            id
+        });
+        if (responsive) {
+            return new Promise((resolve,reject) => {
+                this.cb.set(id, {
+                    resolve,
+                    reject
+                });
+                setTimeout(() => {
+                    reject(new Error("Message to master timed out."));
+                }, 10000);
+            });
+        }
+    }
+}
+
+export class EmptyService extends Service {
+    protected handleMessage(): Promise<unknown> {
+        throw new Error("Method not implemented.");
+    }
+}

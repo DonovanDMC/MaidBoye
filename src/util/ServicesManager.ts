@@ -1,0 +1,159 @@
+import Logger from "./Logger.js";
+import Debug from "./Debug.js";
+import { randomUUID } from "node:crypto";
+import { Worker } from "node:worker_threads";
+
+export enum ServiceEvents {
+    READY = "ready",
+    RESPONSE = "response",
+    WORKER_COMMAND = "workerCommand",
+    MASTER_COMMAND = "masterCommand"
+}
+
+export interface ServiceMessage {
+    data: unknown;
+    event: ServiceEvents;
+    id: string;
+    responseTo?: string;
+    responsive?: boolean;
+}
+export default class ServicesManager {
+    static cb: Map<string, { reject(reason?: unknown): void; resolve(value?: unknown): void; }> = new Map();
+    static exitCounts: Map<string, number> = new Map();
+    static serviceStatuses: Map<string, "starting" | "ready" | "dead"> = new Map();
+    static services: Map<string, Worker> = new Map();
+
+    private static async _handleMessage(worker: Worker, message: ServiceMessage) {
+        const name = this.workerToName(worker)!;
+        Debug("services:master", `Received message from service "${name}":`, message);
+        switch (message.event) {
+            case ServiceEvents.READY: {
+                Logger.getLogger("Services").info(`Service "${name}" is ready.`);
+                this.serviceStatuses.set(name, "ready");
+                this.exitCounts.set(name, 0);
+                this.cb.get(name)?.resolve();
+                this.cb.delete(name);
+                break;
+            }
+
+            case ServiceEvents.RESPONSE: {
+                this.cb.get(message.responseTo!)?.resolve(message);
+                this.cb.delete(message.responseTo!);
+                break;
+            }
+
+            case ServiceEvents.WORKER_COMMAND: {
+                const op = (message.data as { op: string; }).op;
+                const data = (message.data as { data?: unknown; }).data;
+                const toname = (message.data as { name: string; }).name;
+                const res = await this.send(toname, op, data, message.responsive as true);
+                if (message.responsive) {
+                    worker.postMessage({
+                        data:       res,
+                        event:      ServiceEvents.RESPONSE,
+                        id:         randomUUID(),
+                        responseTo: message.id
+                    });
+                }
+                break;
+            }
+
+            case ServiceEvents.MASTER_COMMAND: {
+                const op = (message.data as { op: string; }).op;
+                const data = (message.data as { data?: unknown; }).data;
+                const res = await this.handleMessage(worker, op, data);
+                if (message.responsive) {
+                    worker.postMessage({
+                        data:       res,
+                        event:      ServiceEvents.RESPONSE,
+                        id:         randomUUID(),
+                        responseTo: message.id
+                    });
+                }
+                break;
+            }
+        }
+    }
+    private static workerToName(worker: Worker) {
+        return [...this.services.entries()].find(([, w]) => w === worker)?.[0];
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    static async handleMessage(worker: Worker, op: string, data?: unknown): Promise<unknown> {
+        throw new Error("Not Implemented");
+    }
+
+    static async register(name: string, path: string | URL, timeout = 30000) {
+        if (path instanceof URL) {
+            path = path.pathname;
+        }
+        Logger.getLogger("Services").info(`Registering service "${name}". Attempt: ${(this.exitCounts.get(name) ?? 0) + 1}`);
+        const worker = new Worker(new URL("WorkerRunner.ts", import.meta.url), { workerData: { name, path } });
+        worker
+            .on("message", this._handleMessage.bind(this, worker))
+            .on("exit", code => {
+                this.serviceStatuses.set(name, "dead");
+                let exitCount: number;
+                this.exitCounts.set(name, exitCount = (this.exitCounts.get(name) ?? 0) + 1);
+                Logger.getLogger("Services").warn(`Service "${name}" exited with code ${code}. Total Attempts: ${exitCount}`);
+                if (exitCount > 5) {
+                    Logger.getLogger("Services").error(`Service "${name}" has exited too many times. Not restarting.`);
+                    this.exitCounts.delete(name);
+                } else {
+                    const time = Math.floor(Math.pow(exitCount, 2.3) * 1000);
+                    Logger.getLogger("Services").info(`Restarting service "${name}" in ${time}ms.`);
+                    setTimeout(() => this.register(name, path), time);
+                }
+            });
+        return new Promise((resolve, reject) => {
+            this.services.set(name, worker);
+            this.serviceStatuses.set(name, "starting");
+            const t =  setTimeout(() => {
+                if (this.serviceStatuses.get(name) === "starting") {
+                    this.serviceStatuses.set(name, "dead");
+                    this.cb.delete(name);
+                    reject(new Error(`Starting service "${name}" timed out.`));
+                }
+            }, timeout);
+            this.cb.set(name, {
+                resolve(val) {
+                    clearTimeout(t);
+                    resolve(val);
+                },
+                reject
+            });
+        });
+    }
+
+    static async send<T = unknown>(name: string, op: string, data: unknown | string, responsive: true): Promise<T>;
+    static async send(name: string, op: string, data?: unknown, responsive?: false): Promise<void>;
+    static async send<T = unknown>(name: string, op: string, data?: unknown, responsive = false): Promise<T | void> {
+        if (this.serviceStatuses.get(name) !== "ready") {
+            throw new Error(`Attempted to send message to service "${name}" that is not ready.`);
+        }
+
+        const id = randomUUID();
+        this.services.get(name)?.postMessage({
+            id,
+            event: ServiceEvents.WORKER_COMMAND,
+            data:  { op, data },
+            responsive
+        });
+
+        if (responsive) {
+            return new Promise((resolve, reject) => {
+                const t = setTimeout(() => {
+                    this.cb.delete(id);
+                    reject(new Error(`Sending message to service "${name}" timed out.`));
+                }, 30000);
+                this.cb.set(id, {
+                    resolve(val) {
+                        clearTimeout(t);
+                        resolve((val as ServiceMessage).data as T);
+                    },
+                    reject
+                });
+            });
+        }
+    }
+}

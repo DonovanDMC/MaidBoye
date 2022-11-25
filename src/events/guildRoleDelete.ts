@@ -27,7 +27,9 @@ export default new ClientEvent("guildRoleDelete", async function guildRoleDelete
             const entry = auditLog.entries.find(e => e.targetID === role.id);
             if (entry?.user && (entry.createdAt.getTime() + 5e3) > Date.now()) {
                 embed.addField("Blame", `**${entry.user.tag}** (${entry.user.tag})`, false);
-                if (entry.reason) embed.addField("Reason", entry.reason, false);
+                if (entry.reason) {
+                    embed.addField("Reason", entry.reason, false);
+                }
             }
         }
 

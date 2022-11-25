@@ -12,7 +12,9 @@ import { randomBytes } from "node:crypto";
 // this requires the messageContent intent
 export default new ClientEvent("messageDeleteBulk", async function messageDeleteBulkEvent(messages) {
     const guild = (messages.find(msg  => "guildID" in msg) as Message<Uncached | AnyGuildTextChannel>)?.guild;
-    if (!guild) return;
+    if (!guild) {
+        return;
+    }
 
     const time = Date.now();
     const channel = (await this.getGuildChannel(messages[0]!.channelID))!;
@@ -33,7 +35,9 @@ export default new ClientEvent("messageDeleteBulk", async function messageDelete
         })
     };
     const events = await LogEvent.getType(guild.id, LogEvents.MESSAGE_DELETE_BULK);
-    if (events.length === 0) return;
+    if (events.length === 0) {
+        return;
+    }
 
     const id = randomBytes(16).toString("hex");
     await writeFile(`${Config.bulkDeleteDir}/${id}.json`, JSON.stringify(report));
@@ -54,7 +58,9 @@ export default new ClientEvent("messageDeleteBulk", async function messageDelete
         const entry = auditLog.entries[0];
         if (entry?.user && (entry.createdAt.getTime() + 5e3) > Date.now()) {
             embed.addField("Blame", `${entry.user.tag} (${entry.user.id})`, false);
-            if (entry.reason) embed.addField("Reason", entry.reason, false);
+            if (entry.reason) {
+                embed.addField("Reason", entry.reason, false);
+            }
         }
     }
 

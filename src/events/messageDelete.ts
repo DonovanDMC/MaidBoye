@@ -10,29 +10,37 @@ import { AuditLogActionTypes, Message } from "oceanic.js";
 
 // this requires the messageContent intent
 export default new ClientEvent("messageDelete", async function messageDeleteEvent(msg) {
-    if (!("guildID" in msg) || !msg.guildID || !(msg instanceof Message)) return;
+    if (!("guildID" in msg) || !msg.guildID || !(msg instanceof Message)) {
+        return;
+    }
     // if the message gets deleted, we remove the message from the case
     const modCase = await ModLog.getFromMessage(msg.guildID, msg.id);
-    if (modCase) await modCase.edit({ message_id: null });
+    if (modCase) {
+        await modCase.edit({ message_id: null });
+    }
 
-    if (msg.content !== "") await db.redis
-        .multi()
-        .lpush(`snipe:delete:${msg.channelID}`, JSON.stringify({
-            content: EncryptionHandler.encrypt(msg.content),
-            author:  msg.author.id,
-            time:    Date.now(),
-            ref:     msg.referencedMessage ? {
-                link:    msg.referencedMessage.jumpLink,
-                author:  msg.referencedMessage.author.id,
-                content: EncryptionHandler.encrypt(msg.referencedMessage.content)
-            } : null
-        }))
-        .ltrim(`snipe:delete:${msg.channelID}`, 0, 2)
-        .expire(`snipe:delete:${msg.channelID}`, 21600)
-        .exec();
+    if (msg.content !== "") {
+        await db.redis
+            .multi()
+            .lpush(`snipe:delete:${msg.channelID}`, JSON.stringify({
+                content: EncryptionHandler.encrypt(msg.content),
+                author:  msg.author.id,
+                time:    Date.now(),
+                ref:     msg.referencedMessage ? {
+                    link:    msg.referencedMessage.jumpLink,
+                    author:  msg.referencedMessage.author.id,
+                    content: EncryptionHandler.encrypt(msg.referencedMessage.content)
+                } : null
+            }))
+            .ltrim(`snipe:delete:${msg.channelID}`, 0, 2)
+            .expire(`snipe:delete:${msg.channelID}`, 21600)
+            .exec();
+    }
 
     const events = await LogEvent.getType(msg.guildID, LogEvents.MESSAGE_DELETE);
-    if (events.length === 0) return;
+    if (events.length === 0) {
+        return;
+    }
 
     const embed = Util.makeEmbed(true, msg.author)
         .setTitle("Message Deleted")
@@ -47,7 +55,9 @@ export default new ClientEvent("messageDelete", async function messageDeleteEven
         const entry = auditLog.entries[0];
         if (entry?.user && (entry.createdAt.getTime() + 5e3) > Date.now()) {
             embed.addField("Blame", `${entry.user.tag} (${entry.user.id})`, false);
-            if (entry.reason) embed.addField("Reason", entry.reason, false);
+            if (entry.reason) {
+                embed.addField("Reason", entry.reason, false);
+            }
         }
     }
 

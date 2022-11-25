@@ -36,27 +36,30 @@ export class State {
         ];
         const d = Buffer.from(data, "base64url").toString("ascii").split(sep).map((val, index) => {
             let value: unknown;
-            if (val === "NULL") value = null;
-            else switch (types[index]) {
-                case "undefined": {
-                    value = undefined;
-                    break;
-                }
-                case "boolean": {
-                    value = Boolean(val);
-                    break;
-                }
-                case "number": {
-                    value = Number(val);
-                    break;
-                }
-                case "bigint": {
-                    value = BigInt(val);
-                    break;
-                }
-                default: {
-                    value = val;
-                    break;
+            if (val === "NULL") {
+                value = null;
+            } else {
+                switch (types[index]) {
+                    case "undefined": {
+                        value = undefined;
+                        break;
+                    }
+                    case "boolean": {
+                        value = Boolean(val);
+                        break;
+                    }
+                    case "number": {
+                        value = Number(val);
+                        break;
+                    }
+                    case "bigint": {
+                        value = BigInt(val);
+                        break;
+                    }
+                    default: {
+                        value = val;
+                        break;
+                    }
                 }
             }
             return { [names[index] || `unknown${index}`]: value };
@@ -73,7 +76,9 @@ export class State {
 
     static encode(data: Array<string | number | boolean | null>, sep = ",") {
         const str = Buffer.from(data.map(d => d === null ? "NULL" : d).join(sep)).toString("base64url").replace(/=/g, "");
-        if (str.length > this.MAX_LENGTH) throw new Error(`encoded state is longer than ${this.MAX_LENGTH} (${str})`);
+        if (str.length > this.MAX_LENGTH) {
+            throw new Error(`encoded state is longer than ${this.MAX_LENGTH} (${str})`);
+        }
         return str;
     }
 
@@ -108,7 +113,9 @@ export class State {
 
     encode() {
         for (const key of Object.keys(this.extraValues)) {
-            if (["user", "cmd", "action"].includes(key)) throw new Error(`Provided extra "${key}" for ${this.command || "NONE"}/${this.action} overrides a deault value`);
+            if (["user", "cmd", "action"].includes(key)) {
+                throw new Error(`Provided extra "${key}" for ${this.command || "NONE"}/${this.action} overrides a deault value`);
+            }
         }
         void this.saveNamesAndTypes(this.extraKeys, this.extraTypes);
         return State.encode([
@@ -136,7 +143,9 @@ export class State {
 
     /** @deprecated use with(key, value) */
     withExtra(extra: Record<string, string | number | bigint | boolean | null>) {
-        for (const [key, value] of Object.entries(extra)) this.with(key, value);
+        for (const [key, value] of Object.entries(extra)) {
+            this.with(key, value);
+        }
         return this;
     }
 }

@@ -16,9 +16,11 @@ export default new Command(import.meta.url, "divorce")
     }))
     .setUserLookup(true)
     .setExecutor(async function(interaction, { user }, gConfig, uConfig) {
-        if (!uConfig.marriagePartners.includes(user)) return interaction.reply({
-            content: `H-hey! You aren't married to <@!${user}>...`
-        });
+        if (!uConfig.marriagePartners.includes(user)) {
+            return interaction.reply({
+                content: `H-hey! You aren't married to <@!${user}>...`
+            });
+        }
 
 
         return interaction.reply({

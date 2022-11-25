@@ -44,28 +44,36 @@ export default class MaidBoye extends Client {
             Config.eventsDirectory,
             Config.commandsDirectory
         ];
-        for (const dir of directories) await mkdir(dir, { recursive: true });
+        for (const dir of directories) {
+            await mkdir(dir, { recursive: true });
+        }
     }
 
     async getGuildChannel<CH extends AnyGuildChannel = AnyGuildChannel>(id: string, forceRest = false) {
         const ch = this.getChannel(id) as CH;
         if (!ch || forceRest) {
             const channel = await this.rest.channels.get(id).catch(() => null) as CH | null;
-            if (channel === null || !("guild" in channel)) return null;
+            if (channel === null || !("guild" in channel)) {
+                return null;
+            }
             const guild = this.guilds.get(channel.guild.id);
             if (guild) {
                 if (channel instanceof ThreadChannel) {
                     guild.threads.add(channel);
                     this.threadGuildMap[channel.id] = guild.id;
                     const parent = await this.getGuildChannel(channel.parentID);
-                    if (parent && "threads" in parent) (parent.threads as TypedCollection<string, RawThreadChannel, AnyThreadChannel>).add(channel);
+                    if (parent && "threads" in parent) {
+                        (parent.threads as TypedCollection<string, RawThreadChannel, AnyThreadChannel>).add(channel);
+                    }
                 } else {
                     guild.channels.add(channel);
                     this.channelGuildMap[channel.id] = guild.id;
                 }
             }
             return channel;
-        } else return ch;
+        } else {
+            return ch;
+        }
     }
 
     async getMember(guildID: string, userID: string, forceRest = false) {
@@ -80,13 +88,17 @@ export default class MaidBoye extends Client {
 
     async getUser(id: string, forceRest = false) {
         const current = this.users.get(id);
-        if (current && !forceRest) return current;
+        if (current && !forceRest) {
+            return current;
+        }
         return this.rest.users.get(id).catch(() => null);
     }
 
     async handleRegistrationError(commands: Array<CreateApplicationCommandOptions>, err: Error) {
         Logger.getLogger("CommandRegistration").error("Failed To Register Commands:", err);
-        for (const cmd of commands) Logger.getLogger("CommandRegistration").error(`Command At ${commands.indexOf(cmd)}: ${cmd.name} (${ApplicationCommandTypeNames[cmd.type]})`);
+        for (const cmd of commands) {
+            Logger.getLogger("CommandRegistration").error(`Command At ${commands.indexOf(cmd)}: ${cmd.name} (${ApplicationCommandTypeNames[cmd.type]})`);
+        }
     }
 
     async launch() {
@@ -99,13 +111,19 @@ export default class MaidBoye extends Client {
 
     async loadEvents() {
         const overallStart = Timer.getTime();
-        if (!await Util.exists(Config.eventsDirectory))  throw new Error(`Events directory "${Config.eventsDirectory}" does not exist.`);
+        if (!await Util.exists(Config.eventsDirectory))  {
+            throw new Error(`Events directory "${Config.eventsDirectory}" does not exist.`);
+        }
         const events = (await readdir(Config.eventsDirectory, { withFileTypes: true })).filter(ev => ev.isFile()).map(ev => `${Config.eventsDirectory}/${ev.name}`);
         for (const event of events) {
             const start = Timer.getTime();
             let ev = await import(event) as ModuleImport<ClientEvent>;
-            if ("default" in ev) ev = ev.default;
-            if (!(ev instanceof ClientEvent)) throw new TypeError(`Export of event file "${event}" is not an instance of ClientEvent.`);
+            if ("default" in ev) {
+                ev = ev.default;
+            }
+            if (!(ev instanceof ClientEvent)) {
+                throw new TypeError(`Export of event file "${event}" is not an instance of ClientEvent.`);
+            }
             this.events.set(ev.name, ev);
             this.on(ev.name, ev.listener.bind(this));
             const end = Timer.getTime();

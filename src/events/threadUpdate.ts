@@ -6,9 +6,13 @@ import { AuditLogActionTypes, ChannelFlags, ChannelTypes, EmbedOptions } from "o
 import { Time } from "@uwu-codes/utils";
 
 export default new ClientEvent("threadUpdate", async function threadUpdateEvent(thread, oldThread) {
-    if (oldThread === null) return;
+    if (oldThread === null) {
+        return;
+    }
     const events = await LogEvent.getType(thread.guildID, LogEvents.THREAD_UPDATE);
-    if (events.length === 0) return;
+    if (events.length === 0) {
+        return;
+    }
 
     const embeds: Array<EmbedOptions> = [];
 
@@ -108,7 +112,9 @@ export default new ClientEvent("threadUpdate", async function threadUpdateEvent(
                 .setTitle("Thread Update: Blame")
                 .setColor(Colors.gold)
                 .setDescription(`**${entry.user.tag}** (${entry.user.mention})`);
-            if (entry.reason) embed.addField("Reason", entry.reason, false);
+            if (entry.reason) {
+                embed.addField("Reason", entry.reason, false);
+            }
             embeds.push(embed.toJSON());
         }
     }

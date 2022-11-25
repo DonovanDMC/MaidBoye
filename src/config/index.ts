@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/member-ordering */
 import betaClient from "./private/client.beta.json" assert { type: "json" };
 import prodClient from "./private/client.prod.json" assert { type: "json" };
+import otherClients from "./private/client.other.json" assert { type: "json" };
 import PrivateConfig from "./private/private.js";
 import emojis from "./json/emojis.json" assert { type: "json" };
 import pkg from "../../package.json" assert { type: "json" };
@@ -37,6 +38,12 @@ export default class Config extends PrivateConfig {
         return `MaidBoye/${pkg.version} (https://github.com/DonovanDMC/MaidBoye)`;
     }
 
+    static get furrybotToken() {
+        return otherClients.furrybot;
+    }
+    static get furrybotBetaToken() {
+        return otherClients.furrybotbeta;
+    }
     static get clientID() {
         return this.isDevelopment ? betaClient.id : prodClient.id;
     }

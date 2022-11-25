@@ -23,10 +23,12 @@ export default new Command(import.meta.url, "bap")
         text: interaction.data.options.getString("text")
     }))
     .setAck(async function(interaction, { user, text }) {
-        if (!user && !text) return interaction.reply({
-            flags:   MessageFlags.EPHEMERAL,
-            content: "H-hey! You have to specify a user or some text.."
-        });
+        if (!user && !text) {
+            return interaction.reply({
+                flags:   MessageFlags.EPHEMERAL,
+                content: "H-hey! You have to specify a user or some text.."
+            });
+        }
         return interaction.defer();
     })
     .setExecutor(async function(interaction, { user, text }) {

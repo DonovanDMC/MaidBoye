@@ -29,7 +29,9 @@ export default class db {
 
     // because of some weird circular import nonsense this has to be done this way
     static async initIfNotReady() {
-        if (this.init) return;
+        if (this.init) {
+            return;
+        }
         this.init = true;
 
         this.dbClient = new pg.Client({

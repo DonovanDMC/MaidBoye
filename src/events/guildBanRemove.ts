@@ -6,7 +6,9 @@ import { AuditLogActionTypes, Guild } from "oceanic.js";
 
 export default new ClientEvent("guildBanRemove", async function guildBanRemoveEvent(guild, user) {
     const events = await LogEvent.getType(guild.id, LogEvents.BAN_REMOVE);
-    if (events.length === 0) return;
+    if (events.length === 0) {
+        return;
+    }
 
     const embed = Util.makeEmbed(true)
         .setTitle("Member Unbanned")
@@ -21,7 +23,9 @@ export default new ClientEvent("guildBanRemove", async function guildBanRemoveEv
         const entry = auditLog.entries[0];
         if (entry?.user && (entry.createdAt.getTime() + 5e3) > Date.now()) {
             embed.addField("Blame", `**${entry.user.tag}** (${entry.user.mention})`, false);
-            if (entry.reason) embed.addField("Reason", entry.reason, false);
+            if (entry.reason) {
+                embed.addField("Reason", entry.reason, false);
+            }
         }
     }
 

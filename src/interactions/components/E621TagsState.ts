@@ -4,7 +4,9 @@ import { createHash } from "node:crypto";
 export default class E621TagsState {
     static async get(id: string) {
         const get = await db.redis.get(`e621-tags:${id}`);
-        if (!get) return null;
+        if (!get) {
+            return null;
+        }
         return Buffer.from(get, "base64url").toString("ascii").split(" ");
     }
 

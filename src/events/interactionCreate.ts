@@ -42,9 +42,13 @@ async function processRestrictions(this: MaidBoye, cmd: AnyCommand, interaction:
 async function processAck(this: MaidBoye, cmd: AnyCommand, interaction: CommandInteraction, ephemeralUser: boolean, options?:  Record<string, unknown>) {
     if (typeof cmd.ack === "function") {
         let ack: false | void | AckString;
-        if (cmd instanceof Command) ack = await cmd.ack.call(this, interaction, options! as Record<string, never>, ephemeralUser, cmd);
-        else if (cmd instanceof UserCommand) ack = await cmd.ack.call(this, interaction, ephemeralUser, cmd);
-        else if (cmd instanceof MessageCommand) ack = await cmd.ack.call(this, interaction, ephemeralUser, cmd);
+        if (cmd instanceof Command) {
+            ack = await cmd.ack.call(this, interaction, options! as Record<string, never>, ephemeralUser, cmd);
+        } else if (cmd instanceof UserCommand) {
+            ack = await cmd.ack.call(this, interaction, ephemeralUser, cmd);
+        } else if (cmd instanceof MessageCommand) {
+            ack = await cmd.ack.call(this, interaction, ephemeralUser, cmd);
+        }
         if (ack !== undefined) {
             switch (ack) {
                 case false: {
@@ -58,11 +62,15 @@ async function processAck(this: MaidBoye, cmd: AnyCommand, interaction: CommandI
                     break;
                 }
                 case "command-images-check": {
-                    if (cmd.validLocation !== ValidLocation.GUILD) return false;
-                    if (!(interaction as unknown as CommandInteraction<ValidLocation.GUILD>).channel.permissionsOf(this.user.id).has("ATTACH_FILES")) return interaction.reply({
-                        flags:   MessageFlags.EPHEMERAL,
-                        content: "H-hey! This server has the **Command Images** setting enabled, but I cannot attach files.. Please correct this."
-                    });
+                    if (cmd.validLocation !== ValidLocation.GUILD) {
+                        return false;
+                    }
+                    if (!(interaction as unknown as CommandInteraction<ValidLocation.GUILD>).channel.permissionsOf(this.user.id).has("ATTACH_FILES")) {
+                        return interaction.reply({
+                            flags:   MessageFlags.EPHEMERAL,
+                            content: "H-hey! This server has the **Command Images** setting enabled, but I cannot attach files.. Please correct this."
+                        });
+                    }
                     break;
                 }
             }
@@ -77,11 +85,15 @@ async function processAck(this: MaidBoye, cmd: AnyCommand, interaction: CommandI
                 break;
             }
             case "command-images-check": {
-                if (cmd.validLocation !== ValidLocation.GUILD) return false;
-                if (!(interaction as unknown as CommandInteraction<ValidLocation.GUILD>).channel.permissionsOf(this.user.id).has("ATTACH_FILES")) return interaction.reply({
-                    flags:   MessageFlags.EPHEMERAL,
-                    content: "H-hey! This server has the **Command Images** setting enabled, but I cannot attach files.. Please correct this."
-                });
+                if (cmd.validLocation !== ValidLocation.GUILD) {
+                    return false;
+                }
+                if (!(interaction as unknown as CommandInteraction<ValidLocation.GUILD>).channel.permissionsOf(this.user.id).has("ATTACH_FILES")) {
+                    return interaction.reply({
+                        flags:   MessageFlags.EPHEMERAL,
+                        content: "H-hey! This server has the **Command Images** setting enabled, but I cannot attach files.. Please correct this."
+                    });
+                }
                 break;
             }
             case "none": {
@@ -103,68 +115,98 @@ export default new ClientEvent("interactionCreate", async function interactionCr
             switch (interaction.data.type) {
                 case ApplicationCommandTypes.CHAT_INPUT: {
                     const cmd = CommandHandler.getCommand("default", interaction.data.name);
-                    if (!cmd) return interaction.reply({
-                        content: "We couldn't figure out how to execute that command.",
-                        flags:   MessageFlags.EPHEMERAL
-                    });
+                    if (!cmd) {
+                        return interaction.reply({
+                            content: "We couldn't figure out how to execute that command.",
+                            flags:   MessageFlags.EPHEMERAL
+                        });
+                    }
 
-                    if (!(await processRestrictions.call(this, cmd, interaction))) return;
+                    if (!(await processRestrictions.call(this, cmd, interaction))) {
+                        return;
+                    }
 
                     if ("guildID" in interaction && !Config.developers.includes(interaction.user.id)) {
                         if (cmd.userPermissions.length !== 0 && interaction.user) {
                             const missingRequired: Array<string> = [], missingOptional: Array<string> = [];
                             for (const [perm, optional] of cmd.userPermissions) {
-                                if (!interaction.member.permissions.has(perm)) (optional ? missingOptional : missingRequired).push(perm);
+                                if (!interaction.member.permissions.has(perm)) {
+                                    (optional ? missingOptional : missingRequired).push(perm);
+                                }
                             }
 
                             // we don't really use optional permissions, and I have no idea how to display them to the user if we did
-                            if (missingRequired.length !== 0) return interaction.reply({
-                                content: `H-hey! You're missing some permissions needed to use that..\n${missingRequired.map(p => `- ${PermissionNames[p]}`).join("\n")}`,
-                                flags:   MessageFlags.EPHEMERAL
-                            });
+                            if (missingRequired.length !== 0) {
+                                return interaction.reply({
+                                    content: `H-hey! You're missing some permissions needed to use that..\n${missingRequired.map(p => `- ${PermissionNames[p]}`).join("\n")}`,
+                                    flags:   MessageFlags.EPHEMERAL
+                                });
+                            }
                         }
 
                         if (cmd.botPermissions.length !== 0 && interaction.guild) {
                             const missingRequired: Array<string> = [], missingOptional: Array<string> = [];
                             for (const [perm, optional] of cmd.botPermissions) {
-                                if (!(interaction.appPermissions || interaction.channel.permissionsOf(this.user.id)).has(perm)) (optional ? missingOptional : missingRequired).push(perm);
+                                if (!(interaction.appPermissions || interaction.channel.permissionsOf(this.user.id)).has(perm)) {
+                                    (optional ? missingOptional : missingRequired).push(perm);
+                                }
                             }
-                            if (missingRequired.length !== 0) return interaction.reply({
-                                content: `H-hey! I'm missing some permissions needed to use that..\n${missingRequired.map(p => `- ${PermissionNames[p]}`).join("\n")}`,
-                                flags:   MessageFlags.EPHEMERAL
-                            });
+                            if (missingRequired.length !== 0) {
+                                return interaction.reply({
+                                    content: `H-hey! I'm missing some permissions needed to use that..\n${missingRequired.map(p => `- ${PermissionNames[p]}`).join("\n")}`,
+                                    flags:   MessageFlags.EPHEMERAL
+                                });
+                            }
                         }
                     }
 
                     let gConfig: GuildConfig | null = null, uConfig: UserConfig | null = null;
-                    if (cmd.doGuildLookup && "guildID" in interaction) gConfig = await GuildConfig.get(interaction.guildID);
-                    if (cmd.doUserLookup) uConfig = await UserConfig.get(interaction.user.id);
+                    if (cmd.doGuildLookup && "guildID" in interaction) {
+                        gConfig = await GuildConfig.get(interaction.guildID);
+                    }
+                    if (cmd.doUserLookup) {
+                        uConfig = await UserConfig.get(interaction.user.id);
+                    }
 
                     const opt = await cmd.parseOptions.call(this, interaction, cmd);
                     const ephemeralUser = uConfig ? uConfig.preferences.ephemeral : await UserConfig.getEphemeral(interaction.user.id);
                     const ack = await processAck.call(this, cmd, interaction, ephemeralUser, opt);
-                    if (ack === false) return;
+                    if (ack === false) {
+                        return;
+                    }
 
                     void cmd.run.call(this, interaction, opt as Record<string, never>, gConfig as null, uConfig as null, cmd);
-                    if ("guildID" in interaction) await Leveling.run(interaction as unknown as CommandInteraction<ValidLocation.GUILD>);
+                    if ("guildID" in interaction) {
+                        await Leveling.run(interaction as unknown as CommandInteraction<ValidLocation.GUILD>);
+                    }
                     break;
                 }
 
                 case ApplicationCommandTypes.USER: {
                     const cmd = CommandHandler.getCommand("user", interaction.data.name);
-                    if (!cmd) return interaction.reply({
-                        content: "We couldn't figure out how to execute that command.",
-                        flags:   MessageFlags.EPHEMERAL
-                    });
+                    if (!cmd) {
+                        return interaction.reply({
+                            content: "We couldn't figure out how to execute that command.",
+                            flags:   MessageFlags.EPHEMERAL
+                        });
+                    }
 
-                    if (!(await processRestrictions.call(this, cmd, interaction))) return;
+                    if (!(await processRestrictions.call(this, cmd, interaction))) {
+                        return;
+                    }
 
                     let gConfig: GuildConfig | null = null, uConfig: UserConfig | null = null;
-                    if (cmd.doGuildLookup && "guildID" in interaction) gConfig = await GuildConfig.get(interaction.guildID);
-                    if (cmd.doUserLookup) uConfig = await UserConfig.get(interaction.user.id);
+                    if (cmd.doGuildLookup && "guildID" in interaction) {
+                        gConfig = await GuildConfig.get(interaction.guildID);
+                    }
+                    if (cmd.doUserLookup) {
+                        uConfig = await UserConfig.get(interaction.user.id);
+                    }
                     const ephemeralUser = uConfig ? uConfig.preferences.ephemeral : await UserConfig.getEphemeral(interaction.user.id);
                     const ack = await processAck.call(this, cmd, interaction, ephemeralUser);
-                    if (ack === false) return;
+                    if (ack === false) {
+                        return;
+                    }
 
                     // generics do weird things
                     void cmd.run.call(this, interaction, gConfig as null, uConfig as null, cmd);
@@ -174,19 +216,29 @@ export default new ClientEvent("interactionCreate", async function interactionCr
                 // the above doesn't want to work dynamically
                 case ApplicationCommandTypes.MESSAGE: {
                     const cmd = CommandHandler.getCommand("message", interaction.data.name);
-                    if (!cmd) return interaction.reply({
-                        content: "We couldn't figure out how to execute that command.",
-                        flags:   MessageFlags.EPHEMERAL
-                    });
+                    if (!cmd) {
+                        return interaction.reply({
+                            content: "We couldn't figure out how to execute that command.",
+                            flags:   MessageFlags.EPHEMERAL
+                        });
+                    }
 
-                    if (!(await processRestrictions.call(this, cmd, interaction))) return;
+                    if (!(await processRestrictions.call(this, cmd, interaction))) {
+                        return;
+                    }
 
                     let gConfig: GuildConfig | null = null, uConfig: UserConfig | null = null;
-                    if (cmd.doGuildLookup && "guildID" in interaction) gConfig = await GuildConfig.get(interaction.guildID);
-                    if (cmd.doUserLookup) uConfig = await UserConfig.get(interaction.user.id);
+                    if (cmd.doGuildLookup && "guildID" in interaction) {
+                        gConfig = await GuildConfig.get(interaction.guildID);
+                    }
+                    if (cmd.doUserLookup) {
+                        uConfig = await UserConfig.get(interaction.user.id);
+                    }
                     const ephemeralUser = uConfig ? uConfig.preferences.ephemeral : await UserConfig.getEphemeral(interaction.user.id);
                     const ack = await processAck.call(this, cmd, interaction, ephemeralUser);
-                    if (ack === false) return;
+                    if (ack === false) {
+                        return;
+                    }
                     // generics do weird things
                     void cmd.run.call(this, interaction, gConfig as null, uConfig as null, cmd);
                     break;

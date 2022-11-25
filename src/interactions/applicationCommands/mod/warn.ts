@@ -34,8 +34,12 @@ export default new Command(import.meta.url, "warn")
     .setAck("ephemeral")
     .setGuildLookup(true)
     .setExecutor(async function(interaction, { member, reason, dm }, gConfig) {
-        if (member.id === interaction.user.id) return interaction.reply({ content: "H-hey! You can't warn yourself.." });
-        if (Util.compareMemberToMember(member, interaction.member) !== "lower") return interaction.reply({ content: "H-hey! That member's highest role is higher than or as high as your highest role, you cannot warn them.." });
+        if (member.id === interaction.user.id) {
+            return interaction.reply({ content: "H-hey! You can't warn yourself.." });
+        }
+        if (Util.compareMemberToMember(member, interaction.member) !== "lower") {
+            return interaction.reply({ content: "H-hey! That member's highest role is higher than or as high as your highest role, you cannot warn them.." });
+        }
         reason = Strings.truncateWords(reason, 500);
         await UserConfig.createIfNotExists(member.id);
         const w = await Warning.create({
@@ -47,10 +51,12 @@ export default new Command(import.meta.url, "warn")
             warning_id: await Warning.getNextID(interaction.guildID, member.id)
         });
         let dmError: Error | undefined;
-        if (dm && !member.bot) await (await member.user.createDM()).createMessage({
-            allowedMentions: { users: false },
-            content:         `You were warned in ${interaction.guild.name}${gConfig.settings.dmBlame ? ` by **${interaction.member.mention}**` : ""}\nReason:\n\`\`\`\n${reason}\`\`\``
-        }).catch((err: Error) => dmError = err);
+        if (dm && !member.bot) {
+            await (await member.user.createDM()).createMessage({
+                allowedMentions: { users: false },
+                content:         `You were warned in ${interaction.guild.name}${gConfig.settings.dmBlame ? ` by **${interaction.member.mention}**` : ""}\nReason:\n\`\`\`\n${reason}\`\`\``
+            }).catch((err: Error) => dmError = err);
+        }
         const { caseID, entry } = await ModLogHandler.createEntry({
             type:      ModLogType.WARNING,
             guild:     interaction.guild,

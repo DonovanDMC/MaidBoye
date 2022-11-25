@@ -30,11 +30,17 @@ export default class CommandHandler {
 
     static checkDuplicate(name: string): [true, string, Command | UserCommand | MessageCommand] | [false, null, null] {
         const dupCommand = this.commands.find(cmd => cmd.name === name);
-        if (dupCommand) return [true, name, dupCommand];
+        if (dupCommand) {
+            return [true, name, dupCommand];
+        }
         const dupUserCommand = this.userCommands.find(cmd => cmd.name === name);
-        if (dupUserCommand) return [true, name, dupUserCommand];
+        if (dupUserCommand) {
+            return [true, name, dupUserCommand];
+        }
         const dupMessageCommand = this.messageCommands.find(cmd => cmd.name === name);
-        if (dupMessageCommand) return [true, name, dupMessageCommand];
+        if (dupMessageCommand) {
+            return [true, name, dupMessageCommand];
+        }
 
         return [false, null, null];
     }
@@ -60,7 +66,9 @@ export default class CommandHandler {
     static async load(whitelistCategories: Array<string> = []) {
         let skippedCategories = 0;
         const start = Timer.getTime();
-        if (!await Util.exists(Config.commandsDirectory)) throw new Error(`Commands directory "${Config.commandsDirectory}" does not exist.`);
+        if (!await Util.exists(Config.commandsDirectory)) {
+            throw new Error(`Commands directory "${Config.commandsDirectory}" does not exist.`);
+        }
         const loadWhitelist: Array<string> | null = null;
         const categories = (await readdir(Config.commandsDirectory)).map(cmd => `${Config.commandsDirectory}/${cmd}`);
         for (const category of categories) {
@@ -70,7 +78,9 @@ export default class CommandHandler {
                 continue;
             }
             // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-            if (Config.isDevelopment && (Array.isArray(loadWhitelist) && !(loadWhitelist as Array<string>).includes(category.split("/").slice(-1)[0]))) continue;
+            if (Config.isDevelopment && (Array.isArray(loadWhitelist) && !(loadWhitelist as Array<string>).includes(category.split("/").slice(-1)[0]))) {
+                continue;
+            }
             const { default: cat } = (await import(`${category}/index.js`)) as { default: Category; };
             CommandHandler.registerCategory(cat);
             await CommandHandler.loadCategoryCommands(cat.name, cat.dir);
@@ -81,7 +91,9 @@ export default class CommandHandler {
 
     static async loadCategoryCommands(name: string, dir: string) {
         const cat = this.getCategory(name);
-        if (!cat) throw new Error(`Invalid category "${name}" provided in CommandHandler#loadCategoryCommands(${name}, ${dir})`);
+        if (!cat) {
+            throw new Error(`Invalid category "${name}" provided in CommandHandler#loadCategoryCommands(${name}, ${dir})`);
+        }
         let i = 0;
         for (const file of (await readdir(dir)).filter(v => !v.startsWith("index."))) {
             await this.registerExports(name, `${dir}/${file}`);
@@ -93,7 +105,9 @@ export default class CommandHandler {
 
     static registerCategory(cat: Category) {
         const dup = this.categories.find(c => c.name.toLowerCase() === cat.name.toLowerCase());
-        if (dup) throw new Error(`Duplicate category name "${cat.name.toLowerCase()}" (${dup.dir})`);
+        if (dup) {
+            throw new Error(`Duplicate category name "${cat.name.toLowerCase()}" (${dup.dir})`);
+        }
         Logger.getLogger("CommandHandler").info(`Registered the category "${cat.name}" (${cat.dir})`);
         this.categories.push(cat);
         this.categoryMap.set(cat.name, cat);
@@ -102,7 +116,9 @@ export default class CommandHandler {
 
     static async registerExports(category: string, file: string) {
         const cat = this.getCategory(category);
-        if (!cat) throw new Error(`Invalid category (${category}) provided for file "${file}"`);
+        if (!cat) {
+            throw new Error(`Invalid category (${category}) provided for file "${file}"`);
+        }
         const { default: command, userCommand, messageCommand } = await import(file) as CommandExport;
 
         if (!command && !userCommand && !messageCommand) {
@@ -112,7 +128,9 @@ export default class CommandHandler {
 
         if (command) {
             const [dup, dupName, dupCmd] = this.checkDuplicate(command.name);
-            if (dup) throw new Error(`Duplicate application command name "${dupName}" for file "${file}" (dup: ${dupCmd.file}, type: interaction)`);
+            if (dup) {
+                throw new Error(`Duplicate application command name "${dupName}" for file "${file}" (dup: ${dupCmd.file}, type: interaction)`);
+            }
             command.category = category;
             cat.commands.push(command);
             this.commandMap.set(command.name, command);
@@ -121,7 +139,9 @@ export default class CommandHandler {
 
         if (userCommand) {
             const [dup, dupName, dupCmd] = this.checkDuplicate(userCommand.name);
-            if (dup) throw new Error(`Duplicate application command name "${dupName}" for file "${file}" (dup: ${dupCmd.file}, type: user)`);
+            if (dup) {
+                throw new Error(`Duplicate application command name "${dupName}" for file "${file}" (dup: ${dupCmd.file}, type: user)`);
+            }
             userCommand.category = category;
             cat.userCommands.push(userCommand);
             this.userCommandMap.set(userCommand.name, userCommand);
@@ -130,7 +150,9 @@ export default class CommandHandler {
 
         if (messageCommand) {
             const [dup, dupName, dupCmd] = this.checkDuplicate(messageCommand.name);
-            if (dup) throw new Error(`Duplicate application command name "${dupName}" for file "${file}" (dup: ${dupCmd.file}, type: message)`);
+            if (dup) {
+                throw new Error(`Duplicate application command name "${dupName}" for file "${file}" (dup: ${dupCmd.file}, type: message)`);
+            }
             messageCommand.category = category;
             cat.messageCommands.push(messageCommand);
             this.messageCommandMap.set(messageCommand.name, messageCommand);
@@ -150,7 +172,9 @@ export default class CommandHandler {
 
     static removeCategory(name: string) {
         const cat = this.getCategory(name);
-        if (!cat) throw new Error(`Invalid category "${name}" provided in CommandHandler#removeCategory`);
+        if (!cat) {
+            throw new Error(`Invalid category "${name}" provided in CommandHandler#removeCategory`);
+        }
         this.categories.splice(this.categories.indexOf(cat), 1);
         this.categoryMap.delete(name);
         Logger.getLogger("CommandHandler").info(`Removed the category "${name}" (${cat.dir})`);
@@ -159,10 +183,14 @@ export default class CommandHandler {
 
     static removeCommand(type: CommandTypes, name: string, log = true) {
         const cmd = this.getCommand(type as "default", name);
-        if (!cmd) throw new Error(`Invalid category "${name}" provided in CommandHandler#removeCategory`);
+        if (!cmd) {
+            throw new Error(`Invalid category "${name}" provided in CommandHandler#removeCategory`);
+        }
         this.commands.splice(this.commands.indexOf(cmd), 1);
         this.commandMap.delete(name);
-        if (log) Logger.getLogger("CommandHandler").info(`Removed the command "${name}" (${cmd.file})`);
+        if (log) {
+            Logger.getLogger("CommandHandler").info(`Removed the command "${name}" (${cmd.file})`);
+        }
         return cmd;
     }
 }

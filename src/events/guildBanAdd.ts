@@ -6,7 +6,9 @@ import { AuditLogActionTypes, Guild } from "oceanic.js";
 
 export default new ClientEvent("guildBanAdd", async function guildBanAddEvent(guild, user) {
     const events = await LogEvent.getType(guild.id, LogEvents.BAN_ADD);
-    if (events.length === 0) return;
+    if (events.length === 0) {
+        return;
+    }
 
     const embed = Util.makeEmbed(true)
         .setTitle("Member Banned")
@@ -20,7 +22,9 @@ export default new ClientEvent("guildBanAdd", async function guildBanAddEvent(gu
         });
         if (auditLog) {
             const entry = auditLog.entries[0];
-            if (entry?.user && (entry.createdAt.getTime() + 5e3) > Date.now() && entry.reason) embed.addField("Reason", entry.reason, false);
+            if (entry?.user && (entry.createdAt.getTime() + 5e3) > Date.now() && entry.reason) {
+                embed.addField("Reason", entry.reason, false);
+            }
         }
     }
 

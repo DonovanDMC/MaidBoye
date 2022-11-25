@@ -155,7 +155,9 @@ export default class ModLog {
 
     async edit(data: ModLogUpdateData) {
         const success = await Util.genericEdit(ModLog.TABLE, this.id, Util.removeUndefinedKV(data));
-        if (success) this.load(Util.removeUndefinedKV({ ...this._data, ...data }));
+        if (success) {
+            this.load(Util.removeUndefinedKV({ ...this._data, ...data }));
+        }
         return success;
     }
 
@@ -176,7 +178,9 @@ export default class ModLog {
     }
 
     async getTarget(client: MaidBoye) {
-        if (this.targetID === null) return null;
+        if (this.targetID === null) {
+            return null;
+        }
         switch (this.type) {
             case ModLogType.BAN:
             case ModLogType.UNBAN:
