@@ -4,6 +4,7 @@ import BaseAutocomplete from "../structure/BaseAutocomplete.js";
 import { LogCategories, LogEvents } from "../../../db/Models/LogEvent.js";
 import Util from "../../../util/Util.js";
 import { assert } from "tsafe";
+import FuzzySearch from "fuzzy-search";
 
 export default class LoggingEventAutocomplete extends BaseAutocomplete {
     command = "logging";
@@ -17,6 +18,7 @@ export default class LoggingEventAutocomplete extends BaseAutocomplete {
                 { name: "Select a category first.", value: "ALL" }
             ]);
         }
-        return interaction.result(LogCategories[category].map(event => ({ name: Util.readableConstant(LogEvents[event]), value: LogEvents[event] })));
+        const search = new FuzzySearch(LogCategories[category].map(event => ({ name: Util.readableConstant(LogEvents[event]), value: LogEvents[event] })), ["name"]);
+        return interaction.result(search.search(focused.value));
     }
 }

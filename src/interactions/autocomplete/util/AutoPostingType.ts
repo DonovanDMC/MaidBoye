@@ -4,6 +4,7 @@ import BaseAutocomplete from "../structure/BaseAutocomplete.js";
 import Util from "../../../util/Util.js";
 import { AutoPostingCategories, AutoPostingTypes } from "../../../db/Models/AutoPostingEntry.js";
 import { assert } from "tsafe";
+import FuzzySearch from "fuzzy-search";
 
 export default class AutoPostingTypeAutocomplete extends BaseAutocomplete {
     command = "autoposting";
@@ -17,6 +18,7 @@ export default class AutoPostingTypeAutocomplete extends BaseAutocomplete {
                 { name: "Select a category first.", value: AutoPostingTypes[AutoPostingTypes.RED_PANDA] }
             ]);
         }
-        return interaction.result(AutoPostingCategories[category].map(event => ({ name: Util.readableConstant(AutoPostingTypes[event]), value: AutoPostingTypes[event] })));
+        const search = new FuzzySearch(AutoPostingCategories[category].map(event => ({ name: Util.readableConstant(AutoPostingTypes[event]), value: AutoPostingTypes[event] })), ["name"]);
+        return interaction.result(search.search(focused.value));
     }
 }
