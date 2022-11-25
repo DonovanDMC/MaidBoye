@@ -14,6 +14,7 @@ import {
 } from "oceanic.js";
 import { ButtonColors, ComponentBuilder } from "@oceanicjs/builders";
 import chunk from "chunk";
+import { assert } from "tsafe";
 
 export async function enableLogging(interaction: ComponentInteraction<ValidLocation.GUILD> | ModalSubmitInteraction<ValidLocation.GUILD>, channel: string, webhook: Webhook, event: LogEvents) {
     if (!interaction.acknowledged) {
@@ -119,7 +120,12 @@ export default new Command(import.meta.url, "logging")
                 if (!channel) {
                     channel = interaction.channel as AnyGuildTextChannelWithoutThreads;
                 }
-                const event = LogEvents[rawEvent!];
+                assert(rawEvent);
+                if (!Object.hasOwn(LogEvents, rawEvent)) {
+                    // Discord™️ - sometimes the name gets sent as the value
+                    rawEvent = rawEvent.toUpperCase().replace(/\s/g, "_") as typeof rawEvent;
+                }
+                const event = LogEvents[rawEvent];
                 const total = await LogEvent.getCount(interaction.guild.id);
                 const events = await LogEvent.getAll(interaction.guild.id);
                 if (total >= LogEvent.MAX_EVENTS) {

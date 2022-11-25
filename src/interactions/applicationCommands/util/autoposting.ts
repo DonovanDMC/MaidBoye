@@ -14,6 +14,7 @@ import {
 } from "oceanic.js";
 import { ButtonColors, ComponentBuilder } from "@oceanicjs/builders";
 import chunk from "chunk";
+import { assert } from "tsafe";
 
 export async function enableAutoposting(interaction: ComponentInteraction<ValidLocation.GUILD> | ModalSubmitInteraction<ValidLocation.GUILD>, channel: string, webhook: Webhook, type: AutoPostingTypes, time: number) {
     if (!interaction.acknowledged) {
@@ -105,7 +106,7 @@ export default new Command(import.meta.url, "autoposting")
     )
     .setOptionsParser(interaction => ({
         sub:     interaction.data.options.getSubCommand<["add" | "clear" | "list" | "remove"]>(true)[0],
-        type:    interaction.data.options.getString<keyof typeof AutoPostingTypes>("type", true),
+        type:    interaction.data.options.getString<keyof typeof AutoPostingTypes>("type"),
         channel: interaction.data.options.getChannel("channel") as InteractionResolvedChannel | AnyGuildTextChannelWithoutThreads,
         entry:   interaction.data.options.getString("entry"),
         time:    interaction.data.options.getNumber("time")
@@ -125,6 +126,7 @@ export default new Command(import.meta.url, "autoposting")
         }
         switch (sub) {
             case "add": {
+                assert(rawType);
                 if (!channel) {
                     channel = interaction.channel as AnyGuildTextChannelWithoutThreads;
                 }
