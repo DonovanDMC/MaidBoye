@@ -47,7 +47,7 @@ export default class FurryBotStatusService extends Service {
                     resolve();
                     Logger.getLogger("FurryBotStatusService | FurryBot").info("Ready!");
                     setInterval(async() => {
-                        await this.furrybot.editStatus("online", [{
+                        await this.furrybot.editStatus("dnd", [{
                             type: ActivityTypes.WATCHING,
                             name: "Visit https://maid.gay"
                         }]);

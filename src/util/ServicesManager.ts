@@ -16,6 +16,7 @@ export enum ServiceEvents {
 export interface ServiceMessage {
     data: unknown;
     event: ServiceEvents;
+    from?: string;
     id: string;
     responseTo?: string;
     responsive?: boolean;

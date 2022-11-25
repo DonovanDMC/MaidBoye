@@ -14,11 +14,11 @@ export default class LoggingEventAutocomplete extends BaseAutocomplete {
         assert(typeof focused.value === "string");
         const category = interaction.data.options.getString<keyof typeof LogCategories>("category");
         if (!category) {
-            return interaction.result([
+            return interaction.reply([
                 { name: "Select a category first.", value: "ALL" }
             ]);
         }
         const search = new FuzzySearch(LogCategories[category].map(event => ({ name: Util.readableConstant(LogEvents[event]), value: LogEvents[event] })), ["name"]);
-        return interaction.result(search.search(focused.value));
+        return interaction.reply(search.search(focused.value));
     }
 }

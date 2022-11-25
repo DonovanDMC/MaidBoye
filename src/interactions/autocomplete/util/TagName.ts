@@ -12,8 +12,8 @@ export default class TagNameAutocomplete extends BaseAutocomplete {
         assert(typeof focused.value === "string");
         const gConfig = await GuildConfig.get(interaction.guildID);
         if (gConfig.tagNames.length === 0) {
-            return interaction.result([]);
+            return interaction.reply([]);
         }
-        return interaction.result(gConfig.tagNames.map(t => ({ name: t, value: t })));
+        return interaction.reply(gConfig.tagNames.map(t => ({ name: t, value: t })));
     }
 }

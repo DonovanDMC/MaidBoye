@@ -26,7 +26,7 @@ export default class SelfrolesRoleAutocomplete extends BaseAutocomplete {
             case "join": {
                 const joinable = gConfig.selfroles.filter(r => !interaction.member.roles.includes(r)).map(r => interaction.guild.roles.get(r)!);
 
-                return interaction.result(joinable.map(r => ({
+                return interaction.reply(joinable.map(r => ({
                     name:  r.name,
                     value: r.id
                 })));
@@ -35,7 +35,7 @@ export default class SelfrolesRoleAutocomplete extends BaseAutocomplete {
             case "leave": {
                 const current = gConfig.selfroles.filter(r => interaction.member.roles.includes(r)).map(r => interaction.guild.roles.get(r)!);
 
-                return interaction.result(current.map(r => ({
+                return interaction.reply(current.map(r => ({
                     name:  r.name,
                     value: r.id
                 })));
@@ -43,11 +43,11 @@ export default class SelfrolesRoleAutocomplete extends BaseAutocomplete {
 
             case "remove": {
                 if (!interaction.member.permissions.has("MANAGE_ROLES")) {
-                    return interaction.result([]);
+                    return interaction.reply([]);
                 }
 
                 const roles = gConfig.selfroles.map(r => interaction.guild.roles.get(r)!);
-                return interaction.result(roles.map(r => ({
+                return interaction.reply(roles.map(r => ({
                     name:  r.name,
                     value: r.id
                 })));

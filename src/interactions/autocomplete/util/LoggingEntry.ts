@@ -16,6 +16,6 @@ export default class LoggingEntryAutocomplete extends BaseAutocomplete {
         const events = await LogEvent.getAll(interaction.guild.id);
         const choices = events.map(ev => ({ name: `${Util.readableConstant(LogEvents[ev.event])} in #${interaction.client.getChannel<AnyGuildTextChannelWithoutThreads>(ev.channelID)?.name ?? ev.channelID}`, value: ev.id }));
         const fuzzy = new FuzzySearch(choices, ["name"], { caseSensitive: false });
-        return interaction.result(fuzzy.search(focused.value).slice(0, 25));
+        return interaction.reply(fuzzy.search(focused.value));
     }
 }

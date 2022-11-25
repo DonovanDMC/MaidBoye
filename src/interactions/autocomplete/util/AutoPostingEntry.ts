@@ -16,6 +16,6 @@ export default class AutoPostingEntryAutocomplete extends BaseAutocomplete {
         const autos = await AutoPostingEntry.getAll(interaction.guild.id);
         const choices = autos.map(a => ({ name: `${Util.readableConstant(AutoPostingTypes[a.type])} in #${interaction.client.getChannel<AnyGuildTextChannelWithoutThreads>(a.channelID)?.name ?? a.channelID}`, value: a.id }));
         const fuzzy = new FuzzySearch(choices, ["name"], { caseSensitive: false });
-        return interaction.result(fuzzy.search(focused.value).slice(0, 25));
+        return interaction.reply(fuzzy.search(focused.value));
     }
 }

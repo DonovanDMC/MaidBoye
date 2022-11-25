@@ -10,7 +10,7 @@ export default abstract class Service {
     }> = new Map();
     file: string;
     name: string;
-    protected abstract handleMessage(op: string, data?: unknown): Promise<unknown>;
+    protected abstract handleMessage(op: string, data?: unknown, from?: string): Promise<unknown>;
     constructor(file: string, name: string) {
         this.file = file;
         this.name = name;
@@ -22,7 +22,7 @@ export default abstract class Service {
             case ServiceEvents.WORKER_COMMAND: {
                 const op = (message.data as { op: string; }).op;
                 const data = (message.data as { data?: unknown; }).data;
-                const res = await this.handleMessage(op, data);
+                const res = await this.handleMessage(op, data, message.from);
                 if (message.responsive) {
                     parentPort!.postMessage({
                         data:       res,

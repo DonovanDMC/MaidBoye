@@ -13,7 +13,7 @@ export default class E621TagsAutocomplete extends BaseAutocomplete {
         const tags = focused.value.split(" ");
         const currentValue = tags[tags.length - 1];
         if (!currentValue || currentValue.length < 3) {
-            return interaction.result(focused.value === "" ? [
+            return interaction.reply(focused.value === "" ? [
                 { name: "(NONE)", value: "" }
             ] : [
                 { name: focused.value, value: focused.value }
@@ -21,10 +21,10 @@ export default class E621TagsAutocomplete extends BaseAutocomplete {
         } else {
             const auto = await E621.tags.getAutocomplete(currentValue);
             if (auto === null) {
-                return interaction.result([{ name: focused.value, value: focused.value }]);
+                return interaction.reply([{ name: focused.value, value: focused.value }]);
             }
             const valueWithoutLast = focused.value.slice(0, focused.value.indexOf(currentValue)).trim();
-            return interaction.result([
+            return interaction.reply([
                 { name: focused.value, value: focused.value },
                 ...auto.map(a => ({
                     name:  `${valueWithoutLast} ${a.name}`,

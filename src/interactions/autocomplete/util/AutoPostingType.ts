@@ -14,11 +14,11 @@ export default class AutoPostingTypeAutocomplete extends BaseAutocomplete {
         assert(typeof focused.value === "string");
         const category = interaction.data.options.getString<keyof typeof AutoPostingCategories>("category");
         if (!category) {
-            return interaction.result([
+            return interaction.reply([
                 { name: "Select a category first.", value: AutoPostingTypes[AutoPostingTypes.RED_PANDA] }
             ]);
         }
         const search = new FuzzySearch(AutoPostingCategories[category].map(event => ({ name: Util.readableConstant(AutoPostingTypes[event]), value: AutoPostingTypes[event] })), ["name"]);
-        return interaction.result(search.search(focused.value));
+        return interaction.reply(search.search(focused.value));
     }
 }

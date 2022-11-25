@@ -9,7 +9,7 @@ import {
 
 Object.defineProperty(AutocompleteInteraction.prototype, "reply", {
     async value(this: AutocompleteInteraction, data: Array<AutocompleteChoice>) {
-        await this.result(data);
+        await this.reply(data);
     }
 });
 
