@@ -6,9 +6,9 @@ import Util from "../../../../util/Util.js";
 import Preferences from "../../../../util/preferences/index.js";
 import UserConfig from "../../../../db/Models/UserConfig.js";
 import Config from "../../../../config/index.js";
-import { assert } from "tsafe";
 import { ComponentTypes, MessageActionRow, User } from "oceanic.js";
 import { ButtonColors, ComponentBuilder } from "@oceanicjs/builders";
+import assert from "node:assert";
 
 export function formatEmbed(page: number, uConfig: UserConfig, author: User) {
     const preferences = Preferences.getPage(page);

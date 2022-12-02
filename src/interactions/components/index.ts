@@ -5,10 +5,10 @@ import { State } from "../../util/State.js";
 import type { ComponentInteraction, ValidLocation } from "../../util/cmd/Command.js";
 import Debug from "../../util/Debug.js";
 import Logger from "../../util/Logger.js";
-import { assert } from "tsafe";
 import { Timer } from "@uwu-codes/utils";
 import type { ModuleImport } from "@uwu-codes/types";
 import { MessageFlags } from "oceanic.js";
+import assert from "node:assert";
 import { readdir } from "node:fs/promises";
 
 const thisDirectory = new URL(".", import.meta.url).pathname.slice(0, -1);

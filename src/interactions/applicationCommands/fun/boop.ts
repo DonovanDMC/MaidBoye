@@ -46,7 +46,7 @@ export default new Command(import.meta.url, "boop")
                     content: "H-hey! This server has the **Command Images** setting enabled, but I cannot attach files.. Please correct this."
                 });
             }
-            const img = await Yiffy.furry.boop("json", 1);
+            const img = await Yiffy.images.furry.boop();
             embed.setImage(img.url);
         }
 

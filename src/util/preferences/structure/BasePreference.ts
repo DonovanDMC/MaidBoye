@@ -6,9 +6,9 @@ import Util from "../../Util.js";
 import { Colors } from "../../Constants.js";
 import type { CommandInteraction, ComponentInteraction } from "../../cmd/Command.js";
 import Config from "../../../config/index.js";
-import { assert } from "tsafe";
 import { ButtonColors, ComponentBuilder } from "@oceanicjs/builders";
 import type { ApplicationCommandOptionTypes, GuildComponentSelectMenuInteraction, MessageActionRow, PrivateComponentSelectMenuInteraction } from "oceanic.js";
+import assert from "node:assert";
 
 
 export default abstract class BasePreference {

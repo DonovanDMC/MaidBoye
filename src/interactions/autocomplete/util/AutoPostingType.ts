@@ -3,8 +3,8 @@ import type { AutocompleteInteraction, ValidLocation } from "../../../util/cmd/C
 import BaseAutocomplete from "../structure/BaseAutocomplete.js";
 import Util from "../../../util/Util.js";
 import { AutoPostingCategories, AutoPostingTypes } from "../../../db/Models/AutoPostingEntry.js";
-import { assert } from "tsafe";
 import FuzzySearch from "fuzzy-search";
+import assert from "node:assert";
 
 export default class AutoPostingTypeAutocomplete extends BaseAutocomplete {
     command = "autoposting";

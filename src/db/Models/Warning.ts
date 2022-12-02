@@ -1,7 +1,7 @@
 import db from "../index.js";
 import type MaidBoye from "../../main.js";
 import Debug from "../../util/Debug.js";
-import { assert } from "tsafe";
+import assert from "node:assert";
 
 
 export interface WarningData {

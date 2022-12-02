@@ -3,10 +3,10 @@ import ModLogHandler from "../../../util/handlers/ModLogHandler.js";
 import ModLog from "../../../db/Models/ModLog.js";
 import Util from "../../../util/Util.js";
 import { State } from "../../../util/State.js";
-import { assert } from "tsafe";
 import { Strings } from "@uwu-codes/utils";
 import { ButtonColors, ComponentBuilder } from "@oceanicjs/builders";
 import { ApplicationCommandOptionTypes, MessageActionRow } from "oceanic.js";
+import assert from "node:assert";
 
 export default new Command(import.meta.url, "modlog")
     .setDescription("Manage this server's modlog")

@@ -3,7 +3,7 @@ import db from "../index.js";
 import type { ExcludedPreferences } from "../../util/preferences/index";
 import Preferences, { PreferenceBits } from "../../util/preferences/index.js";
 import type Config from "../../config/index.js";
-import { assert } from "tsafe";
+import assert from "node:assert";
 
 export interface UserConfigData {
     created_at: Date;

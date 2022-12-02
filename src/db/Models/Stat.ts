@@ -1,7 +1,7 @@
 import db from "../index.js";
 import StatsHandler from "../../util/StatsHandler.js";
-import { assert } from "tsafe";
 import type { ApplicationCommandTypes, InteractionTypes } from "oceanic.js";
+import assert from "node:assert";
 
 
 export interface StatData {

@@ -1,7 +1,8 @@
 import Command from "../../../util/cmd/Command.js";
 import Util from "../../../util/Util.js";
-import YiffRocks, { APIError } from "yiff-rocks";
+import Yiffy from "../../../util/req/Yiffy.js";
 import { ApplicationCommandOptionTypes, MessageFlags } from "oceanic.js";
+import { APIError, YiffyErrorCodes } from "yiffy";
 
 export default new Command(import.meta.url, "shorten")
     .setDescription("Shorten a url, using our shortener: yiff.rocks")
@@ -31,7 +32,7 @@ export default new Command(import.meta.url, "shorten")
     })
     .setCooldown(3e3)
     .setExecutor(async function(interaction, { url, code }) {
-        void YiffRocks.create(url, `Discord:${interaction.user.id}`, code, false)
+        void Yiffy.shortener.create(url, `Discord:${interaction.user.id}`, code, false)
             .then(short =>
                 interaction.reply({
                     embeds: Util.makeEmbed(true, interaction.user)
@@ -41,12 +42,12 @@ export default new Command(import.meta.url, "shorten")
                 }))
             .catch(err => {
                 if (err instanceof APIError) {
-                    if (err.obj === "Invalid url proided.") {
+                    if (err.code === YiffyErrorCodes.SHORTENER_INVALID_URL) {
                         return interaction.reply({ content: "H-hey! That url was invalid.." });
-                    } else if (err.obj === "Code already in use.") {
+                    } else if (err.code === YiffyErrorCodes.SHORTENER_CODE_IN_USE) {
                         return interaction.reply({ content: "H-hey! That code is already in use.." });
                     } else {
-                        return interaction.reply({ content: `Our api returned an unknown error.. \`${err.message}\`${typeof err.obj === "string" ? "" : `, ${JSON.stringify(err.obj)}`}` });
+                        return interaction.reply({ content: `Our api returned an unknown error.. \`${err.message}\` (${err.code ?? "no error code"})` });
                     }
                 } else {
                     throw err;

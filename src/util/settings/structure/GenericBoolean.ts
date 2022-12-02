@@ -7,8 +7,8 @@ import type { CommandInteraction, ComponentInteraction, SelectMenuComponentInter
 import CommandOption from "../../cmd/CommandOption.js";
 import Config from "../../../config/index.js";
 import { ButtonColors, ComponentBuilder } from "@oceanicjs/builders";
-import { assert } from "tsafe";
 import { ApplicationCommandOptionTypes, MessageActionRow } from "oceanic.js";
+import assert from "node:assert";
 
 export enum Type {
     YES_NO           = 0,

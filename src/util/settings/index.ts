@@ -5,10 +5,10 @@ import Util from "../Util.js";
 import type { CommandInteraction, ValidLocation } from "../cmd/Command.js";
 import type GuildConfig from "../../db/Models/GuildConfig.js";
 import Debug from "../Debug.js";
-import { assert } from "tsafe";
 import type { ModuleImport } from "@uwu-codes/types";
 import { Timer } from "@uwu-codes/utils";
 import type { ApplicationCommandOptions, InteractionOptionsWithValue } from "oceanic.js";
+import assert from "node:assert";
 import { readdir } from "node:fs/promises";
 
 // load must be called from a different file

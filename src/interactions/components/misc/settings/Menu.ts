@@ -6,9 +6,9 @@ import GuildConfig from "../../../../db/Models/GuildConfig.js";
 import Util from "../../../../util/Util.js";
 import Settings from "../../../../util/settings/index.js";
 import Config from "../../../../config/index.js";
-import { assert } from "tsafe";
 import { ButtonColors, ComponentBuilder } from "@oceanicjs/builders";
 import { ComponentTypes, MessageActionRow, User } from "oceanic.js";
+import assert from "node:assert";
 
 export function formatEmbed(page: number, gConfig: GuildConfig, author: User) {
     const settings = Settings.getPage(page);

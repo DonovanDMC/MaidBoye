@@ -2,7 +2,7 @@ import type { AnyAutocompleteFocus } from "../index.js";
 import type { AutocompleteInteraction, ValidLocation } from "../../../util/cmd/Command.js";
 import BaseAutocomplete from "../structure/BaseAutocomplete.js";
 import GuildConfig from "../../../db/Models/GuildConfig.js";
-import { assert } from "tsafe";
+import assert from "node:assert";
 
 export default class SelfrolesRoleAutocomplete extends BaseAutocomplete {
     command = "selfroles";

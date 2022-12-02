@@ -75,7 +75,7 @@ export default class AutoPostingService extends Service {
         let image: string, api: string, shortURL: string | undefined, sources: Array<string> | undefined;
         switch (entry.type) {
             case AutoPostingTypes.BIRB: {
-                const img = await Yiffy.animals.birb();
+                const img = await Yiffy.images.animals.birb();
                 image = img.url;
                 shortURL = img.shortURL;
                 sources = img.sources;
@@ -84,7 +84,7 @@ export default class AutoPostingService extends Service {
             }
 
             case AutoPostingTypes.BLEP: {
-                const img = await Yiffy.animals.blep();
+                const img = await Yiffy.images.animals.blep();
                 image = img.url;
                 shortURL = img.shortURL;
                 sources = img.sources;
@@ -105,7 +105,7 @@ export default class AutoPostingService extends Service {
             }
 
             case AutoPostingTypes.DIKDIK: {
-                const img = await Yiffy.animals.dikdik();
+                const img = await Yiffy.images.animals.dikdik();
                 image = img.url;
                 shortURL = img.shortURL;
                 sources = img.sources;
@@ -180,7 +180,7 @@ export default class AutoPostingService extends Service {
             }
 
             case AutoPostingTypes.BOOP: {
-                const img = await Yiffy.furry.boop();
+                const img = await Yiffy.images.furry.boop();
                 image = img.url;
                 shortURL = img.shortURL;
                 sources = img.sources;
@@ -189,7 +189,7 @@ export default class AutoPostingService extends Service {
             }
 
             case AutoPostingTypes.CUDDLE: {
-                const img = await Yiffy.furry.cuddle();
+                const img = await Yiffy.images.furry.cuddle();
                 image = img.url;
                 shortURL = img.shortURL;
                 sources = img.sources;
@@ -198,7 +198,7 @@ export default class AutoPostingService extends Service {
             }
 
             case AutoPostingTypes.FLOP: {
-                const img = await Yiffy.furry.flop();
+                const img = await Yiffy.images.furry.flop();
                 image = img.url;
                 shortURL = img.shortURL;
                 sources = img.sources;
@@ -207,7 +207,7 @@ export default class AutoPostingService extends Service {
             }
 
             case AutoPostingTypes.FURSUIT: {
-                const img = await Yiffy.furry.fursuit();
+                const img = await Yiffy.images.furry.fursuit();
                 image = img.url;
                 shortURL = img.shortURL;
                 sources = img.sources;
@@ -216,7 +216,7 @@ export default class AutoPostingService extends Service {
             }
 
             case AutoPostingTypes.HOLD: {
-                const img = await Yiffy.furry.hold();
+                const img = await Yiffy.images.furry.hold();
                 image = img.url;
                 shortURL = img.shortURL;
                 sources = img.sources;
@@ -225,7 +225,7 @@ export default class AutoPostingService extends Service {
             }
 
             case AutoPostingTypes.HOWL: {
-                const img = await Yiffy.furry.howl();
+                const img = await Yiffy.images.furry.howl();
                 image = img.url;
                 shortURL = img.shortURL;
                 sources = img.sources;
@@ -234,7 +234,7 @@ export default class AutoPostingService extends Service {
             }
 
             case AutoPostingTypes.HUG: {
-                const img = await Yiffy.furry.hug();
+                const img = await Yiffy.images.furry.hug();
                 image = img.url;
                 shortURL = img.shortURL;
                 sources = img.sources;
@@ -243,7 +243,7 @@ export default class AutoPostingService extends Service {
             }
 
             case AutoPostingTypes.KISS: {
-                const img = await Yiffy.furry.kiss();
+                const img = await Yiffy.images.furry.kiss();
                 image = img.url;
                 shortURL = img.shortURL;
                 sources = img.sources;
@@ -252,7 +252,7 @@ export default class AutoPostingService extends Service {
             }
 
             case AutoPostingTypes.LICK: {
-                const img = await Yiffy.furry.lick();
+                const img = await Yiffy.images.furry.lick();
                 image = img.url;
                 shortURL = img.shortURL;
                 sources = img.sources;
@@ -261,7 +261,7 @@ export default class AutoPostingService extends Service {
             }
 
             case AutoPostingTypes.BULGE_YIFF: {
-                const img = await Yiffy.furry.bulge();
+                const img = await Yiffy.images.furry.bulge();
                 image = img.url;
                 shortURL = img.shortURL;
                 sources = img.sources;
@@ -270,7 +270,7 @@ export default class AutoPostingService extends Service {
             }
 
             case AutoPostingTypes.ANDROMORPH_YIFF: {
-                const img = await Yiffy.furry.yiff.andromorph();
+                const img = await Yiffy.images.furry.yiff.andromorph();
                 image = img.url;
                 shortURL = img.shortURL;
                 sources = img.sources;
@@ -279,7 +279,7 @@ export default class AutoPostingService extends Service {
             }
 
             case AutoPostingTypes.GAY_YIFF: {
-                const img = await Yiffy.furry.yiff.gay();
+                const img = await Yiffy.images.furry.yiff.gay();
                 image = img.url;
                 shortURL = img.shortURL;
                 sources = img.sources;
@@ -288,7 +288,7 @@ export default class AutoPostingService extends Service {
             }
 
             case AutoPostingTypes.GYNOMORPH_YIFF: {
-                const img = await Yiffy.furry.yiff.gynomorph();
+                const img = await Yiffy.images.furry.yiff.gynomorph();
                 image = img.url;
                 shortURL = img.shortURL;
                 sources = img.sources;
@@ -297,7 +297,7 @@ export default class AutoPostingService extends Service {
             }
 
             case AutoPostingTypes.LESBIAN_YIFF: {
-                const img = await Yiffy.furry.yiff.lesbian();
+                const img = await Yiffy.images.furry.yiff.lesbian();
                 image = img.url;
                 shortURL = img.shortURL;
                 sources = img.sources;
@@ -306,7 +306,7 @@ export default class AutoPostingService extends Service {
             }
 
             case AutoPostingTypes.STRAIGHT_YIFF: {
-                const img = await Yiffy.furry.yiff.straight();
+                const img = await Yiffy.images.furry.yiff.straight();
                 image = img.url;
                 shortURL = img.shortURL;
                 sources = img.sources;

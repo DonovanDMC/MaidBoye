@@ -3,8 +3,8 @@ import type { AutocompleteInteraction, ValidLocation } from "../../../util/cmd/C
 import BaseAutocomplete from "../structure/BaseAutocomplete.js";
 import { LogCategories, LogEvents } from "../../../db/Models/LogEvent.js";
 import Util from "../../../util/Util.js";
-import { assert } from "tsafe";
 import FuzzySearch from "fuzzy-search";
+import assert from "node:assert";
 
 export default class LoggingEventAutocomplete extends BaseAutocomplete {
     command = "logging";

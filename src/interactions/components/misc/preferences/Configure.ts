@@ -3,7 +3,7 @@ import BaseComponent from "../../structure/BaseComponent.js";
 import Preferences from "../../../../util/preferences/index.js";
 import UserConfig from "../../../../db/Models/UserConfig.js";
 import type { SelectMenuComponentInteraction } from "../../../../util/cmd/Command.js";
-import { assert } from "tsafe";
+import assert from "node:assert";
 
 export default class PreferencesMenuComponent extends BaseComponent {
     action = "configure";

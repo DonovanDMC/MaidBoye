@@ -12,7 +12,7 @@ export default new Command(import.meta.url, "fursuitbutt")
     .setAck("ephemeral-user")
     .setCooldown(1e4)
     .setExecutor(async function(interaction) {
-        const img = await Yiffy.furry.butts("json", 1);
+        const img = await Yiffy.images.furry.butts();
         return interaction.reply({
             embeds: Util.makeEmbed(true, interaction.user)
                 .setTitle("Fursuit Butt")

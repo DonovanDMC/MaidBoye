@@ -7,10 +7,10 @@ import type { CommandInteraction, ValidLocation } from "../cmd/Command.js";
 import type UserConfig from "../../db/Models/UserConfig.js";
 import Config from "../../config/index.js";
 import Debug from "../Debug.js";
-import { assert } from "tsafe";
 import { Timer } from "@uwu-codes/utils";
 import type { ModuleImport } from "@uwu-codes/types";
 import type { ApplicationCommandOptionsWithOptions, InteractionOptionsWithValue } from "oceanic.js";
+import assert from "node:assert";
 import { readdir } from "node:fs/promises";
 
 export default class Preferences {

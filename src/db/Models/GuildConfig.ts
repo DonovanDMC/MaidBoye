@@ -2,7 +2,7 @@ import type { ExcludedSettings } from "../../util/settings/index.js";
 import Settings, { SettingsBits } from "../../util/settings/index.js";
 import Util from "../../util/Util.js";
 import db from "../index.js";
-import { assert } from "tsafe";
+import assert from "node:assert";
 
 interface Tag {
     content: string;

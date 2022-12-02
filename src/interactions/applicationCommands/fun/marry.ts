@@ -49,7 +49,7 @@ export default new Command(import.meta.url, "marry")
             });
         }
 
-        const img = await Yiffy.furry.propose("json", 1);
+        const img = await Yiffy.images.furry.propose();
 
         return interaction.reply({
             embeds: Util.makeEmbed(true, interaction.user)

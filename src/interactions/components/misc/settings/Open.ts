@@ -3,7 +3,7 @@ import type { BaseState } from "../../../../util/State.js";
 import BaseComponent from "../../structure/BaseComponent.js";
 import Settings from "../../../../util/settings/index.js";
 import GuildConfig from "../../../../db/Models/GuildConfig.js";
-import { assert } from "tsafe";
+import assert from "node:assert";
 
 
 export default class SettingsPickComponent extends BaseComponent {

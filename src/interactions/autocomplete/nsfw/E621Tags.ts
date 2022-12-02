@@ -2,7 +2,7 @@ import type { AnyAutocompleteFocus } from "../index.js";
 import type { AutocompleteInteraction } from "../../../util/cmd/Command.js";
 import E621 from "../../../util/req/E621.js";
 import BaseAutocomplete from "../structure/BaseAutocomplete.js";
-import { assert } from "tsafe";
+import assert from "node:assert";
 
 export default class E621TagsAutocomplete extends BaseAutocomplete {
     command = "e621";

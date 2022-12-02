@@ -14,7 +14,7 @@ import {
 } from "oceanic.js";
 import { ButtonColors, ComponentBuilder } from "@oceanicjs/builders";
 import chunk from "chunk";
-import { assert } from "tsafe";
+import assert from "node:assert";
 
 export async function enableAutoposting(interaction: ComponentInteraction<ValidLocation.GUILD> | ModalSubmitInteraction<ValidLocation.GUILD>, channel: string, webhook: Webhook, type: AutoPostingTypes, time: number) {
     if (!interaction.acknowledged) {

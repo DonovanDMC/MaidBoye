@@ -12,7 +12,7 @@ export default class BulgeComponent extends BaseComponent {
     command = "bulge";
 
     protected override async handle(interaction: ComponentInteraction) {
-        const img = await Yiffy.furry.bulge("json", 1);
+        const img = await Yiffy.images.furry.bulge();
         await interaction.editParent({
             embeds: Util.makeEmbed(true, interaction.user)
                 .setTitle("Bolgy Wolgy UwU")

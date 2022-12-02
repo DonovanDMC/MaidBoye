@@ -282,7 +282,7 @@ export default class Util {
                     url = post.file.url;
                     source = `https://e621.net/posts/${post.id}`;
                 } else {
-                    const img = await Yiffy.furry.cuddle("json", 1);
+                    const img = await Yiffy.images.furry.cuddle();
                     url = img.url;
                     if (img.sources.length !== 0) {
                         source = img.sources[0];
@@ -302,7 +302,7 @@ export default class Util {
                     url = post.file.url;
                     source = `https://e621.net/posts/${post.id}`;
                 } else {
-                    const img = await Yiffy.furry.hug("json", 1);
+                    const img = await Yiffy.images.furry.hug();
                     url = img.url;
                     if (img.sources.length !== 0) {
                         source = img.sources[0];
@@ -322,7 +322,7 @@ export default class Util {
                     url = post.file.url;
                     source = `https://e621.net/posts/${post.id}`;
                 } else {
-                    const img = await Yiffy.furry.lick("json", 1);
+                    const img = await Yiffy.images.furry.lick();
                     url = img.url;
                     if (img.sources.length !== 0) {
                         source = img.sources[0];
@@ -342,7 +342,7 @@ export default class Util {
                     url = post.file.url;
                     source = `https://e621.net/posts/${post.id}`;
                 } else {
-                    const img = await Yiffy.furry.kiss("json", 1);
+                    const img = await Yiffy.images.furry.kiss();
                     url = img.url;
                     if (img.sources.length !== 0) {
                         source = img.sources[0];
@@ -376,15 +376,15 @@ export default class Util {
 
     static async getYiff(type: YiffTypes) {
         switch (type) {
-            case "straight": { return Yiffy.furry.yiff.straight("json", 1);
+            case "straight": { return Yiffy.images.furry.yiff.straight();
             }
-            case "lesbian": { return Yiffy.furry.yiff.lesbian("json", 1);
+            case "lesbian": { return Yiffy.images.furry.yiff.lesbian();
             }
-            case "gynomorph": { return Yiffy.furry.yiff.gynomorph("json", 1);
+            case "gynomorph": { return Yiffy.images.furry.yiff.gynomorph();
             }
-            case "andromorph": { return Yiffy.furry.yiff.andromorph("json", 1);
+            case "andromorph": { return Yiffy.images.furry.yiff.andromorph();
             }
-            default: { return Yiffy.furry.yiff.gay("json", 1);
+            default: { return Yiffy.images.furry.yiff.gay();
             }
         }
     }
@@ -439,7 +439,7 @@ export default class Util {
             }
 
             case "birb": case "dikdik": case "fursuit": {
-                const img = await (cmd === "birb" || cmd === "dikdik" ? Yiffy.animals[cmd]() : Yiffy.furry[cmd]());
+                const img = await (cmd === "birb" || cmd === "dikdik" ? Yiffy.images.animals[cmd]() : Yiffy.images.furry[cmd]());
                 void (interaction.type === InteractionTypes.APPLICATION_COMMAND ? interaction.reply.bind(interaction) : interaction.editParent.bind(interaction))({
                     embeds: Util.makeEmbed(true, interaction.user)
                         .setTitle(titles[cmd])
@@ -492,6 +492,10 @@ export default class Util {
     static async import<T extends object = never>(path: string, options?: ImportCallOptions) {
         const res = await import(`${path}?${Date.now()}`, options) as ModuleImport<T>;
         return "default" in res ? res.default : res;
+    }
+
+    static is<T>(param: unknown): param is T {
+        return true;
     }
 
     static isNSFW(channel: AnyChannel | Uncached) {

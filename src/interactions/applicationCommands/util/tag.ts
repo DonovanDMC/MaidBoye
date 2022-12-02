@@ -6,9 +6,9 @@ import type MaidBoye from "../../../main.js";
 import Config from "../../../config/index.js";
 import chunk from "chunk";
 import { ButtonColors, ComponentBuilder } from "@oceanicjs/builders";
-import { assert } from "tsafe";
 import { Strings } from "@uwu-codes/utils";
 import { ApplicationCommandOptionTypes, InteractionContent, MessageActionRow } from "oceanic.js";
+import assert from "node:assert";
 
 async function getTag(client: MaidBoye, name: string, info: GuildConfig["tags"][string], index: number, page: number, WithContent: boolean) {
     const creator = await client.getUser(info.createdBy);

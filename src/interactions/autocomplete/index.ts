@@ -4,10 +4,10 @@ import type EmptyAutocomplete from "./structure/Empty.js";
 import Logger from "../../util/Logger.js";
 import type { AutocompleteInteraction } from "../../util/cmd/Command.js";
 import Debug from "../../util/Debug.js";
-import { assert } from "tsafe";
 import { Timer } from "@uwu-codes/utils";
 import type { ModuleImport } from "@uwu-codes/types";
 import type { InteractionOptionsInteger, InteractionOptionsNumber, InteractionOptionsString } from "oceanic.js";
+import assert from "node:assert";
 import { readdir } from "node:fs/promises";
 
 export type AnyAutocompleteFocus = InteractionOptionsString | InteractionOptionsInteger | InteractionOptionsNumber;

@@ -1,10 +1,11 @@
+import Util from "./Util.js";
 import Config from "../config/index.js";
 import type { StatCreationData, StatProperties } from "../db/Models/Stat.js";
 import Stat, { StatType } from "../db/Models/Stat.js";
 import db from "../db/index.js";
-import { assert, is } from "tsafe";
 import shortUUID from "short-uuid";
 import { ApplicationCommandTypes, GatewayOPCodes, InteractionTypes } from "oceanic.js";
+import assert from "node:assert";
 import { hostname } from "node:os";
 import { randomUUID } from "node:crypto";
 
@@ -41,7 +42,7 @@ export default class StatsHandler {
         const rstats: Array<string> = [];
         switch (type) {
             case "GATEWAY_RECIEVE": {
-                assert(is<StatProperties["GATEWAY_RECIEVE"]>(args));
+                assert(Util.is<StatProperties["GATEWAY_RECIEVE"]>(args));
                 props.payload = args[0];
                 props.event   = args[1];
                 rstats.push("stats:gateway", `stats:gateway:${args[0]}`, `stats:session-${this.ShortSessionID}:gateway:${args[0]}`);
@@ -52,20 +53,20 @@ export default class StatsHandler {
             }
 
             case "REST": {
-                assert(is<StatProperties["REST"]>(args));
+                assert(Util.is<StatProperties["REST"]>(args));
                 props.status_code    = args[0];
                 props.status_message = args[1];
                 break;
             }
 
             case "FAILED_RESTRICTION": {
-                assert(is<StatProperties["FAILED_RESTRICTION"]>(args));
+                assert(Util.is<StatProperties["FAILED_RESTRICTION"]>(args));
                 rstats.push(`stats:restrictionFail:${args[0]}`, `stats:session-${this.ShortSessionID}:restrictionFail:${args[0]}`);
                 break;
             }
 
             case "INTERACTION": {
-                assert(is<StatProperties["INTERACTION"]>(args));
+                assert(Util.is<StatProperties["INTERACTION"]>(args));
                 props.interaction_type      = args[0];
                 props.interaction_type_name = InteractionTypes[args[0]];
                 rstats.push(`stats:interactions:${InteractionTypes[args[0]]}`, `stats:session-${this.ShortSessionID}:interactions:${InteractionTypes[args[0]]}`);
@@ -85,7 +86,7 @@ export default class StatsHandler {
             case "SHARD_READY":
             case "SHARD_DISCONNECT":
             case "SHARD_RESUME": {
-                assert(is<StatProperties["SHARD_READY" | "SHARD_DISCONNECT" | "SHARD_RESUME"]>(args));
+                assert(Util.is<StatProperties["SHARD_READY" | "SHARD_DISCONNECT" | "SHARD_RESUME"]>(args));
                 props.shard_id = args[0];
                 if (type === "SHARD_DISCONNECT") {
                     props.close_code = args[1];
@@ -94,7 +95,7 @@ export default class StatsHandler {
             }
 
             case "SAUCE_SUCCESS": {
-                assert(is<StatProperties["SAUCE_SUCCESS"]>(args));
+                assert(Util.is<StatProperties["SAUCE_SUCCESS"]>(args));
                 props.sauce_simularity = args[0];
                 props.sauce_method     = args[1];
                 rstats.push("stats:sauceSuccess", `stats:sauceSuccess:${args[1]}`, `stats:session-${this.ShortSessionID}:sauceSuccess`, `stats:session-${this.ShortSessionID}:sauceSuccess:${args[1]}`);
@@ -103,7 +104,7 @@ export default class StatsHandler {
 
             case "SAUCE_FAIL":
             case "SAUCE_RATELIMITED": {
-                assert(is<StatProperties["SAUCE_FAIL" | "SAUCE_RATELIMITED"]>(args));
+                assert(Util.is<StatProperties["SAUCE_FAIL" | "SAUCE_RATELIMITED"]>(args));
                 props.sauce_simularity = args[0];
                 props.sauce_attempted  = args[1];
                 rstats.push(`stats:sauce${type === "SAUCE_FAIL" ? "Fail" : "Ratelimited"}`, `stats:session-${this.ShortSessionID}:sauce${type === "SAUCE_FAIL" ? "Fail" : "Ratelimited"}`);

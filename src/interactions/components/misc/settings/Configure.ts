@@ -3,7 +3,7 @@ import type { BaseState } from "../../../../util/State.js";
 import BaseComponent from "../../structure/BaseComponent.js";
 import GuildConfig from "../../../../db/Models/GuildConfig.js";
 import Settings from "../../../../util/settings/index.js";
-import { assert } from "tsafe";
+import assert from "node:assert";
 
 export default class SettingsMenuComponent extends BaseComponent {
     action = "configure";

@@ -1,7 +1,7 @@
 import Command, { ValidLocation } from "../../../util/cmd/Command.js";
 import RequestProxy from "../../../util/RequestProxy.js";
+import Util from "../../../util/Util.js";
 import { Strings } from "@uwu-codes/utils";
-import { assert, is } from "tsafe";
 import {
     ApplicationCommandOptionTypes,
     DiscordRESTError,
@@ -9,6 +9,7 @@ import {
     JSONErrorCodes,
     Sticker
 } from "oceanic.js";
+import assert from "node:assert";
 import { basename } from "node:path";
 
 export default new Command(import.meta.url, "steal")
@@ -150,7 +151,7 @@ export default new Command(import.meta.url, "steal")
                         image: buf
                     });
                 } catch (err) {
-                    assert(is<Error>(err));
+                    assert(Util.is<Error>(err));
                     if (err instanceof DiscordRESTError) {
                         if (err.code === JSONErrorCodes.INVALID_FORM_BODY || err.code === JSONErrorCodes.FILE_UPLOADED_EXCEEDS_MAXIMUM_SIZE) {
                             return interaction.reply({ content: "H-hey! The file was too large, please try again with a smaller file..\n(try 256kb or less)" });
@@ -182,7 +183,7 @@ export default new Command(import.meta.url, "steal")
                         }
                     });
                 } catch (err) {
-                    assert(is<Error>(err));
+                    assert(Util.is<Error>(err));
                     if (err instanceof DiscordRESTError) {
                         if (err.code === JSONErrorCodes.INVALID_FORM_BODY || err.code === JSONErrorCodes.FILE_UPLOADED_EXCEEDS_MAXIMUM_SIZE) {
                             return interaction.reply({ content: "H-hey! The file was too large, please try again with a smaller file..\n(try 512kb or less)" });

@@ -1,17 +1,6 @@
+import Yiffy from "./req/Yiffy.js";
 import type { E621ThumbnailType } from "../db/Models/UserConfig.js";
-import Config from "../config/index.js";
-import genThumbnail from "e621-thumbnailer";
-import AWS from "aws-sdk";
 
-const awsClient = new AWS.S3({
-    endpoint:    Config.thumbsEndpoint,
-    region:      Config.thumbsRegion,
-    credentials: new AWS.Credentials({
-        accessKeyId:     Config.s3Accesskey,
-        secretAccessKey: Config.s3SecretKey
-    }),
-    s3BucketEndpoint: true
-});
 export default class E621Thumbnail {
     // so we don't override if we've already navigated away
     private static pendingList: Array<[string, number]> = [];
@@ -29,27 +18,7 @@ export default class E621Thumbnail {
     }
 
     static async create(url: string, md5: string, type: Exclude<E621ThumbnailType, "none">) {
-        const name = `${md5}.${type === "image" ? "png" : "gif"}`;
-        const prev = await awsClient.getObject({
-            Bucket: Config.thumbsBucket,
-            Key:    name
-        }).promise().then(() => true, () => false);
-        console.log(url, md5, type, prev);
-        if (prev) {
-            return `${Config.thumbsURL}/${name}`;
-        }
-        const thumb = await genThumbnail(url, type, {
-            gifLength:            1,
-            gifOptimizationLevel: 3
-        });
-
-        await awsClient.putObject({
-            Bucket:      Config.thumbsBucket,
-            Key:         name,
-            Body:        thumb,
-            ContentType: type === "image" ? "image/png" : "image/gif"
-        }).promise();
-        return `${Config.thumbsURL}/${name}`;
+        return Yiffy.thumbs.create(md5, type === "image" ? "png" : "gif");
     }
 
     static hasPending(message: string, post?: number) {

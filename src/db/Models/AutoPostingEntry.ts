@@ -4,7 +4,6 @@ import Config from "../../config/index.js";
 import { Colors } from "../../util/Constants.js";
 import Logger from "../../util/Logger.js";
 import Util from "../../util/Util.js";
-import { assert } from "tsafe";
 import {
     AnyGuildTextChannelWithoutThreads,
     ApplicationCommandOptionsChoice,
@@ -15,6 +14,7 @@ import {
     JSONErrorCodes
 } from "oceanic.js";
 import { EmbedBuilder } from "@oceanicjs/builders";
+import assert from "node:assert";
 import { randomUUID } from "node:crypto";
 
 

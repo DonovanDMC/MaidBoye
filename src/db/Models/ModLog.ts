@@ -4,9 +4,9 @@ import Warning from "./Warning.js";
 import db from "../index.js";
 import type MaidBoye from "../../main.js";
 import Util from "../../util/Util.js";
-import { assert } from "tsafe";
 import { Strings } from "@uwu-codes/utils";
 import type { AnyGuildTextChannel } from "oceanic.js";
+import assert from "node:assert";
 
 
 export interface ModLogData {

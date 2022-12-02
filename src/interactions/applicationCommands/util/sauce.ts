@@ -1,8 +1,8 @@
 import Command, { ValidLocation } from "../../../util/cmd/Command.js";
 import Sauce from "../../../util/Sauce.js";
 import StatsHandler from "../../../util/StatsHandler.js";
-import { assert } from "tsafe";
 import { ApplicationCommandOptionTypes } from "oceanic.js";
+import assert from "node:assert";
 
 export default new Command(import.meta.url, "sauce")
     .setDescription("Get the sauce for an image")

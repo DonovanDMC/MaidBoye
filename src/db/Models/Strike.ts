@@ -1,7 +1,7 @@
 import db, { CountResult } from "../index.js";
 import type MaidBoye from "../../main.js";
-import { assert } from "tsafe";
 import { Strings } from "@uwu-codes/utils";
+import assert from "node:assert";
 
 
 export interface StrikeData {

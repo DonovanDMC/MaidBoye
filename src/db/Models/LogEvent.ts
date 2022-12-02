@@ -2,7 +2,6 @@ import db, { CountResult } from "../index.js";
 import type MaidBoye from "../../main.js";
 import WebhookFailureHandler from "../../util/handlers/LoggingWebhookFailureHandler.js";
 import Util from "../../util/Util.js";
-import { assert } from "tsafe";
 import {
     ApplicationCommandOptionsChoice,
     ApplicationCommandOptionTypes,
@@ -11,6 +10,7 @@ import {
     JSONErrorCodes
 } from "oceanic.js";
 import chunk from "chunk";
+import assert from "node:assert";
 import { randomUUID } from "node:crypto";
 
 

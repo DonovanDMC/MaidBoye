@@ -5,10 +5,10 @@ import type { ModalSubmitInteraction } from "../../util/cmd/Command.js";
 import Debug from "../../util/Debug.js";
 import Logger from "../../util/Logger.js";
 import { State } from "../../util/State.js";
-import { assert } from "tsafe";
 import { Timer } from "@uwu-codes/utils";
 import { MessageFlags } from "oceanic.js";
 import type { ModuleImport } from "@uwu-codes/types";
+import assert from "node:assert";
 import { readdir } from "node:fs/promises";
 
 const thisDirectory = new URL(".", import.meta.url).pathname.slice(0, -1);

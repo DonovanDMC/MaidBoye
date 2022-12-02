@@ -3,8 +3,8 @@ import type { BaseState } from "../../../../util/State.js";
 import BaseComponent from "../../structure/BaseComponent.js";
 import UserConfig from "../../../../db/Models/UserConfig.js";
 import Preferences from "../../../../util/preferences/index.js";
-import { assert } from "tsafe";
 import { ComponentTypes } from "oceanic.js";
+import assert from "node:assert";
 
 
 export default class PreferencesPickComponent extends BaseComponent {

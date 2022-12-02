@@ -12,7 +12,7 @@ export default new Command(import.meta.url, "bulge")
     .setAck("ephemeral-user")
     .setCooldown(1e4)
     .setExecutor(async function(interaction) {
-        const img = await Yiffy.furry.bulge("json", 1);
+        const img = await Yiffy.images.furry.bulge();
         return interaction.reply({
             embeds: Util.makeEmbed(true, interaction.user)
                 .setTitle("Bolgy Wolgy UwU")

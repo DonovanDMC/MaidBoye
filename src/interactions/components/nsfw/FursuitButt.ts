@@ -12,7 +12,7 @@ export default class FursuitButtComponent extends BaseComponent {
     command = "fursuitbutt";
 
     protected override async handle(interaction: ComponentInteraction) {
-        const img = await Yiffy.furry.butts("json", 1);
+        const img = await Yiffy.images.furry.butts();
         await interaction.editParent({
             embeds: Util.makeEmbed(true, interaction.user)
                 .setTitle("Fursuit Butt")

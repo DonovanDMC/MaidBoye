@@ -34,7 +34,7 @@ export default new Command(import.meta.url, "flop")
     .setExecutor(async function(interaction, { user, text }) {
         const r = strings(interaction.user.id, user && text ? `<@!${user}> ${text}` : (user ? `<@!${user}>` : text!));
 
-        const img = await Yiffy.furry.flop("json", 1);
+        const img = await Yiffy.images.furry.flop();
 
         return interaction.reply({
             embeds: Util.makeEmbed(true, interaction.user)

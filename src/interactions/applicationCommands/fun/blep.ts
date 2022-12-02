@@ -13,7 +13,7 @@ export default new Command(import.meta.url, "blep")
     .setValidLocation(ValidLocation.GUILD)
     .setExecutor(async function(interaction) {
         const r = strings(interaction.user.id);
-        const img = await Yiffy.animals.blep("json", 1);
+        const img = await Yiffy.images.animals.blep();
 
         return interaction.reply({
             embeds: Util.makeEmbed(true, interaction.user)

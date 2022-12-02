@@ -7,8 +7,8 @@ import type { E621ThumbnailType } from "../../db/Models/UserConfig.js";
 import CommandOption from "../cmd/CommandOption.js";
 import type UserConfig from "../../db/Models/UserConfig.js";
 import { ButtonColors, ComponentBuilder } from "@oceanicjs/builders";
-import { assert } from "tsafe";
 import { ApplicationCommandOptionTypes, ComponentTypes, MessageActionRow } from "oceanic.js";
+import assert from "node:assert";
 
 export default class E621ThumbnailTypePreference extends BasePreference {
     description = "The thumbnail type for webm posts in the `e621` command. This overrides server settings.";

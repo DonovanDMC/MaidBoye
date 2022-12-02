@@ -8,8 +8,8 @@ import CommandOption from "../cmd/CommandOption.js";
 import type UserConfig from "../../db/Models/UserConfig.js";
 import { ButtonColors, ComponentBuilder } from "@oceanicjs/builders";
 import { Strings } from "@uwu-codes/utils";
-import { assert } from "tsafe";
 import { ApplicationCommandOptionTypes, ComponentTypes, MessageActionRow } from "oceanic.js";
+import assert from "node:assert";
 
 export default class DefaultYiffTypePreference extends BasePreference {
     description = "The default yiff type for the `yiff` command. This overrides server settings.";
