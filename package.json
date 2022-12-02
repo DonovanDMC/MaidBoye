@@ -57,8 +57,6 @@
   "dependencies": {
     "@oceanicjs/builders": "^1.1.7",
     "@uwu-codes/utils": "^1.1.7",
-    "canvas": "^2.10.2",
-    "canvas-constructor": "^7.0.0",
     "cheweyapi": "^1.0.3",
     "chunk": "^0.0.3",
     "dashargs": "^4.1.5",
