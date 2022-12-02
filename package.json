@@ -79,7 +79,7 @@
     "short-uuid": "^4.2.2",
     "tsafe": "^1.4.1",
     "tslog": "^3.3.4",
-    "yiffy": "^2.2.5"
+    "yiffy": "^2.3.0"
   },
   "type": "module",
   "engines": {
