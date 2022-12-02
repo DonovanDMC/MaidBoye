@@ -350,7 +350,9 @@ export default class AutoPostingService extends Service {
                 Logger.getLogger("AutoPosting").info(`Running "${time} minutes"`);
                 const entries = await AutoPostingEntry.getTime(time as 5);
                 for (const entry of entries) {
-                    await this.execute(entry);
+                    await this.execute(entry).catch(err => {
+                        Logger.getLogger("AutoPosting").error(`Failed to execute entry ${entry.id} (${entry.type})`, err);
+                    });
                 }
             }
         }
