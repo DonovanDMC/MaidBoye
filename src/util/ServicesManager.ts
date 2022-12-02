@@ -91,7 +91,7 @@ export default class ServicesManager {
         }
     }
 
-    static async register(name: string, path: string | URL, timeout = 30000) {
+    static async register(name: string, path: string | URL, timeout = 30000, waitForReady = true) {
         if (path instanceof URL) {
             path = path.pathname;
         }
@@ -113,7 +113,7 @@ export default class ServicesManager {
                     setTimeout(() => this.register(name, path), time);
                 }
             });
-        return new Promise((resolve, reject) => {
+        const p = new Promise((resolve, reject) => {
             this.services.set(name, worker);
             this.serviceStatuses.set(name, "starting");
             const t =  setTimeout(() => {
@@ -131,6 +131,8 @@ export default class ServicesManager {
                 reject
             });
         });
+
+        return waitForReady ? p : Promise.resolve();
     }
 
     static async send<T = unknown>(name: string, op: string, data: unknown | string, responsive: true, from?: string): Promise<T>;

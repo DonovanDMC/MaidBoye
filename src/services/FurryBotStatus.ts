@@ -16,7 +16,7 @@ export default class FurryBotStatusService extends Service {
         if (Config.isDevelopment) {
             Logger.getLogger("FurryBotStatusService").info("Not registering FurryBotStatusService in development mode.");
         } else {
-            return ServicesManager.register("furry-bot-status", import.meta.url, 120000); // starting 6 shards takes a bit of time, longer than 30 seconds
+            return ServicesManager.register("furry-bot-status", import.meta.url, 120000, false); // starting 6 shards takes a bit of time, longer than 30 seconds
         }
     }
 
