@@ -93,7 +93,9 @@ export default class Config extends PrivateConfig {
                     }],
                     status: "dnd"
                 }
-
+            },
+            rest: {
+                superProperties: "eyJjbGllbnRfYnVpbGRfbnVtYmVyIjoxNjI5OTJ9"
             }
         };
     }

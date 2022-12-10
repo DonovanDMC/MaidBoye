@@ -72,6 +72,7 @@ export const GuildFeatureNames: Record<GuildFeature, string> = {
     COMMUNITY:                                 `${serverFeatures.community} Community`,
     CREATOR_MONETIZABLE:                       "Creator Monetizable",
     CREATOR_MONETIZABLE_DISABLED:              "Creator Monetizable Disabled",
+    CREATOR_MONETIZABLE_PROVISIONAL:           "Creator Monetizable Provisional",
     DEVELOPER_SUPPORT_SERVER:                  "Developer Support Server",
     DISCOVERABLE:                              `${serverFeatures.discoverable} Discoverable`,
     DISCOVERABLE_DISABLED:                     "Discoverable Disabled",
@@ -98,6 +99,7 @@ export const GuildFeatureNames: Record<GuildFeature, string> = {
     PARTNERED:                                 `${serverFeatures.partnered} Partnered`,
     PREVIEW_ENABLED:                           `${serverFeatures.previewEnabled} Preview Enabled`,
     PREVIOUSLY_DISCOVERABLE:                   `${serverFeatures.previouslyDiscoverable} Previously Discoverable`,
+    PRIVATE_THREADS:                           `${serverFeatures.privateThreads} Private Threads`,
     ROLE_ICONS:                                `${serverFeatures.roleIcons} Role Icons`,
     ROLE_SUBSCRIPTIONS_AVAILABLE_FOR_PURCHASE: "Role Subscriptions Available For Purchase",
     ROLE_SUBSCRIPTIONS_ENABLED:                `${serverFeatures.roleSubscriptionsEnabled} Role Subscriptions Enabled`,
@@ -124,6 +126,7 @@ export const GuildFeatureDescriptions: Record<GuildFeature, string | null> = {
     COMMUNITY:                                 "Guild can enable welcome screen, Membership Screening, stage channels and discovery, and receives community updates",
     CREATOR_MONETIZABLE:                       null,
     CREATOR_MONETIZABLE_DISABLED:              null,
+    CREATOR_MONETIZABLE_PROVISIONAL:           null,
     DEVELOPER_SUPPORT_SERVER:                  null,
     DISCOVERABLE:                              "Guild is able to be discovered in the directory",
     DISCOVERABLE_DISABLED:                     "Guild is not able to be discovered in the directory, and it cannot be enabled", // *
@@ -150,6 +153,7 @@ export const GuildFeatureDescriptions: Record<GuildFeature, string | null> = {
     PARTNERED:                                 "Guild is partnered",
     PREVIEW_ENABLED:                           "Guild can be previewed before joining via Membership Screening or the directory",
     PREVIOUSLY_DISCOVERABLE:                   "Guild has previously been discoverable, but is not currently", // *
+    PRIVATE_THREADS:                           "Guild has access to private threads", // *
     ROLE_ICONS:                                "Guild is able to set role icons",
     ROLE_SUBSCRIPTIONS_AVAILABLE_FOR_PURCHASE: "Guild has role subscriptions that can be purchased", // *
     ROLE_SUBSCRIPTIONS_ENABLED:                "Guild has access to role subscriptions", // *
@@ -167,7 +171,9 @@ export const GuildFeatureDescriptions: Record<GuildFeature, string | null> = {
 
 export const DefaultMessageNotificationLevelNames = {
     [DefaultMessageNotificationLevels.ALL_MESSAGES]:  "All Messages",
-    [DefaultMessageNotificationLevels.ONLY_MENTIONS]: "Only Mentions"
+    [DefaultMessageNotificationLevels.ONLY_MENTIONS]: "Only Mentions",
+    [DefaultMessageNotificationLevels.NO_MESSAGES]:   "No Messages",
+    [DefaultMessageNotificationLevels.NULL]:          "Default"
 };
 
 export const ExplicitContentFilterLevelNames = {
@@ -197,7 +203,8 @@ export const MessageFlagNames = {
     [MessageFlags.HAS_THREAD]:                             "Has Thread",
     [MessageFlags.EPHEMERAL]:                              "Ephemeral",
     [MessageFlags.LOADING]:                                "Loading",
-    [MessageFlags.FAILED_TO_MENTION_SOME_ROLES_IN_THREAD]: "Failed to Mention Some Roles in Thread"
+    [MessageFlags.FAILED_TO_MENTION_SOME_ROLES_IN_THREAD]: "Failed to Mention Some Roles in Thread",
+    [MessageFlags.SHOULD_SHOW_LINK_NOT_DISCORD_WARNING]:   "Should Show Link Not Discord Warning"
 };
 
 export const MessageTypeNames = {
@@ -214,6 +221,7 @@ export const MessageTypeNames = {
     [MessageTypes.GUILD_BOOST_TIER_2]:                           "User Premium Guild Subscription Tier 2",
     [MessageTypes.GUILD_BOOST_TIER_3]:                           "User Premium Guild Subscription Tier 3",
     [MessageTypes.CHANNEL_FOLLOW_ADD]:                           "Channel Follow Add",
+    [MessageTypes.GUILD_STREAM]:                                 "Guild Stream",
     [MessageTypes.GUILD_DISCOVERY_DISQUALIFIED]:                 "Guild Discovery Disqualified",
     [MessageTypes.GUILD_DISCOVERY_REQUALIFIED]:                  "Guild Discovery Requalified",
     [MessageTypes.GUILD_DISCOVERY_GRACE_PERIOD_INITIAL_WARNING]: "Guild Discovery Grace Period Initial Warning",
@@ -225,7 +233,14 @@ export const MessageTypeNames = {
     [MessageTypes.GUILD_INVITE_REMINDER]:                        "Guild Invite Reminder",
     [MessageTypes.CONTEXT_MENU_COMMAND]:                         "Context Menu Command",
     [MessageTypes.AUTO_MODERATION_ACTION]:                       "Auto Moderation Action",
-    [MessageTypes.ROLE_SUBSCRIPTION_PURCHASE]:                   "Role Subscription Purchase"
+    [MessageTypes.ROLE_SUBSCRIPTION_PURCHASE]:                   "Role Subscription Purchase",
+    [MessageTypes.INTERACTION_PREMIUM_UPSELL]:                   "Interaction Premium Upsell",
+    [MessageTypes.STAGE_START]:                                  "Stage Start",
+    [MessageTypes.STAGE_END]:                                    "Stage End",
+    [MessageTypes.STAGE_SPEAKER]:                                "Stage Speaker",
+    [MessageTypes.STAGE_RAISE_HAND]:                             "Stage Raise Hand",
+    [MessageTypes.STAGE_TOPIC_CHANGE]:                           "Stage Topic Change",
+    [MessageTypes.GUILD_APPLICATION_PREMIUM_SUBSCRIPTION]:       "Guild Application Premium Subscription"
 };
 
 export const PermissionNames = {
@@ -317,10 +332,12 @@ export const StickerTypeNames = {
 };
 
 export const SystemChannelFlagNames = {
-    [SystemChannelFlags.SUPPRESS_JOIN_NOTIFICATIONS]:           "Suppress Join Notifications",
-    [SystemChannelFlags.SUPPRESS_PREMIUM_SUBSCRIPTIONS]:        "Suppress Premium Subscriptions",
-    [SystemChannelFlags.SUPPRESS_GUILD_REMINDER_NOTIFICATIONS]: "Suppress Guild Reminder Notifications",
-    [SystemChannelFlags.SUPPRESS_JOIN_NOTIFICATION_REPLIES]:    "Suppress Join Notification Replies"
+    [SystemChannelFlags.SUPPRESS_JOIN_NOTIFICATIONS]:                              "Suppress Join Notifications",
+    [SystemChannelFlags.SUPPRESS_PREMIUM_SUBSCRIPTIONS]:                           "Suppress Premium Subscriptions",
+    [SystemChannelFlags.SUPPRESS_GUILD_REMINDER_NOTIFICATIONS]:                    "Suppress Guild Reminder Notifications",
+    [SystemChannelFlags.SUPPRESS_JOIN_NOTIFICATION_REPLIES]:                       "Suppress Join Notification Replies",
+    [SystemChannelFlags.SUPPRESS_ROLE_SUBSCRIPTION_PURCHASE_NOTIFICATIONS]:        "Suppress Role Subscription Purchase Notifications",
+    [SystemChannelFlags.SUPPRESS_ROLE_SUBSCRIPTION_PURCHASE_NOTIFICATION_REPLIES]: "Suppress Role Subscription Purchase Notification Replies"
 };
 
 export const ThreadMemberFlagNames = {

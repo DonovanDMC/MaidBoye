@@ -1,12 +1,10 @@
 services:
   maidboye:
-    build: .
+    image: ghcr.io/donovandmc/maidboye
     container_name: maidboye
     profiles:
       - all
     volumes:
-      - modules:/app/node_modules
-      - build:/app/build
       - ./data/bot:/data
       - /etc/hostname:/data/hostname
     environment:
@@ -80,7 +78,3 @@ networks:
   websites:
     name: websites
     external: true
-
-volumes:
-  modules:
-  build:

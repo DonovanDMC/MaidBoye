@@ -1,0 +1,19 @@
+name: Publish Container
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build And Publish
+        uses: macbre/push-to-ghcr@master
+        with:
+          image_name: ${{ github.repository }} 
+          github_token: ${{ secrets.GITHUB_TOKEN }}
