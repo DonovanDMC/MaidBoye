@@ -17,7 +17,6 @@ jobs:
         with:
           ssh-private-key: |
                 ${{ secrets.CONFIG_SSH_KEY }}
-                ${{ secrets.SSL_SSH_KEY }}
       - name: Checkout submodules
         run: git submodule update --init --recursive
       - name: Build And Publish
