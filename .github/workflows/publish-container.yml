@@ -22,5 +22,5 @@ jobs:
       - name: Build And Publish
         uses: macbre/push-to-ghcr@master
         with:
-          image_name: ${{ github.repository }} 
+          image_name: donovandmc/maidboye
           github_token: ${{ secrets.GITHUB_TOKEN }}
