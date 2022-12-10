@@ -9,9 +9,12 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     permissions:
+      contents: read
       packages: write
     steps:
       - uses: actions/checkout@v2
+      - name: Checkout submodules
+        run: git submodule update --init --recursive
       - name: Build And Publish
         uses: macbre/push-to-ghcr@master
         with:
