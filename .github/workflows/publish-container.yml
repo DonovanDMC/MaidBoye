@@ -9,10 +9,14 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
       packages: write
     steps:
       - uses: actions/checkout@v2
+      - uses: webfactory/ssh-agent@v0.7.0
+        with:
+          ssh-private-key: |
+                ${{ secrets.CONFIG_SSH_KEY }}
+                ${{ secrets.SSL_SSH_KEY }}
       - name: Checkout submodules
         run: git submodule update --init --recursive
       - name: Build And Publish
