@@ -10,12 +10,14 @@
     "postinstall": "patch-package",
     "lint": "eslint src --ext .ts",
     "lint:fix": "eslint src --ext .ts --fix",
-    "down": "sudo docker compose down --volumes --remove-orphans",
-    "up:d": "sudo docker compose --profile all up --build --force-recreate -d",
-    "up:db": "sudo docker compose --profile db up --build --force-recreate -d",
+    "up:d": "sudo docker compose pull && sudo docker compose --profile all up -d",
+    "up": "sudo docker compose pull && sudo docker compose --profile all up",
+    "up:db": "sudo docker compose pull && sudo docker compose --profile db up- -d",
+    "down": "sudo docker compose down",
     "up:dev": "sudo docker compose --profile all up",
     "dev": "npm run down && npm run up:dev",
-    "update": "npm run down && git pull && git submodule update --init --recursive --remote && npm run up:d"
+    "dev:build": "npm run down && npm run up",
+    "update": "git pull && git submodule update --init --recursive --remote && docker compose pull && npm run down&& npm run up:d"
   },
   "repository": {
     "type": "git",
