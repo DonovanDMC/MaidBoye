@@ -56,7 +56,7 @@ export const UserFlagNames: Record<UserFlags, string> = {
     [UserFlags.CERTIFIED_MODERATOR]:   `${badges.certifiedModerator} Certified Moderator`,
     [UserFlags.BOT_HTTP_INTERACTIONS]: `${badges.botHTTPInteractions} HTTP Interactions Bot`,
     [UserFlags.SPAMMER]:               `${badges.spammer} Spammer`,
-    [UserFlags.ACTIVE_DEVELOPER]:      "Active Developer"
+    [UserFlags.ACTIVE_DEVELOPER]:      `${badges.activeDeveloper} Active Developer`
 };
 
 export function getFeatureName(feature: GuildFeature) {
