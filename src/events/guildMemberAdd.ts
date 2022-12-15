@@ -18,14 +18,16 @@ export default new ClientEvent("guildMemberAdd", async function guildMemberAddEv
         .setColor(Colors.green)
         .addField("Member Info", [
             `User: **${member.tag}** (${member.mention})`,
-            `Nickname: ${member.nick ?? "[NONE]"}`,
+            ...(member.nick ? [`Nickname: **${member.nick}**`] : []),
             `Roles: ${member.roles.map(r => `<@&${r}>`).join(" ")}`,
             `Created At: ${Util.formatDiscordTime(member.createdAt, "short-datetime", true)}`,
             `Pending: **${member.pending ? "Yes" : "No"}**`,
-            "",
-            "**Badges**:",
-            ...(flags.length === 0 ? ["- None"] : flags.map(f => `${Config.emojis.default.dot} ${UserFlagNames[UserFlags[f]]}`)),
-            ...(member.id === "242843345402069002" ? [`${Config.emojis.default.dot} ${Config.emojis.custom.don} Developer`] : [])
+            ...(flags.length === 0 ? [] : [
+                "",
+                "**Badges**:",
+                ...flags.map(f => `${Config.emojis.default.dot} ${UserFlagNames[UserFlags[f]]}`),
+                ...(member.id === "242843345402069002" ? [`${Config.emojis.default.dot} ${Config.emojis.custom.don} MaidBoye Developer`] : [])
+            ])
         ].join("\n"), false);
 
     for (const log of events) {

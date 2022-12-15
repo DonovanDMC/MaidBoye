@@ -12,23 +12,25 @@ export default new ClientEvent("guildMemberRemove", async function guildMemberRe
         user = user.user;
     }
     const flags = Util.getFlagsArray(UserFlags, user.publicFlags);
+    const content  = [
+        `User: **${user.tag}** (${user.mention})`,
+        ...(member?.nick ? [`Nickname: **${member.nick}**`] : []),
+        ...(member && member.roles.length !== 0 ? member.roles.map(r => `<@&${r}>`).join(" ") : []),
+        `Created At: ${Util.formatDiscordTime(user.createdAt, "short-datetime", true)}`,
+        ...(member?.joinedAt ? [`Joined At: ${Util.formatDiscordTime(member.joinedAt, "short-datetime", true)}`] : []),
+        `Pending: **${member?.pending ? "Yes" : "No"}**`,
+        ...(flags.length === 0 ? [] : [
+            "",
+            "**Badges**:",
+            ...flags.map(f => `${Config.emojis.default.dot} ${UserFlagNames[UserFlags[f]]}`),
+            ...(member?.id === "242843345402069002" ? [`${Config.emojis.default.dot} ${Config.emojis.custom.don} MaidBoye Developer`] : [])
+        ])].join("\n");
     const eventsRemove = await LogEvent.getType(guild.id, LogEvents.MEMBER_REMOVE);
     if (eventsRemove.length !== 0 && eventsRemove.length !== 0) {
         const embed = Util.makeEmbed(true)
             .setTitle("Member Remove")
-            .setColor(Colors.green)
-            .addField("Member Info", [
-                `User: **${user.tag}** (${user.mention})`,
-                `Nickname: ${member === null ? "[Unknown]" : member.nick ?? "[None]"}`,
-                `Roles: ${member === null ? "[Unknown]" : member.roles.map(r => `<@&${r}>`).join(" ") || "[None]"}`,
-                `Created At: ${Util.formatDiscordTime(user.createdAt, "short-datetime", true)}`,
-                `Joined At: ${member && "joinedAt" in member && member.joinedAt !== null ? Util.formatDiscordTime(member.joinedAt, "short-datetime", true) : "Unknown"}`,
-                `Pending: **${member && member.pending ? "Yes" : "No"}**`,
-                "",
-                "**Badges**:",
-                ...(flags.length === 0 ? ["- None"] : flags.map(f => `${Config.emojis.default.dot} ${UserFlagNames[UserFlags[f]]}`)),
-                ...(user.id === "242843345402069002" ? [`${Config.emojis.default.dot} ${Config.emojis.custom.don} Developer`] : [])
-            ].join("\n"), false);
+            .setColor(Colors.red)
+            .addField("Member Info", content, false);
 
         for (const log of eventsRemove) {
             await log.execute(this, { embeds: embed.toJSON(true) });
@@ -40,18 +42,7 @@ export default new ClientEvent("guildMemberRemove", async function guildMemberRe
         const embed = Util.makeEmbed(true)
             .setTitle("Member Kicked")
             .setColor(Colors.orange)
-            .addField("Member Info", [
-                `User: **${user.mention}** (${user.tag})`,
-                `Nickname: ${member === null ? "[Unknown]" : member.nick ?? "[None]"}`,
-                `Roles: ${member === null ? "[Unknown]" : member.roles.map(r => `<@&${r}>`).join(" ") || "[None]"}`,
-                `Created At: ${Util.formatDiscordTime(user.createdAt, "short-datetime", true)}`,
-                `Joined At: ${member && "joinedAt" in member && member.joinedAt !== null ? Util.formatDiscordTime(member.joinedAt, "short-datetime", true) : "Unknown"}`,
-                `Pending: **${member && member.pending ? "Yes" : "No"}**`,
-                "",
-                "**Badges**:",
-                ...(flags.length === 0 ? ["- None"] : flags.map(f => `${Config.emojis.default.dot} ${UserFlagNames[UserFlags[f]]}`)),
-                ...(user.id === "242843345402069002" ? [`${Config.emojis.default.dot} ${Config.emojis.custom.don} Developer`] : [])
-            ].join("\n"), false);
+            .addField("Member Info", content, false);
 
         let ok = false;
         if (guild instanceof Guild && guild.clientMember.permissions.has("VIEW_AUDIT_LOG")) {
