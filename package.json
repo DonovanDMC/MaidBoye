@@ -10,14 +10,14 @@
     "postinstall": "patch-package",
     "lint": "eslint src --ext .ts",
     "lint:fix": "eslint src --ext .ts --fix",
-    "up:d": "sudo docker compose pull && sudo docker compose --profile all up -d",
-    "up": "sudo docker compose pull && sudo docker compose --profile all up",
-    "up:db": "sudo docker compose pull && sudo docker compose --profile db up- -d",
+    "up:d": "sudo docker compose pull && sudo docker compose up -d",
+    "up": "sudo docker compose pull && sudo docker compose up",
+    "up:db": "sudo docker compose pull && sudo docker compose up -d postgres redis",
     "down": "sudo docker compose down",
-    "up:dev": "sudo docker compose --profile all up",
+    "up:dev": "sudo docker compose up",
     "dev": "npm run down && npm run up:dev",
     "dev:build": "npm run down && npm run up",
-    "update": "git pull && git submodule update --init --recursive --remote && docker compose pull && npm run down&& npm run up:d"
+    "update": "git pull && git submodule update --init --recursive --remote && docker compose pull && npm run down && npm run up:d"
   },
   "repository": {
     "type": "git",
