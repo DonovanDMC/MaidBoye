@@ -7,11 +7,11 @@ debug.enable("yiffy:*");
 const Yiffy = new YiffyAPI({
     userAgent:        Config.userAgent,
     apiKey:           Config.yiffyAPIKey,
-    baseURL:          "https://yiff-rest.websites.containers.local",
+    baseURL:          "https://yiff-rest.websites.local",
     host:             "v2.yiff.rest",
-    thumbsBaseURL:    "https://yiff-rest.websites.containers.local",
+    thumbsBaseURL:    "https://yiff-rest.websites.local",
     thumbsHost:       "thumbs.yiff.rest",
-    shortenerBaseURL: "https://yiff-rocks.websites.containers.local",
+    shortenerBaseURL: "https://yiff-rocks.websites.local",
     shortenerHost:    "yiff.rocks"
 });
 

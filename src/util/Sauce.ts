@@ -6,6 +6,7 @@ import type { Post } from "e621";
 import type { JSONResponse } from "yiffy";
 import { Strings } from "@uwu-codes/utils";
 import { fetch } from "undici";
+import { STATUS_CODES } from "node:http";
 
 export class PreCheckError extends Error {
     override name = "PreCheckError";
@@ -35,7 +36,7 @@ export default async function Sauce(input: string, simularity = 75, skipCheck = 
         if (skipCheck === false) {
             const head = await RequestProxy.head(input);
             if (head.status !== 200 && head.status !== 204) {
-                throw new PreCheckError(`A pre-check failed when trying to fetch the image "${input}".\nA \`HEAD\` request returned a non 200 OK/204 No Content responses (${head.status} ${head.statusText})\n\nThis means we either can't access the file, the server is configured incorrectly, or the file does not exist.`);
+                throw new PreCheckError(`A pre-check failed when trying to fetch the image "${input}".\nA \`HEAD\` request returned a non 2XX response (${head.status} ${STATUS_CODES[head.status]})\n\nThis means we either can't access the file, the server is configured incorrectly, or the file does not exist.`);
             }
         }
 

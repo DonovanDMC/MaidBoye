@@ -7,6 +7,7 @@ import { AutoPostingTypes } from "../../../db/Models/AutoPostingEntry.js";
 import { enableAutoposting } from "../../applicationCommands/util/autoposting.js";
 import { MessageFlags } from "oceanic.js";
 import { Strings } from "@uwu-codes/utils";
+import { STATUS_CODES } from "node:http";
 
 export default class AutoPostingWebhookModal extends BaseModal {
     action = "webhook";
@@ -23,14 +24,14 @@ export default class AutoPostingWebhookModal extends BaseModal {
                 });
             }
             const head = await RequestProxy.head(components.avatar);
-            if (head.status !== 200 && head.status !== 204) {
+            if (!head.ok) {
                 return interaction.reply({
-                    content: `A pre-check failed when trying to fetch the image "${components.avatar}".\nA \`HEAD\` request returned a non 200 OK/204 No Content responses (${head.status} ${head.statusText})\n\nThis means we either can't access the file, the server is configured incorrectly, or the file does not exist.`
+                    content: `A pre-check failed when trying to fetch the image "${components.avatar}".\nA \`HEAD\` request returned a non 2XX response (${head.status} ${STATUS_CODES[head.status]})\n\nThis means we either can't access the file, the server is configured incorrectly, or the file does not exist.`
                 });
             }
 
             const img = await RequestProxy.get(components.avatar);
-            avatar = Buffer.from(await img.arrayBuffer());
+            avatar = Buffer.from(await img.response.arrayBuffer());
         }
 
         const webhook = await interaction.client.rest.webhooks.create(channel, {

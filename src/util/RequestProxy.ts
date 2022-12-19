@@ -27,7 +27,7 @@ export default class RequestProxy {
     }
 
     private static async _req(method: string, url: string, fwdAuth?: string) {
-        return fetch(`https://proxy.yiff.rocks/${method.toLowerCase()}?url=${encodeURIComponent(url)}`, {
+        const response = await fetch(`https://proxy.yiff.rocks/${method.toLowerCase()}?url=${encodeURIComponent(url)}`, {
             method,
             headers: {
                 "User-Agent":    Config.userAgent,
@@ -37,5 +37,10 @@ export default class RequestProxy {
                 } : {})
             }
         });
+        return {
+            ok: response.status >= 200 || response.status <= 299,
+            status: response.status,
+            response
+        }
     }
 }
