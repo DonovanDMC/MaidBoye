@@ -3,7 +3,7 @@ import LogEvent, { LogEvents } from "../db/Models/LogEvent.js";
 import Util from "../util/Util.js";
 import { Colors } from "../util/Constants.js";
 import { GuildScheduledEventEntityTypeNames, GuildScheduledEventPrivacyLevelNames, GuildScheduledEventStatusNames } from "../util/Names.js";
-import { AuditLogActionTypes, EmbedOptions } from "oceanic.js";
+import { AuditLogActionTypes, type EmbedOptions } from "oceanic.js";
 
 export default new ClientEvent("guildScheduledEventUpdate", async function guildScheduledEventUpdateEvent(event, oldEvent) {
     if (oldEvent === null) {

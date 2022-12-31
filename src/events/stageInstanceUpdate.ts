@@ -3,7 +3,7 @@ import LogEvent, { LogEvents } from "../db/Models/LogEvent.js";
 import Util from "../util/Util.js";
 import { Colors } from "../util/Constants.js";
 import { StageInstancePrivacyLevelNames } from "../util/Names.js";
-import { AuditLogActionTypes, EmbedOptions, GuildScheduledEvent } from "oceanic.js";
+import { AuditLogActionTypes, type EmbedOptions, type GuildScheduledEvent } from "oceanic.js";
 
 export default new ClientEvent("stageInstanceUpdate", async function stageInstanceUpdateEvent(stage, oldStage) {
     if (oldStage === null) {

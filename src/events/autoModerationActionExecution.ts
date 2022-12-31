@@ -3,7 +3,7 @@ import LogEvent, { LogEvents } from "../db/Models/LogEvent.js";
 import Util from "../util/Util.js";
 import { Colors } from "../util/Constants.js";
 import { AutoModerationActionTypeNames, AutoModerationTriggerTypeNames } from "../util/Names.js";
-import { AnyGuildTextChannel, AutoModerationActionTypes, Guild, User } from "oceanic.js";
+import { type AnyGuildTextChannel, AutoModerationActionTypes, Guild, User } from "oceanic.js";
 import { Strings, Time } from "@uwu-codes/utils";
 
 export default new ClientEvent("autoModerationActionExecution", async function autoModerationActionExecutionEvent(guild, channel, user, options) {

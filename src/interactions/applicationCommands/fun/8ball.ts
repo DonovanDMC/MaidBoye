@@ -2,7 +2,7 @@ import Command from "../../../util/cmd/Command.js";
 import Config from "../../../config/index.js";
 import Util from "../../../util/Util.js";
 import { State } from "../../../util/State.js";
-import { ApplicationCommandOptionTypes, MessageActionRow } from "oceanic.js";
+import { ApplicationCommandOptionTypes, type MessageActionRow } from "oceanic.js";
 import { ButtonColors, ComponentBuilder } from "@oceanicjs/builders";
 
 export default new Command(import.meta.url, "8ball")

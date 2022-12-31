@@ -2,7 +2,7 @@ import ClientEvent from "../util/ClientEvent.js";
 import LogEvent, { LogEvents } from "../db/Models/LogEvent.js";
 import Util from "../util/Util.js";
 import { Colors } from "../util/Constants.js";
-import { AuditLogActionTypes, EmbedOptions, Role } from "oceanic.js";
+import { AuditLogActionTypes, type EmbedOptions, type Role } from "oceanic.js";
 
 export default new ClientEvent("guildMemberUpdate", async function guildMemberUpdateEvent(member, oldMember) {
     if (oldMember === null) {

@@ -5,7 +5,7 @@ import type { ModeratorPermissions } from "../../../util/Constants.js";
 import { Colors, moderatorPermissions, AllPermissions } from "../../../util/Constants.js";
 import { State } from "../../../util/State.js";
 import { ButtonColors, ComponentBuilder } from "@oceanicjs/builders";
-import { ApplicationCommandOptionTypes, MessageActionRow } from "oceanic.js";
+import { ApplicationCommandOptionTypes, type MessageActionRow } from "oceanic.js";
 
 export default new Command(import.meta.url, "selfroles")
     .setDescription("Add/remove & join/leave roles")

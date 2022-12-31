@@ -2,7 +2,7 @@ import Command, { ValidLocation } from "../../../util/cmd/Command.js";
 import Util from "../../../util/Util.js";
 import { State } from "../../../util/State.js";
 import { ButtonColors, ComponentBuilder } from "@oceanicjs/builders";
-import { ApplicationCommandOptionTypes, MessageActionRow } from "oceanic.js";
+import { ApplicationCommandOptionTypes, type MessageActionRow } from "oceanic.js";
 
 export default new Command(import.meta.url, "divorce")
     .setDescription("Leave one of your partners.")

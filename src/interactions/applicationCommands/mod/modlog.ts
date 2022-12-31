@@ -5,7 +5,7 @@ import Util from "../../../util/Util.js";
 import { State } from "../../../util/State.js";
 import { Strings } from "@uwu-codes/utils";
 import { ButtonColors, ComponentBuilder } from "@oceanicjs/builders";
-import { ApplicationCommandOptionTypes, MessageActionRow } from "oceanic.js";
+import { ApplicationCommandOptionTypes, type MessageActionRow } from "oceanic.js";
 import assert from "node:assert";
 
 export default new Command(import.meta.url, "modlog")

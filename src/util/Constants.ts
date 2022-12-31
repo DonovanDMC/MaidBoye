@@ -1,4 +1,4 @@
-import { ChannelTypes, PermissionName, Permissions } from "oceanic.js";
+import { ChannelTypes, type PermissionName, Permissions } from "oceanic.js";
 
 export const moderatorPermissions = [
     "KICK_MEMBERS",

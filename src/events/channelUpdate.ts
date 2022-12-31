@@ -3,7 +3,7 @@ import LogEvent, { LogEvents } from "../db/Models/LogEvent.js";
 import Util from "../util/Util.js";
 import { Colors } from "../util/Constants.js";
 import { SortOrderTypeNames, VideoQualityModeNames } from "../util/Names.js";
-import { AuditLogActionTypes, ChannelTypes, EmbedOptions } from "oceanic.js";
+import { AuditLogActionTypes, ChannelTypes, type EmbedOptions } from "oceanic.js";
 import { Time } from "@uwu-codes/utils";
 
 export default new ClientEvent("channelUpdate", async function channelUpdateEvent(channel, oldChannel) {

@@ -3,7 +3,7 @@ import LogEvent, { LogEvents } from "../db/Models/LogEvent.js";
 import Util from "../util/Util.js";
 import { Colors } from "../util/Constants.js";
 import { StickerFormatTypeNames, StickerTypeNames } from "../util/Names.js";
-import { AuditLogActionTypes, EmbedOptions, Guild, Routes } from "oceanic.js";
+import { AuditLogActionTypes, type EmbedOptions, Guild, Routes } from "oceanic.js";
 
 export default new ClientEvent("guildStickersUpdate", async function guildStickersUpdateEvent(guild, stickers, oldStickers) {
     if (oldStickers === null) {

@@ -16,9 +16,9 @@ import Modals from "../interactions/modals/index.js";
 import Logger from "../util/Logger.js";
 import {
     ApplicationCommandTypes,
-    InteractionOptionsSubCommand,
-    InteractionOptionsSubCommandGroup,
-    InteractionOptionsWithValue,
+    type InteractionOptionsSubCommand,
+    type InteractionOptionsSubCommandGroup,
+    type InteractionOptionsWithValue,
     InteractionTypes,
     MessageFlags
 } from "oceanic.js";

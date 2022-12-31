@@ -4,7 +4,7 @@ import EncryptionHandler from "../util/handlers/EncryptionHandler.js";
 import LogEvent, { LogEvents } from "../db/Models/LogEvent.js";
 import { Colors } from "../util/Constants.js";
 import Util from "../util/Util.js";
-import { EmbedOptions, MessageFlags } from "oceanic.js";
+import { type EmbedOptions, MessageFlags } from "oceanic.js";
 import { Strings } from "@uwu-codes/utils";
 
 // this requires the messageContent intent

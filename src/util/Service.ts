@@ -1,4 +1,4 @@
-import { ServiceEvents, ServiceMessage } from "./ServicesManager.js";
+import { ServiceEvents, type ServiceMessage } from "./ServicesManager.js";
 import Debug from "./Debug.js";
 import { randomUUID } from "node:crypto";
 import { parentPort } from "node:worker_threads";

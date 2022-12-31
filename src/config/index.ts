@@ -5,7 +5,7 @@ import otherClients from "./private/client.other.json" assert { type: "json" };
 import PrivateConfig from "./private/private.js";
 import emojis from "./json/emojis.json" assert { type: "json" };
 import pkg from "../../package.json" assert { type: "json" };
-import { ClientOptions, Permissions, UpdatePresenceOptions, ActivityTypes } from "oceanic.js";
+import { type ClientOptions, Permissions, type UpdatePresenceOptions, ActivityTypes } from "oceanic.js";
 import { readFile } from "node:fs/promises";
 
 const host = await readFile("/data/hostname", "utf8").then(val => val.trim(), () => null);

@@ -166,7 +166,8 @@ export default class Command<T extends Record<string, unknown> = Record<string, 
             name:                     this.name,
             nameLocalizations:        {}, // @TODO name localizations
             options,
-            type:                     ApplicationCommandTypes.CHAT_INPUT
+            type:                     ApplicationCommandTypes.CHAT_INPUT,
+            nsfw:                     this.restrictions.includes("nsfw")
         };
     }
 }

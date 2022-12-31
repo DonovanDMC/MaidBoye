@@ -4,7 +4,7 @@ import { ModLogType } from "../../../db/Models/ModLog.js";
 import { lockPermissions, lockPermissionsList, TextableGuildChannels } from "../../../util/Constants.js";
 import db from "../../../db/index.js";
 import { Strings } from "@uwu-codes/utils";
-import { AnyGuildTextChannelWithoutThreads, ApplicationCommandOptionTypes, OverwriteTypes } from "oceanic.js";
+import { type AnyGuildTextChannelWithoutThreads, ApplicationCommandOptionTypes, OverwriteTypes } from "oceanic.js";
 
 export default new Command(import.meta.url, "unlock")
     .setDescription("Undo a lock")

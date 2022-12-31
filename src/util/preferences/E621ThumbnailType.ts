@@ -7,7 +7,7 @@ import type { E621ThumbnailType } from "../../db/Models/UserConfig.js";
 import CommandOption from "../cmd/CommandOption.js";
 import type UserConfig from "../../db/Models/UserConfig.js";
 import { ButtonColors, ComponentBuilder } from "@oceanicjs/builders";
-import { ApplicationCommandOptionTypes, ComponentTypes, MessageActionRow } from "oceanic.js";
+import { ApplicationCommandOptionTypes, ComponentTypes, type MessageActionRow } from "oceanic.js";
 import assert from "node:assert";
 
 export default class E621ThumbnailTypePreference extends BasePreference {

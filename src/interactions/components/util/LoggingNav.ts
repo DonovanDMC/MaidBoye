@@ -1,7 +1,7 @@
 import LogEvent, { LogEvents } from "../../../db/Models/LogEvent.js";
 import type { ComponentInteraction, ValidLocation } from "../../../util/cmd/Command.js";
 import { Colors } from "../../../util/Constants.js";
-import { BaseState, State } from "../../../util/State.js";
+import { type BaseState, State } from "../../../util/State.js";
 import Util from "../../../util/Util.js";
 import BaseComponent from "../structure/BaseComponent.js";
 import type { MessageActionRow } from "oceanic.js";

@@ -2,7 +2,7 @@ import ClientEvent from "../util/ClientEvent.js";
 import LogEvent, { LogEvents } from "../db/Models/LogEvent.js";
 import Util from "../util/Util.js";
 import { Colors } from "../util/Constants.js";
-import { AuditLogActionTypes, EmbedField, EmbedOptions } from "oceanic.js";
+import { AuditLogActionTypes, type EmbedField, type EmbedOptions } from "oceanic.js";
 
 export default new ClientEvent("voiceStateUpdate", async function voiceStateUpdateEvent(member, oldState) {
     if (oldState === null || member.voiceState === null) {

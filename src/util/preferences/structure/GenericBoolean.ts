@@ -6,7 +6,7 @@ import type { CommandInteraction, ComponentInteraction, SelectMenuComponentInter
 import CommandOption from "../../cmd/CommandOption.js";
 import type UserConfig from "../../../db/Models/UserConfig.js";
 import Config from "../../../config/index.js";
-import { ApplicationCommandOptionTypes, MessageActionRow } from "oceanic.js";
+import { ApplicationCommandOptionTypes, type MessageActionRow } from "oceanic.js";
 import { ButtonColors, ComponentBuilder } from "@oceanicjs/builders";
 import assert from "node:assert";
 

@@ -26,7 +26,7 @@ export default class AutoPostingWebhookModal extends BaseModal {
             const head = await RequestProxy.head(components.avatar);
             if (!head.ok) {
                 return interaction.reply({
-                    content: `A pre-check failed when trying to fetch the image "${components.avatar}".\nA \`HEAD\` request returned a non 2XX response (${head.status} ${STATUS_CODES[head.status]})\n\nThis means we either can't access the file, the server is configured incorrectly, or the file does not exist.`
+                    content: `A pre-check failed when trying to fetch the image "${components.avatar}".\nA \`HEAD\` request returned a non 2XX response (${head.status} ${STATUS_CODES[head.status] || "UNKNOWN"})\n\nThis means we either can't access the file, the server is configured incorrectly, or the file does not exist.`
                 });
             }
 

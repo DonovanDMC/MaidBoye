@@ -1,9 +1,9 @@
 import type { LogEvents } from "../../../db/Models/LogEvent.js";
 import type { ComponentInteraction, ValidLocation } from "../../../util/cmd/Command.js";
-import { BaseState, State } from "../../../util/State.js";
+import { type BaseState, State } from "../../../util/State.js";
 import BaseComponent from "../structure/BaseComponent.js";
 import Util from "../../../util/Util.js";
-import { ModalActionRow, TextInputStyles } from "oceanic.js";
+import { type ModalActionRow, TextInputStyles } from "oceanic.js";
 import { ComponentBuilder } from "@oceanicjs/builders";
 
 export default class LoggingCreateWebhookComponent extends BaseComponent {

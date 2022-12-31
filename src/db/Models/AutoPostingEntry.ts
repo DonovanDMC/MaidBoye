@@ -1,16 +1,16 @@
-import db, { CountResult } from "../index.js";
+import db, { type CountResult } from "../index.js";
 import AutoPostingWebhookFailureHandler from "../../util/handlers/AutoPostingWebhookFailureHandler.js";
 import Config from "../../config/index.js";
 import { Colors } from "../../util/Constants.js";
 import Logger from "../../util/Logger.js";
 import Util from "../../util/Util.js";
 import {
-    AnyGuildTextChannelWithoutThreads,
-    ApplicationCommandOptionsChoice,
-    ApplicationCommandOptionTypes,
-    Client,
+    type AnyGuildTextChannelWithoutThreads,
+    type ApplicationCommandOptionsChoice,
+    type ApplicationCommandOptionTypes,
+    type Client,
     DiscordRESTError,
-    ExecuteWebhookOptions,
+    type ExecuteWebhookOptions,
     JSONErrorCodes
 } from "oceanic.js";
 import { EmbedBuilder } from "@oceanicjs/builders";
@@ -159,7 +159,7 @@ export default class AutoPostingEntry {
     }
 
     async checkNSFW(client: Client, retry = false): Promise<boolean> {
-        const channel = await client.rest.channels.get<AnyGuildTextChannelWithoutThreads>(this.channelID);
+        const channel = await client.rest.channels.get<AnyGuildTextChannelWithoutThreads>(this.channelID).catch(() => null);
         if (channel === null) {
             const check = await this.checkWebhook(client);
             if (check !== null) {
@@ -177,7 +177,7 @@ export default class AutoPostingEntry {
                     .setDescription(`AutoPosting of "${Util.readableConstant(AutoPostingTypes[this.type])}" has been disabled because this channel is not NSFW.`)
                     .setColor(Colors.gold)
                     .toJSON(true)
-            });
+            }).catch(() => null);
             await this.delete();
         }
         return channel.nsfw;

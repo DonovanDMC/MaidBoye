@@ -3,7 +3,7 @@ import LogEvent, { LogEvents } from "../db/Models/LogEvent.js";
 import Util from "../util/Util.js";
 import { Colors } from "../util/Constants.js";
 import { PermissionsByName } from "../util/Names.js";
-import { AuditLogActionTypes, EmbedOptions, Permission, PermissionName } from "oceanic.js";
+import { AuditLogActionTypes, type EmbedOptions, Permission, type PermissionName } from "oceanic.js";
 
 export default new ClientEvent("guildRoleUpdate", async function guildRoleUpdateEvent(role, oldRole) {
     if (oldRole === null) {

@@ -1,5 +1,5 @@
 
-import { AutocompleteInteraction, ValidLocation } from "../../../util/cmd/Command.js";
+import { type AutocompleteInteraction, ValidLocation } from "../../../util/cmd/Command.js";
 import NotImplementedError from "../../../util/NotImplementedError.js";
 import type { AnyAutocompleteFocus } from "../index.js";
 

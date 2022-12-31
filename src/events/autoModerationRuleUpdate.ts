@@ -3,7 +3,7 @@ import LogEvent, { LogEvents } from "../db/Models/LogEvent.js";
 import Util from "../util/Util.js";
 import { Colors } from "../util/Constants.js";
 import { AutoModerationActionTypeNames, AutoModerationEventTypeNames, AutoModerationTriggerTypeNames } from "../util/Names.js";
-import { AuditLogActionTypes, AutoModerationTriggerTypes, EmbedOptions } from "oceanic.js";
+import { AuditLogActionTypes, AutoModerationTriggerTypes, type EmbedOptions } from "oceanic.js";
 
 export default new ClientEvent("autoModerationRuleUpdate", async function autoModerationRuleUpdateEvent(rule, oldRule) {
     if (oldRule === null) {

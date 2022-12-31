@@ -1,6 +1,6 @@
 import Command, { ValidLocation } from "../../../util/cmd/Command.js";
 import Util from "../../../util/Util.js";
-import { ApplicationCommandOptionTypes, MessageActionRow, MessageFlags } from "oceanic.js";
+import { ApplicationCommandOptionTypes, type MessageActionRow, MessageFlags } from "oceanic.js";
 
 const strings = (author: string, text: string) => [
     `<@!${author}> sneaks up being ${text}, and when they aren't looking, tackles them from behind in the biggest hug ever!`,

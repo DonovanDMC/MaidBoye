@@ -1,4 +1,4 @@
-import Command, { CommandInteraction, ComponentInteraction } from "../../../util/cmd/Command.js";
+import Command, { type CommandInteraction, type ComponentInteraction } from "../../../util/cmd/Command.js";
 import E621, { filterPosts } from "../../../util/req/E621.js";
 import E621TagsState from "../../../interactions/components/E621TagsState.js";
 import { State } from "../../../util/State.js";
@@ -8,7 +8,7 @@ import E621Thumbnail from "../../../util/E621Thumbnail.js";
 import Config from "../../../config/index.js";
 import { ButtonColors, ComponentBuilder } from "@oceanicjs/builders";
 import type { Post } from "e621";
-import { ApplicationCommandOptionTypes, InteractionTypes, MessageActionRow } from "oceanic.js";
+import { ApplicationCommandOptionTypes, InteractionTypes, type MessageActionRow } from "oceanic.js";
 
 export const orders = [
     "id", "-id",

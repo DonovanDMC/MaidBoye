@@ -1,16 +1,16 @@
-import Command, { ComponentInteraction, ModalSubmitInteraction, ValidLocation } from "../../../util/cmd/Command.js";
+import Command, { type ComponentInteraction, type ModalSubmitInteraction, ValidLocation } from "../../../util/cmd/Command.js";
 import { Colors, TextableGuildChannels } from "../../../util/Constants.js";
 import Util from "../../../util/Util.js";
 import { State } from "../../../util/State.js";
 import AutoPostingEntry, { AutoPostingCategoryChoices, AutoPostingNSFW, AutoPostingTypes, ValidAutoPostingTimes } from "../../../db/Models/AutoPostingEntry.js";
 import {
-    AnyGuildTextChannelWithoutThreads,
+    type AnyGuildTextChannelWithoutThreads,
     ApplicationCommandOptionTypes,
     ComponentTypes,
     InteractionResolvedChannel,
-    MessageActionRow,
+    type MessageActionRow,
     MessageFlags,
-    Webhook
+    type Webhook
 } from "oceanic.js";
 import { ButtonColors, ComponentBuilder } from "@oceanicjs/builders";
 import chunk from "chunk";

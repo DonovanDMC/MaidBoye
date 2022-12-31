@@ -5,7 +5,7 @@ import Util from "../../../util/Util.js";
 import Config from "../../../config/index.js";
 import { State } from "../../../util/State.js";
 import { ButtonColors, ComponentBuilder } from "@oceanicjs/builders";
-import { ApplicationCommandOptionTypes, MessageActionRow, MessageFlags } from "oceanic.js";
+import { ApplicationCommandOptionTypes, type MessageActionRow, MessageFlags } from "oceanic.js";
 
 
 export default new Command(import.meta.url, "marry")

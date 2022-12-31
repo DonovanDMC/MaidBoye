@@ -2,7 +2,7 @@ import ClientEvent from "../util/ClientEvent.js";
 import LogEvent, { LogEvents } from "../db/Models/LogEvent.js";
 import Util from "../util/Util.js";
 import { Colors } from "../util/Constants.js";
-import { AnyThreadChannel, EmbedOptions, ThreadChannel } from "oceanic.js";
+import { type AnyThreadChannel, type EmbedOptions, ThreadChannel } from "oceanic.js";
 
 export default new ClientEvent("threadMembersUpdate", async function threadMembersUpdateEvent(thread, addedMembers, removedMembers) {
     const eventsAdd = await LogEvent.getType(thread.guildID, LogEvents.THREAD_MEMBER_ADD);

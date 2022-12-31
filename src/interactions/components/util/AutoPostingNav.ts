@@ -1,6 +1,6 @@
 import type { ComponentInteraction, ValidLocation } from "../../../util/cmd/Command.js";
 import { Colors } from "../../../util/Constants.js";
-import { BaseState, State } from "../../../util/State.js";
+import { type BaseState, State } from "../../../util/State.js";
 import Util from "../../../util/Util.js";
 import BaseComponent from "../structure/BaseComponent.js";
 import AutoPostingEntry, { AutoPostingTypes } from "../../../db/Models/AutoPostingEntry.js";

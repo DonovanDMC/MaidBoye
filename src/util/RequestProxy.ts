@@ -38,9 +38,9 @@ export default class RequestProxy {
             }
         });
         return {
-            ok: response.status >= 200 || response.status <= 299,
+            ok:     response.status >= 200 || response.status <= 299,
             status: response.status,
             response
-        }
+        };
     }
 }

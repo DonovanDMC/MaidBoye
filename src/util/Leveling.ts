@@ -6,7 +6,7 @@ import GuildConfig from "../db/Models/GuildConfig.js";
 import Config from "../config/index.js";
 import { Utility } from "@uwu-codes/utils";
 import chunk from "chunk";
-import { AnyGuildTextChannel, GuildCommandInteraction, Message, Interaction } from "oceanic.js";
+import { type AnyGuildTextChannel, type GuildCommandInteraction, type Message, Interaction } from "oceanic.js";
 
 export default class Leveling {
 

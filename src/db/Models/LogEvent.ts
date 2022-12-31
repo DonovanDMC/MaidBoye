@@ -1,12 +1,12 @@
-import db, { CountResult } from "../index.js";
+import db, { type CountResult } from "../index.js";
 import type MaidBoye from "../../main.js";
 import WebhookFailureHandler from "../../util/handlers/LoggingWebhookFailureHandler.js";
 import Util from "../../util/Util.js";
 import {
-    ApplicationCommandOptionsChoice,
-    ApplicationCommandOptionTypes,
+    type ApplicationCommandOptionsChoice,
+    type ApplicationCommandOptionTypes,
     DiscordRESTError,
-    ExecuteWebhookOptions,
+    type ExecuteWebhookOptions,
     JSONErrorCodes
 } from "oceanic.js";
 import chunk from "chunk";

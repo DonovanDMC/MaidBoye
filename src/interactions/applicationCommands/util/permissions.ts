@@ -1,7 +1,7 @@
 import Command, { ValidLocation } from "../../../util/cmd/Command.js";
 import Util from "../../../util/Util.js";
 import { PermissionsByName } from "../../../util/Names.js";
-import { ApplicationCommandOptionTypes, PermissionName, Permissions } from "oceanic.js";
+import { ApplicationCommandOptionTypes, type PermissionName, Permissions } from "oceanic.js";
 
 export default new Command(import.meta.url, "permissions")
     .setDescription("List the permissions of a user")

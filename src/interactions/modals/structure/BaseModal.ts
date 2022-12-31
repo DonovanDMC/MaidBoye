@@ -1,4 +1,4 @@
-import { ModalSubmitInteraction, ValidLocation } from "../../../util/cmd/Command.js";
+import { type ModalSubmitInteraction, ValidLocation } from "../../../util/cmd/Command.js";
 import NotImplementedError from "../../../util/NotImplementedError.js";
 import type { BaseState } from "../../../util/State.js";
 

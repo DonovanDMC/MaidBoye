@@ -1,11 +1,11 @@
 import type MaidBoye from "../../../main.js";
-import Command, { CommandInteraction, ComponentInteraction, ValidLocation } from "../../../util/cmd/Command.js";
+import Command, { type CommandInteraction, type ComponentInteraction, ValidLocation } from "../../../util/cmd/Command.js";
 import Leveling from "../../../util/Leveling.js";
 import Util from "../../../util/Util.js";
 import Config from "../../../config/index.js";
 import { State } from "../../../util/State.js";
 import { Timer } from "@uwu-codes/utils";
-import { ApplicationCommandOptionTypes, InteractionContent, MessageActionRow } from "oceanic.js";
+import { ApplicationCommandOptionTypes, type InteractionContent, type MessageActionRow } from "oceanic.js";
 import { ButtonColors, ComponentBuilder } from "@oceanicjs/builders";
 
 export async function getPage(this: MaidBoye, interaction: CommandInteraction<ValidLocation.GUILD> | ComponentInteraction<ValidLocation.GUILD>, type: "server" | "global", page: number) {

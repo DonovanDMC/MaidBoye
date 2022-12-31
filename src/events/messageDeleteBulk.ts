@@ -5,7 +5,7 @@ import { Colors } from "../util/Constants.js";
 import Config from "../config/index.js";
 import EncryptionHandler from "../util/handlers/EncryptionHandler.js";
 import type { BulkDeleteReport } from "../util/@types/misc.js";
-import { AnyGuildTextChannel, AuditLogActionTypes, Message, Uncached } from "oceanic.js";
+import { type AnyGuildTextChannel, AuditLogActionTypes, type Message, type Uncached } from "oceanic.js";
 import { writeFile } from "node:fs/promises";
 import { randomBytes } from "node:crypto";
 

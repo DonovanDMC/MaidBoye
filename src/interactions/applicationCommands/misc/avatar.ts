@@ -2,7 +2,7 @@ import Command from "../../../util/cmd/Command.js";
 import Config from "../../../config/index.js";
 import Util from "../../../util/Util.js";
 import { ComponentBuilder } from "@oceanicjs/builders";
-import { ApplicationCommandOptionTypes, MessageActionRow, MessageFlags } from "oceanic.js";
+import { ApplicationCommandOptionTypes, type MessageActionRow, MessageFlags } from "oceanic.js";
 
 export default new Command(import.meta.url, "avatar")
     .setDescription("Get someone's avatar..")

@@ -1,7 +1,7 @@
 import Config from "../config/index.js";
 import {
-    GuildFeature,
-    PermissionName,
+    type GuildFeature,
+    type PermissionName,
     GatewayOPCodes,
     InteractionTypes,
     ApplicationCommandTypes,
@@ -57,12 +57,12 @@ export const UserFlagNames: Record<UserFlags, string> = {
     [UserFlags.BOT_HTTP_INTERACTIONS]: `${badges.botHTTPInteractions} HTTP Interactions Bot`,
     [UserFlags.SPAMMER]:               `${badges.spammer} Spammer`,
     [UserFlags.ACTIVE_DEVELOPER]:      `${badges.activeDeveloper} Active Developer`
-};
+} satisfies Record<UserFlags, string>;
 
 export function getFeatureName(feature: GuildFeature) {
     return `${GuildFeatureNames[feature]}${GuildFeatureDescriptions[feature] ? `[*](${Config.apiURL}/features/${feature})` : ""}`;
 }
-export const GuildFeatureNames: Record<GuildFeature, string> = {
+export const GuildFeatureNames = {
     AUTO_MODERATION:                           "Auto Moderation",
     ANIMATED_BANNER:                           `${serverFeatures.animatedBanner} Animated Banner`,
     ANIMATED_ICON:                             `${serverFeatures.animatedIcon} Animated Icon`,
@@ -73,6 +73,7 @@ export const GuildFeatureNames: Record<GuildFeature, string> = {
     CREATOR_MONETIZABLE:                       "Creator Monetizable",
     CREATOR_MONETIZABLE_DISABLED:              "Creator Monetizable Disabled",
     CREATOR_MONETIZABLE_PROVISIONAL:           "Creator Monetizable Provisional",
+    CREATOR_STORE_PAGE:                        "Creator Store Page",
     DEVELOPER_SUPPORT_SERVER:                  "Developer Support Server",
     DISCOVERABLE:                              `${serverFeatures.discoverable} Discoverable`,
     DISCOVERABLE_DISABLED:                     "Discoverable Disabled",
@@ -100,6 +101,7 @@ export const GuildFeatureNames: Record<GuildFeature, string> = {
     PREVIEW_ENABLED:                           `${serverFeatures.previewEnabled} Preview Enabled`,
     PREVIOUSLY_DISCOVERABLE:                   `${serverFeatures.previouslyDiscoverable} Previously Discoverable`,
     PRIVATE_THREADS:                           `${serverFeatures.privateThreads} Private Threads`,
+    RAID_ALERTS_ENABLED:                       "Raid Alerts Enabled",
     ROLE_ICONS:                                `${serverFeatures.roleIcons} Role Icons`,
     ROLE_SUBSCRIPTIONS_AVAILABLE_FOR_PURCHASE: "Role Subscriptions Available For Purchase",
     ROLE_SUBSCRIPTIONS_ENABLED:                `${serverFeatures.roleSubscriptionsEnabled} Role Subscriptions Enabled`,
@@ -113,10 +115,10 @@ export const GuildFeatureNames: Record<GuildFeature, string> = {
     VERIFIED:                                  `${serverFeatures.verified} Verified`,
     VIP_REGIONS:                               `${serverFeatures.vipRegions} 384kbps Voice Bitrate`,
     WELCOME_SCREEN_ENABLED:                    `${serverFeatures.welcomeScreenEnabled} Welcome Screen Enabled`
-};
+} satisfies Record<GuildFeature, string>;
 
 // anything with an asterisk uses an unofficial description made by me
-export const GuildFeatureDescriptions: Record<GuildFeature, string | null> = {
+export const GuildFeatureDescriptions = {
     AUTO_MODERATION:                           "Guild has set up auto moderation rules",
     ANIMATED_BANNER:                           "Guild has access to set an animated guild banner image",
     ANIMATED_ICON:                             "Guild has access to set an animated guild icon",
@@ -127,6 +129,7 @@ export const GuildFeatureDescriptions: Record<GuildFeature, string | null> = {
     CREATOR_MONETIZABLE:                       null,
     CREATOR_MONETIZABLE_DISABLED:              null,
     CREATOR_MONETIZABLE_PROVISIONAL:           null,
+    CREATOR_STORE_PAGE:                        null,
     DEVELOPER_SUPPORT_SERVER:                  null,
     DISCOVERABLE:                              "Guild is able to be discovered in the directory",
     DISCOVERABLE_DISABLED:                     "Guild is not able to be discovered in the directory, and it cannot be enabled", // *
@@ -154,6 +157,7 @@ export const GuildFeatureDescriptions: Record<GuildFeature, string | null> = {
     PREVIEW_ENABLED:                           "Guild can be previewed before joining via Membership Screening or the directory",
     PREVIOUSLY_DISCOVERABLE:                   "Guild has previously been discoverable, but is not currently", // *
     PRIVATE_THREADS:                           "Guild has access to private threads", // *
+    RAID_ALERTS_ENABLED:                       "Guild has enabled raid alerts", // *
     ROLE_ICONS:                                "Guild is able to set role icons",
     ROLE_SUBSCRIPTIONS_AVAILABLE_FOR_PURCHASE: "Guild has role subscriptions that can be purchased", // *
     ROLE_SUBSCRIPTIONS_ENABLED:                "Guild has access to role subscriptions", // *
@@ -167,32 +171,33 @@ export const GuildFeatureDescriptions: Record<GuildFeature, string | null> = {
     VERIFIED:                                  "Guild is verified",
     VIP_REGIONS:                               "Guild has access to set 384kbps bitrate in voice (previously VIP voice servers)",
     WELCOME_SCREEN_ENABLED:                    "Guild has enabled the welcome screen"
-};
+} satisfies Record<GuildFeature, string | null>;
 
 export const DefaultMessageNotificationLevelNames = {
     [DefaultMessageNotificationLevels.ALL_MESSAGES]:  "All Messages",
     [DefaultMessageNotificationLevels.ONLY_MENTIONS]: "Only Mentions",
     [DefaultMessageNotificationLevels.NO_MESSAGES]:   "No Messages",
     [DefaultMessageNotificationLevels.NULL]:          "Default"
-};
+} satisfies Record<DefaultMessageNotificationLevels, string>;
 
 export const ExplicitContentFilterLevelNames = {
     [ExplicitContentFilterLevels.DISABLED]:              "Disabled",
     [ExplicitContentFilterLevels.MEMBERS_WITHOUT_ROLES]: "Members Without Roles",
     [ExplicitContentFilterLevels.ALL_MEMBERS]:           "All Members"
-};
+} satisfies Record<ExplicitContentFilterLevels, string>;
 
 export const GuildNSFWLevelNames = {
     [GuildNSFWLevels.DEFAULT]:        "Default",
     [GuildNSFWLevels.EXPLICIT]:       "Explicit",
     [GuildNSFWLevels.SAFE]:           "Safe",
     [GuildNSFWLevels.AGE_RESTRICTED]: "Age Restricted"
-};
+} satisfies Record<GuildNSFWLevels, string>;
 
 export const InviteTargetTypeNames = {
-    [InviteTargetTypes.STREAM]:               "Stream",
-    [InviteTargetTypes.EMBEDDED_APPLICATION]: "Embedded Application"
-};
+    [InviteTargetTypes.STREAM]:                      "Stream",
+    [InviteTargetTypes.EMBEDDED_APPLICATION]:        "Embedded Application",
+    [InviteTargetTypes.ROLE_SUBSCRIPTIONS_PURCHASE]: "Role Subscriptions Purchase"
+} satisfies Record<InviteTargetTypes, string>;
 
 export const MessageFlagNames = {
     [MessageFlags.CROSSPOSTED]:                            "Crossposted",
@@ -205,7 +210,7 @@ export const MessageFlagNames = {
     [MessageFlags.LOADING]:                                "Loading",
     [MessageFlags.FAILED_TO_MENTION_SOME_ROLES_IN_THREAD]: "Failed to Mention Some Roles in Thread",
     [MessageFlags.SHOULD_SHOW_LINK_NOT_DISCORD_WARNING]:   "Should Show Link Not Discord Warning"
-};
+} satisfies Record<MessageFlags, string>;
 
 export const MessageTypeNames = {
     [MessageTypes.DEFAULT]:                                      "Default",
@@ -241,7 +246,7 @@ export const MessageTypeNames = {
     [MessageTypes.STAGE_RAISE_HAND]:                             "Stage Raise Hand",
     [MessageTypes.STAGE_TOPIC_CHANGE]:                           "Stage Topic Change",
     [MessageTypes.GUILD_APPLICATION_PREMIUM_SUBSCRIPTION]:       "Guild Application Premium Subscription"
-};
+} satisfies Record<MessageTypes, string>;
 
 export const PermissionNames = {
     [String(Permissions.CREATE_INSTANT_INVITE)]:               "Create Instant Invite",
@@ -296,20 +301,20 @@ export const PremiumTierNames = {
     [PremiumTiers.TIER_1]: "Tier 1",
     [PremiumTiers.TIER_2]: "Tier 2",
     [PremiumTiers.TIER_3]: "Tier 3"
-};
+} satisfies Record<PremiumTiers, string>;
 
 export const GuildScheduledEventStatusNames = {
     [GuildScheduledEventStatuses.SCHEDULED]: "Scheduled",
     [GuildScheduledEventStatuses.ACTIVE]:    "Active",
     [GuildScheduledEventStatuses.COMPLETED]: "Completed",
     [GuildScheduledEventStatuses.CANCELED]:  "Canceled"
-};
+} satisfies Record<GuildScheduledEventStatuses, string>;
 
 export const GuildScheduledEventEntityTypeNames = {
     [GuildScheduledEventEntityTypes.STAGE_INSTANCE]: "Stage Instance",
     [GuildScheduledEventEntityTypes.VOICE]:          "Voice",
     [GuildScheduledEventEntityTypes.EXTERNAL]:       "External"
-};
+} satisfies Record<GuildScheduledEventEntityTypes, string>;
 
 export const GuildScheduledEventPrivacyLevelNames = {
     [GuildScheduledEventPrivacyLevels.GUILD_ONLY]: "Guild Only"
@@ -318,18 +323,19 @@ export const GuildScheduledEventPrivacyLevelNames = {
 export const PremiumTypeNames = {
     [PremiumTypes.NONE]:          "None",
     [PremiumTypes.NITRO_CLASSIC]: "Nitro Classic",
-    [PremiumTypes.NITRO]:         "Nitro"
-};
+    [PremiumTypes.NITRO]:         "Nitro",
+    [PremiumTypes.NITRO_BASIC]:   "Nitro Basic"
+} satisfies Record<PremiumTypes, string>;
 
 export const StageInstancePrivacyLevelNames = {
     [StageInstancePrivacyLevels.PUBLIC]:     "Public",
     [StageInstancePrivacyLevels.GUILD_ONLY]: "Guild Only"
-};
+} satisfies Record<StageInstancePrivacyLevels, string>;
 
 export const StickerTypeNames = {
     [StickerTypes.STANDARD]: "Standard",
     [StickerTypes.GUILD]:    "Guild"
-};
+} satisfies Record<StickerTypes, string>;
 
 export const SystemChannelFlagNames = {
     [SystemChannelFlags.SUPPRESS_JOIN_NOTIFICATIONS]:                              "Suppress Join Notifications",
@@ -338,14 +344,14 @@ export const SystemChannelFlagNames = {
     [SystemChannelFlags.SUPPRESS_JOIN_NOTIFICATION_REPLIES]:                       "Suppress Join Notification Replies",
     [SystemChannelFlags.SUPPRESS_ROLE_SUBSCRIPTION_PURCHASE_NOTIFICATIONS]:        "Suppress Role Subscription Purchase Notifications",
     [SystemChannelFlags.SUPPRESS_ROLE_SUBSCRIPTION_PURCHASE_NOTIFICATION_REPLIES]: "Suppress Role Subscription Purchase Notification Replies"
-};
+} satisfies Record<SystemChannelFlags, string>;
 
 export const ThreadMemberFlagNames = {
     [ThreadMemberFlags.HAS_INTERACTED]: "Has Interaction",
     [ThreadMemberFlags.ALL_MESSAGES]:   "All Messages",
     [ThreadMemberFlags.ONLY_MENTIONS]:  "Only Mentions",
     [ThreadMemberFlags.NO_MESSAGES]:    "No Messages"
-};
+} satisfies Record<ThreadMemberFlags, string>;
 
 export const VerificationLevelNames = {
     [VerificationLevels.NONE]:      "None",
@@ -353,18 +359,18 @@ export const VerificationLevelNames = {
     [VerificationLevels.MEDIUM]:    "Medium",
     [VerificationLevels.HIGH]:      "High",
     [VerificationLevels.VERY_HIGH]: "Very High"
-};
+} satisfies Record<VerificationLevels, string>;
 
 export const VideoQualityModeNames = {
     [VideoQualityModes.AUTO]: "Auto",
     [VideoQualityModes.FULL]: "Full 720p"
-};
+} satisfies Record<VideoQualityModes, string>;
 
 export const WebhookTypeNames = {
     [WebhookTypes.INCOMING]:         "Incoming",
     [WebhookTypes.CHANNEL_FOLLOWER]: "Channel Follower",
     [WebhookTypes.APPLICATION]:      "Application"
-};
+} satisfies Record<WebhookTypes, string>;
 
 export const ChannelTypeNames = {
     [ChannelTypes.GUILD_TEXT]:          "Text",
@@ -379,19 +385,18 @@ export const ChannelTypeNames = {
     [ChannelTypes.GUILD_STAGE_VOICE]:   "Stage Voice",
     [ChannelTypes.GUILD_DIRECTORY]:     "Directory",
     [ChannelTypes.GUILD_FORUM]:         "Forum"
-};
+} satisfies Record<ChannelTypes, string>;
 
 export const MFALevelNames = {
     [MFALevels.NONE]:     "None",
     [MFALevels.ELEVATED]: "Required"
-};
+} satisfies Record<MFALevels, string>;
 
 export const ApplicationCommandTypeNames = {
     [ApplicationCommandTypes.CHAT_INPUT]: "Chat Input",
     [ApplicationCommandTypes.USER]:       "User",
     [ApplicationCommandTypes.MESSAGE]:    "Message"
-
-};
+} satisfies Record<ApplicationCommandTypes, string>;
 
 export const InteractionTypeNames  = {
     [InteractionTypes.PING]:                             "Ping",
@@ -399,7 +404,7 @@ export const InteractionTypeNames  = {
     [InteractionTypes.MESSAGE_COMPONENT]:                "Message Component",
     [InteractionTypes.APPLICATION_COMMAND_AUTOCOMPLETE]: "Application Command Autocomplete",
     [InteractionTypes.MODAL_SUBMIT]:                     "Modal Submit"
-};
+} satisfies Record<InteractionTypes, string>;
 
 export const ApplicationCommandOptionTypeNames = {
     [ApplicationCommandOptionTypes.SUB_COMMAND]:       "Sub Command",
@@ -413,7 +418,7 @@ export const ApplicationCommandOptionTypeNames = {
     [ApplicationCommandOptionTypes.MENTIONABLE]:       "Mentionable",
     [ApplicationCommandOptionTypes.NUMBER]:            "Number",
     [ApplicationCommandOptionTypes.ATTACHMENT]:        "Attachment"
-};
+} satisfies Record<ApplicationCommandOptionTypes, string>;
 
 export const GatewayOPCodeNames = {
     [GatewayOPCodes.DISPATCH]:              "Dispatch",
@@ -427,25 +432,25 @@ export const GatewayOPCodeNames = {
     [GatewayOPCodes.INVALID_SESSION]:       "Invalid Session",
     [GatewayOPCodes.HELLO]:                 "Hello",
     [GatewayOPCodes.HEARTBEAT_ACK]:         "Heartbeat Acknowledgement"
-};
+} satisfies Record<GatewayOPCodes, string>;
 
 export const SortOrderTypeNames = {
     [SortOrderTypes.LATEST_ACTIVITY]: "Latest Activity",
     [SortOrderTypes.CREATION_DATE]:   "Creation Date"
-};
+} satisfies Record<SortOrderTypes, string>;
 
 export const AutoModerationActionTypeNames = {
     [AutoModerationActionTypes.BLOCK_MESSAGE]:      "Block Message",
     [AutoModerationActionTypes.SEND_ALERT_MESSAGE]: "Send Alert Message",
     [AutoModerationActionTypes.TIMEOUT]:            "Timeout"
-};
+} satisfies Record<AutoModerationActionTypes, string>;
 
 export const AutoModerationTriggerTypeNames = {
     [AutoModerationTriggerTypes.KEYWORD]:        "Keyword",
     [AutoModerationTriggerTypes.SPAM]:           "Spam",
     [AutoModerationTriggerTypes.KEYWORD_PRESET]: "Keyword Preset",
     [AutoModerationTriggerTypes.MENTION_SPAM]:   "Mention Spam"
-};
+} satisfies Record<AutoModerationTriggerTypes, string>;
 
 export const AutoModerationKeywordPresetTypeNames = {
     [AutoModerationKeywordPresetTypes.PROFANITY]:      "Profanity",
@@ -455,15 +460,15 @@ export const AutoModerationKeywordPresetTypeNames = {
 
 export const AutoModerationEventTypeNames = {
     [AutoModerationEventTypes.MESSAGE_SEND]: "Message Send"
-};
+} satisfies Record<AutoModerationEventTypes, string>;
 
 export const IntegrationExpireBehaviorNames = {
     [IntegrationExpireBehaviors.REMOVE_ROLE]: "Remove Role",
     [IntegrationExpireBehaviors.KICK]:        "Kick"
-};
+} satisfies Record<IntegrationExpireBehaviors, string>;
 
 export const StickerFormatTypeNames = {
     [StickerFormatTypes.PNG]:    "PNG",
     [StickerFormatTypes.APNG]:   "APNG",
     [StickerFormatTypes.LOTTIE]: "Lottie"
-};
+} satisfies Record<StickerFormatTypes, string>;

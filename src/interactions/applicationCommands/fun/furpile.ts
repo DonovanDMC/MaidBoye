@@ -4,7 +4,7 @@ import { State } from "../../../util/State.js";
 import db from "../../../db/index.js";
 import Config from "../../../config/index.js";
 import { ButtonColors, ComponentBuilder } from "@oceanicjs/builders";
-import { ApplicationCommandOptionTypes, MessageActionRow, MessageFlags } from "oceanic.js";
+import { ApplicationCommandOptionTypes, type MessageActionRow, MessageFlags } from "oceanic.js";
 
 export default new Command(import.meta.url, "furpile")
     .setDescription("Start a furpile on someone")

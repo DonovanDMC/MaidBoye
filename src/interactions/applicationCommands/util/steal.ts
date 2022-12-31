@@ -5,12 +5,13 @@ import { Strings } from "@uwu-codes/utils";
 import {
     ApplicationCommandOptionTypes,
     DiscordRESTError,
-    GuildEmoji,
+    type GuildEmoji,
     JSONErrorCodes,
-    Sticker
+    type Sticker
 } from "oceanic.js";
 import assert from "node:assert";
 import { basename } from "node:path";
+import { STATUS_CODES } from "node:http";
 
 export default new Command(import.meta.url, "steal")
     .setDescription("Steal an emoji for this server, or create one from a url")
@@ -131,7 +132,7 @@ export default new Command(import.meta.url, "steal")
         }
         const head = await RequestProxy.head(url);
         if (head.status !== 200 && head.status !== 204) {
-            return interaction.reply({ content: `A pre-check failed when trying to fetch the image "${url}".\nA \`HEAD\` request returned a non 200 OK/204 No Content responses (${head.status} ${head.statusText})\n\nThis means we either can't access the file, the server is configured incorrectly, or the file does not exist.` });
+            return interaction.reply({ content: `A pre-check failed when trying to fetch the image "${url}".\nA \`HEAD\` request returned a non 200 OK/204 No Content responses (${head.status} ${STATUS_CODES[head.status] || "UNKNOWN"})\n\nThis means we either can't access the file, the server is configured incorrectly, or the file does not exist.` });
         }
         switch (outputType) {
             case "emoji": {
@@ -143,7 +144,7 @@ export default new Command(import.meta.url, "steal")
                     }
                 }
                 name = Strings.truncate(name, 32);
-                const buf = Buffer.from(await (await RequestProxy.get(url)).arrayBuffer());
+                const buf = Buffer.from(await (await RequestProxy.get(url)).response.arrayBuffer());
                 let emoji: GuildEmoji;
                 try {
                     emoji = await interaction.guild.createEmoji({
@@ -178,7 +179,7 @@ export default new Command(import.meta.url, "steal")
                         description: description || "",
                         tags,
                         file:        {
-                            contents: Buffer.from(await (await RequestProxy.get(url)).arrayBuffer()),
+                            contents: Buffer.from(await (await RequestProxy.get(url)).response.arrayBuffer()),
                             name:     basename(new URL(url).pathname) || "sticker"
                         }
                     });

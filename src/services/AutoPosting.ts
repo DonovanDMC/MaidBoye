@@ -1,6 +1,6 @@
 import Config from "../config/index.js";
 import Service from "../util/Service.js";
-import AutoPostingEntry, { AutoPostingTime, AutoPostingTypes, ValidAutoPostingTimes } from "../db/Models/AutoPostingEntry.js";
+import AutoPostingEntry, { type AutoPostingTime, AutoPostingTypes, ValidAutoPostingTimes } from "../db/Models/AutoPostingEntry.js";
 import Yiffy from "../util/req/Yiffy.js";
 import CheweyAPI from "../util/req/CheweyAPI.js";
 import db from "../db/index.js";
@@ -330,7 +330,6 @@ export default class AutoPostingService extends Service {
                 ])
                 .toJSON(true)
         });
-        console.log(messageID);
         if (messageID !== null) {
             await this.masterCommand("ATTEMPT_CROSSPOST", { channelID: entry.channelID, messageID });
         }
@@ -351,7 +350,7 @@ export default class AutoPostingService extends Service {
                 const entries = await AutoPostingEntry.getTime(time as 5);
                 for (const entry of entries) {
                     await this.execute(entry).catch(err => {
-                        Logger.getLogger("AutoPosting").error(`Failed to execute entry ${entry.id} (${entry.type})`, err);
+                        Logger.getLogger("AutoPosting").error(`Failed to execute entry ${entry.id} (${AutoPostingTypes[entry.type]})`, err);
                     });
                 }
             }

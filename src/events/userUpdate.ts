@@ -2,7 +2,7 @@ import ClientEvent from "../util/ClientEvent.js";
 import LogEvent, { LogEvents } from "../db/Models/LogEvent.js";
 import Util from "../util/Util.js";
 import { Colors } from "../util/Constants.js";
-import { EmbedOptions, UserFlags } from "oceanic.js";
+import { type EmbedOptions, UserFlags } from "oceanic.js";
 
 export default new ClientEvent("userUpdate", async function userUpdateEvent(user, oldUser) {
     if (oldUser === null) {

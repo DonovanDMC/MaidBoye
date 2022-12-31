@@ -2,7 +2,7 @@ import ClientEvent from "../util/ClientEvent.js";
 import LogEvent, { LogEvents } from "../db/Models/LogEvent.js";
 import Util from "../util/Util.js";
 import { Colors } from "../util/Constants.js";
-import { AuditLogActionTypes, ChannelFlags, ChannelTypes, EmbedOptions } from "oceanic.js";
+import { AuditLogActionTypes, ChannelFlags, ChannelTypes, type EmbedOptions } from "oceanic.js";
 import { Time } from "@uwu-codes/utils";
 
 export default new ClientEvent("threadUpdate", async function threadUpdateEvent(thread, oldThread) {

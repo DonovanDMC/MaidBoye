@@ -1,4 +1,4 @@
-import Command, { CommandInteraction, ComponentInteraction, ValidLocation } from "../../../util/cmd/Command.js";
+import Command, { type CommandInteraction, type ComponentInteraction, ValidLocation } from "../../../util/cmd/Command.js";
 import type MaidBoye from "../../../main.js";
 import Strike from "../../../db/Models/Strike.js";
 import Warning from "../../../db/Models/Warning.js";
@@ -10,7 +10,7 @@ import Config from "../../../config/index.js";
 import { ButtonColors, ComponentBuilder } from "@oceanicjs/builders";
 import chunk from "chunk";
 import { Strings } from "@uwu-codes/utils";
-import { ApplicationCommandOptionTypes, InteractionTypes, MessageActionRow, User } from "oceanic.js";
+import { ApplicationCommandOptionTypes, InteractionTypes, type MessageActionRow, type User } from "oceanic.js";
 
 export async function mainMenu(this: MaidBoye, interaction: CommandInteraction<ValidLocation.GUILD> | ComponentInteraction<ValidLocation.GUILD>, user: User) {
     const strikes = await Strike.getForUser(interaction.guildID, user.id, "DESC");

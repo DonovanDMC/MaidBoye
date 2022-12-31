@@ -1,4 +1,5 @@
-import LogEvent, { LogEvents } from "../../db/Models/LogEvent.js";
+import type LogEvent from "../../db/Models/LogEvent.js";
+import { LogEvents } from "../../db/Models/LogEvent.js";
 import type MaidBoye from "../../main.js";
 import { Colors } from "../Constants.js";
 import Logger from "../Logger.js";

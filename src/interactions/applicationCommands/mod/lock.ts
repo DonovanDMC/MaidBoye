@@ -5,7 +5,7 @@ import Util from "../../../util/Util.js";
 import { Colors, lockPermissions, lockPermissionsList, TextableGuildChannels } from "../../../util/Constants.js";
 import db from "../../../db/index.js";
 import { Strings } from "@uwu-codes/utils";
-import { AnyGuildTextChannelWithoutThreads, ApplicationCommandOptionTypes, OverwriteTypes } from "oceanic.js";
+import { type AnyGuildTextChannelWithoutThreads, ApplicationCommandOptionTypes, OverwriteTypes } from "oceanic.js";
 
 export default new Command(import.meta.url, "lock")
     .setDescription("Block messages in a channel..")

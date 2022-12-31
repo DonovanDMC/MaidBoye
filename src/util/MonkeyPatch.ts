@@ -1,9 +1,9 @@
 import {
-    AutocompleteChoice,
+    type AutocompleteChoice,
     AutocompleteInteraction,
     CommandInteraction,
     ComponentInteraction,
-    InteractionContent,
+    type InteractionContent,
     ModalSubmitInteraction
 } from "oceanic.js";
 

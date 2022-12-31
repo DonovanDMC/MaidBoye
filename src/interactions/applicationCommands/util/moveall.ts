@@ -2,9 +2,9 @@ import Command, { ValidLocation } from "../../../util/cmd/Command.js";
 import {
     ApplicationCommandOptionTypes,
     ChannelTypes,
-    PermissionName,
-    StageChannel,
-    VoiceChannel
+    type PermissionName,
+    type StageChannel,
+    type VoiceChannel
 } from "oceanic.js";
 
 export default new Command(import.meta.url, "moveall")

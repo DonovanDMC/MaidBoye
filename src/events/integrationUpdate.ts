@@ -3,7 +3,7 @@ import LogEvent, { LogEvents } from "../db/Models/LogEvent.js";
 import Util from "../util/Util.js";
 import { Colors } from "../util/Constants.js";
 import { IntegrationExpireBehaviorNames } from "../util/Names.js";
-import { AuditLogActionTypes, EmbedOptions, Guild } from "oceanic.js";
+import { AuditLogActionTypes, type EmbedOptions, Guild } from "oceanic.js";
 
 export default new ClientEvent("integrationUpdate", async function integrationUpdateEvent(guild, integration, oldIntegration) {
     if (oldIntegration === null) {

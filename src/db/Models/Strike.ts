@@ -1,4 +1,4 @@
-import db, { CountResult } from "../index.js";
+import db, { type CountResult } from "../index.js";
 import type MaidBoye from "../../main.js";
 import { Strings } from "@uwu-codes/utils";
 import assert from "node:assert";

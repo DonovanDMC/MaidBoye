@@ -6,7 +6,7 @@ import pkg from "../../../../package.json" assert { type: "json" };
 import lock from "../../../../package-lock.json" assert { type: "json" };
 import { ComponentBuilder } from "@oceanicjs/builders";
 import { Strings, Time } from "@uwu-codes/utils";
-import { GATEWAY_VERSION, REST_VERSION, VERSION, MessageActionRow } from "oceanic.js";
+import { GATEWAY_VERSION, REST_VERSION, VERSION, type MessageActionRow } from "oceanic.js";
 import { freemem, totalmem } from "node:os";
 import { memoryUsage, uptime } from "node:process";
 

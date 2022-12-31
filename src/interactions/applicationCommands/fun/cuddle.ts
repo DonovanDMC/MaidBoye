@@ -1,6 +1,6 @@
 import Command, { ValidLocation } from "../../../util/cmd/Command.js";
 import Util from "../../../util/Util.js";
-import { ApplicationCommandOptionTypes, MessageActionRow, MessageFlags } from "oceanic.js";
+import { ApplicationCommandOptionTypes, type MessageActionRow, MessageFlags } from "oceanic.js";
 
 const strings = (author: string, text: string) => [
     `<@!${author}> has cuddled ${text}!\nAren't they cute?`,

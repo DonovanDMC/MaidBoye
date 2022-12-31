@@ -2,7 +2,7 @@ import ClientEvent from "../util/ClientEvent.js";
 import LogEvent, { LogEvents } from "../db/Models/LogEvent.js";
 import Util from "../util/Util.js";
 import { Colors } from "../util/Constants.js";
-import { AuditLogActionTypes, Channel, StageChannel, VoiceChannel } from "oceanic.js";
+import { AuditLogActionTypes, Channel, type StageChannel, type VoiceChannel } from "oceanic.js";
 
 export default new ClientEvent("voiceChannelJoin", async function voiceChannelJoinEvent(member, inputChannel) {
     if (!(inputChannel instanceof Channel)) {

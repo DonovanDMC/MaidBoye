@@ -8,7 +8,7 @@ import type { YiffTypes } from "../../../db/Models/UserConfig.js";
 import UserConfig from "../../../db/Models/UserConfig.js";
 import { ComponentBuilder, ButtonColors } from "@oceanicjs/builders";
 import { Strings } from "@uwu-codes/utils";
-import { ApplicationCommandOptionTypes, MessageActionRow } from "oceanic.js";
+import { ApplicationCommandOptionTypes, type MessageActionRow } from "oceanic.js";
 
 export default new Command(import.meta.url, "yiff")
     .setDescription("Y-you know what this is..")

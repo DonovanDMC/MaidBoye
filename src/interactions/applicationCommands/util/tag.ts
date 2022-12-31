@@ -1,4 +1,4 @@
-import Command, { CommandInteraction, ValidLocation } from "../../../util/cmd/Command.js";
+import Command, { type CommandInteraction, ValidLocation } from "../../../util/cmd/Command.js";
 import type GuildConfig from "../../../db/Models/GuildConfig.js";
 import Util from "../../../util/Util.js";
 import { State } from "../../../util/State.js";
@@ -7,7 +7,7 @@ import Config from "../../../config/index.js";
 import chunk from "chunk";
 import { ButtonColors, ComponentBuilder } from "@oceanicjs/builders";
 import { Strings } from "@uwu-codes/utils";
-import { ApplicationCommandOptionTypes, InteractionContent, MessageActionRow } from "oceanic.js";
+import { ApplicationCommandOptionTypes, type InteractionContent, type MessageActionRow } from "oceanic.js";
 import assert from "node:assert";
 
 async function getTag(client: MaidBoye, name: string, info: GuildConfig["tags"][string], index: number, page: number, WithContent: boolean) {

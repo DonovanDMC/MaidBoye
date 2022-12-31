@@ -33,7 +33,7 @@ import type {
 } from "../@types/modlog.js";
 import Warning from "../../db/Models/Warning.js";
 import { Time } from "@uwu-codes/utils";
-import { Guild, Member, User } from "oceanic.js";
+import { type Guild, Member, User } from "oceanic.js";
 import { randomUUID } from "node:crypto";
 
 export default class ModLogHandler {

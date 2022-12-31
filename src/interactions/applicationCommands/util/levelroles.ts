@@ -1,4 +1,4 @@
-import Command, { CommandInteraction, ComponentInteraction, ValidLocation } from "../../../util/cmd/Command.js";
+import Command, { type CommandInteraction, type ComponentInteraction, ValidLocation } from "../../../util/cmd/Command.js";
 import type MaidBoye from "../../../main.js";
 import type GuildConfig from "../../../db/Models/GuildConfig.js";
 import Util from "../../../util/Util.js";
@@ -6,7 +6,7 @@ import { State } from "../../../util/State.js";
 import Config from "../../../config/index.js";
 import chunk from "chunk";
 import { ButtonColors, ComponentBuilder } from "@oceanicjs/builders";
-import { ApplicationCommandOptionTypes, InteractionContent, MessageActionRow } from "oceanic.js";
+import { ApplicationCommandOptionTypes, type InteractionContent, type MessageActionRow } from "oceanic.js";
 import assert from "node:assert";
 
 export async function getPage(this: MaidBoye, interaction: CommandInteraction<ValidLocation.GUILD> | ComponentInteraction<ValidLocation.GUILD>, gConfig: GuildConfig, page: number) {

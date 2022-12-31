@@ -13,10 +13,10 @@ import {
 } from "../util/Names.js";
 import {
     AuditLogActionTypes,
-    EmbedOptions,
-    GuildFeature,
+    type EmbedOptions,
+    type GuildFeature,
     SystemChannelFlags,
-    WelcomeScreenChannel
+    type WelcomeScreenChannel
 } from "oceanic.js";
 import { Time } from "@uwu-codes/utils";
 

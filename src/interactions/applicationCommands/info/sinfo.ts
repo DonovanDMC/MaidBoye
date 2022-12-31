@@ -1,4 +1,4 @@
-import Command, { CommandInteraction, ComponentInteraction, ValidLocation } from "../../../util/cmd/Command.js";
+import Command, { type CommandInteraction, type ComponentInteraction, ValidLocation } from "../../../util/cmd/Command.js";
 import Util from "../../../util/Util.js";
 import type MaidBoye from "../../../main.js";
 import {
@@ -13,7 +13,7 @@ import {
 import { State } from "../../../util/State.js";
 import Config from "../../../config/index.js";
 import { ButtonColors, ComponentBuilder } from "@oceanicjs/builders";
-import { ApplicationCommandOptionTypes, ChannelTypes, InteractionContent, MessageActionRow } from "oceanic.js";
+import { ApplicationCommandOptionTypes, ChannelTypes, type InteractionContent, type MessageActionRow } from "oceanic.js";
 
 export type SectionNames = keyof Awaited<ReturnType<typeof generateSections>>;
 export async function generateSections(this: MaidBoye, interaction: CommandInteraction<ValidLocation.GUILD> | ComponentInteraction<ValidLocation.GUILD>) {

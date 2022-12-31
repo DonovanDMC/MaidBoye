@@ -7,7 +7,7 @@ import Util from "../../../../util/Util.js";
 import Settings from "../../../../util/settings/index.js";
 import Config from "../../../../config/index.js";
 import { ButtonColors, ComponentBuilder } from "@oceanicjs/builders";
-import { ComponentTypes, MessageActionRow, User } from "oceanic.js";
+import { ComponentTypes, type MessageActionRow, type User } from "oceanic.js";
 import assert from "node:assert";
 
 export function formatEmbed(page: number, gConfig: GuildConfig, author: User) {
