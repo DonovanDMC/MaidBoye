@@ -5,8 +5,6 @@ services:
     volumes:
       - ./data/bot:/data
       - /etc/hostname:/data/hostname
-    environment:
-      DOCKER: 1
     restart: always
     healthcheck:
       interval: 10s

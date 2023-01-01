@@ -12,7 +12,6 @@ import {
     Strings,
     Time,
     Timer,
-    Timers,
     Utility,
     ReNice
 } from "@uwu-codes/utils";
@@ -41,7 +40,6 @@ const evalVariables: Record<string, unknown> = {
     Strings,
     Time,
     Timer,
-    Timers,
     Utility,
     ReNice,
     RequestProxy,

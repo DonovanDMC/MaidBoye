@@ -39,7 +39,7 @@ export default class Logger {
         await mkdir(Config.logsDirectory, { recursive: true });
         const d = new Date();
         const current = `${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}-${d.getFullYear()}`;
-        await appendFile(`${Config.logsDirectory}/${current}.log`, `${Time.formatDateWithPadding(d, true, true, false).replace(/\//g, "/")} ${obj.logLevel.toUpperCase()} [${obj.loggerName ?? "Unknown"}${obj.filePath ? ` ${obj.filePath}` : ""}${!obj.typeName || !obj.functionName ? "" : ` ${obj.typeName}.${obj.functionName}`}] ${obj.argumentsArray.join(" ")}\n`);
+        await appendFile(`${Config.logsDirectory}/${current}.log`, `${Time.formatDateWithPadding({ date: d, hms: true, millis: true, words: false }).replace(/\//g, "/")} ${obj.logLevel.toUpperCase()} [${obj.loggerName ?? "Unknown"}${obj.filePath ? ` ${obj.filePath}` : ""}${!obj.typeName || !obj.functionName ? "" : ` ${obj.typeName}.${obj.functionName}`}] ${obj.argumentsArray.join(" ")}\n`);
     }
 
     static getLogger(name?: string) {

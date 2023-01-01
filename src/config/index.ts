@@ -2,14 +2,17 @@
 import betaClient from "./private/client.beta.json" assert { type: "json" };
 import prodClient from "./private/client.prod.json" assert { type: "json" };
 import otherClients from "./private/client.other.json" assert { type: "json" };
-import PrivateConfig from "./private/private.js";
+import PrivateConfiguration from "./private/private.js";
 import emojis from "./json/emojis.json" assert { type: "json" };
 import pkg from "../../package.json" assert { type: "json" };
 import { type ClientOptions, Permissions, type UpdatePresenceOptions, ActivityTypes } from "oceanic.js";
-import { readFile } from "node:fs/promises";
+import { EnvOverride } from "@uwu-codes/utils";
+import { access, readFile } from "node:fs/promises";
 
 const host = await readFile("/data/hostname", "utf8").then(val => val.trim(), () => null);
-export default class Config extends PrivateConfig {
+
+const isDocker = await access("/.dockerenv").then(() => true, () => false) || await readFile("/proc/1/cgroup", "utf8").then(contents => contents.includes("docker"));
+export class Configuration extends PrivateConfiguration {
     static get isDevelopment() {
         return host !== this.prodServerHost;
     }
@@ -23,7 +26,7 @@ export default class Config extends PrivateConfig {
     }
 
     static get isDocker() {
-        return process.env.DOCKER === "1";
+        return isDocker;
     }
 
     static get developmentGuild() {
@@ -465,3 +468,6 @@ export default class Config extends PrivateConfig {
         return super.encryptionSalt;
     }
 }
+
+const Config = EnvOverride("MAIDBOYE_", Configuration);
+export default Config;
