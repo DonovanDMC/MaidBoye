@@ -24,21 +24,37 @@ export default class SelfrolesRoleAutocomplete extends BaseAutocomplete {
         }
         switch (type) {
             case "join": {
-                const joinable = gConfig.selfroles.filter(r => !interaction.member.roles.includes(r)).map(r => interaction.guild.roles.get(r)!);
-
-                return interaction.reply(joinable.map(r => ({
+                let joinable = gConfig.selfroles.filter(r => !interaction.member.roles.includes(r)).map(r => interaction.guild.roles.get(r)!).map(r => ({
                     name:  r.name,
                     value: r.id
-                })));
+                }));
+
+                if (joinable.length > 25) {
+                    const more = joinable.length - 24;
+                    joinable = joinable.slice(0, 24);
+                    joinable.push({
+                        name:  `(and ${more} more)`,
+                        value: "0"
+                    });
+                }
+                return interaction.reply(joinable);
             }
 
             case "leave": {
-                const current = gConfig.selfroles.filter(r => interaction.member.roles.includes(r)).map(r => interaction.guild.roles.get(r)!);
-
-                return interaction.reply(current.map(r => ({
+                let current = gConfig.selfroles.filter(r => interaction.member.roles.includes(r)).map(r => interaction.guild.roles.get(r)!).map(r => ({
                     name:  r.name,
                     value: r.id
-                })));
+                }));
+                if (current.length > 25) {
+                    const more = current.length - 24;
+                    current = current.slice(0, 24);
+                    current.push({
+                        name:  `(and ${more} more)`,
+                        value: "0"
+                    });
+                }
+
+                return interaction.reply(current);
             }
 
             case "remove": {
@@ -46,11 +62,19 @@ export default class SelfrolesRoleAutocomplete extends BaseAutocomplete {
                     return interaction.reply([]);
                 }
 
-                const roles = gConfig.selfroles.map(r => interaction.guild.roles.get(r)!);
-                return interaction.reply(roles.map(r => ({
+                let roles = gConfig.selfroles.map(r => interaction.guild.roles.get(r)!).map(r => ({
                     name:  r.name,
                     value: r.id
-                })));
+                }));
+                if (roles.length > 25) {
+                    const more = roles.length - 24;
+                    roles = roles.slice(0, 24);
+                    roles.push({
+                        name:  `(and ${more} more)`,
+                        value: "0"
+                    });
+                }
+                return interaction.reply(roles);
 
             }
         }
