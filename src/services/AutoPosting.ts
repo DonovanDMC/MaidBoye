@@ -351,6 +351,7 @@ export default class AutoPostingService extends Service {
                 for (const entry of entries) {
                     await this.execute(entry).catch(err => {
                         Logger.getLogger("AutoPosting").error(`Failed to execute entry ${entry.id} (${AutoPostingTypes[entry.type]})`, err);
+                        Logger.getLogger("AutoPostingExecution").error(err);
                     });
                 }
             }
