@@ -7,4 +7,4 @@ RUN apk add --no-cache lsof ffmpeg git cairo jpeg pango giflib
 RUN npm install --development --force
 RUN apk del build
 RUN npm run build
-CMD ["node", "/app/build/src/index.js"]
+CMD ["node", "/app/dist/src/index.js"]
