@@ -4,6 +4,7 @@ import type { ILogObject } from "tslog";
 import { Logger as TSLog } from "tslog";
 import { Time } from "@uwu-codes/utils";
 import { appendFile, mkdir } from "node:fs/promises";
+import { inspect } from "node:util";
 
 export default class Logger {
     private static log = new TSLog();
@@ -37,9 +38,8 @@ export default class Logger {
 
     private static async saveToFile(obj: ILogObject) {
         await mkdir(Config.logsDirectory, { recursive: true });
-        const d = new Date();
-        const current = `${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}-${d.getFullYear()}`;
-        await appendFile(`${Config.logsDirectory}/${current}.log`, `${Time.formatDateWithPadding({ date: d, hms: true, millis: true, words: false }).replace(/\//g, "/")} ${obj.logLevel.toUpperCase()} [${obj.loggerName ?? "Unknown"}${obj.filePath ? ` ${obj.filePath}` : ""}${!obj.typeName || !obj.functionName ? "" : ` ${obj.typeName}.${obj.functionName}`}] ${obj.argumentsArray.join(" ")}\n`);
+        const current = `${String(obj.date.getMonth() + 1).padStart(2, "0")}-${String(obj.date.getDate()).padStart(2, "0")}-${obj.date.getFullYear()}`;
+        await appendFile(`${Config.logsDirectory}/${current}.log`, `${Time.formatDateWithPadding({ date: obj.date, hms: true, millis: true, words: false }).replace(/\//g, "/")} ${obj.logLevel.toUpperCase()} [${obj.loggerName ?? "Unknown"}${obj.filePath ? ` ${obj.filePath}` : ""}${!obj.typeName || !obj.functionName ? "" : ` ${obj.typeName}.${obj.functionName}`}] ${obj.argumentsArray.map(o => ["string", "number", "boolean"].includes(typeof o) ? o : inspect(o)).join(" ")}\n`);
     }
 
     static getLogger(name?: string) {
