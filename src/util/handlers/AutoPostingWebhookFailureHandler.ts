@@ -4,8 +4,9 @@ import Logger from "../Logger.js";
 import Util from "../Util.js";
 import type AutoPostingEntry from "../../db/Models/AutoPostingEntry.js";
 import { AutoPostingTypes } from "../../db/Models/AutoPostingEntry.js";
-import AutoPostingService from "../../services/AutoPosting.js";
-import { isMainThread } from "node:worker_threads";
+import { ServiceEvents } from "../ServicesManager.js";
+import { isMainThread, parentPort } from "node:worker_threads";
+import { randomUUID } from "node:crypto";
 
 export default class AutoPostingWebhookFailureHandler {
     static WINDOW_TIME = 8.64e+7; // failure window is 24 hours
@@ -20,7 +21,13 @@ export default class AutoPostingWebhookFailureHandler {
 
     static async tick(entry: AutoPostingEntry, bypassRequirements = false) {
         if (!isMainThread) {
-            return AutoPostingService.INSTANCE.masterCommand("AUTOPOST_FAILURE", { entry: entry.id, bypassRequirements });
+            parentPort!.postMessage({
+                id:         randomUUID(),
+                event:      ServiceEvents.MASTER_COMMAND,
+                data:       { op: "AUTOPOST_FAILURE", data: { entry: entry.id, bypassRequirements } },
+                responsive: false
+            });
+            return -1;
         }
         const dt = Date.now();
         Logger.getLogger("AutoPostingWebhookFailureHandler").warn(`Failure for autoposting "${Util.readableConstant(AutoPostingTypes[entry.type])}" (webhook: ${entry.webhook.id}, channel: ${entry.channelID}, guild: ${entry.guildID})`);

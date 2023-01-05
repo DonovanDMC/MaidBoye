@@ -3,6 +3,7 @@ import Debug from "./Debug.js";
 import AutoPostingWebhookFailureHandler from "./handlers/AutoPostingWebhookFailureHandler.js";
 import MaidBoye from "../main.js";
 import Config from "../config/index.js";
+import AutoPostingEntry from "../db/Models/AutoPostingEntry.js";
 import { ChannelTypes } from "oceanic.js";
 import { randomUUID } from "node:crypto";
 import { Worker } from "node:worker_threads";
@@ -95,7 +96,6 @@ export default class ServicesManager {
                 }
 
                 case "AUTOPOST_FAILURE": {
-                    const AutoPostingEntry = (await import("../db/Models/AutoPostingEntry.js")).default;
                     const { bypassRequirements, entry: entryID } = data as { bypassRequirements: boolean; entry: string; };
                     const entry = await AutoPostingEntry.get(entryID);
                     if (!entry) {
