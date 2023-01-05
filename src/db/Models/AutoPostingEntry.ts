@@ -4,7 +4,6 @@ import Config from "../../config/index.js";
 import { Colors } from "../../util/Constants.js";
 import Logger from "../../util/Logger.js";
 import Util from "../../util/Util.js";
-import AutoPostingService from "../../services/AutoPosting.js";
 import {
     type AnyGuildTextChannelWithoutThreads,
     type ApplicationCommandOptionsChoice,
@@ -220,3 +219,5 @@ export default class AutoPostingEntry {
         }
     }
 }
+
+const { default: AutoPostingService } = await import("../../services/AutoPosting.js");
