@@ -2,7 +2,13 @@ import Command, { type ComponentInteraction, type ModalSubmitInteraction, ValidL
 import { Colors, TextableGuildChannels } from "../../../util/Constants.js";
 import Util from "../../../util/Util.js";
 import { State } from "../../../util/State.js";
-import AutoPostingEntry, { AutoPostingCategoryChoices, AutoPostingNSFW, AutoPostingTypes, ValidAutoPostingTimes } from "../../../db/Models/AutoPostingEntry.js";
+import AutoPostingEntry, {
+    AutoPostingCategoryChoices,
+    AutoPostingNSFW,
+    type AutoPostingTime,
+    AutoPostingTypes,
+    ValidAutoPostingTimes
+} from "../../../db/Models/AutoPostingEntry.js";
 import {
     type AnyGuildTextChannelWithoutThreads,
     ApplicationCommandOptionTypes,
@@ -22,7 +28,7 @@ export async function enableAutoposting(interaction: ComponentInteraction<ValidL
     }
     await AutoPostingEntry.create({
         type,
-        time:          time as 5,
+        time:          time as AutoPostingTime,
         channel_id:    channel,
         webhook_id:    webhook.id,
         webhook_token: webhook.token!,
@@ -119,7 +125,7 @@ export default new Command(import.meta.url, "autoposting")
                 content: `H-hey! <#${channel.id}> is not a valid textable channel..`
             });
         }
-        if (time && !ValidAutoPostingTimes.includes(time as 5)) {
+        if (time && !ValidAutoPostingTimes.includes(time as AutoPostingTime)) {
             return interaction.reply({
                 content: `H-hey! **${time}** is not a valid autoposting time..`
             });
@@ -233,7 +239,7 @@ export default new Command(import.meta.url, "autoposting")
                 const page = 1;
                 return interaction.reply({
                     embeds: Util.makeEmbed(true, interaction.user)
-                        .setDescription(list[0].map(a => `**${Util.readableConstant(AutoPostingTypes[a.type])}** in <#${a.channelID}>`).join("\n"))
+                        .setDescription(list[0].map(a => `**${Util.readableConstant(AutoPostingTypes[a.type])}** every **${a.time} Minutes** in <#${a.channelID}>`).join("\n"))
                         .setColor(Colors.gold)
                         .setFooter(`Page ${page}/${list.length}`)
                         .toJSON(true),
