@@ -1,8 +1,10 @@
 import Logger from "./Logger.js";
 import Debug from "./Debug.js";
+import AutoPostingWebhookFailureHandler from "./handlers/AutoPostingWebhookFailureHandler.js";
 import MaidBoye from "../main.js";
 import Config from "../config/index.js";
-import { ChannelTypes } from "oceanic.js";
+import AutoPostingEntry from "../db/Models/AutoPostingEntry.js";
+import { ChannelTypes, JSONErrorCodes } from "oceanic.js";
 import { randomUUID } from "node:crypto";
 import { Worker } from "node:worker_threads";
 
@@ -82,12 +84,34 @@ export default class ServicesManager {
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     static async handleMessage(worker: Worker, from: string, op: string, data?: unknown): Promise<void> {
-        if (from === "auto-posting" && op === "ATTEMPT_CROSSPOST") {
-            const { channelID, messageID } = data as { channelID: string; messageID: string; };
-            const channel = await MaidBoye.INSTANCE.getGuildChannel(channelID);
-            if (channel && channel.type === ChannelTypes.GUILD_ANNOUNCEMENT && channel.permissionsOf(Config.clientID).has("MANAGE_MESSAGES")) {
-                await MaidBoye.INSTANCE.rest.channels.crosspostMessage(channelID, messageID);
+        if (from === "auto-posting") {
+            switch (op) {
+                case "ATTEMPT_CROSSPOST": {
+                    const { channelID, messageID } = data as { channelID: string; messageID: string; };
+                    const channel = await MaidBoye.INSTANCE.getGuildChannel(channelID);
+                    if (channel && channel.type === ChannelTypes.GUILD_ANNOUNCEMENT && channel.permissionsOf(Config.clientID).has("MANAGE_MESSAGES")) {
+                        await MaidBoye.INSTANCE.rest.channels.crosspostMessage(channelID, messageID);
+                    }
+                    break;
+                }
+
+                case "AUTOPOST_FAILURE": {
+                    const { code, entry: entryID } = data as { code: number | null; entry: string; };
+                    const entry = await AutoPostingEntry.get(entryID);
+                    if (!entry) {
+                        Logger.getLogger("AutoPosting").warn(`Received autopost failure for unknown entry "${entryID}".`);
+                        return;
+                    }
+                    await AutoPostingWebhookFailureHandler.tick(entry, code !== null && (code === JSONErrorCodes.UNKNOWN_WEBHOOK || code === JSONErrorCodes.INVALID_WEBHOOK_TOKEN));
+                    break;
+                }
+
+                default: {
+                    Logger.getLogger("Services").warn(`Unknown master command "${op}" from service "auto-posting".`);
+                }
             }
+        } else {
+            Logger.getLogger("Services").warn(`Unknown master command "${op}" from service "${from}".`);
         }
     }
 

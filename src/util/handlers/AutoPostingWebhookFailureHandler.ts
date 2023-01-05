@@ -4,6 +4,7 @@ import Logger from "../Logger.js";
 import Util from "../Util.js";
 import type AutoPostingEntry from "../../db/Models/AutoPostingEntry.js";
 import { AutoPostingTypes } from "../../db/Models/AutoPostingEntry.js";
+import { isMainThread } from "node:worker_threads";
 
 export default class AutoPostingWebhookFailureHandler {
     static WINDOW_TIME = 8.64e+7; // failure window is 24 hours
@@ -17,12 +18,15 @@ export default class AutoPostingWebhookFailureHandler {
     }
 
     static async tick(entry: AutoPostingEntry, bypassRequirements = false) {
+        if (!isMainThread) {
+            throw new Error("Attempted to call AutoPostingWebhookFailureHandler#tick from a worker thread");
+        }
         const dt = Date.now();
+        Logger.getLogger("AutoPostingWebhookFailureHandler").warn(`Failure for autoposting "${Util.readableConstant(AutoPostingTypes[entry.type])}" (webhook: ${entry.webhook.id}, channel: ${entry.channelID}, guild: ${entry.guildID})`);
         if (!this.client) {
-            return -1;
+            throw new Error("AutoPostingWebhookFailureHandler not initialized");
         }
         this.list = this.list.filter(([t]) => t > dt);
-        Logger.getLogger("AutoPostingWebhookFailureHandler").warn(`Failure for autoposting "${Util.readableConstant(AutoPostingTypes[entry.type])}" (webhook: ${entry.webhook.id}, channel: ${entry.channelID}, guild: ${entry.guildID})`);
         let [time = (dt + this.WINDOW_TIME), amount = null] = this.list.find(([, , d]) => entry.id === d) ?? [];
         if (bypassRequirements) {
             amount = this.WINDOW_TOTAL;

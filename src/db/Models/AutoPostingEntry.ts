@@ -4,6 +4,7 @@ import Config from "../../config/index.js";
 import { Colors } from "../../util/Constants.js";
 import Logger from "../../util/Logger.js";
 import Util from "../../util/Util.js";
+import AutoPostingService from "../../services/AutoPosting.js";
 import {
     type AnyGuildTextChannelWithoutThreads,
     type ApplicationCommandOptionsChoice,
@@ -16,6 +17,7 @@ import {
 import { EmbedBuilder } from "@oceanicjs/builders";
 import assert from "node:assert";
 import { randomUUID } from "node:crypto";
+import { isMainThread } from "node:worker_threads";
 
 
 export interface AutoPostingEntryData {
@@ -207,7 +209,7 @@ export default class AutoPostingEntry {
         } catch (err) {
             Logger.getLogger("AutoPostingExecution").error(`Failed to execute autoposting entry ${this.id} for guild ${this.guildID} (type: ${Util.readableConstant(AutoPostingTypes[this.type])}):`);
             Logger.getLogger("AutoPostingExecution").error(err);
-            await AutoPostingWebhookFailureHandler.tick(this, err instanceof DiscordRESTError && (err.code === JSONErrorCodes.UNKNOWN_WEBHOOK || err.code === JSONErrorCodes.INVALID_WEBHOOK_TOKEN));
+            await (isMainThread ? AutoPostingWebhookFailureHandler.tick(this, err instanceof DiscordRESTError && (err.code === JSONErrorCodes.UNKNOWN_WEBHOOK || err.code === JSONErrorCodes.INVALID_WEBHOOK_TOKEN)) : AutoPostingService.INSTANCE.masterCommand("AUTOPOST_FAILURE", { entry: this.id, code: err instanceof DiscordRESTError ? err.code : null }));
             return null;
         }
     }

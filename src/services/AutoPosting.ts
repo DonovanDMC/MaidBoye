@@ -45,10 +45,13 @@ const AutoPostingTitles = {
     [AutoPostingTypes.STRAIGHT_YIFF]:   "Straight Yiff!"
 
 };
+
 export default class AutoPostingService extends Service {
+    static INSTANCE: AutoPostingService;
     client = new Client({ auth: `Bot ${Config.clientToken}` });
     constructor(file: string, name: string) {
         super(file, name);
+        AutoPostingService.INSTANCE = this;
         void db.initIfNotReady().then(this.ready.bind(this));
         setInterval(this.run.bind(this), 1e3);
     }

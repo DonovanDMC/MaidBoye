@@ -14,6 +14,7 @@ import Modals from "../interactions/modals/index.js";
 import WebhookFailureHandler from "../util/handlers/LoggingWebhookFailureHandler.js";
 import AutoPostingService from "../services/AutoPosting.js";
 import FurryBotStatusService from "../services/FurryBotStatus.js";
+import AutoPostingWebhookFailureHandler from "../util/handlers/AutoPostingWebhookFailureHandler.js";
 import { Time } from "@uwu-codes/utils";
 
 export default new ClientEvent("ready", async function readyEvent() {
@@ -32,6 +33,7 @@ export default new ClientEvent("ready", async function readyEvent() {
     await this.registerCommands();
     await this.startAPIServer();
     await WebhookFailureHandler.init(this);
+    await AutoPostingWebhookFailureHandler.init(this);
     this.readyTime = process.hrtime.bigint();
     this.presenceUpdateInterval = setInterval(async() => {
         const presence = Config.getPresence();
