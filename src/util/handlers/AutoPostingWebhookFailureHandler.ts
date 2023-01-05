@@ -4,6 +4,7 @@ import Logger from "../Logger.js";
 import Util from "../Util.js";
 import type AutoPostingEntry from "../../db/Models/AutoPostingEntry.js";
 import { AutoPostingTypes } from "../../db/Models/AutoPostingEntry.js";
+import AutoPostingService from "../../services/AutoPosting.js";
 import { isMainThread } from "node:worker_threads";
 
 export default class AutoPostingWebhookFailureHandler {
@@ -19,7 +20,7 @@ export default class AutoPostingWebhookFailureHandler {
 
     static async tick(entry: AutoPostingEntry, bypassRequirements = false) {
         if (!isMainThread) {
-            throw new Error("Attempted to call AutoPostingWebhookFailureHandler#tick from a worker thread");
+            return AutoPostingService.INSTANCE.masterCommand("AUTOPOST_FAILURE", { entry: entry.id, bypassRequirements });
         }
         const dt = Date.now();
         Logger.getLogger("AutoPostingWebhookFailureHandler").warn(`Failure for autoposting "${Util.readableConstant(AutoPostingTypes[entry.type])}" (webhook: ${entry.webhook.id}, channel: ${entry.channelID}, guild: ${entry.guildID})`);

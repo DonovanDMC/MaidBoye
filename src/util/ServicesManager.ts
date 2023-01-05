@@ -4,7 +4,7 @@ import AutoPostingWebhookFailureHandler from "./handlers/AutoPostingWebhookFailu
 import MaidBoye from "../main.js";
 import Config from "../config/index.js";
 import AutoPostingEntry from "../db/Models/AutoPostingEntry.js";
-import { ChannelTypes, JSONErrorCodes } from "oceanic.js";
+import { ChannelTypes } from "oceanic.js";
 import { randomUUID } from "node:crypto";
 import { Worker } from "node:worker_threads";
 
@@ -96,13 +96,13 @@ export default class ServicesManager {
                 }
 
                 case "AUTOPOST_FAILURE": {
-                    const { code, entry: entryID } = data as { code: number | null; entry: string; };
+                    const { bypassRequirements, entry: entryID } = data as { bypassRequirements: boolean; entry: string; };
                     const entry = await AutoPostingEntry.get(entryID);
                     if (!entry) {
                         Logger.getLogger("AutoPosting").warn(`Received autopost failure for unknown entry "${entryID}".`);
                         return;
                     }
-                    await AutoPostingWebhookFailureHandler.tick(entry, code !== null && (code === JSONErrorCodes.UNKNOWN_WEBHOOK || code === JSONErrorCodes.INVALID_WEBHOOK_TOKEN));
+                    await AutoPostingWebhookFailureHandler.tick(entry, bypassRequirements);
                     break;
                 }
 

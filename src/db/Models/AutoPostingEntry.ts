@@ -16,7 +16,6 @@ import {
 import { EmbedBuilder } from "@oceanicjs/builders";
 import assert from "node:assert";
 import { randomUUID } from "node:crypto";
-import { isMainThread } from "node:worker_threads";
 
 
 export interface AutoPostingEntryData {
@@ -86,6 +85,9 @@ export const AutoPostingCategoryChoices: Array<ApplicationCommandOptionsChoice<A
     value: category
 }));
 export const ValidAutoPostingTimes = [5, 10, 15, 30, 60] as const;
+if (Config.isDevelopment) {
+    (ValidAutoPostingTimes as unknown as Array<number>).unshift(1);
+}
 export type AutoPostingTime = typeof ValidAutoPostingTimes[number];
 export default class AutoPostingEntry {
     static MAX_ENTRIES = 30;
@@ -189,10 +191,7 @@ export default class AutoPostingEntry {
             const webhook = await client.rest.webhooks.get(this.webhook.id, this.webhook.token);
             return webhook.channelID!;
         } catch (err) {
-            await (isMainThread ?
-                AutoPostingWebhookFailureHandler.tick(this, err instanceof DiscordRESTError && (err.code === JSONErrorCodes.UNKNOWN_WEBHOOK || err.code === JSONErrorCodes.INVALID_WEBHOOK_TOKEN)) :
-                AutoPostingService.INSTANCE.masterCommand("AUTOPOST_FAILURE", { entry: this.id, code: err instanceof DiscordRESTError ? err.code : null })
-            );
+            await AutoPostingWebhookFailureHandler.tick(this, err instanceof DiscordRESTError && (err.code === JSONErrorCodes.UNKNOWN_WEBHOOK || err.code === JSONErrorCodes.INVALID_WEBHOOK_TOKEN));
             return null;
         }
     }
@@ -210,14 +209,11 @@ export default class AutoPostingEntry {
             return (await client.rest.webhooks.execute(this.webhook.id, this.webhook.token, { ...options, wait: true })).id;
         } catch (err) {
             Logger.getLogger("AutoPostingExecution").error(`Failed to execute autoposting entry ${this.id} for guild ${this.guildID} (type: ${Util.readableConstant(AutoPostingTypes[this.type])}):`);
-            Logger.getLogger("AutoPostingExecution").error(err);
-            await (isMainThread ?
-                AutoPostingWebhookFailureHandler.tick(this, err instanceof DiscordRESTError && (err.code === JSONErrorCodes.UNKNOWN_WEBHOOK || err.code === JSONErrorCodes.INVALID_WEBHOOK_TOKEN)) :
-                AutoPostingService.INSTANCE.masterCommand("AUTOPOST_FAILURE", { entry: this.id, code: err instanceof DiscordRESTError ? err.code : null })
-            );
+            if (!(err instanceof DiscordRESTError && (err.code === JSONErrorCodes.UNKNOWN_WEBHOOK || err.code === JSONErrorCodes.INVALID_WEBHOOK_TOKEN))) {
+                Logger.getLogger("AutoPostingExecution").error(err);
+            }
+            await AutoPostingWebhookFailureHandler.tick(this, err instanceof DiscordRESTError && (err.code === JSONErrorCodes.UNKNOWN_WEBHOOK || err.code === JSONErrorCodes.INVALID_WEBHOOK_TOKEN));
             return null;
         }
     }
 }
-
-const { default: AutoPostingService } = await import("../../services/AutoPosting.js");
