@@ -14,11 +14,7 @@ const host = await readFile("/data/hostname", "utf8").then(val => val.trim(), ()
 const isDocker = await access("/.dockerenv").then(() => true, () => false) || await readFile("/proc/1/cgroup", "utf8").then(contents => contents.includes("docker"));
 export class Configuration extends PrivateConfiguration {
     static get isDevelopment() {
-        return host !== this.prodServerHost;
-    }
-
-    static override get prodServerHost() {
-        return super.prodServerHost;
+        return host === "DONOVAN-PC";
     }
 
     static get developers() {
