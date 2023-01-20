@@ -7,7 +7,6 @@
   "scripts": {
     "build": "tsc && node --no-warnings --no-deprecation --experimental-specifier-resolution=node --loader ts-node/esm/transpile-only scripts/build-date.ts && echo Build Finished",
     "create-migration": "node -e \"require('fs').writeFileSync('./src/db/migrations/' + Date.now() + '_' + (process.argv[1] || 'name') + '.sql', '')\"",
-    "postinstall": "patch-package",
     "lint": "eslint src --ext .ts",
     "lint:fix": "eslint src --ext .ts --fix",
     "up:d": "sudo docker compose pull && sudo docker compose up -d",
