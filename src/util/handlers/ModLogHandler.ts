@@ -95,7 +95,7 @@ export default class ModLogHandler {
         }
         const caseID = await ModLog.getNextID(gConfig.id);
         const data: ModLogCreationData = {
-            type:      ModLogType.BAN,
+            type,
             case_id:   caseID,
             guild_id:  guild.id,
             target_id: "target" in options ? options.target.id : null,
