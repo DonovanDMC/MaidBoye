@@ -1,3 +1,4 @@
+import GuildConfig from "./GuildConfig.js";
 import db, { type CountResult } from "../index.js";
 import type MaidBoye from "../../main.js";
 import WebhookFailureHandler from "../../util/handlers/LoggingWebhookFailureHandler.js";
@@ -128,6 +129,7 @@ export default class LogEvent {
     }
 
     static async create(data: LogEventCreationData) {
+        await GuildConfig.ensureExists(data.guild_id);
         const res = await db.insert<string>(this.TABLE, { ...data, id: randomUUID() });
         const createdObject = await this.get(res);
         assert(createdObject !== null, "failed to create new LogEvent object");

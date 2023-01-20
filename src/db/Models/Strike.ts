@@ -1,3 +1,4 @@
+import GuildConfig from "./GuildConfig.js";
 import db, { type CountResult } from "../index.js";
 import type MaidBoye from "../../main.js";
 import { Strings } from "@uwu-codes/utils";
@@ -50,6 +51,7 @@ export default class Strike {
     }
 
     static async create(data: StrikeCreationData) {
+        await GuildConfig.ensureExists(data.guild_id);
         const res = await db.insert<string>(this.TABLE, data);
         const createdObject = await this.get(res);
         assert(createdObject !== null, "failed to create new Strike object");

@@ -1,3 +1,4 @@
+import GuildConfig from "./GuildConfig.js";
 import db, { type CountResult } from "../index.js";
 import AutoPostingWebhookFailureHandler from "../../util/handlers/AutoPostingWebhookFailureHandler.js";
 import Config from "../../config/index.js";
@@ -112,6 +113,7 @@ export default class AutoPostingEntry {
     }
 
     static async create(data: AutoPostingEntryCreationData) {
+        await GuildConfig.ensureExists(data.guild_id);
         const res = await db.insert<string>(this.TABLE, { ...data, id: randomUUID() });
         const createdObject = await this.get(res);
         assert(createdObject !== null, "failed to create new AutoPostingEntry object");

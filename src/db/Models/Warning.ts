@@ -1,3 +1,4 @@
+import GuildConfig from "./GuildConfig.js";
 import db from "../index.js";
 import type MaidBoye from "../../main.js";
 import Debug from "../../util/Debug.js";
@@ -38,6 +39,7 @@ export default class Warning {
     }
 
     static async create(data: WarningCreationData) {
+        await GuildConfig.ensureExists(data.guild_id);
         const res = await db.insert<string>(this.TABLE, data);
         const createdObject = await this.get(res);
         assert(createdObject !== null, "failed to create new warning object");

@@ -92,6 +92,10 @@ export default class GuildConfig {
         return db.delete(this.TABLE, id);
     }
 
+    static async ensureExists(id: string) {
+        await this.get(id, true);
+    }
+
     static async get(id: string, createIfNotExists: false): Promise<GuildConfig | null>;
     static async get(id: string, createIfNotExists?: true): Promise<GuildConfig>;
     static async get(id: string, createIfNotExists = true) {

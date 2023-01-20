@@ -1,6 +1,7 @@
 import Strike from "./Strike.js";
 import Timed from "./Timed.js";
 import Warning from "./Warning.js";
+import GuildConfig from "./GuildConfig.js";
 import db from "../index.js";
 import type MaidBoye from "../../main.js";
 import Util from "../../util/Util.js";
@@ -83,6 +84,7 @@ export default class ModLog {
     }
 
     static async create(data: ModLogCreationData) {
+        await GuildConfig.ensureExists(data.guild_id);
         const res = await db.insert<string>(this.TABLE, data);
         const createdObject = await this.get(res);
         assert(createdObject !== null, "failed to create new ModLog object");
