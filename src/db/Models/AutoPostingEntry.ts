@@ -24,6 +24,7 @@ export interface AutoPostingEntryData {
     created_at: Date;
     guild_id: string;
     id: string;
+    status: AutoPostingStatus;
     time: AutoPostingTime;
     type: AutoPostingTypes;
     updated_at: Date;
@@ -68,6 +69,20 @@ export enum AutoPostingTypes {
     LESBIAN_YIFF    = 30,
     STRAIGHT_YIFF   = 31
 }
+export enum AutoPostingStatus {
+    ENABLED  = 0,
+    DISABLED = 1,
+    FAILED_NSFW_CHECK = 2,
+    WEBHOOK_DELETED = 3,
+    REPEATED_FAILURES = 4
+}
+export const AutoPostingStatusNames = {
+    [AutoPostingStatus.ENABLED]:           "Enabled",
+    [AutoPostingStatus.DISABLED]:          "Disabled (Manually)",
+    [AutoPostingStatus.FAILED_NSFW_CHECK]: "Disabled (Failed NSFW Check)",
+    [AutoPostingStatus.WEBHOOK_DELETED]:   "Disabled (Webhook Deleted)",
+    [AutoPostingStatus.REPEATED_FAILURES]: "Disabled (Repeated Failures)"
+};
 export const AutoPostingNSFW = [
     AutoPostingTypes.BULGE_YIFF,
     AutoPostingTypes.ANDROMORPH_YIFF,
@@ -99,6 +114,7 @@ export default class AutoPostingEntry {
     createdAt: Date;
     guildID: string;
     id: string;
+    status: AutoPostingStatus;
     time: AutoPostingTime;
     type: AutoPostingTypes;
     updatedAt: Date;
@@ -129,13 +145,30 @@ export default class AutoPostingEntry {
         return res ? new AutoPostingEntry(res) : null;
     }
 
-    static async getAll(guild: string) {
-        const { rows } = await db.query<AutoPostingEntryData>(`SELECT * FROM ${this.TABLE} WHERE guild_id = $1`, [guild]);
+    static async getAll(guild: string, filter: "enabled" | "disabled" = "enabled") {
+        const { rows } = await db.query<AutoPostingEntryData>(`SELECT * FROM ${this.TABLE} WHERE guild_id = $1 AND status ${filter === "enabled" ? "=" : "!="} $2`, [guild, AutoPostingStatus.ENABLED ]);
         return rows.map(row => new AutoPostingEntry(row));
     }
 
-    static async getCount(guild: string, type?: AutoPostingTypes) {
-        const { rows: [{ count: rawCount }] } = await db.query<CountResult>(`SELECT COUNT(*) FROM ${this.TABLE} WHERE guild_id = $1${type === undefined ? "" :  " AND type = $2"}`, type === undefined ? [guild] : [guild, type]);
+    static async getCount(guild: string, type?: AutoPostingTypes, channel?: string, includeDisabled = false) {
+        let i = 1;
+        const query = [
+            "guild_id = $1"
+        ];
+        const values: Array<string | number> = [guild];
+        if (type !== undefined) {
+            query.push(`type = $${++i}`);
+            values.push(type);
+        }
+        if (channel) {
+            query.push(`channel_id = $${++i}`);
+            values.push(channel);
+        }
+        if (!includeDisabled) {
+            query.push(`status = $${++i}`);
+            values.push(AutoPostingStatus.ENABLED);
+        }
+        const { rows: [{ count: rawCount }] } = await db.query<CountResult>(`SELECT COUNT(*) FROM ${this.TABLE} WHERE ${query.join(" AND ")}`, values);
         return Number(rawCount);
     }
 
@@ -156,6 +189,7 @@ export default class AutoPostingEntry {
         this.time      = data.time;
         this.type      = data.type;
         this.guildID   = data.guild_id;
+        this.status    = data.status;
         this.updatedAt = data.updated_at;
         this.webhook   = {
             id:    data.webhook_id,
@@ -163,7 +197,7 @@ export default class AutoPostingEntry {
         };
     }
 
-    async checkNSFW(client: Client, retry = false): Promise<boolean> {
+    async checkNSFW(client: Client, isRetry = false): Promise<boolean> {
         const channel = await client.rest.channels.get<AnyGuildTextChannelWithoutThreads>(this.channelID).catch(() => null);
         if (channel === null) {
             const check = await this.checkWebhook(client);
@@ -171,7 +205,7 @@ export default class AutoPostingEntry {
                 await db.query(`UPDATE ${AutoPostingEntry.TABLE} SET channel_id = $1 WHERE id = $2`, [check, this.id]);
                 this.channelID = this._data.channel_id = check;
             }
-            return retry ? false : this.checkNSFW(client, true);
+            return isRetry ? false : this.checkNSFW(client, true);
         }
         if (channel.nsfw === false) {
             await client.rest.webhooks.execute(this.webhook.id, this.webhook.token, {
@@ -183,7 +217,7 @@ export default class AutoPostingEntry {
                     .setColor(Colors.gold)
                     .toJSON(true)
             }).catch(() => null);
-            await this.delete();
+            await this.disable(AutoPostingStatus.FAILED_NSFW_CHECK);
         }
         return channel.nsfw;
     }
@@ -193,13 +227,27 @@ export default class AutoPostingEntry {
             const webhook = await client.rest.webhooks.get(this.webhook.id, this.webhook.token);
             return webhook.channelID!;
         } catch (err) {
-            await AutoPostingWebhookFailureHandler.tick(this, err instanceof DiscordRESTError && (err.code === JSONErrorCodes.UNKNOWN_WEBHOOK || err.code === JSONErrorCodes.INVALID_WEBHOOK_TOKEN));
+            await (err instanceof DiscordRESTError && (err.code === JSONErrorCodes.UNKNOWN_WEBHOOK || err.code === JSONErrorCodes.INVALID_WEBHOOK_TOKEN) ? this.disable(AutoPostingStatus.WEBHOOK_DELETED) : AutoPostingWebhookFailureHandler.tick(this));
             return null;
         }
     }
 
     async delete() {
         return AutoPostingEntry.delete(this.id);
+    }
+
+    async disable(type: Exclude<AutoPostingStatus, AutoPostingStatus.ENABLED>) {
+        await db.query(`UPDATE ${AutoPostingEntry.TABLE} SET status = $1 WHERE id = $2`, [type, this.id]);
+        this._data.status = type;
+        this.status       = type;
+        return this;
+    }
+
+    async enable() {
+        await db.query(`UPDATE ${AutoPostingEntry.TABLE} SET status = $1 WHERE id = $2`, [AutoPostingStatus.ENABLED, this.id]);
+        this._data.status = AutoPostingStatus.ENABLED;
+        this.status       = AutoPostingStatus.ENABLED;
+        return this;
     }
 
     async execute(client: Client, options: ExecuteWebhookOptions) {

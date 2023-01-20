@@ -3,7 +3,7 @@ import { Colors } from "../Constants.js";
 import Logger from "../Logger.js";
 import Util from "../Util.js";
 import type AutoPostingEntry from "../../db/Models/AutoPostingEntry.js";
-import { AutoPostingTypes } from "../../db/Models/AutoPostingEntry.js";
+import { AutoPostingStatus, AutoPostingTypes } from "../../db/Models/AutoPostingEntry.js";
 import { ServiceEvents } from "../ServicesManager.js";
 import { isMainThread, parentPort } from "node:worker_threads";
 import { randomUUID } from "node:crypto";
@@ -65,7 +65,7 @@ export default class AutoPostingWebhookFailureHandler {
                         ]
                     });
                 }
-                void entry.delete();
+                void entry.disable(AutoPostingStatus.REPEATED_FAILURES);
                 return 0;
             } else {
                 this.list.splice(this.list.findIndex(([, a, b]) => a === amount && b === entry.id), 1);

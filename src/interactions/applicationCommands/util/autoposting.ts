@@ -7,8 +7,11 @@ import AutoPostingEntry, {
     AutoPostingNSFW,
     type AutoPostingTime,
     AutoPostingTypes,
-    ValidAutoPostingTimes
+    ValidAutoPostingTimes,
+    AutoPostingStatus,
+    AutoPostingStatusNames
 } from "../../../db/Models/AutoPostingEntry.js";
+import Config from "../../../config/index.js";
 import {
     type AnyGuildTextChannelWithoutThreads,
     ApplicationCommandOptionTypes,
@@ -16,7 +19,9 @@ import {
     InteractionResolvedChannel,
     type MessageActionRow,
     MessageFlags,
-    type Webhook
+    type Webhook,
+    type GuildCommandInteraction,
+    type GuildComponentInteraction
 } from "oceanic.js";
 import { ButtonColors, ComponentBuilder } from "@oceanicjs/builders";
 import chunk from "chunk";
@@ -47,6 +52,37 @@ export async function enableAutoposting(interaction: ComponentInteraction<ValidL
 
     await interaction.editOriginal({
         content: `Autoposting of **${Util.readableConstant(AutoPostingTypes[type])}** has been enabled every **${time} Minutes** in <#${channel}> via **${webhook.name!}**.`
+    });
+}
+
+export async function autoPostingNav(interaction: GuildCommandInteraction | GuildComponentInteraction, page: number, channel?: string | null) {
+    const autos = (await AutoPostingEntry.getAll(interaction.guild.id)).filter(ev => channel ? ev.channelID === channel : true);
+    const list = chunk(autos, 10);
+    return interaction.reply({
+        embeds: Util.makeEmbed(true, interaction.user)
+            .setDescription(list[0].map(a => `**${Util.readableConstant(AutoPostingTypes[a.type])}** every **${a.time} Minutes** in <#${a.channelID}> (Status: **${AutoPostingStatusNames[a.status]}**)`).join("\n"))
+            .setColor(Colors.gold)
+            .setFooter(`Page ${page}/${list.length}`)
+            .toJSON(true),
+        components: new ComponentBuilder<MessageActionRow>()
+            .addInteractionButton({
+                customID: State.new(interaction.user.id, "autoposting", "nav").with("channel", channel ?? null).with("page", page).with("dir", -1).encode(),
+                disabled: (page - 1) < 1,
+                label:    "Previous Page",
+                style:    ButtonColors.BLURPLE
+            })
+            .addInteractionButton({
+                customID: State.exit(interaction.user.id),
+                label:    "Exit",
+                style:    ButtonColors.RED
+            })
+            .addInteractionButton({
+                customID: State.new(interaction.user.id, "autoposting", "nav").with("channel", channel ?? null).with("page", page).with("dir", 1).encode(),
+                disabled: (page + 1) > list.length,
+                label:    "Next Page",
+                style:    ButtonColors.BLURPLE
+            })
+            .toJSON()
     });
 }
 
@@ -110,10 +146,28 @@ export default new Command(import.meta.url, "autoposting")
                     .setAutocomplete()
             )
     )
+    .addOption(new Command.Option(ApplicationCommandOptionTypes.SUB_COMMAND, "enable")
+        .setDescription("Enable a disabled autoposting entry.")
+        .addOption(
+            new Command.Option(ApplicationCommandOptionTypes.STRING, "entry")
+                .setDescription("The entry to enable.")
+                .setRequired()
+                .setAutocomplete()
+        )
+    )
+    .addOption(new Command.Option(ApplicationCommandOptionTypes.SUB_COMMAND, "disable")
+        .setDescription("Disable an autoposting entry.")
+        .addOption(
+            new Command.Option(ApplicationCommandOptionTypes.STRING, "entry")
+                .setDescription("The entry to disable.")
+                .setRequired()
+                .setAutocomplete()
+        )
+    )
     .setOptionsParser(interaction => ({
-        sub:     interaction.data.options.getSubCommand<["add" | "clear" | "list" | "remove"]>(true)[0],
+        sub:     interaction.data.options.getSubCommand<["add" | "clear" | "list" | "remove" | "enable" | "disable"]>(true)[0],
         type:    interaction.data.options.getString<keyof typeof AutoPostingTypes>("type"),
-        channel: interaction.data.options.getChannel("channel") as InteractionResolvedChannel | AnyGuildTextChannelWithoutThreads,
+        channel: interaction.data.options.getChannel("channel") as InteractionResolvedChannel | AnyGuildTextChannelWithoutThreads | undefined,
         entry:   interaction.data.options.getString("entry"),
         time:    interaction.data.options.getNumber("time")
     }))
@@ -133,9 +187,7 @@ export default new Command(import.meta.url, "autoposting")
         switch (sub) {
             case "add": {
                 assert(rawType);
-                if (!channel) {
-                    channel = interaction.channel as AnyGuildTextChannelWithoutThreads;
-                }
+                channel ??= interaction.channel as AnyGuildTextChannelWithoutThreads;
                 if (!time) {
                     time = 60;
                 }
@@ -160,7 +212,7 @@ export default new Command(import.meta.url, "autoposting")
                     }));
                 }
 
-                if (current > 0 && autos.some(ev => ev.type === type && ev.channelID === channel.id)) {
+                if (current > 0 && autos.some(ev => ev.type === type && ev.channelID === channel!.id)) {
                     return interaction.reply(Util.replaceContent({
                         content: `H-hey! This server already has autoposting for **${Util.readableConstant(AutoPostingTypes[type])}** enabled in <#${channel.id}>..`
                     }));
@@ -228,41 +280,13 @@ export default new Command(import.meta.url, "autoposting")
             }
 
             case "list": {
-                const autos = (await AutoPostingEntry.getAll(interaction.guild.id)).filter(ev => channel?.id ? ev.channelID === channel.id : true);
-                if (autos.length === 0) {
+                const autos = (await AutoPostingEntry.getCount(interaction.guild.id, undefined, channel?.id));
+                if (autos === 0) {
                     return interaction.reply({
                         content: "H-hey! There aren't any entries to list.."
                     });
                 }
-                const list = chunk(autos, 10);
-
-                const page = 1;
-                return interaction.reply({
-                    embeds: Util.makeEmbed(true, interaction.user)
-                        .setDescription(list[0].map(a => `**${Util.readableConstant(AutoPostingTypes[a.type])}** every **${a.time} Minutes** in <#${a.channelID}>`).join("\n"))
-                        .setColor(Colors.gold)
-                        .setFooter(`Page ${page}/${list.length}`)
-                        .toJSON(true),
-                    components: new ComponentBuilder<MessageActionRow>()
-                        .addInteractionButton({
-                            customID: State.new(interaction.user.id, "autoposting", "nav").with("channel", channel?.id ?? null).with("page", page).with("dir", -1).encode(),
-                            disabled: (page - 1) < 1,
-                            label:    "Previous Page",
-                            style:    ButtonColors.BLURPLE
-                        })
-                        .addInteractionButton({
-                            customID: State.exit(interaction.user.id),
-                            label:    "Exit",
-                            style:    ButtonColors.RED
-                        })
-                        .addInteractionButton({
-                            customID: State.new(interaction.user.id, "autoposting", "nav").with("channel", channel?.id ?? null).with("page", page).with("dir", 1).encode(),
-                            disabled: (page + 1) > list.length,
-                            label:    "Next Page",
-                            style:    ButtonColors.BLURPLE
-                        })
-                        .toJSON()
-                });
+                return autoPostingNav(interaction, 1, channel?.id);
             }
 
             case "remove": {
@@ -278,6 +302,157 @@ export default new Command(import.meta.url, "autoposting")
                     components: new ComponentBuilder<MessageActionRow>()
                         .addInteractionButton({
                             customID: State.new(interaction.user.id, "autoposting", "remove").with("entry", entry!).encode(),
+                            label:    "Yes",
+                            style:    ButtonColors.GREEN
+                        })
+                        .addInteractionButton({
+                            customID: State.cancel(interaction.user.id),
+                            label:    "No",
+                            style:    ButtonColors.RED
+                        })
+                        .toJSON()
+                });
+            }
+
+            case "enable": {
+                assert(entry);
+                if (entry === "all") {
+                    const autos = await AutoPostingEntry.getAll(interaction.guild.id, "disabled");
+                    if (autos.length === 0) {
+                        return interaction.reply({
+                            content: "H-hey! There aren't any entries to enable.."
+                        });
+                    }
+
+                    if (autos.length === 1) {
+                        entry = autos[0].id;
+                    } else {
+                        return interaction.reply({
+                            content:    `Are you sure you want to enable **${autos.length}** autoposting entries?`,
+                            components: new ComponentBuilder<MessageActionRow>()
+                                .addInteractionButton({
+                                    customID: State.new(interaction.user.id, "autoposting", "enable").with("entry", "all").encode(),
+                                    label:    "Yes",
+                                    style:    ButtonColors.GREEN
+                                })
+                                .addInteractionButton({
+                                    customID: State.cancel(interaction.user.id),
+                                    label:    "No",
+                                    style:    ButtonColors.RED
+                                })
+                                .toJSON()
+                        });
+                    }
+                }
+                const auto = await AutoPostingEntry.get(entry);
+                if (auto === null) {
+                    return interaction.reply({
+                        content: "H-hey! That entry doesn't exist.."
+                    });
+                }
+
+                let notes = "";
+                switch (auto.status) {
+                    case AutoPostingStatus.ENABLED: {
+                        return interaction.reply({
+                            content: "H-hey! That entry is already enabled.."
+                        });
+                    }
+
+                    case AutoPostingStatus.DISABLED: {
+                        notes = "This entry was manually disabled.";
+                        break;
+                    }
+
+                    case AutoPostingStatus.FAILED_NSFW_CHECK: {
+                        notes = "This entry was disabled due to an NSFW check failing. This check is performed each time autoposting is ran.";
+                        break;
+                    }
+
+                    case AutoPostingStatus.REPEATED_FAILURES: {
+                        notes = `This entry was disabled due to repeated failures when attempting to post. If this is a recurring issue, please join our support server. (${Config.discordLink})`;
+                        break;
+                    }
+
+                    case AutoPostingStatus.WEBHOOK_DELETED: {
+                        return interaction.reply({
+                            content:    "That entry was disabled due to the webhook being deleted. It cannot be enabled, please remove it and re-add it.",
+                            components: new ComponentBuilder<MessageActionRow>()
+                                .addInteractionButton({
+                                    customID: State.new(interaction.user.id, "autoposting", "remove").with("entry", entry).encode(),
+                                    label:    "Delete Entry",
+                                    style:    ButtonColors.RED
+                                })
+                                .toJSON()
+                        });
+                    }
+                }
+
+                return interaction.reply({
+                    content:    `Are you sure you want to enable the autoposting of **${Util.readableConstant(AutoPostingTypes[auto.type])}** in <#${auto.channelID}>?\n\n${notes}`,
+                    components: new ComponentBuilder<MessageActionRow>()
+                        .addInteractionButton({
+                            customID: State.new(interaction.user.id, "autoposting", "enable").with("entry", entry).encode(),
+                            label:    "Yes",
+                            style:    ButtonColors.GREEN
+                        })
+                        .addInteractionButton({
+                            customID: State.cancel(interaction.user.id),
+                            label:    "No",
+                            style:    ButtonColors.RED
+                        })
+                        .toJSON()
+                });
+            }
+
+            case "disable": {
+                assert(entry);
+                if (entry === "all") {
+                    const autos = await AutoPostingEntry.getAll(interaction.guild.id, "enabled");
+                    if (autos.length === 0) {
+                        return interaction.reply({
+                            content: "H-hey! There aren't any entries to disable.."
+                        });
+                    }
+
+                    if (autos.length === 1) {
+                        entry = autos[0].id;
+                    } else {
+                        return interaction.reply({
+                            content:    `Are you sure you want to disable **${autos.length}** autoposting entries?`,
+                            components: new ComponentBuilder<MessageActionRow>()
+                                .addInteractionButton({
+                                    customID: State.new(interaction.user.id, "autoposting", "disable").with("entry", "all").encode(),
+                                    label:    "Yes",
+                                    style:    ButtonColors.GREEN
+                                })
+                                .addInteractionButton({
+                                    customID: State.cancel(interaction.user.id),
+                                    label:    "No",
+                                    style:    ButtonColors.RED
+                                })
+                                .toJSON()
+                        });
+                    }
+                }
+                const auto = await AutoPostingEntry.get(entry);
+                if (auto === null) {
+                    return interaction.reply({
+                        content: "H-hey! That entry doesn't exist.."
+                    });
+                }
+
+                if (auto.status !== AutoPostingStatus.ENABLED) {
+                    return interaction.reply({
+                        content: "H-hey! That entry is already disabled.."
+                    });
+                }
+
+                return interaction.reply({
+                    content:    `Are you sure you want to disable the autoposting of **${Util.readableConstant(AutoPostingTypes[auto.type])}** in <#${auto.channelID}>?`,
+                    components: new ComponentBuilder<MessageActionRow>()
+                        .addInteractionButton({
+                            customID: State.new(interaction.user.id, "autoposting", "disable").with("entry", entry).encode(),
                             label:    "Yes",
                             style:    ButtonColors.GREEN
                         })
