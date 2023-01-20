@@ -90,13 +90,11 @@ export async function strikeHistory(this: MaidBoye, interaction: CommandInteract
 }
 
 export async function modHistory(this: MaidBoye, interaction: CommandInteraction<ValidLocation.GUILD> | ComponentInteraction<ValidLocation.GUILD>, user: User, page: number) {
-    // this isn't using an actual array
-    // eslint-disable-next-line unicorn/no-array-method-this-argument
-    const modlog = (await ModLog.getForUser(interaction.guildID, user.id)).filter(m => ![ModLogType.WARNING, ModLogType.DELETE_WARNING, ModLogType.CLEAR_WARNINGS].includes(m.type), "DESC");
+    const modlog = (await ModLog.getForUser(interaction.guildID, user.id));
     const pages = chunk(modlog, 5);
     await (interaction.type === InteractionTypes.APPLICATION_COMMAND ? interaction.editOriginal.bind(interaction) : interaction.editParent.bind(interaction))(Util.replaceContent({
         embeds: Util.makeEmbed(true, interaction.user)
-            .setTitle(`Strike History: ${user.tag}`)
+            .setTitle(`Moderation History: ${user.tag}`)
             .setDescription(modlog.length === 0 ? "This user has no moderation history." : (await Promise.all(pages[page - 1].map(async entry => {
                 const blame = (await this.getUser(entry.blameID || this.user.id)) || { id: "000000000000000000", tag: "Unknown#0000" };
                 return [

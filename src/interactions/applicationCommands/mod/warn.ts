@@ -18,7 +18,7 @@ export default new Command(import.meta.url, "warn")
     )
     .addOption(
         new Command.Option(ApplicationCommandOptionTypes.STRING, "reason")
-            .setDescription("The reason for softbanning the user")
+            .setDescription("The reason for warning the user.")
             .setMinMax(1, 500)
     )
     .addOption(
