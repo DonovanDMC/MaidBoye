@@ -6,7 +6,7 @@ import E621, { filterPosts } from "../../../util/req/E621.js";
 import UserConfig from "../../../db/Models/UserConfig.js";
 import { makeMessage, orders } from "../../applicationCommands/nsfw/e621.js";
 
-export default class YiffComponent extends BaseComponent {
+export default class E621Component extends BaseComponent {
     action = "nav";
     command = "e621";
 
