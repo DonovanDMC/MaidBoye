@@ -282,7 +282,7 @@ export class Configuration extends PrivateConfiguration {
 
     /* links */
     static get discordLink() {
-        return "https://discord.gg/8k8WHcyf57";
+        return "https://discord.gg/eWJ7aygvqr";
     }
     static get webLink() {
         return "https://maid.gay";
