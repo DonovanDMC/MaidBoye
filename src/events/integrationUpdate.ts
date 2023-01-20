@@ -140,12 +140,8 @@ export default new ClientEvent("integrationUpdate", async function integrationUp
     }
 
     if (guild instanceof Guild && guild.clientMember.permissions.has("VIEW_AUDIT_LOG")) {
-        const auditLog = await guild.getAuditLog({
-            actionType: AuditLogActionTypes.INTEGRATION_UPDATE,
-            limit:      50
-        });
-        const entry = auditLog.entries.find(e => e.targetID === integration.id);
-        if (entry?.user && (entry.createdAt.getTime() + 5e3) > Date.now()) {
+        const entry = Util.getAuditLogEntry(guild, AuditLogActionTypes.INTEGRATION_UPDATE, e => e.targetID === integration.id);
+        if (entry?.user && entry.isRecent) {
             const embed = Util.makeEmbed(true)
                 .setTitle("Integration Update: Blame")
                 .setColor(Colors.gold)

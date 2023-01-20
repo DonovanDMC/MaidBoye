@@ -41,13 +41,9 @@ export default new ClientEvent("guildStickersUpdate", async function guildSticke
         }
 
         if (guild instanceof Guild && guild.clientMember.permissions.has("VIEW_AUDIT_LOG")) {
-            const auditLog = await guild.getAuditLog({
-                actionType: AuditLogActionTypes.STICKER_CREATE,
-                limit:      50
-            });
             const ids = new Set(addedStickers.map(s => s.id));
-            const entry = auditLog.entries.find(e => e.targetID !== null && ids.has(e.targetID));
-            if (entry?.user && (entry.createdAt.getTime() + 5e3) > Date.now()) {
+            const entry = Util.getAuditLogEntry(guild, AuditLogActionTypes.STICKER_CREATE, e => e.targetID !== null && ids.has(e.targetID));
+            if (entry?.user && entry.isRecent) {
                 const embed = Util.makeEmbed(true)
                     .setTitle("Sticker Created: Blame")
                     .setColor(Colors.gold)
@@ -84,13 +80,9 @@ export default new ClientEvent("guildStickersUpdate", async function guildSticke
         }
 
         if (guild instanceof Guild && guild.clientMember.permissions.has("VIEW_AUDIT_LOG")) {
-            const auditLog = await guild.getAuditLog({
-                actionType: AuditLogActionTypes.STICKER_DELETE,
-                limit:      50
-            });
             const ids = new Set(removedStickers.map(s => s.id));
-            const entry = auditLog.entries.find(e => e.targetID !== null && ids.has(e.targetID));
-            if (entry?.user && (entry.createdAt.getTime() + 5e3) > Date.now()) {
+            const entry = Util.getAuditLogEntry(guild, AuditLogActionTypes.STICKER_DELETE, e => e.targetID !== null && ids.has(e.targetID));
+            if (entry?.user && entry.isRecent) {
                 const embed = Util.makeEmbed(true)
                     .setTitle("Sticker Deleted: Blame")
                     .setColor(Colors.gold)
@@ -171,13 +163,9 @@ export default new ClientEvent("guildStickersUpdate", async function guildSticke
             }
 
             if (guild instanceof Guild && guild.clientMember.permissions.has("VIEW_AUDIT_LOG")) {
-                const auditLog = await guild.getAuditLog({
-                    actionType: AuditLogActionTypes.STICKER_UPDATE,
-                    limit:      50
-                });
                 const ids = new Set(updatedStickers.map(s => s.id));
-                const entry = auditLog.entries.find(e => e.targetID !== null && ids.has(e.targetID));
-                if (entry?.user && (entry.createdAt.getTime() + 5e3) > Date.now()) {
+                const entry = Util.getAuditLogEntry(guild, AuditLogActionTypes.STICKER_UPDATE, e => e.targetID !== null && ids.has(e.targetID));
+                if (entry?.user && entry.isRecent) {
                     const embed = Util.makeEmbed(true)
                         .setTitle("Sticker Updated: Blame")
                         .setColor(Colors.gold)

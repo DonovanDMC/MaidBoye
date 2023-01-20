@@ -27,12 +27,8 @@ export default new ClientEvent("channelDelete", async function channelDeleteEven
         ].join("\n"), false);
 
     if (channel.guild.clientMember.permissions.has("VIEW_AUDIT_LOG")) {
-        const auditLog = await channel.guild.getAuditLog({
-            actionType: AuditLogActionTypes.CHANNEL_DELETE,
-            limit:      50
-        });
-        const entry = auditLog.entries.find(e => e.targetID === channel.id);
-        if (entry?.user && (entry.createdAt.getTime() + 5e3) > Date.now()) {
+        const entry = Util.getAuditLogEntry(channel.guild, AuditLogActionTypes.CHANNEL_DELETE, e => e.targetID === channel.id);
+        if (entry?.user && entry.isRecent) {
             embed.addField("Blame", `**${entry.user.tag}** (${entry.user.tag})`, false);
             if (entry.reason) {
                 embed.addField("Reason", entry.reason, false);

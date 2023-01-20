@@ -40,13 +40,9 @@ export default new ClientEvent("guildEmojisUpdate", async function guildEmojisUp
         }
 
         if (guild instanceof Guild && guild.clientMember.permissions.has("VIEW_AUDIT_LOG")) {
-            const auditLog = await guild.getAuditLog({
-                actionType: AuditLogActionTypes.EMOJI_CREATE,
-                limit:      50
-            });
             const ids = new Set(addedEmojis.map(e => e.id));
-            const entry = auditLog.entries.find(e => e.targetID !== null && ids.has(e.targetID));
-            if (entry?.user && (entry.createdAt.getTime() + 5e3) > Date.now()) {
+            const entry = Util.getAuditLogEntry(guild, AuditLogActionTypes.EMOJI_CREATE, e => e.targetID !== null && ids.has(e.targetID));
+            if (entry?.user && entry.isRecent) {
                 const embed = Util.makeEmbed(true)
                     .setTitle("Emoji Created: Blame")
                     .setColor(Colors.gold)
@@ -83,13 +79,9 @@ export default new ClientEvent("guildEmojisUpdate", async function guildEmojisUp
         }
 
         if (guild instanceof Guild && guild.clientMember.permissions.has("VIEW_AUDIT_LOG")) {
-            const auditLog = await guild.getAuditLog({
-                actionType: AuditLogActionTypes.EMOJI_DELETE,
-                limit:      50
-            });
             const ids = new Set(removedEmojis.map(e => e.id));
-            const entry = auditLog.entries.find(e => e.targetID !== null && ids.has(e.targetID));
-            if (entry?.user && (entry.createdAt.getTime() + 5e3) > Date.now()) {
+            const entry = Util.getAuditLogEntry(guild, AuditLogActionTypes.EMOJI_DELETE, e => e.targetID !== null && ids.has(e.targetID));
+            if (entry?.user && entry.isRecent) {
                 const embed = Util.makeEmbed(true)
                     .setTitle("Emoji Deleted: Blame")
                     .setColor(Colors.gold)
@@ -148,13 +140,9 @@ export default new ClientEvent("guildEmojisUpdate", async function guildEmojisUp
         }
 
         if (guild instanceof Guild && guild.clientMember.permissions.has("VIEW_AUDIT_LOG")) {
-            const auditLog = await guild.getAuditLog({
-                actionType: AuditLogActionTypes.EMOJI_UPDATE,
-                limit:      50
-            });
             const ids = new Set(updatedEmojis.map(e => e.id));
-            const entry = auditLog.entries.find(e => e.targetID !== null && ids.has(e.targetID));
-            if (entry?.user && (entry.createdAt.getTime() + 5e3) > Date.now()) {
+            const entry = Util.getAuditLogEntry(guild, AuditLogActionTypes.EMOJI_UPDATE, e => e.targetID !== null && ids.has(e.targetID));
+            if (entry?.user && entry.isRecent) {
                 const embed = Util.makeEmbed(true)
                     .setTitle("Emoji Updated: Blame")
                     .setColor(Colors.gold)

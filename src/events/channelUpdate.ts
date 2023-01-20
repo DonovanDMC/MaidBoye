@@ -256,12 +256,8 @@ export default new ClientEvent("channelUpdate", async function channelUpdateEven
     }
 
     if (channel.guild.clientMember.permissions.has("VIEW_AUDIT_LOG")) {
-        const auditLog = await channel.guild.getAuditLog({
-            actionType: AuditLogActionTypes.CHANNEL_UPDATE,
-            limit:      50
-        });
-        const entry = auditLog.entries.find(e => e.targetID === channel.id);
-        if (entry?.user && (entry.createdAt.getTime() + 5e3) > Date.now()) {
+        const entry = Util.getAuditLogEntry(channel.guild, AuditLogActionTypes.CHANNEL_UPDATE, e => e.targetID === channel.id);
+        if (entry?.user && entry.isRecent) {
             const embed = Util.makeEmbed(true)
                 .setTitle("Channel Update: Blame")
                 .setColor(Colors.gold)

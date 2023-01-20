@@ -60,12 +60,8 @@ export default new ClientEvent("stageInstanceUpdate", async function stageInstan
     }
 
     if (stage.guild.clientMember.permissions.has("VIEW_AUDIT_LOG")) {
-        const auditLog = await stage.guild.getAuditLog({
-            actionType: AuditLogActionTypes.STAGE_INSTANCE_CREATE,
-            limit:      50
-        });
-        const entry = auditLog.entries.find(e => e.targetID === stage.id);
-        if (entry?.user && (entry.createdAt.getTime() + 5e3) > Date.now()) {
+        const entry = Util.getAuditLogEntry(stage.guild, AuditLogActionTypes.STAGE_INSTANCE_CREATE, e => e.targetID === stage.id);
+        if (entry?.user && entry.isRecent) {
             const embed = Util.makeEmbed(true)
                 .setTitle("Stage Instance Update: Blame")
                 .setColor(Colors.gold)

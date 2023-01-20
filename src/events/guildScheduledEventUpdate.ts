@@ -156,12 +156,8 @@ export default new ClientEvent("guildScheduledEventUpdate", async function guild
     }
 
     if (event.guild.clientMember.permissions.has("VIEW_AUDIT_LOG")) {
-        const auditLog = await event.guild.getAuditLog({
-            actionType: AuditLogActionTypes.GUILD_SCHEDULED_EVENT_UPDATE,
-            limit:      50
-        });
-        const entry = auditLog.entries.find(e => e.targetID === event.id);
-        if (entry?.user && (entry.createdAt.getTime() + 5e3) > Date.now()) {
+        const entry = Util.getAuditLogEntry(event.guild, AuditLogActionTypes.GUILD_SCHEDULED_EVENT_UPDATE, e => e.targetID === event.id);
+        if (entry?.user && entry.isRecent) {
             const embed = Util.makeEmbed(true)
                 .setTitle("Scheduled Event Update: Blame")
                 .setColor(Colors.gold)

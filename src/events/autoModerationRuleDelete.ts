@@ -58,7 +58,7 @@ export default new ClientEvent("autoModerationRuleDelete", async function autoMo
 
     const creator = (await this.getUser(rule.creatorID))!;
     const embed = Util.makeEmbed(true)
-        .setTitle("Auto Moderation Rule De;eted")
+        .setTitle("Auto Moderation Rule Deleted")
         .setColor(Colors.red)
         .addField("Rule Info", [
             `Name: **${rule.name}**`,
@@ -74,12 +74,8 @@ export default new ClientEvent("autoModerationRuleDelete", async function autoMo
         ].join("\n"), false);
 
     if (rule.guild.clientMember.permissions.has("VIEW_AUDIT_LOG")) {
-        const auditLog = await rule.guild.getAuditLog({
-            actionType: AuditLogActionTypes.AUTO_MODERATION_RULE_DELETE,
-            limit:      50
-        });
-        const entry = auditLog.entries.find(e => e.targetID === rule.id);
-        if (entry?.user && (entry.createdAt.getTime() + 5e3) > Date.now()) {
+        const entry = Util.getAuditLogEntry(rule.guild, AuditLogActionTypes.AUTO_MODERATION_RULE_DELETE, e => e.targetID === rule.id);
+        if (entry?.user && entry.isRecent) {
             embed.addField("Blame", `**${entry.user.tag}** (${entry.user.tag})`, false);
             if (entry.reason) {
                 embed.addField("Reason", entry.reason, false);

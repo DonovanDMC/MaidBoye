@@ -51,12 +51,9 @@ export default new ClientEvent("messageDeleteBulk", async function messageDelete
         .setColor(Colors.red);
 
     if (guild.clientMember.permissions.has("VIEW_AUDIT_LOG")) {
-        const auditLog = await guild.getAuditLog({
-            actionType: AuditLogActionTypes.MESSAGE_BULK_DELETE,
-            limit:      50
-        });
-        const entry = auditLog.entries[0];
-        if (entry?.user && (entry.createdAt.getTime() + 5e3) > Date.now()) {
+        // @TODO ensure this works
+        const entry = Util.getAuditLogEntry(guild, AuditLogActionTypes.MESSAGE_BULK_DELETE, e => e.targetID === channel.id);
+        if (entry?.user && entry.isRecent) {
             embed.addField("Blame", `${entry.user.tag} (${entry.user.id})`, false);
             if (entry.reason) {
                 embed.addField("Reason", entry.reason, false);

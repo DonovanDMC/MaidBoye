@@ -46,12 +46,8 @@ export default new ClientEvent("guildMemberRemove", async function guildMemberRe
 
         let ok = false;
         if (guild instanceof Guild && guild.clientMember.permissions.has("VIEW_AUDIT_LOG")) {
-            const auditLog = await guild.getAuditLog({
-                actionType: AuditLogActionTypes.MEMBER_KICK,
-                limit:      50
-            });
-            const entry = auditLog.entries.find(e => e.targetID === user.id);
-            if (entry?.user && (entry.createdAt.getTime() + 5e3) > Date.now()) {
+            const entry = Util.getAuditLogEntry(guild, AuditLogActionTypes.MEMBER_KICK, e => e.targetID === user.id);
+            if (entry?.user && entry.isRecent) {
                 embed.addField("Blame", `${entry.user.tag} (${entry.user.id})`, false);
                 if (entry.reason) {
                     embed.addField("Reason", entry.reason, false);

@@ -455,12 +455,8 @@ export default new ClientEvent("guildUpdate", async function guildUpdateEvent(gu
         }
 
         if (guild.clientMember.permissions.has("VIEW_AUDIT_LOG")) {
-            const auditLog = await guild.getAuditLog({
-                actionType: AuditLogActionTypes.GUILD_UPDATE,
-                limit:      50
-            });
-            const entry = auditLog.entries.find(e => e.targetID === guild.id);
-            if (entry?.user && (entry.createdAt.getTime() + 5e3) > Date.now()) {
+            const entry = Util.getAuditLogEntry(guild, AuditLogActionTypes.GUILD_UPDATE, e => e.targetID === guild.id);
+            if (entry?.user && entry.isRecent) {
                 const embed = Util.makeEmbed(true)
                     .setTitle("Server Update: Blame")
                     .setColor(Colors.gold)

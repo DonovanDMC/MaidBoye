@@ -2,7 +2,7 @@ import ClientEvent from "../util/ClientEvent.js";
 import LogEvent, { LogEvents } from "../db/Models/LogEvent.js";
 import Util from "../util/Util.js";
 import { Colors } from "../util/Constants.js";
-import { AuditLogActionTypes, type EmbedField, type EmbedOptions } from "oceanic.js";
+import type { EmbedField, EmbedOptions } from "oceanic.js";
 
 export default new ClientEvent("voiceStateUpdate", async function voiceStateUpdateEvent(member, oldState) {
     if (oldState === null || member.voiceState === null) {
@@ -113,12 +113,8 @@ export default new ClientEvent("voiceStateUpdate", async function voiceStateUpda
     }
 
     if ((deafIndex !== -1 || muteIndex !== -1) && member.guild.clientMember.permissions.has("VIEW_AUDIT_LOG")) {
-        const auditLog = await member.guild.getAuditLog({
-            actionType: AuditLogActionTypes.MEMBER_UPDATE,
-            limit:      50
-        });
-        const entryDeaf = auditLog.entries.find(e => e.targetID === member.id && e.changes?.find(c => c.key === "deaf" && c.new_value === member.voiceState?.deaf && c.old_value === oldState.deaf));
-        const entryMute = auditLog.entries.find(e => e.targetID === member.id && e.changes?.find(c => c.key === "mute" && c.new_value === member.voiceState?.mute && c.old_value === oldState.mute));
+        const entryDeaf = member.guild.auditLogEntries.find(e => e.targetID === member.id && e.changes?.find(c => c.key === "deaf" && c.new_value === member.voiceState?.deaf && c.old_value === oldState.deaf));
+        const entryMute = member.guild.auditLogEntries.find(e => e.targetID === member.id && e.changes?.find(c => c.key === "mute" && c.new_value === member.voiceState?.mute && c.old_value === oldState.mute));
 
         if (deafIndex !== -1 && entryDeaf?.user && (entryDeaf.createdAt.getTime() + 5e3) > Date.now()) {
             const fields: Array<EmbedField> = [];

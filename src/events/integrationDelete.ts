@@ -29,12 +29,8 @@ export default new ClientEvent("integrationDelete", async function integrationDe
         ].join("\n") : `ID: ${integration.id}\nNo other information is available.`, false);
 
     if (guild instanceof Guild && guild.clientMember.permissions.has("VIEW_AUDIT_LOG")) {
-        const auditLog = await guild.getAuditLog({
-            actionType: AuditLogActionTypes.INTEGRATION_DELETE,
-            limit:      50
-        });
-        const entry = auditLog.entries.find(e => e.targetID === integration.id);
-        if (entry?.user && (entry.createdAt.getTime() + 5e3) > Date.now()) {
+        const entry = Util.getAuditLogEntry(guild, AuditLogActionTypes.INTEGRATION_DELETE, e => e.targetID === integration.id);
+        if (entry?.user && entry.isRecent) {
             embed.addField("Blame", `**${entry.user.tag}** (${entry.user.tag})`, false);
             if (entry.reason) {
                 embed.addField("Reason", entry.reason, false);

@@ -23,12 +23,8 @@ export default new ClientEvent("voiceChannelLeave", async function voiceChannelL
         ].join("\n"), false);
 
     if (channel.guild.clientMember.permissions.has("VIEW_AUDIT_LOG")) {
-        const auditLog = await channel.guild.getAuditLog({
-            actionType: AuditLogActionTypes.MEMBER_DISCONNECT,
-            limit:      50
-        });
-        const entry = auditLog.entries[0];
-        if (entry?.user && (entry.createdAt.getTime() + 5e3) > Date.now()) {
+        const entry = Util.getAuditLogEntry(channel.guild, AuditLogActionTypes.MEMBER_DISCONNECT, e => e.targetID === member.id);
+        if (entry?.user && entry.isRecent) {
             embed.addField("Blame", `**${entry.user.tag}** (${entry.user.tag})`, false);
             if (entry.reason) {
                 embed.addField("Reason", entry.reason, false);

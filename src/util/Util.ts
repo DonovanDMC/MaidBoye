@@ -21,14 +21,15 @@ import {
     ComponentTypes,
     Member,
     User,
-    Role
-} from "oceanic.js";
-import type {
-    AnyChannel,
-    CreateMessageOptions,
-    EmbedOptions,
-    Uncached,
-    MessageActionRow
+    Role,
+    type Guild,
+    type AuditLogActionTypes,
+    type AuditLogEntry,
+    type AnyChannel,
+    type CreateMessageOptions,
+    type EmbedOptions,
+    type Uncached,
+    type MessageActionRow
 } from "oceanic.js";
 import type { ModuleImport } from "@uwu-codes/types";
 import { ButtonColors, ComponentBuilder, EmbedBuilder } from "@oceanicjs/builders";
@@ -244,6 +245,18 @@ export default class Util {
         const values = Object.values(data).filter(val => val !== undefined && val !== null);
         const res = await db.query<OkPacket>(`UPDATE ${table} SET ${keys.map((j, index) => `${j}=$${index + 2}`).join(", ")}, updated_at=CURRENT_TIMESTAMP(3) WHERE id = $1`, [id, ...values]);
         return res.rowCount >= 1;
+    }
+
+    static getAuditLogEntry(guild: Guild, type: AuditLogActionTypes, filter: (entry: AuditLogEntry) => boolean = () => true) {
+        const entry = guild.auditLogEntries.find(e => e.actionType === type && filter(e));
+        if (entry) {
+            Object.defineProperty(entry, "isRecent", {
+                get(this: AuditLogEntry) {
+                    return (Date.now() - this.createdAt.getTime()) < 5000;
+                }
+            });
+        }
+        return entry as AuditLogEntry & { readonly isRecent: boolean;} ?? null;
     }
 
     static getFlags<T extends string, N extends number | bigint>(list: Record<T, N>, flags: N, skipEnumReverseKeys = true) {

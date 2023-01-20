@@ -16,13 +16,9 @@ export default new ClientEvent("guildBanRemove", async function guildBanRemoveEv
         .addField("Member", `**${user.tag}** (${user.mention})`, false);
 
     if (guild instanceof Guild && guild.clientMember.permissions.has("VIEW_AUDIT_LOG")) {
-        const auditLog = await guild.getAuditLog({
-            actionType: AuditLogActionTypes.MEMBER_BAN_REMOVE,
-            limit:      50
-        });
-        const entry = auditLog.entries[0];
-        if (entry?.user && (entry.createdAt.getTime() + 5e3) > Date.now()) {
-            embed.addField("Blame", `**${entry.user.tag}** (${entry.user.mention})`, false);
+        const entry = Util.getAuditLogEntry(guild, AuditLogActionTypes.MEMBER_BAN_REMOVE, e => e.targetID === user.id);
+        if (entry?.user && entry.isRecent) {
+            embed.addField("Blame", `**${entry.user.tag}** (${entry.user.tag})`, false);
             if (entry.reason) {
                 embed.addField("Reason", entry.reason, false);
             }

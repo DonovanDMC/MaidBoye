@@ -470,5 +470,6 @@ export const IntegrationExpireBehaviorNames = {
 export const StickerFormatTypeNames = {
     [StickerFormatTypes.PNG]:    "PNG",
     [StickerFormatTypes.APNG]:   "APNG",
-    [StickerFormatTypes.LOTTIE]: "Lottie"
+    [StickerFormatTypes.LOTTIE]: "Lottie",
+    [StickerFormatTypes.GIF]:    "GIF"
 } satisfies Record<StickerFormatTypes, string>;

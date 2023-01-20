@@ -70,7 +70,7 @@ export class Configuration extends PrivateConfiguration {
                 intents:       [
                     "GUILDS",
                     "GUILD_MEMBERS",
-                    "GUILD_BANS",
+                    "GUILD_MODERATION",
                     "GUILD_EMOJIS_AND_STICKERS",
                     "GUILD_INTEGRATIONS",
                     "GUILD_WEBHOOKS",

@@ -16,13 +16,10 @@ export default new ClientEvent("guildBanAdd", async function guildBanAddEvent(gu
         .addField("Member", `**${user.tag}** (${user.mention})`, false);
 
     if (guild instanceof Guild && guild.clientMember.permissions.has("VIEW_AUDIT_LOG")) {
-        const auditLog = await guild.getAuditLog({
-            actionType: AuditLogActionTypes.MEMBER_BAN_ADD,
-            limit:      50
-        });
-        if (auditLog) {
-            const entry = auditLog.entries[0];
-            if (entry?.user && (entry.createdAt.getTime() + 5e3) > Date.now() && entry.reason) {
+        const entry = Util.getAuditLogEntry(guild, AuditLogActionTypes.MEMBER_BAN_ADD, e => e.targetID === user.id);
+        if (entry?.user && entry.isRecent) {
+            embed.addField("Blame", `**${entry.user.tag}** (${entry.user.tag})`, false);
+            if (entry.reason) {
                 embed.addField("Reason", entry.reason, false);
             }
         }

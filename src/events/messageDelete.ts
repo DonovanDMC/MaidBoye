@@ -48,12 +48,8 @@ export default new ClientEvent("messageDelete", async function messageDeleteEven
         .addField("Content", Strings.truncate(msg.content || "[No Content]", 1000), false);
 
     if (msg.guild?.clientMember.permissions.has("VIEW_AUDIT_LOG")) {
-        const auditLog = await msg.guild.getAuditLog({
-            actionType: AuditLogActionTypes.MESSAGE_DELETE,
-            limit:      50
-        });
-        const entry = auditLog.entries[0];
-        if (entry?.user && (entry.createdAt.getTime() + 5e3) > Date.now()) {
+        const entry = Util.getAuditLogEntry(msg.guild, AuditLogActionTypes.MESSAGE_DELETE, e => e.targetID === msg.id);
+        if (entry?.user && entry.isRecent) {
             embed.addField("Blame", `${entry.user.tag} (${entry.user.id})`, false);
             if (entry.reason) {
                 embed.addField("Reason", entry.reason, false);

@@ -3,7 +3,7 @@ import LogEvent, { LogEvents } from "../db/Models/LogEvent.js";
 import Util from "../util/Util.js";
 import { Colors } from "../util/Constants.js";
 import { InviteTargetTypeNames } from "../util/Names.js";
-import { AuditLogActionTypes, Invite } from "oceanic.js";
+import { AuditLogActionTypes, Guild, Invite } from "oceanic.js";
 import { Time } from "@uwu-codes/utils";
 
 export default new ClientEvent("inviteDelete", async function inviteDeleteEvent(invite) {
@@ -32,13 +32,10 @@ export default new ClientEvent("inviteDelete", async function inviteDeleteEvent(
             ] : [])
         ].join("\n"), false);
 
-    if (invite instanceof Invite && invite.guild?.clientMember.permissions.has("VIEW_AUDIT_LOG")) {
-        const auditLog = await invite.guild.getAuditLog({
-            actionType: AuditLogActionTypes.INVITE_DELETE,
-            limit:      50
-        });
-        const entry = auditLog.entries.find(e => e.changes?.find(c => c.key === "code" && c.new_value === invite.code));
-        if (entry?.user && (entry.createdAt.getTime() + 5e3) > Date.now()) {
+    const guild = invite instanceof Invite ? invite.guild.completeGuild : (invite.guild instanceof Guild ? invite.guild : undefined);
+    if (invite instanceof Invite && guild?.clientMember.permissions.has("VIEW_AUDIT_LOG")) {
+        const entry = Util.getAuditLogEntry(guild, AuditLogActionTypes.INVITE_DELETE, e => !!e.changes?.find(c => c.key === "code" && c.new_value === invite.code));
+        if (entry?.user && entry.isRecent) {
             embed.addField("Blame", `**${entry.user.tag}** (${entry.user.tag})`, false);
             if (entry.reason) {
                 embed.addField("Reason", entry.reason, false);

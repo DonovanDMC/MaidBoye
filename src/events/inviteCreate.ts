@@ -30,13 +30,10 @@ export default new ClientEvent("inviteCreate", async function inviteCreateEvent(
             `Temporary: **${invite.temporary ? "Yes" : "No"}**`
         ].join("\n"), false);
 
-    if (invite.guild?.clientMember.permissions.has("VIEW_AUDIT_LOG")) {
-        const auditLog = await invite.guild.getAuditLog({
-            actionType: AuditLogActionTypes.INVITE_CREATE,
-            limit:      50
-        });
-        const entry = auditLog.entries.find(e => e.changes?.find(c => c.key === "code" && c.new_value === invite.code));
-        if (entry?.user && (entry.createdAt.getTime() + 5e3) > Date.now()) {
+    const guild = invite.guild?.completeGuild;
+    if (guild?.clientMember.permissions.has("VIEW_AUDIT_LOG")) {
+        const entry = Util.getAuditLogEntry(guild, AuditLogActionTypes.INVITE_CREATE, e => !!e.changes?.find(c => c.key === "code" && c.new_value === invite.code));
+        if (entry?.user && entry.isRecent) {
             embed.addField("Blame", `**${entry.user.tag}** (${entry.user.tag})`, false);
             if (entry.reason) {
                 embed.addField("Reason", entry.reason, false);
