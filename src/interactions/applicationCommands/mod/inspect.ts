@@ -5,12 +5,18 @@ import Warning from "../../../db/Models/Warning.js";
 import ModLog, { ModLogType } from "../../../db/Models/ModLog.js";
 import Util from "../../../util/Util.js";
 import { State } from "../../../util/State.js";
-import { UserCommand } from "../../../util/cmd/OtherCommand.js";
+import { MessageCommand, UserCommand } from "../../../util/cmd/OtherCommand.js";
 import Config from "../../../config/index.js";
 import { ButtonColors, ComponentBuilder } from "@oceanicjs/builders";
 import chunk from "chunk";
 import { Strings } from "@uwu-codes/utils";
-import { ApplicationCommandOptionTypes, InteractionTypes, type MessageActionRow, type User } from "oceanic.js";
+import {
+    ApplicationCommandOptionTypes,
+    InteractionTypes,
+    type Message,
+    type MessageActionRow,
+    type User
+} from "oceanic.js";
 
 export async function mainMenu(this: MaidBoye, interaction: CommandInteraction<ValidLocation.GUILD> | ComponentInteraction<ValidLocation.GUILD>, user: User) {
     const strikes = await Strike.getForUser(interaction.guildID, user.id, "DESC");
@@ -67,7 +73,7 @@ export async function strikeHistory(this: MaidBoye, interaction: CommandInteract
                 style:    ButtonColors.BLURPLE
             })
             .addInteractionButton({
-                customID: State.new(interaction.user.id, "inspect", "nav").with("target", user.id).with("section", "home").encode(),
+                customID: State.new(interaction.user.id, "inspect", "nav").with("target", user.id).with("section", "menu").encode(),
                 emoji:    ComponentBuilder.emojiToPartial(Config.emojis.default.home, "default"),
                 label:    "Home",
                 style:    ButtonColors.BLURPLE
@@ -112,7 +118,7 @@ export async function modHistory(this: MaidBoye, interaction: CommandInteraction
                 style:    ButtonColors.BLURPLE
             })
             .addInteractionButton({
-                customID: State.new(interaction.user.id, "inspect", "nav").with("target", user.id).with("section", "home").encode(),
+                customID: State.new(interaction.user.id, "inspect", "nav").with("target", user.id).with("section", "menu").encode(),
                 emoji:    ComponentBuilder.emojiToPartial(Config.emojis.default.home, "default"),
                 label:    "Home",
                 style:    ButtonColors.BLURPLE
@@ -154,7 +160,7 @@ export async function warningHistory(this: MaidBoye, interaction: CommandInterac
                 style:    ButtonColors.BLURPLE
             })
             .addInteractionButton({
-                customID: State.new(interaction.user.id, "inspect", "nav").with("target", user.id).with("section", "home").encode(),
+                customID: State.new(interaction.user.id, "inspect", "nav").with("target", user.id).with("section", "menu").encode(),
                 emoji:    ComponentBuilder.emojiToPartial(Config.emojis.default.home, "default"),
                 label:    "Home",
                 style:    ButtonColors.BLURPLE
@@ -200,7 +206,7 @@ export default new Command(import.meta.url, "inspect")
     .setOptionsParser(async interaction => ({
         user:    interaction.data.options.getUser("member", true),
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
-        section: (interaction.data.options.getString("section") || "menu") as "strikes" | "mod" | "warnings" | "home"
+        section: (interaction.data.options.getString("section") || "menu") as "strikes" | "mod" | "warnings" | "menu"
     }))
     .setExecutor(async function(interaction, { user, section }) {
         switch (section) {
@@ -213,7 +219,7 @@ export default new Command(import.meta.url, "inspect")
             case "warnings": {
                 return warningHistory.call(this, interaction, user, 1);
             }
-            case "home": {
+            case "menu": {
                 return mainMenu.call(this, interaction, user);
             }
         }
@@ -224,4 +230,12 @@ export const userCommand = new UserCommand(import.meta.url, "Inspect User")
     .setAck("ephemeral")
     .setExecutor(async function(interaction) {
         return mainMenu.call(this, interaction, interaction.data.target as User);
+    });
+
+
+export const messageCommand = new MessageCommand(import.meta.url, "Inspect Author")
+    .setValidLocation(ValidLocation.GUILD)
+    .setAck("ephemeral")
+    .setExecutor(async function(interaction) {
+        return mainMenu.call(this, interaction, (interaction.data.target as Message).author);
     });

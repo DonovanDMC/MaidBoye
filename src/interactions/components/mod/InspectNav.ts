@@ -8,7 +8,7 @@ export default class InspectNavComponent extends BaseComponent {
     action = "nav";
     command = "inspect";
 
-    override async handleGuild(interaction: ComponentInteraction<ValidLocation.GUILD>, { page, section, target }: BaseState & { page: number; section: "home" | "strikes" | "mod" | "warnings"; target: string; }) {
+    override async handleGuild(interaction: ComponentInteraction<ValidLocation.GUILD>, { page, section, target }: BaseState & { page: number; section: "menu" | "strikes" | "mod" | "warnings"; target: string; }) {
         const client = interaction.client as MaidBoye;
         const user = await client.getUser(target);
         if (user === null) {
@@ -25,7 +25,7 @@ export default class InspectNavComponent extends BaseComponent {
             case "warnings": {
                 return warningHistory.call(client, interaction, user, page);
             }
-            case "home": {
+            case "menu": {
                 return mainMenu.call(client, interaction, user);
             }
         }
