@@ -1,3 +1,4 @@
+import TextEncoding from "./TextEncoding.js";
 import db from "../db/index.js";
 
 
@@ -34,7 +35,7 @@ export class State {
             "string",
             ...(extraTypes || [])
         ];
-        const d = Buffer.from(data, "base64url").toString("ascii").split(sep).map((val, index) => {
+        const d = TextEncoding.decode(data).split(sep).map((val, index) => {
             let value: unknown;
             if (val === "NULL") {
                 value = null;
@@ -75,7 +76,7 @@ export class State {
     }
 
     static encode(data: Array<string | number | boolean | null>, sep = ",") {
-        const str = Buffer.from(data.map(d => d === null ? "NULL" : d).join(sep)).toString("base64url").replace(/=/g, "");
+        const str = TextEncoding.encode(data.map(d => d === null ? "NULL" : d).join(sep));
         if (str.length > this.MAX_LENGTH) {
             throw new Error(`encoded state is longer than ${this.MAX_LENGTH} (${str})`);
         }

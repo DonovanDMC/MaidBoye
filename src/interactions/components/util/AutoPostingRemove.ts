@@ -1,11 +1,9 @@
 import AutoPostingEntry, { AutoPostingTypes } from "../../../db/Models/AutoPostingEntry.js";
 import type { ComponentInteraction, ValidLocation } from "../../../util/cmd/Command.js";
 import type { BaseState } from "../../../util/State.js";
-import Util from "../../../util/Util.js";
+import Util, { expandUUID } from "../../../util/Util.js";
 import BaseComponent from "../structure/BaseComponent.js";
-import short from "short-uuid";
 
-const expandUUID = (str: string) => short().toUUID(str);
 export default class AutoPostingRemoveComponent extends BaseComponent {
     action = "remove";
     command = "autoposting";

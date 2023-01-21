@@ -1,4 +1,5 @@
 import db from "../../db/index.js";
+import TextEncoding from "../../util/TextEncoding.js";
 import { createHash } from "node:crypto";
 
 export default class E621TagsState {
@@ -7,12 +8,12 @@ export default class E621TagsState {
         if (get === null) {
             return null;
         }
-        return Buffer.from(get, "base64url").toString("ascii").split(" ");
+        return TextEncoding.decode(get).split(" ");
     }
 
     static async store(tags: Array<string>) {
         const id = createHash("md5").update(tags.join(" ")).digest("hex");
-        await db.redis.set(`e621-tags:${id}`, Buffer.from(tags.join(" ")).toString("base64url"));
+        await db.redis.set(`e621-tags:${id}`, TextEncoding.encode(tags.join(" ")));
         return id;
     }
 }

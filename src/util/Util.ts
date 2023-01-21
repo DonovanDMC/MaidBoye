@@ -34,10 +34,13 @@ import {
 import type { ModuleImport } from "@uwu-codes/types";
 import { ButtonColors, ComponentBuilder, EmbedBuilder } from "@oceanicjs/builders";
 import { Strings } from "@uwu-codes/utils";
+import short from "short-uuid";
 import { access } from "node:fs/promises";
 import { request } from "node:https";
 import { AssertionError } from "node:assert";
 
+export const expandUUID = (str: string) => short().toUUID(str);
+export const shrinkUUID = (str: string) => short().fromUUID(str);
 export type CompareResult = "higher" | "lower" | "same" | "invalid" | "unknown";
 export default class Util {
     private static async getE621Image(tags: string, lastScoreTry = 300): Promise<Post | null> {
