@@ -1,5 +1,5 @@
-import Base91 from "./Base91";
-import Logger from "./Logger";
+import Base91 from "./Base91.js";
+import Logger from "./Logger.js";
 
 export default class TextEncoding {
     static decode(data: string) {
