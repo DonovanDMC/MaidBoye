@@ -25,8 +25,10 @@ import {
 } from "oceanic.js";
 import { ButtonColors, ComponentBuilder } from "@oceanicjs/builders";
 import chunk from "chunk";
+import short from "short-uuid";
 import assert from "node:assert";
 
+const shrinkUUID = (str: string) => short().fromUUID(str);
 export async function enableAutoposting(interaction: ComponentInteraction<ValidLocation.GUILD> | ModalSubmitInteraction<ValidLocation.GUILD>, channel: string, webhook: Webhook, type: AutoPostingTypes, time: number) {
     if (!interaction.acknowledged) {
         await interaction.defer(MessageFlags.EPHEMERAL);
@@ -306,7 +308,7 @@ export default new Command(import.meta.url, "autoposting")
                     content:    `Are you sure you want to remove the autoposting of **${Util.readableConstant(AutoPostingTypes[auto.type])}** in <#${auto.channelID}>?`,
                     components: new ComponentBuilder<MessageActionRow>()
                         .addInteractionButton({
-                            customID: State.new(interaction.user.id, "autoposting", "remove").with("entry", entry!).encode(),
+                            customID: State.new(interaction.user.id, "autoposting", "remove").with("entry", shrinkUUID(entry!)).encode(),
                             label:    "Yes",
                             style:    ButtonColors.GREEN
                         })
@@ -369,7 +371,7 @@ export default new Command(import.meta.url, "autoposting")
                             content:    "That entry was disabled due to the webhook being deleted. It cannot be enabled, please remove it and re-add it.",
                             components: new ComponentBuilder<MessageActionRow>()
                                 .addInteractionButton({
-                                    customID: State.new(interaction.user.id, "autoposting", "remove").with("entry", entry).encode(),
+                                    customID: State.new(interaction.user.id, "autoposting", "remove").with("entry", shrinkUUID(entry)).encode(),
                                     label:    "Delete Entry",
                                     style:    ButtonColors.RED
                                 })
@@ -418,7 +420,7 @@ export default new Command(import.meta.url, "autoposting")
                     content:    `Are you sure you want to enable the autoposting of **${Util.readableConstant(AutoPostingTypes[auto.type])}** in <#${auto.channelID}>?\n\n${notes}`,
                     components: new ComponentBuilder<MessageActionRow>()
                         .addInteractionButton({
-                            customID: State.new(interaction.user.id, "autoposting", "enable").with("entry", entry).encode(),
+                            customID: State.new(interaction.user.id, "autoposting", "enable").with("entry", shrinkUUID(entry)).encode(),
                             label:    "Yes",
                             style:    ButtonColors.GREEN
                         })
@@ -478,7 +480,7 @@ export default new Command(import.meta.url, "autoposting")
                     content:    `Are you sure you want to disable the autoposting of **${Util.readableConstant(AutoPostingTypes[auto.type])}** in <#${auto.channelID}>?`,
                     components: new ComponentBuilder<MessageActionRow>()
                         .addInteractionButton({
-                            customID: State.new(interaction.user.id, "autoposting", "disable").with("entry", entry).encode(),
+                            customID: State.new(interaction.user.id, "autoposting", "disable").with("entry", shrinkUUID(entry)).encode(),
                             label:    "Yes",
                             style:    ButtonColors.GREEN
                         })

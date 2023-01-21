@@ -3,7 +3,9 @@ import type { ComponentInteraction, ValidLocation } from "../../../util/cmd/Comm
 import type { BaseState } from "../../../util/State.js";
 import Util from "../../../util/Util.js";
 import BaseComponent from "../structure/BaseComponent.js";
+import short from "short-uuid";
 
+const expandUUID = (str: string) => short().toUUID(str);
 export default class AutoPostingDisableComponent extends BaseComponent {
     action = "disable";
     command = "autoposting";
@@ -19,7 +21,9 @@ export default class AutoPostingDisableComponent extends BaseComponent {
             }));
         }
 
-        const auto = await AutoPostingEntry.get(entry);
+        const uuid = expandUUID(entry);
+
+        const auto = await AutoPostingEntry.get(uuid);
         if (!auto) {
             return interaction.editParent(Util.replaceContent({
                 content: "Something broke.."
