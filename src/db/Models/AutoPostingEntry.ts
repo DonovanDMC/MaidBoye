@@ -106,8 +106,9 @@ if (Config.isDevelopment) {
 }
 export type AutoPostingTime = typeof ValidAutoPostingTimes[number];
 export default class AutoPostingEntry {
-    static MAX_ENTRIES = 30;
-    static MAX_ENTRIES_PER_TYPE = 3;
+    static MAX_ENABLED = 50;
+    static MAX_PER_TYPE = 3;
+    static MAX_TOTAL = 30;
     static TABLE = "autoposting";
     _data: AutoPostingEntryData;
     channelID: string;
@@ -128,6 +129,24 @@ export default class AutoPostingEntry {
         this.load(data);
     }
 
+    static async canAdd(type: AutoPostingTypes, guild: string, channel: string) {
+        const autos = await AutoPostingEntry.getAll(guild, "enabled");
+        if (autos.length >= AutoPostingEntry.MAX_ENABLED) {
+            return "MAX_ENABLED" as const;
+        }
+
+        const typeCount = autos.filter(a => a.type === type).length;
+        if (typeCount >= AutoPostingEntry.MAX_PER_TYPE) {
+            return "MAX_PER_TYPE" as const;
+        }
+
+        if (typeCount > 0 && autos.some(ev => ev.type === type && ev.channelID === channel)) {
+            return "CHANNEL_ALREADY_ENABLED" as const;
+        }
+
+        return true;
+    }
+
     static async create(data: AutoPostingEntryCreationData) {
         await GuildConfig.ensureExists(data.guild_id);
         const res = await db.insert<string>(this.TABLE, { ...data, id: randomUUID() });
@@ -145,8 +164,8 @@ export default class AutoPostingEntry {
         return res ? new AutoPostingEntry(res) : null;
     }
 
-    static async getAll(guild: string, filter: "enabled" | "disabled" = "enabled") {
-        const { rows } = await db.query<AutoPostingEntryData>(`SELECT * FROM ${this.TABLE} WHERE guild_id = $1 AND status ${filter === "enabled" ? "=" : "!="} $2`, [guild, AutoPostingStatus.ENABLED ]);
+    static async getAll(guild: string, filter?: "enabled" | "disabled") {
+        const { rows } = await db.query<AutoPostingEntryData>(`SELECT * FROM ${this.TABLE} WHERE guild_id = $1${filter ? ` AND status ${filter === "enabled" ? "=" : "!="} $2` : ""}`, filter ? [guild, AutoPostingStatus.ENABLED ] : [guild]);
         return rows.map(row => new AutoPostingEntry(row));
     }
 
@@ -173,12 +192,7 @@ export default class AutoPostingEntry {
     }
 
     static async getTime(time: AutoPostingEntry["time"]) {
-        const { rows } = await db.query<AutoPostingEntryData>(`SELECT * FROM ${this.TABLE} WHERE time = $1`, [time]);
-        return rows.map(row => new AutoPostingEntry(row));
-    }
-
-    static async getType(guild: string, type: AutoPostingTypes) {
-        const { rows } = await db.query<AutoPostingEntryData>(`SELECT * FROM ${this.TABLE} WHERE guild_id = $1 AND type = $2`, [guild, type]);
+        const { rows } = await db.query<AutoPostingEntryData>(`SELECT * FROM ${this.TABLE} WHERE time = $1 AND status = $2`, [time, AutoPostingStatus.ENABLED]);
         return rows.map(row => new AutoPostingEntry(row));
     }
 
@@ -197,7 +211,31 @@ export default class AutoPostingEntry {
         };
     }
 
+    async canEnable(client: Client) {
+        if (this.status === AutoPostingStatus.ENABLED) {
+            return "ALREADY_ENABLED" as const;
+        }
+
+        if (this.status === AutoPostingStatus.WEBHOOK_DELETED) {
+            return "WEBHOOK_DELETED" as const;
+        }
+
+        const addCheck = await AutoPostingEntry.canAdd(this.type, this.guildID, this.channelID);
+        if (addCheck !== true) {
+            return addCheck;
+        }
+
+        if (!await this.checkNSFW(client)) {
+            return "NSFW_CHECK_FAILED" as const;
+        }
+
+        return true;
+    }
+
     async checkNSFW(client: Client, isRetry = false): Promise<boolean> {
+        if (!AutoPostingNSFW.includes(this.type)) {
+            return true;
+        }
         const channel = await client.rest.channels.get<AnyGuildTextChannelWithoutThreads>(this.channelID).catch(() => null);
         if (channel === null) {
             const check = await this.checkWebhook(client);
@@ -251,7 +289,10 @@ export default class AutoPostingEntry {
     }
 
     async execute(client: Client, options: ExecuteWebhookOptions) {
-        if (AutoPostingNSFW.includes(this.type) && !(await this.checkNSFW(client))) {
+        if (this.status !== AutoPostingStatus.ENABLED) {
+            return null;
+        }
+        if (!(await this.checkNSFW(client))) {
             Logger.getLogger("AutoPosting").warn(`AutoPosting of "${Util.readableConstant(AutoPostingTypes[this.type])}" has been disabled because the NSFW check failed.`);
             return null;
         }

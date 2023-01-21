@@ -196,17 +196,22 @@ export default new Command(import.meta.url, "autoposting")
                     rawType = rawType.toUpperCase().replace(/\s/g, "_") as typeof rawType;
                 }
                 const type = AutoPostingTypes[rawType];
-                const total = await AutoPostingEntry.getCount(interaction.guild.id);
                 const autos = await AutoPostingEntry.getAll(interaction.guild.id);
-                if (total >= AutoPostingEntry.MAX_ENTRIES) {
+                const enabled = autos.filter(ev => ev.status === AutoPostingStatus.ENABLED);
+                if (autos.length >= AutoPostingEntry.MAX_TOTAL) {
                     return interaction.reply(Util.replaceContent({
-                        content: `H-hey! This server already has the maximum amount of autoposting (${AutoPostingEntry.MAX_ENTRIES}) enabled.. Remove some to add more.`
+                        content: `H-hey! This server already has the maximum amount of autoposting entries (${AutoPostingEntry.MAX_TOTAL}) .. Remove some to add more.\n\nNote: This includes both enabled and disabled entries.`
+                    }));
+                }
+                if (enabled.length >= AutoPostingEntry.MAX_ENABLED) {
+                    return interaction.reply(Util.replaceContent({
+                        content: `H-hey! This server already has the maximum amount of enabled autoposting entries (${AutoPostingEntry.MAX_ENABLED}) .. Remove or disable some to add more.`
                     }));
                 }
 
-                const current = autos.filter(ev => ev.type === type).length;
+                const current = enabled.filter(ev => ev.type === type).length;
 
-                if (current >= AutoPostingEntry.MAX_ENTRIES_PER_TYPE) {
+                if (current >= AutoPostingEntry.MAX_PER_TYPE) {
                     return interaction.reply(Util.replaceContent({
                         content: `H-hey! This server already has the maximum amount of autoposting for **${Util.readableConstant(AutoPostingTypes[type])}** enabled.. Remove some to add more.`
                     }));
@@ -218,9 +223,9 @@ export default new Command(import.meta.url, "autoposting")
                     }));
                 }
 
-                if (total + 1 > AutoPostingEntry.MAX_ENTRIES) {
+                if (autos.length >= AutoPostingEntry.MAX_ENABLED) {
                     return interaction.reply(Util.replaceContent({
-                        content: `H-hey! Adding that would put you over the autoposting limit (${AutoPostingEntry.MAX_ENTRIES}).. Remove some to add it.`
+                        content: `H-hey! Adding that would put you over the autoposting limit (${AutoPostingEntry.MAX_ENABLED}).. Remove some to add it.`
                     }));
                 }
 
@@ -280,7 +285,7 @@ export default new Command(import.meta.url, "autoposting")
             }
 
             case "list": {
-                const autos = (await AutoPostingEntry.getCount(interaction.guild.id, undefined, channel?.id));
+                const autos = (await AutoPostingEntry.getCount(interaction.guild.id, undefined, channel?.id, true));
                 if (autos === 0) {
                     return interaction.reply({
                         content: "H-hey! There aren't any entries to list.."
@@ -351,30 +356,15 @@ export default new Command(import.meta.url, "autoposting")
                     });
                 }
 
-                let notes = "";
-                switch (auto.status) {
-                    case AutoPostingStatus.ENABLED: {
+                const canEnable = await auto.canEnable(this);
+                switch (canEnable) {
+                    case "ALREADY_ENABLED": {
                         return interaction.reply({
                             content: "H-hey! That entry is already enabled.."
                         });
                     }
 
-                    case AutoPostingStatus.DISABLED: {
-                        notes = "This entry was manually disabled.";
-                        break;
-                    }
-
-                    case AutoPostingStatus.FAILED_NSFW_CHECK: {
-                        notes = "This entry was disabled due to an NSFW check failing. This check is performed each time autoposting is ran.";
-                        break;
-                    }
-
-                    case AutoPostingStatus.REPEATED_FAILURES: {
-                        notes = `This entry was disabled due to repeated failures when attempting to post. If this is a recurring issue, please join our support server. (${Config.discordLink})`;
-                        break;
-                    }
-
-                    case AutoPostingStatus.WEBHOOK_DELETED: {
+                    case "WEBHOOK_DELETED": {
                         return interaction.reply({
                             content:    "That entry was disabled due to the webhook being deleted. It cannot be enabled, please remove it and re-add it.",
                             components: new ComponentBuilder<MessageActionRow>()
@@ -385,6 +375,42 @@ export default new Command(import.meta.url, "autoposting")
                                 })
                                 .toJSON()
                         });
+                    }
+
+                    case "MAX_ENABLED": {
+                        return interaction.reply(Util.replaceContent({
+                            content: `H-hey! This server already has the maximum amount of enabled autoposting entries (${AutoPostingEntry.MAX_ENABLED}) .. Remove or disable some to add more.`
+                        }));
+                    }
+
+                    case "MAX_PER_TYPE":{
+                        return interaction.reply(Util.replaceContent({
+                            content: `H-hey! This server already has the maximum amount of autoposting for **${Util.readableConstant(AutoPostingTypes[auto.type])}** enabled.. Remove some to add more.`
+                        }));
+                    }
+
+                    case "CHANNEL_ALREADY_ENABLED": {
+                        return interaction.reply(Util.replaceContent({
+                            content: `H-hey! This server already has autoposting for **${Util.readableConstant(AutoPostingTypes[auto.type])}** enabled in <#${auto.channelID}>..`
+                        }));
+                    }
+
+                    case "NSFW_CHECK_FAILED": {
+                        return interaction.reply({
+                            content: `H-hey! Autoposting of **${Util.readableConstant(AutoPostingTypes[auto.type])}** must be done in an nsfw channel. Please make <#${auto.channelID}> nsfw and try again.`
+                        });
+                    }
+                }
+
+                let notes = "";
+                switch (auto.status) {
+                    case AutoPostingStatus.DISABLED: {
+                        notes = "This entry was manually disabled.";
+                        break;
+                    }
+                    case AutoPostingStatus.REPEATED_FAILURES: {
+                        notes = `This entry was disabled due to repeated failures when attempting to post. If this is a recurring issue, please join our support server. (${Config.discordLink})`;
+                        break;
                     }
                 }
 
