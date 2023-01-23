@@ -5,6 +5,7 @@ import Logger from "./util/Logger.js";
 import CommandHandler from "./util/cmd/CommandHandler.js";
 import api from "./api/index.js";
 import { ApplicationCommandTypeNames } from "./util/Names.js";
+import WebhookHandler from "./util/handlers/WebhookHandler.js";
 import { Strings, Timer } from "@uwu-codes/utils";
 import type { ModuleImport } from "@uwu-codes/types";
 import type {
@@ -107,6 +108,7 @@ export default class MaidBoye extends Client {
         await this.dirCheck();
         await this.loadEvents();
         await CommandHandler.load();
+        await WebhookHandler.init(this);
         /* register commands in ready event */
         return this.connect();
     }

@@ -15,7 +15,7 @@ export default class TextEncoding {
                 }
             }
         } else {
-            // bakcwards compatibility
+            // backwards compatibility
             return Buffer.from(data, "base64url").toString("ascii");
         }
     }
