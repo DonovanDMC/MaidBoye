@@ -26,7 +26,8 @@ export interface GuildConfigData {
     settings: string;
     tags: Record<string, Tag>;
     updated_at: Date | null;
-    welcome_message: string;
+    welcome_join_message: string;
+    welcome_leave_message: string;
     welcome_modifiers: number;
     welcome_webhook_channel_id: string | null;
     welcome_webhook_id: string | null;
@@ -39,12 +40,14 @@ export type GuildConfigCreationData = GuildConfigCreationRequired & Partial<Omit
 export type GuildConfigUpdateData = AllowSymbol<Partial<Omit<GuildConfigData, GuildConfigUpdateIgnored>>>;
 
 export enum GuildWelcomeModifiers {
-    DISABLE_USER_MENTIONS        = 1 << 0,
-    DISABLE_ROLE_MENTIONS        = 1 << 1,
-    DISABLE_EVERYONE_MENTIONS    = 1 << 2,
-    SUPPRESS_EMBEDS              = 1 << 3,
-    WAIT_FOR_PASSING_MEMBER_GATE = 1 << 4,
-    SUPPRESS_NOTIFICATIONS       = 1 << 5,
+    JOIN_ENABLED                 = 1 << 0,
+    LEAVE_ENABLED                = 1 << 1,
+    DISABLE_USER_MENTIONS        = 1 << 2,
+    DISABLE_ROLE_MENTIONS        = 1 << 3,
+    DISABLE_EVERYONE_MENTIONS    = 1 << 4,
+    SUPPRESS_EMBEDS              = 1 << 5,
+    WAIT_FOR_PASSING_MEMBER_GATE = 1 << 6,
+    SUPPRESS_NOTIFICATIONS       = 1 << 7,
 }
 
 export const ModlogSettingKeys = ["MODLOG_CASE_DELETING_ENABLED", "MODLOG_CASE_EDITING_ENABLED", "MODLOG_MODIFY_OTHERS_CASES_ENABLED"] as const;
@@ -92,7 +95,8 @@ export default class GuildConfig {
     updatedAt: Date | null;
     welcome: {
         enabled: boolean;
-        message: string;
+        joinMessage: string;
+        leaveMessage: string;
         modifiers: Array<keyof typeof GuildWelcomeModifiers>;
         webhook: (Record<"id" | "token" | "channelID", string> & { managed: boolean; }) | null;
     };
@@ -165,10 +169,11 @@ export default class GuildConfig {
         this.levelingRoles = data.leveling_roles.slice(1, -1).match(/"\(\d{15,25},\d{1,4}\)"/g)?.map(m => [m.slice(2).split(",")[0], Number(m.slice(0, -2).split(",")[1])]) ?? [];
         this.tags          = data.tags;
         this.welcome       = {
-            enabled:   settings.welcomeEnabled,
-            message:   data.welcome_message,
-            modifiers: Util.getFlagsArray(GuildWelcomeModifiers, data.welcome_modifiers),
-            webhook:   !settings.welcomeEnabled || data.welcome_webhook_id === null || data.welcome_webhook_token === null || data.welcome_webhook_channel_id === null ? null : {
+            enabled:      settings.welcomeEnabled,
+            joinMessage:  data.welcome_join_message,
+            leaveMessage: data.welcome_leave_message,
+            modifiers:    Util.getFlagsArray(GuildWelcomeModifiers, data.welcome_modifiers),
+            webhook:      !settings.welcomeEnabled || data.welcome_webhook_id === null || data.welcome_webhook_token === null || data.welcome_webhook_channel_id === null ? null : {
                 id:        data.welcome_webhook_id,
                 token:     data.welcome_webhook_token,
                 channelID: data.welcome_webhook_channel_id,
@@ -238,7 +243,9 @@ export default class GuildConfig {
             welcome_webhook_id:         null,
             welcome_webhook_token:      null,
             welcome_webhook_channel_id: null,
-            welcome_message:            DBLiteral.DEFAULT
+            welcome_modifiers:          DBLiteral.DEFAULT,
+            welcome_join_message:       DBLiteral.DEFAULT,
+            welcome_leave_message:      DBLiteral.DEFAULT
         });
     }
 

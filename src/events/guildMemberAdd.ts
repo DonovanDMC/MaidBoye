@@ -8,7 +8,7 @@ import WelcomeMessageHandler from "../util/handlers/WelcomeMessageHandler.js";
 import { GuildMemberFlags, UserFlags } from "oceanic.js";
 
 export default new ClientEvent("guildMemberAdd", async function guildMemberAddEvent(member) {
-    await WelcomeMessageHandler.handle(member);
+    await WelcomeMessageHandler.handle(member, member.guild, "join");
 
     const events = await LogEvent.getType(member.guildID, LogEvents.MEMBER_ADD);
     if (events.length === 0) {

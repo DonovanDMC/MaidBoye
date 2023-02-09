@@ -4,9 +4,15 @@ import Util from "../util/Util.js";
 import { Colors } from "../util/Constants.js";
 import { UserFlagNames } from "../util/Names.js";
 import Config from "../config/index.js";
+import WelcomeMessageHandler from "../util/handlers/WelcomeMessageHandler.js";
 import { AuditLogActionTypes, Guild, Member, UserFlags } from "oceanic.js";
 
 export default new ClientEvent("guildMemberRemove", async function guildMemberRemoveEvent(user, guild) {
+    try {
+        if (guild instanceof Guild || (user instanceof Member && user.guild instanceof Guild)) {
+            await WelcomeMessageHandler.handle(user, user instanceof Member ? user.guild : guild as Guild, "leave");
+        }
+    } catch {}
     const member: Member | null = user instanceof Member ? user : null;
     if (user instanceof Member) {
         user = user.user;

@@ -173,7 +173,7 @@ export default new Command(import.meta.url, "welcome")
                             return interaction.reply({ content: "H-hey! The welcome message is not enabled.." });
                         }
 
-                        const map = Replacements(interaction.member);
+                        const map = Replacements(interaction.member, interaction.guild);
                         const commandID = (await this.getCommandIDMap()).chatInput.welcome;
                         return interaction.reply({
                             embeds: Util.makeEmbed(true, interaction.user)
@@ -182,7 +182,7 @@ export default new Command(import.meta.url, "welcome")
                                     "The welcome message can be a maximum of 500 characters. The following variables can be used:",
                                     ...Object.entries(map).map(([k, v]) => `${Config.emojis.default.dot} **${k}** - ${v}`),
                                     "",
-                                    `Modifiers like enabling mentions and disabling embeds can be toggled via ${commandID ? `</welcome config modifiers:${commandID}>` : "/welcome config modifiers"}`,
+                                    `Modifiers like enabling mentions and disabling embeds can be toggled via ${commandID ? `</welcome config modifiers:${commandID}>` : "/welcome config modifiers"}. Note that the modifiers apply to both join and leave messages. For ease of use, the toggling of join/leave messages is considered a modifier.`,
                                     "Click below to edit the welcome message. A preview will be shown before anything is saved."
                                 ])
                                 .toJSON(true),
@@ -231,8 +231,10 @@ export default new Command(import.meta.url, "welcome")
                                     `Webhook: ${hook ? `**${hook.name ?? hook.id}**` : "Unknown"}`
                                 ])
                                 .addField("Modifiers", gConfig.welcome.modifiers.map(mod => `${Config.emojis.default.dot} **${Strings.ucwords(mod.replace(/_/g, " "))}**`).join("\n") || "None", false)
-                                .addField("Raw Message", `\`\`\`\n${gConfig.welcome.message}\`\`\``, false)
-                                .addField("Message Preview", WelcomeMessageHandler.format(gConfig, interaction.member).content, false)
+                                .addField("Raw Join Message", `\`\`\`\n${gConfig.welcome.joinMessage}\`\`\``, false)
+                                .addField("Message Join Preview", WelcomeMessageHandler.format(gConfig, interaction.member, interaction.guild, "join").content, false)
+                                .addField("Raw Leave Message", `\`\`\`\n${gConfig.welcome.leaveMessage}\`\`\``, false)
+                                .addField("Message Leave Preview", WelcomeMessageHandler.format(gConfig, interaction.member, interaction.guild, "leave").content, false)
                                 .setThumbnail(hook?.avatarURL() || "https://cdn.discordapp.com/embed/avatars/0.png")
                                 .toJSON(true)
                         });

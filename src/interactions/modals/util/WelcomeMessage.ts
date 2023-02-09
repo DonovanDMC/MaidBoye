@@ -14,19 +14,26 @@ export default class WelcomeMessageModal extends BaseModal {
     action = "message";
     command = "welcome";
 
-    override async handleGuild(interaction: ModalSubmitInteraction<ValidLocation.GUILD>, components: Record<string, string | undefined>, state: BaseState & { uuid: string | null; }) {
+    override async handleGuild(interaction: ModalSubmitInteraction<ValidLocation.GUILD>, components: Record<string, string | undefined>, state: BaseState & { noFollowupEdit?: boolean; uuid: string | null;  }) {
         const gConfig = await GuildConfig.get(interaction.guildID);
-        const message = components.message!;
-        if (message.length > 500) {
+        const joinMessage = components.joinMessage!;
+        const leaveMessage = components.leaveMessage!;
+        if (joinMessage.length > 500) {
             return interaction.reply({
-                content: "H-hey! That message is too long.."
+                content: "H-hey! The join message is too long.."
+            });
+        }
+        if (leaveMessage.length > 500) {
+            return interaction.reply({
+                content: "H-hey! The leave message is too long.."
             });
         }
 
         const uuid = shortUUID().generate();
-        await db.redis.setex(`welcome-set:${interaction.guildID}:${uuid}`, 60 * 15, message);
+        await db.redis.setex(`welcome-set:${interaction.guildID}:${uuid}:join`, 60 * 15, joinMessage);
+        await db.redis.setex(`welcome-set:${interaction.guildID}:${uuid}:leave`, 60 * 15, leaveMessage);
         await interaction.editParent(Util.replaceContent({
-            content:    "When members join, the message shown below this will be sent. If it looks ok, click **OK** below to continue, else click **Edit** to change the message, or **Cancel** to cancel.",
+            content:    "A preview of the join and leave messages are shown below. The first is join, the second is leave. If they look ok, click **OK** below to continue, else click **Edit** to change the message, or **Cancel** to cancel. If you would like a reference of the variables you can use, click **Show Variables**.",
             components: new ComponentBuilder<MessageActionRow>()
                 .addInteractionButton({
                     customID: State.new(interaction.user.id, "welcome", "set-message").with("uuid", uuid).encode(),
@@ -44,33 +51,50 @@ export default class WelcomeMessageModal extends BaseModal {
                     style:    ButtonColors.BLURPLE
                 })
                 .addInteractionButton({
-                    customID: State.cancel(interaction.user.id),
+                    customID: State.new(interaction.user.id, "welcome", "cancel").with("uuid", state.uuid || uuid).encode(),
                     label:    "Cancel",
                     style:    ButtonColors.RED
                 })
                 .toJSON()
         }));
 
-        let newFollowup = true;
+        let newFollowupJoin = true, newFollowupLeave = true;
         if (state.uuid) {
-            try {
-                const old = await db.redis.get(`welcome-edit:${interaction.guildID}:${state.uuid}`);
-                if (old !== null) {
-                    const [token, id] = EncryptionHandler.decrypt(old).split(":");
-                    newFollowup = await interaction.client.rest.interactions.editFollowupMessage(interaction.applicationID, token, id, {
-                        ...WelcomeMessageHandler.format(gConfig, interaction.member, message),
-                        flags: MessageFlags.EPHEMERAL
-                    }).then(() => false, () => true);
-                }
-            } catch {}
+            const oldJoin = await db.redis.get(`welcome-edit:${interaction.guildID}:${state.uuid}:join`);
+            if (oldJoin !== null) {
+                const [token, id] = EncryptionHandler.decrypt(oldJoin).split(":");
+                console.log("join", token.slice(0, 20), id);
+                newFollowupJoin = await interaction.client.rest.interactions.editFollowupMessage(interaction.applicationID, token, id, {
+                    ...WelcomeMessageHandler.format(gConfig, interaction.member, interaction.guild, "join", joinMessage),
+                    flags: MessageFlags.EPHEMERAL
+                }).then(() => false);
+            }
+
+            const oldLeave = await db.redis.get(`welcome-edit:${interaction.guildID}:${state.uuid}:leave`);
+            if (oldLeave !== null) {
+                const [token, id] = EncryptionHandler.decrypt(oldLeave).split(":");
+                console.log("leave", token.slice(0, 20), id);
+                newFollowupLeave = await interaction.client.rest.interactions.editFollowupMessage(interaction.applicationID, token, id, {
+                    ...WelcomeMessageHandler.format(gConfig, interaction.member, interaction.guild, "leave", leaveMessage),
+                    flags: MessageFlags.EPHEMERAL
+                }).then(() => false);
+            }
         }
 
-        if (newFollowup) {
+        if (newFollowupJoin) {
             const f = await interaction.createFollowup({
-                ...WelcomeMessageHandler.format(gConfig, interaction.member, message),
+                ...WelcomeMessageHandler.format(gConfig, interaction.member, interaction.guild, "join", joinMessage),
                 flags: MessageFlags.EPHEMERAL
             });
-            await db.redis.setex(`welcome-edit:${interaction.guildID}:${uuid}`, 60 * 15, EncryptionHandler.encrypt(`${interaction.token}:${f.id}`));
+            await db.redis.setex(`welcome-edit:${interaction.guildID}:${uuid}:join`, 60 * 15, EncryptionHandler.encrypt(`${interaction.token}:${f.id}`));
+        }
+
+        if (newFollowupLeave) {
+            const f = await interaction.createFollowup({
+                ...WelcomeMessageHandler.format(gConfig, interaction.member, interaction.guild, "leave", leaveMessage),
+                flags: MessageFlags.EPHEMERAL
+            });
+            await db.redis.setex(`welcome-edit:${interaction.guildID}:${uuid}:leave`, 60 * 15, EncryptionHandler.encrypt(`${interaction.token}:${f.id}`));
         }
     }
 }

@@ -14,13 +14,21 @@ export default class WelcomeEditMessageComponent extends BaseComponent {
         await interaction.createModal({
             components: new ComponentBuilder<ModalActionRow>()
                 .addTextInput({
-                    customID:    "message",
-                    label:       "Message Content",
-                    maxLength:   500,
-                    minLength:   2,
-                    required:    true,
-                    style:       TextInputStyles.SHORT,
-                    placeholder: gConfig.welcome.message
+                    customID:  "joinMessage",
+                    label:     "Join Message Content",
+                    maxLength: 500,
+                    minLength: 2,
+                    required:  true,
+                    style:     TextInputStyles.PARAGRAPH,
+                    value:     gConfig.welcome.joinMessage
+                }).addTextInput({
+                    customID:  "leaveMessage",
+                    label:     "Leave Message Content",
+                    maxLength: 500,
+                    minLength: 2,
+                    required:  true,
+                    style:     TextInputStyles.PARAGRAPH,
+                    value:     gConfig.welcome.leaveMessage
                 })
                 .toJSON(),
             customID: State.new(interaction.user.id, "welcome", "message").with("uuid", state.uuid || null).encode(),

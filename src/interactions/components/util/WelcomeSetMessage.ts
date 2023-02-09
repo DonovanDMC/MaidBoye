@@ -11,8 +11,9 @@ export default class WelcomeSetMessageComponent extends BaseComponent {
     command = "welcome";
 
     override async handleGuild(interaction: ComponentInteraction<ValidLocation.GUILD>, state: BaseState & { uuid: string; }) {
-        const message = await db.redis.get(`welcome-set:${interaction.guildID}:${state.uuid}`);
-        if (!message) {
+        const joinMessage = await db.redis.get(`welcome-set:${interaction.guildID}:${state.uuid}:join`);
+        const leaveMessage = await db.redis.get(`welcome-set:${interaction.guildID}:${state.uuid}:leave`);
+        if (!joinMessage || !leaveMessage) {
             await interaction.editParent(Util.replaceContent({
                 content: "H-hey! Something went wrong, try again."
             }));
@@ -21,12 +22,19 @@ export default class WelcomeSetMessageComponent extends BaseComponent {
 
         const gConfig = await GuildConfig.get(interaction.guildID);
         await gConfig.edit({
-            welcome_message: message
+            welcome_join_message:  joinMessage,
+            welcome_leave_message: leaveMessage
         });
 
-        const old = await db.redis.get(`welcome-edit:${interaction.guildID}:${state.uuid}`);
-        if (old !== null) {
-            const [token, id] = EncryptionHandler.decrypt(old).split(":");
+        const oldJoin = await db.redis.get(`welcome-edit:${interaction.guildID}:${state.uuid}:join`);
+        if (oldJoin !== null) {
+            const [token, id] = EncryptionHandler.decrypt(oldJoin).split(":");
+            await interaction.client.rest.interactions.deleteFollowupMessage(interaction.applicationID, token, id).catch(() => null);
+        }
+
+        const oldLeave = await db.redis.get(`welcome-edit:${interaction.guildID}:${state.uuid}:leave`);
+        if (oldLeave !== null) {
+            const [token, id] = EncryptionHandler.decrypt(oldLeave).split(":");
             await interaction.client.rest.interactions.deleteFollowupMessage(interaction.applicationID, token, id).catch(() => null);
         }
 
