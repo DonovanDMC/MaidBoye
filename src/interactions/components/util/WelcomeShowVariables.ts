@@ -7,6 +7,7 @@ import { Replacements } from "../../../util/handlers/WelcomeMessageHandler.js";
 import Util from "../../../util/Util.js";
 import db from "../../../db/index.js";
 import EncryptionHandler from "../../../util/handlers/EncryptionHandler.js";
+import { badgesLink, flagsLink } from "../../applicationCommands/util/welcome.js";
 import { ButtonColors, ComponentBuilder } from "@oceanicjs/builders";
 import type { MessageActionRow } from "oceanic.js";
 
@@ -15,7 +16,7 @@ export default class WelcomeShowVariablesComponent extends BaseComponent {
     command = "welcome";
 
     override async handleGuild(interaction: ComponentInteraction<ValidLocation.GUILD>, state: BaseState & { uuid: string; }) {
-        const map = Replacements(interaction.member, interaction.guild);
+        const map = Replacements(interaction.member);
         const commandID = (await (interaction.client as MaidBoye).getCommandIDMap()).chatInput.welcome;
 
         const oldJoin = await db.redis.get(`welcome-edit:${interaction.guildID}:${state.uuid}:join`);
@@ -37,7 +38,7 @@ export default class WelcomeShowVariablesComponent extends BaseComponent {
                     "The welcome message can be a maximum of 500 characters. The following variables can be used:",
                     ...Object.entries(map).map(([k, v]) => `${Config.emojis.default.dot} **${k}** - ${v}`),
                     "",
-                    `Modifiers like enabling mentions and disabling embeds can be toggled via ${commandID ? `</welcome config modifiers:${commandID}>` : "/welcome config modifiers"}. Note that the modifiers apply to both join and leave messages. For ease of use, the toggling of join/leave messages is considered a modifier.`,
+                    `Modifiers like enabling mentions and disabling embeds can be toggled via ${commandID ? `</welcome config modifiers:${commandID}>` : "/welcome config modifiers"}. Note that the modifiers apply to both join and leave messages. For ease of use, the toggling of join/leave messages is considered a modifier. Note for [badges](${badgesLink}) and [flags](${flagsLink}), this is the same list that is shown in the member add/remove logging. You can see the possible list by clicking on the respective links.`,
                     "Click below to edit the welcome message. A preview will be shown before anything is saved."
                 ])
                 .toJSON(true),

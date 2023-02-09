@@ -17,6 +17,8 @@ import {
 import { Strings } from "@uwu-codes/utils";
 import assert from "node:assert";
 
+export const badgesLink = "https://github.com/DonovanDMC/MaidBoye/blob/e41e140c7551d4b0417f6471b2c5a36b0a229d1c/src/util/Names.ts#L46-L62";
+export const flagsLink = "https://github.com/DonovanDMC/MaidBoye/blob/e41e140c7551d4b0417f6471b2c5a36b0a229d1c/src/util/Names.ts#L482-L485";
 export async function enableWelcome(interaction: ComponentInteraction<ValidLocation.GUILD> | ModalSubmitInteraction<ValidLocation.GUILD>, channel: string, webhook: Webhook) {
 
     const gConfig = await GuildConfig.get(interaction.guildID);
@@ -173,7 +175,7 @@ export default new Command(import.meta.url, "welcome")
                             return interaction.reply({ content: "H-hey! The welcome message is not enabled.." });
                         }
 
-                        const map = Replacements(interaction.member, interaction.guild);
+                        const map = Replacements(interaction.member);
                         const commandID = (await this.getCommandIDMap()).chatInput.welcome;
                         return interaction.reply({
                             embeds: Util.makeEmbed(true, interaction.user)
@@ -182,7 +184,7 @@ export default new Command(import.meta.url, "welcome")
                                     "The welcome message can be a maximum of 500 characters. The following variables can be used:",
                                     ...Object.entries(map).map(([k, v]) => `${Config.emojis.default.dot} **${k}** - ${v}`),
                                     "",
-                                    `Modifiers like enabling mentions and disabling embeds can be toggled via ${commandID ? `</welcome config modifiers:${commandID}>` : "/welcome config modifiers"}. Note that the modifiers apply to both join and leave messages. For ease of use, the toggling of join/leave messages is considered a modifier.`,
+                                    `Modifiers like enabling mentions and disabling embeds can be toggled via ${commandID ? `</welcome config modifiers:${commandID}>` : "/welcome config modifiers"}. Note that the modifiers apply to both join and leave messages. For ease of use, the toggling of join/leave messages is considered a modifier. Note for [badges](${badgesLink}) and [flags](${flagsLink}), this is the same list that is shown in the member add/remove logging. You can see the possible list by clicking on the respective links.`,
                                     "Click below to edit the welcome message. A preview will be shown before anything is saved."
                                 ])
                                 .toJSON(true),
@@ -232,9 +234,9 @@ export default new Command(import.meta.url, "welcome")
                                 ])
                                 .addField("Modifiers", gConfig.welcome.modifiers.map(mod => `${Config.emojis.default.dot} **${Strings.ucwords(mod.replace(/_/g, " "))}**`).join("\n") || "None", false)
                                 .addField("Raw Join Message", `\`\`\`\n${gConfig.welcome.joinMessage}\`\`\``, false)
-                                .addField("Message Join Preview", WelcomeMessageHandler.format(gConfig, interaction.member, interaction.guild, "join").content, false)
+                                .addField("Message Join Preview", WelcomeMessageHandler.format(gConfig, interaction.member, "join").content, false)
                                 .addField("Raw Leave Message", `\`\`\`\n${gConfig.welcome.leaveMessage}\`\`\``, false)
-                                .addField("Message Leave Preview", WelcomeMessageHandler.format(gConfig, interaction.member, interaction.guild, "leave").content, false)
+                                .addField("Message Leave Preview", WelcomeMessageHandler.format(gConfig, interaction.member, "leave").content, false)
                                 .setThumbnail(hook?.avatarURL() || "https://cdn.discordapp.com/embed/avatars/0.png")
                                 .toJSON(true)
                         });

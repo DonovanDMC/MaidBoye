@@ -7,6 +7,7 @@ import type { AnyImageFormat, FailResponse, TextFormat } from "./@types/fluxpoin
 import type { CommandInteraction, ComponentInteraction } from "./cmd/Command.js";
 import type { ExtractConstructorArg } from "./@types/misc.js";
 import Logger from "./Logger.js";
+import { GuildMemberFlagNames, UserFlagNames } from "./Names.js";
 import Config from "../config/index.js";
 import db, { DBLiteral, DBLiteralReverse } from "../db/index.js";
 import type { YiffTypes } from "../db/Models/UserConfig.js";
@@ -30,7 +31,9 @@ import {
     type EmbedOptions,
     type Uncached,
     type MessageActionRow,
-    type Guild
+    type Guild,
+    UserFlags,
+    GuildMemberFlags
 } from "oceanic.js";
 import type { ModuleImport } from "@uwu-codes/types";
 import { ButtonColors, ComponentBuilder, EmbedBuilder } from "@oceanicjs/builders";
@@ -219,6 +222,16 @@ export default class Util {
         });
     }
 
+    static formatBadges(user: User | Member) {
+        const flags = Util.getFlagsArray(UserFlags, user.publicFlags);
+        const names = flags.map(f => `${Config.emojis.default.dot} ${UserFlagNames[UserFlags[f]]}`);
+        if (user.id === "242843345402069002") {
+            names.push(`${Config.emojis.default.dot} ${Config.emojis.custom.don} MaidBoye Developer`);
+        }
+
+        return names.join("\n");
+    }
+
     static formatDiscordTime(time: Date, flag: "short-time" | "long-time" | "short-date" | "long-date" | "short-datetime" | "long-datetime" | "relative" , ms?: true): string;
     static formatDiscordTime(time: number, flag: "short-time" | "long-time" | "short-date" | "long-date" | "short-datetime" | "long-datetime" | "relative", ms?: boolean): string;
     static formatDiscordTime(time: number | Date, flag: "short-time" | "long-time" | "short-date" | "long-date" | "short-datetime" | "long-datetime" | "relative" = "short-datetime", ms = false) {
@@ -239,6 +252,11 @@ export default class Util {
             "relative":       "R"
         };
         return `<t:${time}:${shortFlags[flag]}>`;
+    }
+
+    static formatFlags(member: Member) {
+        const guildFlags = Util.getFlagsArray(GuildMemberFlags, member.flags);
+        return guildFlags.map(f => `${Config.emojis.default.dot} ${GuildMemberFlagNames[GuildMemberFlags[f]]}`).join("\n");
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

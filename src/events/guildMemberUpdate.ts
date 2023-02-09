@@ -10,7 +10,7 @@ export default new ClientEvent("guildMemberUpdate", async function guildMemberUp
         return;
     }
     if (!member.pending && oldMember.pending) {
-        await WelcomeMessageHandler.handle(member, member.guild, "join");
+        await WelcomeMessageHandler.handle(member, "join");
     }
 
     const events = await LogEvent.getType(member.guildID, LogEvents.MEMBER_UPDATE);

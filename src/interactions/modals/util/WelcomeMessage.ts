@@ -65,7 +65,7 @@ export default class WelcomeMessageModal extends BaseModal {
                 const [token, id] = EncryptionHandler.decrypt(oldJoin).split(":");
                 console.log("join", token.slice(0, 20), id);
                 newFollowupJoin = await interaction.client.rest.interactions.editFollowupMessage(interaction.applicationID, token, id, {
-                    ...WelcomeMessageHandler.format(gConfig, interaction.member, interaction.guild, "join", joinMessage),
+                    ...WelcomeMessageHandler.format(gConfig, interaction.member, "join", joinMessage),
                     flags: MessageFlags.EPHEMERAL
                 }).then(() => false);
             }
@@ -75,7 +75,7 @@ export default class WelcomeMessageModal extends BaseModal {
                 const [token, id] = EncryptionHandler.decrypt(oldLeave).split(":");
                 console.log("leave", token.slice(0, 20), id);
                 newFollowupLeave = await interaction.client.rest.interactions.editFollowupMessage(interaction.applicationID, token, id, {
-                    ...WelcomeMessageHandler.format(gConfig, interaction.member, interaction.guild, "leave", leaveMessage),
+                    ...WelcomeMessageHandler.format(gConfig, interaction.member, "leave", leaveMessage),
                     flags: MessageFlags.EPHEMERAL
                 }).then(() => false);
             }
@@ -83,7 +83,7 @@ export default class WelcomeMessageModal extends BaseModal {
 
         if (newFollowupJoin) {
             const f = await interaction.createFollowup({
-                ...WelcomeMessageHandler.format(gConfig, interaction.member, interaction.guild, "join", joinMessage),
+                ...WelcomeMessageHandler.format(gConfig, interaction.member, "join", joinMessage),
                 flags: MessageFlags.EPHEMERAL
             });
             await db.redis.setex(`welcome-edit:${interaction.guildID}:${uuid}:join`, 60 * 15, EncryptionHandler.encrypt(`${interaction.token}:${f.id}`));
@@ -91,7 +91,7 @@ export default class WelcomeMessageModal extends BaseModal {
 
         if (newFollowupLeave) {
             const f = await interaction.createFollowup({
-                ...WelcomeMessageHandler.format(gConfig, interaction.member, interaction.guild, "leave", leaveMessage),
+                ...WelcomeMessageHandler.format(gConfig, interaction.member, "leave", leaveMessage),
                 flags: MessageFlags.EPHEMERAL
             });
             await db.redis.setex(`welcome-edit:${interaction.guildID}:${uuid}:leave`, 60 * 15, EncryptionHandler.encrypt(`${interaction.token}:${f.id}`));
