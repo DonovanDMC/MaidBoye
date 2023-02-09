@@ -2,24 +2,14 @@ import ClientEvent from "../util/ClientEvent.js";
 import LogEvent, { LogEvents } from "../db/Models/LogEvent.js";
 import Util from "../util/Util.js";
 import { Colors } from "../util/Constants.js";
+import { getRoleManagedType } from "../util/Names.js";
 import { AuditLogActionTypes, Guild, Role } from "oceanic.js";
 
 export default new ClientEvent("guildRoleDelete", async function guildRoleDeleteEvent(role, guild) {
     const events = await LogEvent.getType(guild.id, LogEvents.ROLE_DELETE);
 
-    let managedType: string | undefined;
-    if (role instanceof Role) {
-        if (role.tags.botID !== undefined) {
-            const user = await this.getUser(role.tags.botID);
-            managedType = `Bot Permissions (${user?.tag ?? role.tags.botID})`;
-        } else if (role.tags.integrationID !== undefined) {
-            managedType = `Integration (${role.guild.integrations.get(role.tags.integrationID)?.name ?? role.tags.integrationID})`;
-        } else if (role.tags.premiumSubscriber !== false) {
-            managedType = "Nitro Booster";
-        } else if (role.tags.subscriptionListingID !== undefined) {
-            managedType = `Subscription Role (Purchasable: ${role.tags.availableForPurchase ? "Yes" : "No"})`;
-        }
-    }
+    const managedType = role instanceof Role ? await getRoleManagedType(role) : undefined;
+
     const embed = Util.makeEmbed(true)
         .setTitle("Role Deleted")
         .setColor(Colors.red)

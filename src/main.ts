@@ -8,14 +8,16 @@ import { ApplicationCommandTypeNames } from "./util/Names.js";
 import WebhookHandler from "./util/handlers/WebhookHandler.js";
 import { Strings, Timer } from "@uwu-codes/utils";
 import type { ModuleImport } from "@uwu-codes/types";
-import type {
-    AnyGuildChannel,
-    AnyThreadChannel,
-    CreateApplicationCommandOptions,
-    RawThreadChannel,
-    TypedCollection
+import {
+    type AnyGuildChannel,
+    type AnyThreadChannel,
+    ApplicationCommandTypes,
+    type CreateApplicationCommandOptions,
+    type RawThreadChannel,
+    type TypedCollection,
+    Client,
+    ThreadChannel
 } from "oceanic.js";
-import { Client, ThreadChannel } from "oceanic.js";
 import {
     access,
     mkdir,
@@ -50,6 +52,15 @@ export default class MaidBoye extends Client {
         for (const dir of directories) {
             await mkdir(dir, { recursive: true });
         }
+    }
+
+    async getCommandIDMap(): Promise<Record<"chatInput" | "message" | "user", Record<string, string>>> {
+        const idMap = await access(`${Config.dataDir}/id-map.json`).then(async() => readFile(`${Config.dataDir}/id-map.json`, "utf8")).catch(() => null);
+        if (idMap === null) {
+            await this.registerCommands();
+            return this.getCommandIDMap();
+        }
+        return JSON.parse(idMap) as Record<"chatInput" | "message" | "user", Record<string, string>>;
     }
 
     async getGuildChannel<CH extends AnyGuildChannel = AnyGuildChannel>(id: string, forceRest = false) {
@@ -102,6 +113,8 @@ export default class MaidBoye extends Client {
         for (const cmd of commands) {
             Logger.getLogger("CommandRegistration").error(`Command At ${commands.indexOf(cmd)}: ${cmd.name} (${ApplicationCommandTypeNames[cmd.type]})`);
         }
+
+        return [];
     }
 
     async launch() {
@@ -144,13 +157,65 @@ export default class MaidBoye extends Client {
             ...CommandHandler.messageCommands.map(cmd => cmd.toJSON())
         ];
         const cached = await access(`${Config.dataDir}/commands.json`).then(async() => readFile(`${Config.dataDir}/commands.json`, "utf8")).catch(() => "[]");
-        if (JSON.stringify(commands) === cached) {
+        const idMap = await access(`${Config.dataDir}/id-map.json`).then(async() => JSON.parse(await readFile(`${Config.dataDir}/id-map.json`, "utf8")) as Record<"chatInput" | "message" | "user", Record<string, string>>).catch(() => ({ chatInput: {}, message: {}, user: {} }) as Record<"chatInput" | "message" | "user", Record<string, string>>);
+        let needsIDMapUpdate = false;
+        outer: for (const cmd of commands) {
+            switch (cmd.type) {
+                case ApplicationCommandTypes.CHAT_INPUT: {
+                    if (!idMap.chatInput[cmd.name]) {
+                        needsIDMapUpdate = true;
+                        break outer;
+                    }
+                    break;
+                }
+
+                case ApplicationCommandTypes.MESSAGE: {
+                    if (!idMap.message[cmd.name]) {
+                        needsIDMapUpdate = true;
+                        break outer;
+                    }
+                    break;
+                }
+
+                case ApplicationCommandTypes.USER: {
+                    if (!idMap.user[cmd.name]) {
+                        needsIDMapUpdate = true;
+                        break outer;
+                    }
+
+                    break;
+                }
+            }
+        }
+        if (!needsIDMapUpdate && JSON.stringify(commands) === cached) {
             Logger.getLogger("CommandRegistration").debug("Commands are up to date, skipping registration.");
             return;
         }
         writeFile(`${Config.dataDir}/commands.json`, JSON.stringify(commands), "utf8").catch(() => null);
         const regStart = Timer.getTime();
-        await (Config.useGuildCommands ? this.application.bulkEditGuildCommands(Config.developmentGuild, commands).catch(this.handleRegistrationError.bind(this, commands)) : this.application.bulkEditGlobalCommands(commands).catch(this.handleRegistrationError.bind(this, commands)));
+        const cmds = await (Config.useGuildCommands ? this.application.bulkEditGuildCommands(Config.developmentGuild, commands).catch(this.handleRegistrationError.bind(this, commands)) : this.application.bulkEditGlobalCommands(commands).catch(this.handleRegistrationError.bind(this, commands)));
+        idMap.chatInput = {};
+        idMap.message = {};
+        idMap.user = {};
+        for (const cmd of cmds) {
+            switch (cmd.type) {
+                case ApplicationCommandTypes.CHAT_INPUT: {
+                    idMap.chatInput[cmd.name] = cmd.id;
+                    break;
+                }
+
+                case ApplicationCommandTypes.MESSAGE: {
+                    idMap.message[cmd.name] = cmd.id;
+                    break;
+                }
+
+                case ApplicationCommandTypes.USER: {
+                    idMap.user[cmd.name] = cmd.id;
+                    break;
+                }
+            }
+        }
+        await writeFile(`${Config.dataDir}/id-map.json`, JSON.stringify(idMap), "utf8").catch(() => null);
         const regEnd = Timer.getTime();
         Logger.getLogger("CommandRegistration").info(`Registered ${commands.length} commands in ${Timer.calc(regStart, regEnd, 3, false)}`);
     }

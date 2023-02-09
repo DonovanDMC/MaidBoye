@@ -78,11 +78,12 @@ export default class Timed {
     }
 
     async edit(data: TimedUpdateData) {
-        const success = await Util.genericEdit(Timed.TABLE, this.id, Util.removeUndefinedKV(data));
-        if (success) {
-            this.load(Util.removeUndefinedKV({ ...this._data, ...data }));
+        const res = await Util.genericEdit(Timed, this.id, Util.removeUndefinedKV(data));
+        if (res !== null) {
+            this.load(res);
         }
-        return success;
+
+        return res !== null;
     }
 
     async getGuild(client: MaidBoye) {

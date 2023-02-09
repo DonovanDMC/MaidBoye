@@ -9,13 +9,15 @@ import { EmbedBuilder } from "@oceanicjs/builders";
 export default new ClientEvent("shardResume", async function shardResumeEvent(id) {
     Logger.info(`Shard #${id} Resumed`);
     StatsHandler.track("SHARD_RESUME", id);
-    await WebhookHandler.execute("status", {
-        embeds: new EmbedBuilder()
-            .setTitle("Shard Resume")
-            .setDescription(`Shard #${id} resumed.`)
-            .setFooter(`Shard ${id + 1}/${this.shards.size}`, Config.botIcon)
-            .setTimestamp(new Date().toISOString())
-            .setColor(Colors.gold)
-            .toJSON(true)
-    });
+    if (!Config.isDevelopment) {
+        await WebhookHandler.execute("status", {
+            embeds: new EmbedBuilder()
+                .setTitle("Shard Resume")
+                .setDescription(`Shard #${id} resumed.`)
+                .setFooter(`Shard ${id + 1}/${this.shards.size}`, Config.botIcon)
+                .setTimestamp(new Date().toISOString())
+                .setColor(Colors.gold)
+                .toJSON(true)
+        });
+    }
 });

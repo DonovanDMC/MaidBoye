@@ -2,12 +2,17 @@ import ClientEvent from "../util/ClientEvent.js";
 import LogEvent, { LogEvents } from "../db/Models/LogEvent.js";
 import Util from "../util/Util.js";
 import { Colors } from "../util/Constants.js";
+import WelcomeMessageHandler from "../util/handlers/WelcomeMessageHandler.js";
 import { AuditLogActionTypes, type EmbedOptions, type Role } from "oceanic.js";
 
 export default new ClientEvent("guildMemberUpdate", async function guildMemberUpdateEvent(member, oldMember) {
     if (oldMember === null) {
         return;
     }
+    if (!member.pending && oldMember.pending) {
+        await WelcomeMessageHandler.handle(member);
+    }
+
     const events = await LogEvent.getType(member.guildID, LogEvents.MEMBER_UPDATE);
     if (events.length === 0) {
         return;

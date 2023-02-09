@@ -19,8 +19,6 @@ services:
     networks:
       default:
         ipv4_address: 172.19.3.2
-      websites:
-        ipv4_address: 172.19.2.250
 
   postgres:
     image: postgres:14-alpine
@@ -65,6 +63,3 @@ networks:
       config:
         - subnet: 172.19.3.0/29
           gateway: 172.19.3.1
-  websites:
-    name: websites
-    external: true

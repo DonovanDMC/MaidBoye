@@ -84,3 +84,9 @@ export default class db {
         return this.dbClient.query<R, I>(queryTextOrConfig, values);
     }
 }
+
+export const DBLiteral = {
+    DEFAULT: Symbol.for("postgres.dbliteral.default")
+};
+
+export const DBLiteralReverse = Object.fromEntries(Object.entries(DBLiteral).map(([key, value]) => [value, key])) as Record<symbol, string>;

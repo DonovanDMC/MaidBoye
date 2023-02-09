@@ -42,36 +42,23 @@ export default class ModLogHandler {
     static async check(gConfig: GuildConfig) {
         if (gConfig.modlog.enabled) {
             if (gConfig.modlog.webhook === null) {
-                await gConfig.setSetting("MODLOG_ENABLED", false);
-                await gConfig.setSetting("WEBHOOK_MANAGED", false);
+                await gConfig.resetModLog();
                 return false;
             }
 
             if (!gConfig.modlog.webhook.id || !gConfig.modlog.webhook.token) {
-                await gConfig.setSetting("MODLOG_ENABLED", false);
-                await gConfig.setSetting("WEBHOOK_MANAGED", false);
-                await gConfig.edit({
-                    modlog_webhook_id:         null,
-                    modlog_webhook_token:      null,
-                    modlog_webhook_channel_id: null
-                });
+                await gConfig.resetModLog();
                 return false;
             }
 
             const hook = await this.client.rest.webhooks.get(gConfig.modlog.webhook.id, gConfig.modlog.webhook.token).catch(() => null);
             if (!hook) {
-                await gConfig.setSetting("MODLOG_ENABLED", false);
-                await gConfig.setSetting("WEBHOOK_MANAGED", false);
-                await gConfig.edit({
-                    modlog_webhook_id:         null,
-                    modlog_webhook_token:      null,
-                    modlog_webhook_channel_id: null
-                });
+                await gConfig.resetModLog();
                 return false;
             }
 
             if (hook.applicationID !== this.client.user.id) {
-                await gConfig.setSetting("WEBHOOK_MANAGED", false);
+                await gConfig.setSetting("MODLOG_WEBHOOK_MANAGED", false);
             }
 
             if (hook.channelID !== null && hook.channelID !== gConfig.modlog.webhook.channelID) {

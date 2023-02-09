@@ -18,7 +18,6 @@ import {
     ComponentTypes,
     InteractionResolvedChannel,
     type MessageActionRow,
-    MessageFlags,
     type Webhook,
     type GuildCommandInteraction,
     type GuildComponentInteraction
@@ -30,9 +29,6 @@ import assert from "node:assert";
 
 const shrinkUUID = (str: string) => short().fromUUID(str);
 export async function enableAutoposting(interaction: ComponentInteraction<ValidLocation.GUILD> | ModalSubmitInteraction<ValidLocation.GUILD>, channel: string, webhook: Webhook, type: AutoPostingTypes, time: number) {
-    if (!interaction.acknowledged) {
-        await interaction.defer(MessageFlags.EPHEMERAL);
-    }
     await AutoPostingEntry.create({
         type,
         time:          time as AutoPostingTime,
@@ -52,9 +48,9 @@ export async function enableAutoposting(interaction: ComponentInteraction<ValidL
         embeds: embed.toJSON(true)
     });
 
-    await interaction.editOriginal({
+    await interaction.editParent(Util.replaceContent({
         content: `Autoposting of **${Util.readableConstant(AutoPostingTypes[type])}** has been enabled every **${time} Minutes** in <#${channel}> via **${webhook.name!}**.`
-    });
+    }));
 }
 
 export async function autoPostingNav(interaction: GuildCommandInteraction | GuildComponentInteraction, page: number, channel?: string | null) {

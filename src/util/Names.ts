@@ -1,4 +1,5 @@
 import Config from "../config/index.js";
+import type MaidBoye from "../main.js";
 import {
     type GuildFeature,
     type PermissionName,
@@ -34,7 +35,9 @@ import {
     AutoModerationEventTypes,
     IntegrationExpireBehaviors,
     StickerFormatTypes,
-    SortOrderTypes
+    SortOrderTypes,
+    GuildMemberFlags,
+    type Role
 } from "oceanic.js";
 const { badges, serverFeatures } = Config.emojis;
 
@@ -209,7 +212,8 @@ export const MessageFlagNames = {
     [MessageFlags.EPHEMERAL]:                              "Ephemeral",
     [MessageFlags.LOADING]:                                "Loading",
     [MessageFlags.FAILED_TO_MENTION_SOME_ROLES_IN_THREAD]: "Failed to Mention Some Roles in Thread",
-    [MessageFlags.SHOULD_SHOW_LINK_NOT_DISCORD_WARNING]:   "Should Show Link Not Discord Warning"
+    [MessageFlags.SHOULD_SHOW_LINK_NOT_DISCORD_WARNING]:   "Should Show Link Not Discord Warning",
+    [MessageFlags.SUPPRESS_NOTIFICATIONS]:                 "Suppress Notifications"
 } satisfies Record<MessageFlags, string>;
 
 export const MessageTypeNames = {
@@ -473,3 +477,28 @@ export const StickerFormatTypeNames = {
     [StickerFormatTypes.LOTTIE]: "Lottie",
     [StickerFormatTypes.GIF]:    "GIF"
 } satisfies Record<StickerFormatTypes, string>;
+
+export const GuildMemberFlagNames = {
+    [GuildMemberFlags.DID_REJOIN]:            "Rejoined",
+    [GuildMemberFlags.COMPLETED_ONBOARDING]:  "Completed Onboarding",
+    [GuildMemberFlags.BYPASSES_VERIFICATION]: "Bypasses Verification",
+    [GuildMemberFlags.STARTED_ONBOARDING]:    "Started Onboarding"
+} satisfies Record<GuildMemberFlags, string>;
+
+export async function getRoleManagedType(role: Role) {
+    let managedType: string | undefined;
+    if (role.tags.botID !== undefined) {
+        const user = await (role.client as MaidBoye).getUser(role.tags.botID);
+        managedType = `Bot Permissions (${user?.tag ?? role.tags.botID})`;
+    } else if (role.tags.integrationID !== undefined) {
+        managedType = `Integration (${role.guild.integrations.get(role.tags.integrationID)?.name ?? role.tags.integrationID})`;
+    } else if (role.tags.premiumSubscriber !== false) {
+        managedType = "Nitro Booster";
+    } else if (role.tags.guildConnections !== false) {
+        managedType = "Linked Role";
+    } else if (role.tags.subscriptionListingID !== undefined) {
+        managedType = `Subscription Role (Purchasable: ${role.tags.availableForPurchase ? "Yes" : "No"})`;
+    }
+
+    return managedType;
+}

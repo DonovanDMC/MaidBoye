@@ -50,7 +50,7 @@ export default class UserConfig {
         const levels = await this.getXP(user);
         const amount = Math.floor(Math.random() * 10) + 5;
         levels[guild] = (levels[guild] || 0) + amount;
-        await Util.genericEdit(UserConfig.TABLE, user, Util.removeUndefinedKV({ levels }));
+        await Util.genericEdit(UserConfig, user, Util.removeUndefinedKV({ levels }));
         await db.redis.set(`leveling:${user}:${guild}`, levels[guild]);
         return levels[guild];
     }
@@ -122,11 +122,12 @@ export default class UserConfig {
     }
 
     async edit(data: UserConfigUpdateData) {
-        const success = await Util.genericEdit(UserConfig.TABLE, this.id, Util.removeUndefinedKV(data));
-        if (success) {
-            this.load(Util.removeUndefinedKV({ ...this._data, ...data }));
+        const res = await Util.genericEdit(UserConfig, this.id, Util.removeUndefinedKV(data));
+        if (res !== null) {
+            this.load(res);
         }
-        return success;
+
+        return res !== null;
     }
 
     async getXP() {

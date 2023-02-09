@@ -5,9 +5,10 @@ import { State } from "./State.js";
 import E621 from "./req/E621.js";
 import type { AnyImageFormat, FailResponse, TextFormat } from "./@types/fluxpoint.js";
 import type { CommandInteraction, ComponentInteraction } from "./cmd/Command.js";
+import type { ExtractConstructorArg } from "./@types/misc.js";
+import Logger from "./Logger.js";
 import Config from "../config/index.js";
-import type { OkPacket } from "../db/index.js";
-import db from "../db/index.js";
+import db, { DBLiteral, DBLiteralReverse } from "../db/index.js";
 import type { YiffTypes } from "../db/Models/UserConfig.js";
 import type { Post } from "e621";
 import {
@@ -22,14 +23,14 @@ import {
     Member,
     User,
     Role,
-    type Guild,
     type AuditLogActionTypes,
     type AuditLogEntry,
     type AnyChannel,
     type CreateMessageOptions,
     type EmbedOptions,
     type Uncached,
-    type MessageActionRow
+    type MessageActionRow,
+    type Guild
 } from "oceanic.js";
 import type { ModuleImport } from "@uwu-codes/types";
 import { ButtonColors, ComponentBuilder, EmbedBuilder } from "@oceanicjs/builders";
@@ -240,14 +241,33 @@ export default class Util {
         return `<t:${time}:${shortFlags[flag]}>`;
     }
 
-    static async genericEdit<D extends Record<string, unknown>>(table: string, id: number | string, data: D): Promise<boolean> {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    static async genericEdit<C extends { TABLE: string; new(...args: Array<any>): any; }, D extends ExtractConstructorArg<C>>(clazz: C, id: number | string, data: Record<string, unknown>): Promise<D | null> {
         if (Object.hasOwn(data, "updated_at")) {
             delete data.updated_at;
         }
+
+        const literals = Object.values(DBLiteral);
         const keys = Object.keys(data).filter(val => val !== undefined && val !== null);
-        const values = Object.values(data).filter(val => val !== undefined && val !== null);
-        const res = await db.query<OkPacket>(`UPDATE ${table} SET ${keys.map((j, index) => `${j}=$${index + 2}`).join(", ")}, updated_at=CURRENT_TIMESTAMP(3) WHERE id = $1`, [id, ...values]);
-        return res.rowCount >= 1;
+        const values = Object.values(data).filter(val => val !== undefined && typeof val !== "symbol");
+        let i = 1;
+        let str = "";
+        for (const key of keys) {
+            str += typeof data[key] === "symbol" && literals.includes(data[key] as symbol) ? `${key}=${DBLiteralReverse[data[key] as symbol]}, ` : `${key}=$${++i}, `;
+        }
+        str += "updated_at=CURRENT_TIMESTAMP(3)";
+        const query = `UPDATE ${clazz.TABLE} SET ${str} WHERE id = $1 RETURNING *`;
+        try {
+            const res = await db.query<D>(query, [id, ...values]);
+            return res.rowCount === 0 ? null : res.rows[0] as never;
+        } catch (err) {
+            Logger.getLogger("GenericEdit | Error").error(`Error while updating ${clazz.TABLE} with id ${id}:`);
+            Logger.getLogger("GenericEdit | Error").error(err);
+            Logger.getLogger("GenericEdit | Query Input").info(data);
+            Logger.getLogger("GenericEdit | Query Body").info(query);
+            Logger.getLogger("GenericEdit | Query Values").info([id, ...values]);
+            throw err;
+        }
     }
 
     static getAuditLogEntry(guild: Guild, type: AuditLogActionTypes, filter: (entry: AuditLogEntry) => boolean = () => true) {
@@ -260,6 +280,10 @@ export default class Util {
             });
         }
         return entry as AuditLogEntry & { readonly isRecent: boolean;} ?? null;
+    }
+
+    static getBoosterRole(guild: Guild) {
+        return guild.roles.find(r => r.tags.premiumSubscriber) ?? null;
     }
 
     static getFlags<T extends string, N extends number | bigint>(list: Record<T, N>, flags: N, skipEnumReverseKeys = true) {
@@ -563,7 +587,7 @@ export default class Util {
     }
 
     static removeUndefinedKV<T extends Record<string, unknown>>(data: T) {
-        return Object.entries(data).filter(([key, value]) => key !== undefined && key !== null && value !== undefined && value !== null).map(([key, value]) => ({ [key]: value })).reduce((a, b) => ({ ...a, ...b }), {}) as T;
+        return Object.entries(data).filter(([key, value]) => key !== undefined && key !== null && value !== undefined).map(([key, value]) => ({ [key]: value })).reduce((a, b) => ({ ...a, ...b }), {}) as T;
     }
 
     /**

@@ -7,6 +7,9 @@ import { AuditLogActionTypes } from "oceanic.js";
 import { Time } from "@uwu-codes/utils";
 
 export default new ClientEvent("channelCreate", async function channelCreateEvent(channel) {
+    if (!("guildID" in channel)) {
+        return;
+    }
     const events = await LogEvent.getType(channel.guildID, LogEvents.CHANNEL_CREATE);
     if (events.length === 0) {
         return;

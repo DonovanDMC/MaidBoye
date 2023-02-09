@@ -15,6 +15,7 @@ import WebhookFailureHandler from "../util/handlers/LoggingWebhookFailureHandler
 import AutoPostingService from "../services/AutoPosting.js";
 import FurryBotStatusService from "../services/FurryBotStatus.js";
 import AutoPostingWebhookFailureHandler from "../util/handlers/AutoPostingWebhookFailureHandler.js";
+import WelcomeMessageHandler from "../util/handlers/WelcomeMessageHandler.js";
 import { Time } from "@uwu-codes/utils";
 
 export default new ClientEvent("ready", async function readyEvent() {
@@ -29,6 +30,7 @@ export default new ClientEvent("ready", async function readyEvent() {
     await Modals.loadAll();
     await Autocomplete.loadAll();
     await ModLogHandler.init(this);
+    await WelcomeMessageHandler.init(this);
     await TimedModerationHandler.init(this);
     await this.registerCommands();
     await this.startAPIServer();

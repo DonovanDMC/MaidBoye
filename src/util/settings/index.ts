@@ -115,8 +115,10 @@ export default class Settings {
             modlogCaseDeletingEnabled:      Util.hasBits(val, SettingsBits.MODLOG_CASE_DELETING_ENABLED),
             modlogCaseEditingEnabled:       Util.hasBits(val, SettingsBits.MODLOG_CASE_EDITING_ENABLED),
             modlogModifyOthersCasesEnabled: Util.hasBits(val, SettingsBits.MODLOG_MODIFY_OTHERS_CASES_ENABLED),
-            webhookManaged:                 Util.hasBits(val, SettingsBits.WEBHOOK_MANAGED),
-            dmBlame:                        Util.hasBits(val, SettingsBits.DM_BLAME)
+            modlogWebhookManaged:           Util.hasBits(val, SettingsBits.MODLOG_WEBHOOK_MANAGED),
+            dmBlame:                        Util.hasBits(val, SettingsBits.DM_BLAME),
+            welcomeEnabled:                 Util.hasBits(val, SettingsBits.WELCOME_ENABLED),
+            welcomeWebhookManaged:          Util.hasBits(val, SettingsBits.WELCOME_WEBHOOK_MANAGED)
         };
     }
 }
@@ -131,8 +133,12 @@ export const SettingsBits = {
     MODLOG_CASE_DELETING_ENABLED:       1n << 5n,
     MODLOG_CASE_EDITING_ENABLED:        1n << 6n,
     MODLOG_MODIFY_OTHERS_CASES_ENABLED: 1n << 7n,
-    WEBHOOK_MANAGED:                    1n << 8n,
-    DM_BLAME:                           1n << 9n
+    MODLOG_WEBHOOK_MANAGED:             1n << 8n,
+    DM_BLAME:                           1n << 9n,
+    WELCOME_ENABLED:                    1n << 10n,
+    WELCOME_WEBHOOK_MANAGED:            1n << 11n
 };
-export type ExcludedSettings = never;
+export type ExcludedSettings =
+    "MODLOG_ENABLED" | "MODLOG_CASE_DELETING_ENABLED" | "MODLOG_CASE_EDITING_ENABLED" | "MODLOG_MODIFY_OTHERS_CASES_ENABLED" |
+    "MODLOG_WEBHOOK_MANAGED" | "WELCOME_WEBHOOK_MANAGED";
 export const DefaultSettingsBits = 0;

@@ -9,7 +9,6 @@ import {
     ComponentTypes,
     type InteractionResolvedChannel,
     type MessageActionRow,
-    MessageFlags,
     type Webhook
 } from "oceanic.js";
 import { ButtonColors, ComponentBuilder } from "@oceanicjs/builders";
@@ -17,9 +16,6 @@ import chunk from "chunk";
 import assert from "node:assert";
 
 export async function enableLogging(interaction: ComponentInteraction<ValidLocation.GUILD> | ModalSubmitInteraction<ValidLocation.GUILD>, channel: string, webhook: Webhook, event: LogEvents) {
-    if (!interaction.acknowledged) {
-        await interaction.defer(MessageFlags.EPHEMERAL);
-    }
     await LogEvent.create({
         event,
         channel_id:    channel,
@@ -45,9 +41,9 @@ export async function enableLogging(interaction: ComponentInteraction<ValidLocat
         embeds: embed.toJSON(true)
     });
 
-    await interaction.editOriginal({
+    await interaction.editParent(Util.replaceContent({
         content: `Logging of **${Util.readableConstant(LogEvents[event])}** has been enabled in <#${channel}> via **${webhook.name!}**.`
-    });
+    }));
 }
 
 export default new Command(import.meta.url, "logging")

@@ -156,11 +156,12 @@ export default class ModLog {
     }
 
     async edit(data: ModLogUpdateData) {
-        const success = await Util.genericEdit(ModLog.TABLE, this.id, Util.removeUndefinedKV(data));
-        if (success) {
-            this.load(Util.removeUndefinedKV({ ...this._data, ...data }));
+        const res = await Util.genericEdit(ModLog, this.id, Util.removeUndefinedKV(data));
+        if (res !== null) {
+            this.load(res);
         }
-        return success;
+
+        return res !== null;
     }
 
     async getBlame(client: MaidBoye) {

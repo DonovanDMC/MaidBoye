@@ -7,6 +7,8 @@ import { Colors } from "../util/Constants.js";
 import { State } from "../util/State.js";
 import Logger from "../util/Logger.js";
 import Leveling from "../util/Leveling.js";
+import GuildConfig from "../db/Models/GuildConfig.js";
+import UserConfig from "../db/Models/UserConfig.js";
 import {
     Internal,
     Strings,
@@ -43,7 +45,9 @@ const evalVariables: Record<string, unknown> = {
     Utility,
     ReNice,
     RequestProxy,
-    Config
+    Config,
+    GuildConfig,
+    UserConfig
 };
 
 export default new ClientEvent("messageCreate", async function messageCreateEvent(msg) {
@@ -56,6 +60,14 @@ export default new ClientEvent("messageCreate", async function messageCreateEven
         if (new RegExp(`^<@!?${this.user.id}>`).test(prefix)) {
             switch (command) {
                 case "eval": {
+                    Object.defineProperties(msg, {
+                        gConfig: {
+                            value: msg.guildID === null ? null : await GuildConfig.get(msg.guildID)
+                        },
+                        uConfig: {
+                            value: await UserConfig.get(msg.author.id)
+                        }
+                    });
                     // eslint-disable-next-line guard-for-in
                     for (const k in evalVariables) {
                         // eslint-disable-next-line guard-for-in, @typescript-eslint/no-implied-eval, no-new-func -- typescript messes with variable names so we have to remake them

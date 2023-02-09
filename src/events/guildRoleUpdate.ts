@@ -2,7 +2,7 @@ import ClientEvent from "../util/ClientEvent.js";
 import LogEvent, { LogEvents } from "../db/Models/LogEvent.js";
 import Util from "../util/Util.js";
 import { Colors } from "../util/Constants.js";
-import { PermissionsByName } from "../util/Names.js";
+import { getRoleManagedType, PermissionsByName } from "../util/Names.js";
 import { AuditLogActionTypes, type EmbedOptions, Permission, type PermissionName } from "oceanic.js";
 
 export default new ClientEvent("guildRoleUpdate", async function guildRoleUpdateEvent(role, oldRole) {
@@ -95,6 +95,25 @@ export default new ClientEvent("guildRoleUpdate", async function guildRoleUpdate
                 ...removedPermissions.map(p => `- ${PermissionsByName[p]}`),
                 "```"
             ])
+            .toJSON()
+        );
+    }
+
+    if (role.managed !== oldRole.managed || JSON.stringify(role.tags) !== JSON.stringify(oldRole.tags)) {
+        const managedType = await getRoleManagedType(role);
+        const og = role.tags;
+        role.tags = oldRole.tags;
+        const oldManagedType = await getRoleManagedType(role);
+        role.tags = og;
+        embeds.push(Util.makeEmbed(true)
+            .setTitle("Role Updated")
+            .setColor(Colors.gold)
+            .setDescription([
+                `Role: ${role.mention}`,
+                "This role's managed status was changed."
+            ])
+            .addField("Old Managed Status", oldManagedType || "None", false)
+            .addField("New Managed Status", managedType || "None", false)
             .toJSON()
         );
     }

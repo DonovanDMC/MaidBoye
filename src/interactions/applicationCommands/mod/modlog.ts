@@ -1,12 +1,42 @@
-import Command, { ValidLocation } from "../../../util/cmd/Command.js";
+import Command, { type ComponentInteraction, type ModalSubmitInteraction, ValidLocation } from "../../../util/cmd/Command.js";
 import ModLogHandler from "../../../util/handlers/ModLogHandler.js";
 import ModLog from "../../../db/Models/ModLog.js";
 import Util from "../../../util/Util.js";
 import { State } from "../../../util/State.js";
+import GuildConfig, { ModlogSettingChoices, ModlogSettingKeys, ModlogSettingNames } from "../../../db/Models/GuildConfig.js";
+import { TextableGuildChannels } from "../../../util/Constants.js";
+import Config from "../../../config/index.js";
+import { SettingsBits } from "../../../util/settings/index.js";
 import { Strings } from "@uwu-codes/utils";
 import { ButtonColors, ComponentBuilder } from "@oceanicjs/builders";
-import { ApplicationCommandOptionTypes, type MessageActionRow } from "oceanic.js";
+import {
+    ApplicationCommandOptionTypes,
+    type Webhook,
+    type MessageActionRow,
+    type InteractionResolvedChannel,
+    type AnyGuildTextChannelWithoutThreads,
+    ComponentTypes
+} from "oceanic.js";
 import assert from "node:assert";
+
+export async function enableModlog(interaction: ComponentInteraction<ValidLocation.GUILD> | ModalSubmitInteraction<ValidLocation.GUILD>, channel: string, webhook: Webhook) {
+    const gConfig = await GuildConfig.get(interaction.guildID);
+    await gConfig.setModLog(webhook.id, webhook.token!, channel, webhook.applicationID === interaction.client.user.id);
+
+    const embed = Util.makeEmbed(true)
+        .setTitle("ModLog Enabled")
+        .setDescription(`The modlog has been enabled in this channel by ${interaction.user.mention}.`);
+    if (webhook.avatar) {
+        embed.setThumbnail(webhook.avatarURL()!);
+    }
+    await webhook.execute({
+        embeds: embed.toJSON(true)
+    });
+
+    await interaction.editParent(Util.replaceContent({
+        content: `ModLog enabled in <#${channel}> via **${webhook.name!}**.`
+    }));
+}
 
 export default new Command(import.meta.url, "modlog")
     .setDescription("Manage this server's modlog")
@@ -18,6 +48,11 @@ export default new Command(import.meta.url, "modlog")
             .addOption(
                 new Command.Option(ApplicationCommandOptionTypes.SUB_COMMAND, "setup")
                     .setDescription("Set the webhook used for the modlog")
+                    .addOption(
+                        new Command.Option(ApplicationCommandOptionTypes.CHANNEL, "channel")
+                            .setDescription("The channel to setup the modlog in. Defaults to the current channel.")
+                            .setChannelTypes(TextableGuildChannels)
+                    )
             )
             .addOption(
                 new Command.Option(ApplicationCommandOptionTypes.SUB_COMMAND, "reset")
@@ -33,20 +68,7 @@ export default new Command(import.meta.url, "modlog")
                     .addOption(
                         new Command.Option(ApplicationCommandOptionTypes.STRING, "setting")
                             .setDescription("The setting to edit. Administrators bypass all of these")
-                            .setChoices([
-                                {
-                                    name:  "Case Editing Enabled",
-                                    value: "case-editing-enabled"
-                                },
-                                {
-                                    name:  "Case Deleting Enabled",
-                                    value: "case-deleting-enabled"
-                                },
-                                {
-                                    name:  "Modify Others Cases Enabled (Edit or Delete)",
-                                    value: "modify-others-cases-enabled"
-                                }
-                            ])
+                            .setChoices(ModlogSettingChoices)
                             .setRequired()
                     )
                     .addOption(
@@ -84,33 +106,61 @@ export default new Command(import.meta.url, "modlog")
     )
     .setOptionsParser(interaction => ({
         type:         interaction.data.options.getSubCommand<["config", "setup" | "reset" | "get" | "set"] | ["edit-case"] | ["delete-case"]>(true),
-        channel:      interaction.data.options.getChannel("channel") || null,
-        setting:      interaction.data.options.getString<"case-editing-enabled" | "case-deleting-enabled" | "modify-others-cases-enabled">("setting", false) || null,
-        settingValue: interaction.data.options.getBoolean("value", false) || null,
-        caseID:       interaction.data.options.getInteger("case", false) || null,
-        reason:       interaction.data.options.getString("reason", false) || null
+        channel:      interaction.data.options.getChannel("channel") as InteractionResolvedChannel | AnyGuildTextChannelWithoutThreads ?? null,
+        setting:      interaction.data.options.getString<typeof ModlogSettingKeys[number]>("setting", false) ?? null,
+        settingValue: interaction.data.options.getBoolean("value", false) ?? null,
+        caseID:       interaction.data.options.getInteger("case", false) ?? null,
+        reason:       interaction.data.options.getString("reason", false) ?? null
     }))
     .setValidLocation(ValidLocation.GUILD)
     .setAck("ephemeral")
     .setGuildLookup(true)
     .setExecutor(async function(interaction, { type: [type, configType], channel, setting, settingValue, caseID, reason }, gConfig) {
-        if (gConfig.modlog.enabled && gConfig.modlog.webhook === null) {
-            await gConfig.resetModLog();
+        const enabled = await ModLogHandler.check(gConfig);
+        if (channel && !TextableGuildChannels.includes(channel.type)) {
+            return interaction.reply({
+                content: `H-hey! <#${channel.id}> is not a valid textable channel..`
+            });
         }
         switch (type) {
             case "config": {
                 assert(configType);
                 switch (configType) {
                     case "setup": {
-                        assert(channel);
-                        if (await ModLogHandler.check(gConfig)) {
+                        if (!channel) {
+                            channel = interaction.channel as AnyGuildTextChannelWithoutThreads;
+                        }
+                        if (enabled) {
                             return interaction.reply({ content: "H-hey! The modlog has already been set up. Reset it before changing it" });
                         }
-                        break;
+
+
+                        const components = new ComponentBuilder<MessageActionRow>()
+                            .addInteractionButton({
+                                customID: State.new(interaction.user.id, "modlog", "create-webhook").with("channel", channel.id).encode(),
+                                label:    "Create Webhook",
+                                style:    ButtonColors.BLURPLE
+                            });
+
+                        if (("appPermissions" in channel ? channel.appPermissions : channel.permissionsOf(this.user.id)).has("MANAGE_WEBHOOKS")) {
+                            const webhooks = (await this.rest.webhooks.getForChannel(channel.id)).filter(hook => hook.name !== null && hook.token !== undefined);
+                            if (webhooks.length !== 0) {
+                                components.addSelectMenu({
+                                    customID: State.new(interaction.user.id, "modlog", "select-webhook").with("channel", channel.id).encode(),
+                                    options:  webhooks.map(hook => ({ label: hook.name!, value: hook.id })),
+                                    type:     ComponentTypes.STRING_SELECT
+                                });
+                            }
+                        }
+
+                        return interaction.reply({
+                            content:    `Please select an option for enabling the modlog in <#${channel.id}>.`,
+                            components: components.toJSON()
+                        });
                     }
 
                     case "reset": {
-                        if (!(await ModLogHandler.check(gConfig))) {
+                        if (!enabled) {
                             return interaction.reply({ content: "H-hey! The modlog is not enabled.." });
                         }
                         if (gConfig.modlog.webhook) {
@@ -124,13 +174,18 @@ export default new Command(import.meta.url, "modlog")
                                         .toJSON(true),
                                     components: new ComponentBuilder<MessageActionRow>()
                                         .addInteractionButton({
-                                            customID: State.new(interaction.user.id, "modlog", "reset-confirm").with("hook", hook.id).encode(),
+                                            customID: State.new(interaction.user.id, "modlog", "reset").with("hook", hook.id).encode(),
                                             label:    "Yes",
                                             style:    ButtonColors.GREEN
                                         })
                                         .addInteractionButton({
-                                            customID: State.cancel(interaction.user.id),
+                                            customID: State.new(interaction.user.id, "modlog", "reset").with("hook", null).encode(),
                                             label:    "No",
+                                            style:    ButtonColors.BLURPLE
+                                        })
+                                        .addInteractionButton({
+                                            customID: State.cancel(interaction.user.id),
+                                            label:    "Cancel",
                                             style:    ButtonColors.RED
                                         })
                                         .toJSON()
@@ -142,25 +197,42 @@ export default new Command(import.meta.url, "modlog")
                     }
 
                     case "get": {
-                        break;
+                        if (!enabled) {
+                            return interaction.reply({ content: "H-hey! The modlog isn't enabled in this server.." });
+                        }
+                        assert(gConfig.modlog.webhook, `welcome.modlog null when modlog is enabled (guild: ${interaction.guildID})`);
+                        const hook = await this.rest.webhooks.get(gConfig.modlog.webhook.id, gConfig.modlog.webhook.token).catch(() => null);
+
+                        const settings = Util.getFlagsArray(SettingsBits, BigInt(gConfig._data.settings));
+                        return interaction.reply({
+                            embeds: Util.makeEmbed(true, interaction.user)
+                                .setTitle("Modlog Configuration")
+                                .setDescription([
+                                    `Channel: <#${gConfig.modlog.webhook.channelID}>`,
+                                    `Webhook: ${hook ? `**${hook.name ?? hook.id}**` : "Unknown"}`,
+                                    "**Settings**:",
+                                    ...Object.entries(ModlogSettingNames).map(([value, name]) => `${Config.emojis.default.dot} ${name}: ${settings.includes(value as typeof ModlogSettingKeys[number]) ? "Enabled" : "Disabled"}`)
+                                ])
+                                .setThumbnail(hook?.avatarURL() || "https://cdn.discordapp.com/embed/avatars/0.png")
+                                .toJSON(true)
+                        });
                     }
 
                     case "set": {
-                        assert(setting && settingValue);
-                        switch (setting) {
-                            case "case-editing-enabled": {
-                                await gConfig.setSetting("MODLOG_CASE_EDITING_ENABLED", settingValue); break;
-                            }
-                            case "case-deleting-enabled": {
-                                await gConfig.setSetting("MODLOG_CASE_DELETING_ENABLED", settingValue); break;
-                            }
-                            case "modify-others-cases-enabled": {
-                                await gConfig.setSetting("MODLOG_MODIFY_OTHERS_CASES_ENABLED", settingValue); break;
-                            }
+                        assert(setting !== null && settingValue !== null);
+                        if (!enabled) {
+                            return interaction.reply({ content: "H-hey! The modlog isn't enabled in this server, so settings can't be changed." });
                         }
-                        break;
+
+                        if (!ModlogSettingKeys.includes(setting)) {
+                            return interaction.reply({ content: "H-hey! That isn't a valid setting.." });
+                        }
+                        await gConfig.setSetting(setting, settingValue);
+
+                        return interaction.reply({ content: `The setting **${ModlogSettingNames[setting]}** has been ${settingValue ? "enabled" : "disabled"}.` });
                     }
                 }
+                // @ts-expect-error this is unreachable as eslint reports, but typescript complains about switch case fallthrough
                 break;
             }
 

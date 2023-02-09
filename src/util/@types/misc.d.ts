@@ -28,3 +28,10 @@ export interface BulkDeleteReport {
         timestamp: number;
     }>;
 }
+
+export type AllowSymbol<T extends Record<string, unknown>> = {
+    [K in keyof T]: T[K] | symbol;
+};
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type ExtractConstructorArg<T> = T extends new (arg1: infer U) => any ? U : never;
