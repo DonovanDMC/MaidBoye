@@ -46,7 +46,7 @@ export const UserFlagNames: Record<UserFlags, string> = {
     [UserFlags.STAFF]:                 `${badges.staff} Discord Staff`,
     [UserFlags.PARTNER]:               `${badges.partner} Discord Partner`,
     [UserFlags.HYPESQUAD]:             `${badges.hypesquad} Hypesquad`,
-    [UserFlags.BUGHUNTER_LEVEL_1]:     `${badges.bugHunterLevel1} Bug Hunter Level 1`,
+    [UserFlags.BUG_HUNTER_LEVEL_1]:    `${badges.bugHunterLevel1} Bug Hunter Level 1`,
     [UserFlags.HYPESQUAD_BRAVERY]:     `${badges.hypesquadBravery} Hypesquad Bravery`,
     [UserFlags.HYPESQUAD_BRILLIANCE]:  `${badges.hypesquadBrilliance} Hypesquad Brilliance`,
     [UserFlags.HYPESQUAD_BALANCE]:     `${badges.hypesquad_balance} Hypesquad Balance`,
