@@ -2,7 +2,7 @@ import type { ModalSubmitInteraction, ValidLocation } from "../../../util/cmd/Co
 import type { BaseState } from "../../../util/State.js";
 import BaseModal from "../structure/BaseModal.js";
 import RequestProxy from "../../../util/RequestProxy.js";
-import { MessageFlags, type Webhook } from "oceanic.js";
+import type { Webhook } from "oceanic.js";
 import { Strings } from "@uwu-codes/utils";
 import { STATUS_CODES } from "node:http";
 
@@ -13,7 +13,6 @@ export default abstract class WebhookModal extends BaseModal {
     abstract getReason(interaction: ModalSubmitInteraction<ValidLocation.GUILD>, state: BaseState): string;
 
     override async handleGuild(interaction: ModalSubmitInteraction<ValidLocation.GUILD>, components: Record<string, string | undefined>, state: BaseState & Record<string, string>) {
-        await interaction.defer(MessageFlags.EPHEMERAL);
         const name = components.name!;
         let avatar: Buffer | undefined;
         if (components.avatar) {

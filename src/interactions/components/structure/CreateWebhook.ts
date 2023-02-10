@@ -2,7 +2,6 @@
 import type { ComponentInteraction, ValidLocation } from "../../../util/cmd/Command.js";
 import { type BaseState, State } from "../../../util/State.js";
 import BaseComponent from "../structure/BaseComponent.js";
-import Util from "../../../util/Util.js";
 import { type ModalActionRow, TextInputStyles } from "oceanic.js";
 import { ComponentBuilder } from "@oceanicjs/builders";
 
@@ -43,8 +42,5 @@ export default abstract class CreateWebhookComponent extends BaseComponent {
             customID: this.withExtra(state, State.new(interaction.user.id, this.command, "webhook").with("channel", state.channel)).encode(),
             title:    "Webhook"
         });
-        await interaction.editOriginal(Util.replaceContent({
-            content: "See the modal."
-        }));
     }
 }
