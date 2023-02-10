@@ -1,6 +1,6 @@
 import Config from "../../config/index.js";
 import { Router } from "express";
-import { OAuth, OAuthScopes } from "oceanic.js";
+import { OAuthHelper, OAuthScopes } from "oceanic.js";
 
 const app = Router();
 
@@ -20,7 +20,7 @@ app.route("/:link")
                 return res.redirect(Config.privacyPolicyLink);
             }
             case "invite": {
-                return res.redirect(OAuth.constructURL({
+                return res.redirect(OAuthHelper.constructURL({
                     clientID:           Config.clientID,
                     disableGuildSelect: false,
                     guildID:            req.query.guild === undefined ? undefined : String(req.query.guild),
