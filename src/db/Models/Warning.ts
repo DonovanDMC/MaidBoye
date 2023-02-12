@@ -80,7 +80,7 @@ export default class Warning {
     }
 
     private load(data: WarningData) {
-        this._data       = data;
+        this._data     = data;
         this.blameID   = data.blame_id;
         this.createdAt = data.created_at;
         this.guildID   = data.guild_id;

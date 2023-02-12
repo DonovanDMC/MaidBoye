@@ -17,18 +17,23 @@ export default class EmptySetting extends BaseSetting {
     protected override validateInput(value: unknown): boolean {
         throw new NotImplementedError(`${this.constructor.name}#validateInput`);
     }
+
     override formatValue(value: unknown): string {
         throw new NotImplementedError(`${this.constructor.name}#formatValue`);
     }
+
     override getValue(gConfig: GuildConfig): Promise<unknown> {
         throw new NotImplementedError(`${this.constructor.name}#getValue`);
     }
+
     override async handleInteraction(interaction: CommandInteraction<ValidLocation.GUILD>, gConfig: GuildConfig, value: unknown) {
         throw new NotImplementedError(`${this.constructor.name}#handleInteraction`);
     }
+
     override async handlePick(interaction: ComponentInteraction<ValidLocation.GUILD>, gConfig: GuildConfig, value: unknown) {
         throw new NotImplementedError(`${this.constructor.name}#handlePick`);
     }
+
     override async open(interaction: SelectMenuComponentInteraction<ValidLocation.GUILD>, gConfig: GuildConfig) {
         throw new NotImplementedError(`${this.constructor.name}#open`);
     }

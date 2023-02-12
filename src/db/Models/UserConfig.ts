@@ -103,8 +103,8 @@ export default class UserConfig {
     }
 
     private load(data: UserConfigData) {
-        this._data              = data;
-        this._preferencesData   = BigInt(data.preferences);
+        this._data            = data;
+        this._preferencesData = BigInt(data.preferences);
         const preferences     = Preferences.parse(this._preferencesData);
         this.createdAt        = data.created_at;
         this.levels           = data.levels;

@@ -26,12 +26,15 @@ export default abstract class BaseSetting {
     abstract handleInteraction(interaction: CommandInteraction<ValidLocation.GUILD>, gConfig: GuildConfig, value: unknown): Promise<void>;
     abstract handlePick(interaction: ComponentInteraction<ValidLocation.GUILD>, gConfig: GuildConfig, value: unknown): Promise<void>;
     abstract open(interaction: ComponentInteraction<ValidLocation.GUILD>, gConfig: GuildConfig): Promise<void>;
+
     get interactionsName() {
         return this.name.toLowerCase().replace(/\s/g, "-");
     }
+
     get shortDescription() {
         return this.description;
     }
+
     protected async genericHandlePick<T = unknown>(interaction: ComponentInteraction<ValidLocation.GUILD>, name: string, currentValue: T | null, value: T, setValue: (val: T) => Promise<unknown>) {
         assert(this.validateInput(value), `failed to validate input for setting "${this.name}"`);
         if (currentValue === value) {

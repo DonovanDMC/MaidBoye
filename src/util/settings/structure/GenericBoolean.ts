@@ -35,6 +35,7 @@ export default abstract class BooleanSetting extends BaseSetting {
             }
         });
     }
+
     get interactionsOption() {
         return new CommandOption(ApplicationCommandOptionTypes.SUB_COMMAND, this.interactionsName)
             .setDescription(this.description)
@@ -44,6 +45,7 @@ export default abstract class BooleanSetting extends BaseSetting {
                     .setRequired()
             );
     }
+
     override get validValues() {
         return this.type === Type.YES_NO ? "`yes` or `no`" : "`enabled` or `disabled`";
     }

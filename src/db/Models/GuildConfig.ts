@@ -48,6 +48,7 @@ export enum GuildWelcomeModifiers {
     SUPPRESS_EMBEDS              = 1 << 5,
     WAIT_FOR_PASSING_MEMBER_GATE = 1 << 6,
     SUPPRESS_NOTIFICATIONS       = 1 << 7,
+    IGNORE_BOTS                  = 1 << 8,
 }
 
 export const ModlogSettingKeys = ["MODLOG_CASE_DELETING_ENABLED", "MODLOG_CASE_EDITING_ENABLED", "MODLOG_MODIFY_OTHERS_CASES_ENABLED"] as const;
@@ -106,22 +107,6 @@ export default class GuildConfig {
         this.load(data);
     }
 
-    get levelingRolesLevelMap() {
-        return (this._levelingRolesLevelMap || (this._levelingRolesLevelMap = this.levelingRoles.reduce((a, [role, level]) => ((a![level] = [...(a![level] || []), role], a)), {} as GuildConfig["_levelingRolesLevelMap"])))!;
-    }
-
-    get levelingRolesList() {
-        return (this._levelingRolesList || (this._levelingRolesList = Object.keys(this.levelingRoles)))!;
-    }
-
-    get levelingRolesRoleMap() {
-        return (this._levelingRolesRoleMap || (this._levelingRolesRoleMap = this.levelingRoles.reduce((a, [role, level]) => ((a![role] = level, a)), {} as GuildConfig["_levelingRolesRoleMap"])))!;
-    }
-
-    get tagNames() {
-        return (this._tagNames || (this._tagNames = Object.keys(this.tags)))!;
-    }
-
     static async create(data: GuildConfigCreationData) {
         const res = await db.insert<string>(this.TABLE, data);
         const createdObject = await this.get(res, false);
@@ -145,6 +130,22 @@ export default class GuildConfig {
             return createIfNotExists ? this.create({ id }) : null;
         }
         return new GuildConfig(res);
+    }
+
+    get levelingRolesLevelMap() {
+        return (this._levelingRolesLevelMap || (this._levelingRolesLevelMap = this.levelingRoles.reduce((a, [role, level]) => ((a![level] = [...(a![level] || []), role], a)), {} as GuildConfig["_levelingRolesLevelMap"])))!;
+    }
+
+    get levelingRolesList() {
+        return (this._levelingRolesList || (this._levelingRolesList = Object.keys(this.levelingRoles)))!;
+    }
+
+    get levelingRolesRoleMap() {
+        return (this._levelingRolesRoleMap || (this._levelingRolesRoleMap = this.levelingRoles.reduce((a, [role, level]) => ((a![role] = level, a)), {} as GuildConfig["_levelingRolesRoleMap"])))!;
+    }
+
+    get tagNames() {
+        return (this._tagNames || (this._tagNames = Object.keys(this.tags)))!;
     }
 
     private load(data: GuildConfigData) {

@@ -79,10 +79,6 @@ export default class ModLog {
         this.load(data);
     }
 
-    get typeName() {
-        return Strings.ucwords(ModLogType[this.type].replace(/_/g, " "));
-    }
-
     static async create(data: ModLogCreationData) {
         await GuildConfig.ensureExists(data.guild_id);
         const res = await db.insert<string>(this.TABLE, data);
@@ -128,6 +124,10 @@ export default class ModLog {
     static async getNextID(guild: string) {
         const { rows: [{ case_id } = { case_id: 0 }] } = await db.query<{ case_id: number; }>(`SELECT case_id FROM ${this.TABLE} WHERE guild_id = $1 ORDER BY case_id DESC LIMIT 1`, [guild]);
         return case_id + 1;
+    }
+
+    get typeName() {
+        return Strings.ucwords(ModLogType[this.type].replace(/_/g, " "));
     }
 
     private load(data: ModLogData) {

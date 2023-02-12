@@ -62,7 +62,7 @@ export default class Timed {
     }
 
     private load(data: TimedData) {
-        this._data       = data;
+        this._data     = data;
         this.createdAt = data.created_at;
         this.expiresAt = data.expires_at;
         this.guildID   = data.guild_id;

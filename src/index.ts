@@ -1,5 +1,4 @@
 const initTime = process.hrtime.bigint();
-/* eslint-disable @typescript-eslint/triple-slash-reference */
 /// <reference path="./util/@types/util.d.ts" />
 import "./util/MonkeyPatch.js";
 import MaidBoye from "./main.js";

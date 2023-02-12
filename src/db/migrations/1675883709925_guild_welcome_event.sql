@@ -7,7 +7,7 @@ ALTER TABLE public.guilds
     -- 8: disable role mentions
     -- 16: disable everyone/here mentions
     -- 64: wait for pending=false
-    ADD COLUMN "welcome_modifiers" INT NOT NULL DEFAULT 95,
+    ADD COLUMN "welcome_modifiers" INT NOT NULL DEFAULT 351,
     ADD COLUMN "welcome_webhook_channel_id" BIGINT,
     ADD COLUMN "welcome_webhook_id" BIGINT,
     ADD COLUMN "welcome_webhook_token" TEXT;

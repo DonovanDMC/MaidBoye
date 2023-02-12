@@ -46,10 +46,6 @@ export default class Strike {
         this.load(data);
     }
 
-    get typeName() {
-        return Strings.ucwords(StrikeType[this.type].replace(/_/g, " "));
-    }
-
     static async create(data: StrikeCreationData) {
         await GuildConfig.ensureExists(data.guild_id);
         const res = await db.insert<string>(this.TABLE, data);
@@ -75,6 +71,10 @@ export default class Strike {
     static async getForUser(guild: string, user: string, order: "ASC" | "DESC" = "ASC") {
         const { rows: res } = await db.query<StrikeData>(`SELECT * FROM ${this.TABLE} WHERE guild_id = $1 AND user_id = $2 ORDER BY created_at ${order}`, [guild, user]);
         return res.map(r => new Strike(r));
+    }
+
+    get typeName() {
+        return Strings.ucwords(StrikeType[this.type].replace(/_/g, " "));
     }
 
     private load(data: StrikeData) {
