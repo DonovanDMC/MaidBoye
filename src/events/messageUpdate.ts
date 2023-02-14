@@ -4,6 +4,8 @@ import EncryptionHandler from "../util/handlers/EncryptionHandler.js";
 import LogEvent, { LogEvents } from "../db/Models/LogEvent.js";
 import { Colors } from "../util/Constants.js";
 import Util from "../util/Util.js";
+import GuildConfig from "../db/Models/GuildConfig.js";
+import UserConfig from "../db/Models/UserConfig.js";
 import { type EmbedOptions, MessageFlags } from "oceanic.js";
 import { Strings } from "@uwu-codes/utils";
 
@@ -13,7 +15,12 @@ export default new ClientEvent("messageUpdate", async function debugEvent(messag
         return;
     }
 
-    if (message.content !== oldMessage.content) {
+    editsnipe: if (message.content !== oldMessage.content) {
+        const gConfig = await GuildConfig.get(message.guildID, false);
+        const uConfig = await UserConfig.get(message.author.id, false);
+        if (gConfig?.settings.snipeDisabled || uConfig?.preferences.disableSnipes) {
+            break editsnipe;
+        }
         await db.redis
             .multi()
             .lpush(`snipe:edit:${message.channelID}`, JSON.stringify({

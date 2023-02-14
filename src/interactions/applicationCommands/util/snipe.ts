@@ -18,7 +18,21 @@ export default new Command(import.meta.url, "snipe")
         channel: interaction.data.options.getChannelOption("channel")?.value || interaction.channelID
     }))
     .setValidLocation(ValidLocation.GUILD)
-    .setExecutor(async function(interaction, { channel }) {
+    .setGuildLookup(true)
+    .setUserLookup(true)
+    .setExecutor(async function(interaction, { channel }, gConfig, uConfig) {
+        if (gConfig.settings.snipeDisabled) {
+            return interaction.reply({
+                content: "Snipes are disabled in this server.",
+                flags:   MessageFlags.EPHEMERAL
+            });
+        }
+        if (uConfig.preferences.disableSnipes) {
+            return interaction.reply({
+                content: "You have disabled sniping your messages, so you cannot snipe others messages.",
+                flags:   MessageFlags.EPHEMERAL
+            });
+        }
         const snipe = await db.redis.lpop(`snipe:delete:${channel}`);
         if (snipe === null) {
             return interaction.reply({
