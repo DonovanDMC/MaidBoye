@@ -114,8 +114,9 @@ export default new Command(import.meta.url, "steal")
             case "emoji-or-url": {
                 assert(emojiOrURL);
                 let match: RegExpExecArray | null;
-                if ((match = /<(a)?:.{2,32}:(\d{15,21})>/.exec(emojiOrURL.trim()))) {
-                    url = `https://cdn.discordapp.com/emojis/${match[2]}.${match[1] === "a" ? "gif" : "png"}`;
+                if ((match = /<(a)?:(.{2,32}):(\d{15,21})>/.exec(emojiOrURL.trim()))) {
+                    url = `https://cdn.discordapp.com/emojis/${match[3]}.${match[1] === "a" ? "gif" : "png"}`;
+                    name ??= match[2];
                 } else if (Strings.validateURL(emojiOrURL)) {
                     url = emojiOrURL;
                 }
@@ -138,7 +139,6 @@ export default new Command(import.meta.url, "steal")
             case "emoji": {
                 if (!name) {
                     name = basename(new URL(url).pathname) || "unnamed";
-                    console.log(name);
                     if (/.*\..+/.test(name)) {
                         name = name.split(".").slice(0, -1).join(".");
                     }
