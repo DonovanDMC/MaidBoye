@@ -32,7 +32,7 @@ export async function getPage(interaction: CommandInteraction<ValidLocation.GUIL
     const tags = chunk(Object.entries(gConfig.tags), 10);
     return {
         embeds: Util.makeEmbed(true, interaction.user)
-            .setDescription(await Promise.all(tags[page - 1].map(async([name, info], index) => getTag(interaction.client as MaidBoye, name, info, index, page, false)).join("\n\n")))
+            .setDescription((await Promise.all(tags[page - 1].map(([name, info], index) => getTag(interaction.client as MaidBoye, name, info, index, page, false)))).join("\n\n"))
             .setFooter(`UwU | Page ${page}/${tags.length}`)
             .toJSON(true),
         components: new ComponentBuilder<MessageActionRow>()
