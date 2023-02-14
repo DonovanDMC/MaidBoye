@@ -16,6 +16,7 @@ import AutoPostingService from "../services/AutoPosting.js";
 import FurryBotStatusService from "../services/FurryBotStatus.js";
 import AutoPostingWebhookFailureHandler from "../util/handlers/AutoPostingWebhookFailureHandler.js";
 import WelcomeMessageHandler from "../util/handlers/WelcomeMessageHandler.js";
+import BotListUpdater from "../util/handlers/BotListUpdater.js";
 import { Time } from "@uwu-codes/utils";
 
 export default new ClientEvent("ready", async function readyEvent() {
@@ -36,6 +37,7 @@ export default new ClientEvent("ready", async function readyEvent() {
     await this.startAPIServer();
     await WebhookFailureHandler.init(this);
     await AutoPostingWebhookFailureHandler.init(this);
+    await BotListUpdater.init(this);
     this.readyTime = process.hrtime.bigint();
     this.presenceUpdateInterval = setInterval(async() => {
         const presence = Config.getPresence();

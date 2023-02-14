@@ -58,6 +58,7 @@
   "dependencies": {
     "@oceanicjs/builders": "^1.1.7",
     "@uwu-codes/utils": "^1.2.2",
+    "blapi": "^3.1.0",
     "cheweyapi": "^1.0.3",
     "chunk": "^0.0.3",
     "dashargs": "^4.1.5",

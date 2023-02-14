@@ -2,6 +2,7 @@
 import betaClient from "./private/client.beta.json" assert { type: "json" };
 import prodClient from "./private/client.prod.json" assert { type: "json" };
 import otherClients from "./private/client.other.json" assert { type: "json" };
+import botLists from "./private/botLists.json" assert { type: "json" };
 import PrivateConfiguration from "./private/private.js";
 import emojis from "./json/emojis.json" assert { type: "json" };
 import pkg from "../../package.json" assert { type: "json" };
@@ -462,6 +463,10 @@ export class Configuration extends PrivateConfiguration {
 
     static override get encryptionSalt() {
         return super.encryptionSalt;
+    }
+
+    static get botLists() {
+        return botLists;
     }
 }
 

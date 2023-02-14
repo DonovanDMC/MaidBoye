@@ -1,6 +1,6 @@
 {
-	"id": "",
-	"token": "",
-	"secret": "",
-	"_coment": "Put in private.*.json"
+  "id": "",
+  "token": "",
+  "secret": "",
+  "_coment": "Put in private/client.*.json"
 }

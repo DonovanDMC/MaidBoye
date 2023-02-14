@@ -218,6 +218,7 @@ export default class MaidBoye extends Client {
         await writeFile(`${Config.dataDir}/id-map.json`, JSON.stringify(idMap), "utf8").catch(() => null);
         const regEnd = Timer.getTime();
         Logger.getLogger("CommandRegistration").info(`Registered ${commands.length} commands in ${Timer.calc(regStart, regEnd, 3, false)}`);
+        await this.updateBotlistCommands(commands);
     }
 
     async startAPIServer() {
@@ -226,6 +227,17 @@ export default class MaidBoye extends Client {
                 Logger.getLogger("API").info(`API listening on ${Config.apiHost}:${Config.apiPort} (${Config.apiURL})`);
                 resolve();
             });
+        });
+    }
+
+    async updateBotlistCommands(commands: Array<CreateApplicationCommandOptions>) {
+        await fetch(`https://discordbotlist.com/api/v1/bots/${Config.clientID}/commands`, {
+            method:  "POST",
+            headers: {
+                "Authorization": Config.botLists["discordbotlist.com"],
+                "Content-Type":  "application/json"
+            },
+            body: JSON.stringify(commands)
         });
     }
 }
