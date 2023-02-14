@@ -28,16 +28,21 @@ export default new Command(import.meta.url, "softban")
             .setDescription("The hours of messages that should be deleted")
             .setMinMax(0, 168)
     )
+    .addOption(
+        new Command.Option(ApplicationCommandOptionTypes.BOOLEAN, "hide-reason")
+            .setDescription("If we should hide the reason from non-moderators (permission: MANAGE_GUILD)")
+    )
     .setOptionsParser(interaction => ({
         member:      interaction.data.options.getMember("user", true),
         reason:      interaction.data.options.getString("reason") || "None Provided",
         dm:          interaction.data.options.getBoolean("dm") ?? true,
-        deleteHours: interaction.data.options.getInteger("delete-hours") || 0
+        deleteHours: interaction.data.options.getInteger("delete-hours") || 0,
+        hideReason:  interaction.data.options.getBoolean("hide-reason") ?? false
     }))
     .setValidLocation(ValidLocation.GUILD)
     .setAck("ephemeral")
     .setGuildLookup(true)
-    .setExecutor(async function(interaction, { member, reason, dm, deleteHours }, gConfig) {
+    .setExecutor(async function(interaction, { member, reason, dm, deleteHours, hideReason  }, gConfig) {
         if (member.id === interaction.user.id) {
             return interaction.reply({ content: "H-hey! You can't softban yourself.." });
         }
@@ -73,7 +78,8 @@ export default new Command(import.meta.url, "softban")
                     blame:  interaction.member,
                     reason,
                     target: member,
-                    deleteSeconds
+                    deleteSeconds,
+                    hideReason
                 });
                 return interaction.reply({
                     allowedMentions: { users: false },

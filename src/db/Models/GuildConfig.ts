@@ -133,19 +133,19 @@ export default class GuildConfig {
     }
 
     get levelingRolesLevelMap() {
-        return (this._levelingRolesLevelMap || (this._levelingRolesLevelMap = this.levelingRoles.reduce((a, [role, level]) => ((a![level] = [...(a![level] || []), role], a)), {} as GuildConfig["_levelingRolesLevelMap"])))!;
+        return (this._levelingRolesLevelMap ??= this.levelingRoles.reduce((a, [role, level]) => ((a![level] = [...(a![level] || []), role], a)), {} as GuildConfig["_levelingRolesLevelMap"]))!;
     }
 
     get levelingRolesList() {
-        return (this._levelingRolesList || (this._levelingRolesList = Object.keys(this.levelingRoles)))!;
+        return (this._levelingRolesList ??= Object.keys(this.levelingRoles))!;
     }
 
     get levelingRolesRoleMap() {
-        return (this._levelingRolesRoleMap || (this._levelingRolesRoleMap = this.levelingRoles.reduce((a, [role, level]) => ((a![role] = level, a)), {} as GuildConfig["_levelingRolesRoleMap"])))!;
+        return (this._levelingRolesRoleMap ??= this.levelingRoles.reduce((a, [role, level]) => ((a![role] = level, a)), {} as GuildConfig["_levelingRolesRoleMap"]))!;
     }
 
     get tagNames() {
-        return (this._tagNames || (this._tagNames = Object.keys(this.tags)))!;
+        return (this._tagNames ??= Object.keys(this.tags))!;
     }
 
     private load(data: GuildConfigData) {

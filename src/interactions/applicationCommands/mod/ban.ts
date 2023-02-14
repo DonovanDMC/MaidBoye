@@ -43,6 +43,10 @@ export default new Command(import.meta.url, "ban")
             .setDescription("The hours of messages that should be deleted")
             .setMinMax(0, 168)
     )
+    .addOption(
+        new Command.Option(ApplicationCommandOptionTypes.BOOLEAN, "hide-reason")
+            .setDescription("If we should hide the reason from non-moderators (permission: MANAGE_GUILD)")
+    )
     .setOptionsParser(interaction => ({
         user:        interaction.data.options.getUser("user", true),
         reason:      interaction.data.options.getString("reason") || "None Provided",
@@ -50,12 +54,13 @@ export default new Command(import.meta.url, "ban")
         hours:       interaction.data.options.getInteger("hours") || 0,
         minutes:     interaction.data.options.getInteger("minutes") || 0,
         dm:          interaction.data.options.getBoolean("dm") ?? true,
-        deleteHours: interaction.data.options.getInteger("delete-hours") || 0
+        deleteHours: interaction.data.options.getInteger("delete-hours") || 0,
+        hideReason:  interaction.data.options.getBoolean("hide-reason") ?? false
     }))
     .setValidLocation(ValidLocation.GUILD)
     .setAck("ephemeral")
     .setGuildLookup(true)
-    .setExecutor(async function(interaction, { user, reason, days, hours, minutes, dm, deleteHours }, gConfig) {
+    .setExecutor(async function(interaction, { user, reason, days, hours, minutes, dm, deleteHours, hideReason }, gConfig) {
         if (user.id === interaction.user.id) {
             return interaction.reply({ content: "H-hey! You can't ban yourself.." });
         }
@@ -96,7 +101,8 @@ export default new Command(import.meta.url, "ban")
                     reason,
                     target: user,
                     time,
-                    deleteSeconds
+                    deleteSeconds,
+                    hideReason
                 });
                 return interaction.reply({
                     allowedMentions: { users: false },

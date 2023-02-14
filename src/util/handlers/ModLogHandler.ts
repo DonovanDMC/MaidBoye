@@ -75,7 +75,7 @@ export default class ModLogHandler {
     static async createEntry(options: SoftbanOptions | KickOptions | WarningOptions): Promise<CreateEntryResultStrike>;
     static async createEntry(options: UnbanOptions | UnmuteOptions | LockOptions | UnlockOptions | LockdownOptions | UnlockdownOptions | DeleteWarningOptions | ClearWarningsOptions | StrikeOptions): Promise<CreateEntryResultNeither>;
     static async createEntry(options: AnyOptions) {
-        const { type, gConfig, guild, blame, reason } = options;
+        const { type, gConfig, guild, blame } = options;
         const check = await this.check(gConfig);
         if ("target" in options && (options.target instanceof User || options.target instanceof Member)) {
             await UserConfig.createIfNotExists(options.target.id);
@@ -83,13 +83,15 @@ export default class ModLogHandler {
         const caseID = await ModLog.getNextID(gConfig.id);
         const data: ModLogCreationData = {
             type,
-            case_id:   caseID,
-            guild_id:  guild.id,
-            target_id: "target" in options ? options.target.id : null,
-            blame_id:  blame?.id,
-            reason
+            case_id:       caseID,
+            guild_id:      guild.id,
+            target_id:     "target" in options ? options.target.id : null,
+            blame_id:      blame?.id,
+            reason:        options.reason,
+            reason_hidden: options.hideReason
         };
         let text: string, color: number, timed: Timed | null = null, strike: Strike | null = null;
+        const reason = options.hideReason ? "[HIDDEN]" : options.reason;
         switch (type) {
             case ModLogType.BAN: {
                 const { target, time, deleteSeconds } = options;
@@ -274,11 +276,12 @@ export default class ModLogHandler {
                 break;
             }
 
-            default: { throw new Error(`Unhandled modlog type: ${type as number} (${JSON.stringify(options)})`);
+            default: {
+                throw new Error(`Unhandled modlog type: ${type as number} (${JSON.stringify(options)})`);
             }
         }
 
-        const msg = await this.executeWebhook(guild, gConfig, blame, type, caseID, color, text);
+        const msg = await this.executeWebhook(guild, gConfig, blame, type, caseID, color, text, undefined, options.hideReason);
 
         data.channel_id = msg?.channelID;
         data.message_id = msg?.id;
@@ -294,7 +297,7 @@ export default class ModLogHandler {
         return { entry: log, message: msg, timed, strike, caseID, active: check } as unknown;
     }
 
-    static async executeWebhook(guild: Guild, gConfig: GuildConfig, blame: User | Member | null, type: ModLogType, caseID: number, color: number, description: string, title?: string) {
+    static async executeWebhook(guild: Guild, gConfig: GuildConfig, blame: User | Member | null, type: ModLogType, caseID: number, color: number, description: string, title?: string, hideReason = false) {
         const titles = {
             [ModLogType.BAN]:            "User Banned",
             [ModLogType.UNBAN]:          "User Unbanned",
@@ -320,7 +323,7 @@ export default class ModLogHandler {
                 .setTitle(title || `${titles[type] || `Unknown Case Type (${type})`} | Case #${caseID}`)
                 .setDescription(description)
                 .setColor(color)
-                .setFooter(`Action Performed ${blame ? `By ${blame.tag}` : "Automatically"}`, blame === null ? Config.botIcon : blame.avatarURL())
+                .setFooter(`Action Performed ${blame ? `By ${blame.tag}` : "Automatically"}${hideReason ? " | Reason Hidden" : ""}`, blame === null ? Config.botIcon : blame.avatarURL())
                 .toJSON(true)
             ,
             wait: true

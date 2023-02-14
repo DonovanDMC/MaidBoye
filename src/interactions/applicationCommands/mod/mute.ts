@@ -38,18 +38,23 @@ export default new Command(import.meta.url, "mute")
         new Command.Option(ApplicationCommandOptionTypes.BOOLEAN, "dm")
             .setDescription("If we should attempt to dm the muted user with some info (default: yes)")
     )
+    .addOption(
+        new Command.Option(ApplicationCommandOptionTypes.BOOLEAN, "hide-reason")
+            .setDescription("If we should hide the reason from non-moderators (permission: MANAGE_GUILD)")
+    )
     .setOptionsParser(interaction => ({
-        member:  interaction.data.options.getMember("user", true),
-        reason:  interaction.data.options.getString("reason") || "None Provided",
-        days:    interaction.data.options.getInteger("days") || 0,
-        hours:   interaction.data.options.getInteger("hours") || 0,
-        minutes: interaction.data.options.getInteger("minutes") || 0,
-        dm:      interaction.data.options.getBoolean("dm") ?? true
+        member:     interaction.data.options.getMember("user", true),
+        reason:     interaction.data.options.getString("reason") || "None Provided",
+        days:       interaction.data.options.getInteger("days") || 0,
+        hours:      interaction.data.options.getInteger("hours") || 0,
+        minutes:    interaction.data.options.getInteger("minutes") || 0,
+        dm:         interaction.data.options.getBoolean("dm") ?? true,
+        hideReason: interaction.data.options.getBoolean("hide-reason") ?? false
     }))
     .setValidLocation(ValidLocation.GUILD)
     .setAck("ephemeral")
     .setGuildLookup(true)
-    .setExecutor(async function(interaction, { member, reason, days, hours, minutes, dm }, gConfig) {
+    .setExecutor(async function(interaction, { member, reason, days, hours, minutes, dm, hideReason  }, gConfig) {
         if (member.id === interaction.user.id) {
             return interaction.reply({ content: "H-hey! You can't mute yourself.." });
         }
@@ -90,7 +95,8 @@ export default new Command(import.meta.url, "mute")
                     blame:  interaction.member,
                     reason,
                     target: member,
-                    time
+                    time,
+                    hideReason
                 });
                 return interaction.reply({
                     allowedMentions: { users: false },

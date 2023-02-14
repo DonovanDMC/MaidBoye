@@ -6,7 +6,7 @@ import db from "../index.js";
 import type MaidBoye from "../../main.js";
 import Util from "../../util/Util.js";
 import { Strings } from "@uwu-codes/utils";
-import type { AnyGuildTextChannel } from "oceanic.js";
+import type { AnyGuildTextChannel, Member } from "oceanic.js";
 import assert from "node:assert";
 
 
@@ -22,6 +22,7 @@ export interface ModLogData {
     id: string;
     message_id: string | null;
     reason: string;
+    reason_hidden: boolean;
     strike_id: string | null;
     target_id: string | null;
     timed_id: string | null;
@@ -66,6 +67,7 @@ export default class ModLog {
     id: string;
     messageID: string | null;
     reason: string;
+    reasonHidden: boolean;
     strikeID: string | null;
     targetID: string | null;
     timedID: string | null;
@@ -126,29 +128,35 @@ export default class ModLog {
         return case_id + 1;
     }
 
+    static async getWarningsForUser(guild: string, user: string, order: "ASC" | "DESC" = "ASC", withDeleted = false) {
+        const { rows: res } = await db.query<ModLogData>(`SELECT * FROM ${this.TABLE} WHERE guild_id = $1 AND target_id = $2 AND type = $3${withDeleted ? "" : " AND deleted = FALSE"} ORDER BY case_id ${order}`, [guild, user, ModLogType.WARNING]);
+        return res.map(r => new ModLog(r));
+    }
+
     get typeName() {
         return Strings.ucwords(ModLogType[this.type].replace(/_/g, " "));
     }
 
     private load(data: ModLogData) {
-        this._data        = data;
-        this.amount     = data.amount;
-        this.blameID    = data.blame_id;
-        this.caseID     = data.case_id;
-        this.channelID  = data.channel_id;
-        this.createdAt  = data.created_at;
+        this._data         = data;
+        this.amount        = data.amount;
+        this.blameID       = data.blame_id;
+        this.caseID        = data.case_id;
+        this.channelID     = data.channel_id;
+        this.createdAt     = data.created_at;
         this.deleteSeconds = data.delete_seconds;
-        this.deleted    = data.deleted;
-        this.guildID    = data.guild_id;
-        this.messageID  = data.message_id;
-        this.reason     = data.reason;
-        this.strikeID   = data.strike_id;
-        this.targetID   = data.target_id;
-        this.timedID    = data.timed_id;
-        this.type       = data.type;
-        this.updatedAt  = data.updated_at;
-        this.updatedBy  = data.updated_by;
-        this.warningID  = data.warning_id;
+        this.deleted       = data.deleted;
+        this.guildID       = data.guild_id;
+        this.messageID     = data.message_id;
+        this.reason        = data.reason;
+        this.reasonHidden  = data.reason_hidden;
+        this.strikeID      = data.strike_id;
+        this.targetID      = data.target_id;
+        this.timedID       = data.timed_id;
+        this.type          = data.type;
+        this.updatedAt     = data.updated_at;
+        this.updatedBy     = data.updated_by;
+        this.warningID     = data.warning_id;
     }
 
     async delete() {
@@ -220,5 +228,13 @@ export default class ModLog {
 
     async getWarning() {
         return this.warningID === null ? null : Warning.get(this.warningID);
+    }
+
+    shouldShowReason() {
+        return this.reasonHidden === false;
+    }
+
+    shouldShowReasonFor(member: Member) {
+        return this.reasonHidden === false || member.permissions.has("MANAGE_GUILD");
     }
 }

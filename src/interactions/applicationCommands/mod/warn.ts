@@ -25,15 +25,20 @@ export default new Command(import.meta.url, "warn")
         new Command.Option(ApplicationCommandOptionTypes.BOOLEAN, "dm")
             .setDescription("If we should attempt to dm the warned user with some info (default: yes)")
     )
+    .addOption(
+        new Command.Option(ApplicationCommandOptionTypes.BOOLEAN, "hide-reason")
+            .setDescription("If we should hide the reason from non-moderators (permission: MANAGE_GUILD)")
+    )
     .setOptionsParser(interaction => ({
-        member: interaction.data.options.getMember("user", true),
-        reason: interaction.data.options.getString("reason") || "None Provided",
-        dm:     interaction.data.options.getBoolean("dm") ?? true
+        member:     interaction.data.options.getMember("user", true),
+        reason:     interaction.data.options.getString("reason") || "None Provided",
+        dm:         interaction.data.options.getBoolean("dm") ?? true,
+        hideReason: interaction.data.options.getBoolean("hide-reason") ?? false
     }))
     .setValidLocation(ValidLocation.GUILD)
     .setAck("ephemeral")
     .setGuildLookup(true)
-    .setExecutor(async function(interaction, { member, reason, dm }, gConfig) {
+    .setExecutor(async function(interaction, { member, reason, dm, hideReason  }, gConfig) {
         if (member.id === interaction.user.id) {
             return interaction.reply({ content: "H-hey! You can't warn yourself.." });
         }
@@ -64,7 +69,8 @@ export default new Command(import.meta.url, "warn")
             blame:     interaction.member,
             reason,
             target:    member,
-            warningID: w.id
+            warningID: w.id,
+            hideReason
         });
         return interaction.reply({
             allowedMentions: { users: false },

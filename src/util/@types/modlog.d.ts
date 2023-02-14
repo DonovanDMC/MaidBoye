@@ -15,6 +15,7 @@ declare namespace ModLog {
         blame: Member | null;
         gConfig: GuildConfig;
         guild: Guild;
+        hideReason?: boolean;
         reason: string;
         type: ModLogType;
     }

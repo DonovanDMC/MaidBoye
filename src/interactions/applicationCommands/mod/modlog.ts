@@ -91,7 +91,10 @@ export default new Command(import.meta.url, "modlog")
                 new Command.Option(ApplicationCommandOptionTypes.STRING, "reason")
                     .setDescription("The new reason for the case")
                     .setMinMax(1, 500)
-                    .setRequired()
+            )
+            .addOption(
+                new Command.Option(ApplicationCommandOptionTypes.BOOLEAN, "reason-hidden")
+                    .setDescription("If we should hide the reason from non-moderators (permission: MANAGE_GUILD)")
             )
     )
     .addOption(
@@ -110,12 +113,13 @@ export default new Command(import.meta.url, "modlog")
         setting:      interaction.data.options.getString<typeof ModlogSettingKeys[number]>("setting", false) ?? null,
         settingValue: interaction.data.options.getBoolean("value", false) ?? null,
         caseID:       interaction.data.options.getInteger("case", false) ?? null,
-        reason:       interaction.data.options.getString("reason", false) ?? null
+        reason:       interaction.data.options.getString("reason", false),
+        reasonHidden: interaction.data.options.getBoolean("reason-hidden", false)
     }))
     .setValidLocation(ValidLocation.GUILD)
     .setAck("ephemeral")
     .setGuildLookup(true)
-    .setExecutor(async function(interaction, { type: [type, configType], channel, setting, settingValue, caseID, reason }, gConfig) {
+    .setExecutor(async function(interaction, { type: [type, configType], channel, setting, settingValue, caseID, reason, reasonHidden }, gConfig) {
         const enabled = await ModLogHandler.check(gConfig);
         if (channel && !TextableGuildChannels.includes(channel.type)) {
             return interaction.reply({
@@ -237,38 +241,55 @@ export default new Command(import.meta.url, "modlog")
             }
 
             case "edit-case": {
-                assert(caseID && reason);
-                reason = Strings.truncate(reason, 500);
                 if (!(await ModLogHandler.check(gConfig))) {
                     return interaction.reply({ content: "H-hey! The modlog isn't enabled in this server, so cases can't be edited" });
                 }
                 if (!interaction.member.permissions.has("ADMINISTRATOR") && !gConfig.modlog.caseEditingEnabled) {
                     return interaction.reply({ content: "H-hey! Case editing is disabled in this server" });
                 }
-                const modCase = await ModLog.getCase(interaction.guildID, caseID);
+                if (reason === undefined && reasonHidden === undefined) {
+                    return interaction.reply({ content: "H-hey! You need to provide something to edit.." });
+                }
+                if (reasonHidden !== undefined && !interaction.member.permissions.has("ADMINISTRATOR")) {
+                    return interaction.reply({ content: "H-hey! You must be an administrator to edit that on existing cases." });
+                }
+                const modCase = await ModLog.getCase(interaction.guildID, caseID!);
+
                 if (!modCase) {
                     return interaction.reply({ content: "H-hey! I couldn't find that case.." });
                 }
                 if (modCase.deleted) {
                     return interaction.reply({ content: "H-hey! That case has been deleted.." });
                 }
+
+                if (reason !== undefined) {
                 // we also enforce this for administrators as any edits would look as if they were specifically from us
-                if (modCase.blameID === null || modCase.blameID === this.user.id) {
-                    return interaction.reply({ content: "Cases for automatic actions cannot be edited." });
-                }
-                if (!interaction.member.permissions.has("ADMINISTRATOR") && modCase.blameID !== interaction.member.id && gConfig.modlog.modifyOthersCasesEnabled) {
-                    return interaction.reply({ content: "H-hey! You can't edit cases that aren't yours" });
+                    if ((modCase.blameID === null || modCase.blameID === this.user.id)) {
+                        return interaction.reply({ content: "The reason for cases relating to automatic actions cannot be edited." });
+                    }
+
+                    reason = Strings.truncate(reason, 500);
+                    if (!interaction.member.permissions.has("ADMINISTRATOR") && modCase.blameID !== interaction.member.id && gConfig.modlog.modifyOthersCasesEnabled) {
+                        return interaction.reply({ content: "H-hey! You can't edit cases that aren't yours" });
+                    }
                 }
                 let messageUpdated = false;
                 if (gConfig.modlog.webhook) {
                     const msg = await modCase.getMessage(this);
+                    const shouldShow = reasonHidden === false || (reasonHidden === undefined && !modCase.reasonHidden);
                     if (msg && msg.webhookID === gConfig.modlog.webhook.id) {
+                        let footer = msg.embeds[0].footer!.text;
+                        if (footer.includes(" | Reason Hidden")) {
+                            footer = reasonHidden === false ? footer.replace(" | Reason Hidden", "") : footer;
+                        } else {
+                            footer = reasonHidden === true ? `${footer} | Reason Hidden` : footer;
+                        }
                         await this.rest.webhooks.editMessage(gConfig.modlog.webhook.id, gConfig.modlog.webhook.token, msg.id, {
                             embeds: Util.makeEmbed(false, undefined, msg.embeds[0])
                                 .setDescription(
                                     msg.embeds[0].description!.split("\n").map(line => {
                                         if (line.startsWith("Reason: ")) {
-                                            return `Reason: **${reason || "[None Provided]"}**`;
+                                            return `Reason: **${shouldShow ? reason ?? modCase.reason : "[HIDDEN]"}**`;
                                         }
                                         if (line.startsWith("Last Edit")) {
                                             return;
@@ -277,12 +298,13 @@ export default new Command(import.meta.url, "modlog")
                                     }).filter(Boolean).join("\n"),
                                     `Last Edit: by <@!${interaction.user.id}> at ${Util.formatDiscordTime(Date.now(), "short-datetime", true)}`
                                 )
+                                .setFooter(footer, msg.embeds[0].footer!.iconURL)
                                 .toJSON(true)
                         }).then(() => messageUpdated = true);
                     }
                 }
-                await modCase.edit({ updated_by: interaction.user.id, reason });
-                return interaction.reply({ content: `Case #${caseID} has been updated.${messageUpdated ? "" : " Due to a lookup failure, the modlog message has not been edited."}` });
+                await modCase.edit({ updated_by: interaction.user.id, reason, reason_hidden: reasonHidden });
+                return interaction.reply({ content: `Case #${caseID!} has been updated.${messageUpdated ? "" : " Due to a lookup failure, the modlog message has not been edited."}` });
             }
 
             case "delete-case": {
