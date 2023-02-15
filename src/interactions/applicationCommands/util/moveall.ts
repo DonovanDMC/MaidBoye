@@ -42,11 +42,11 @@ export default new Command(import.meta.url, "moveall")
             b = oldChannel.permissionsOf(this.user.id),
             c = newChannel.permissionsOf(interaction.user.id),
             d = newChannel.permissionsOf(this.user.id),
-            size = Number(newChannel.voiceMembers.size);
+            size = Number(oldChannel.voiceMembers.size);
 
         if (size === 0) {
             return interaction.reply({
-                content: `H-hey! There aren't any users in <#${newChannel.id}> to move..`
+                content: `H-hey! There aren't any users in <#${oldChannel.id}> to move..`
             });
         }
 
