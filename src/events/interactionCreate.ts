@@ -11,7 +11,7 @@ import Autocomplete from "../interactions/autocomplete/index.js";
 import { UserCommand, MessageCommand } from "../util/cmd/OtherCommand.js";
 import Leveling from "../util/Leveling.js";
 import StatsHandler from "../util/StatsHandler.js";
-import { PermissionNames } from "../util/Names.js";
+import { PermissionsByName } from "../util/Names.js";
 import Modals from "../interactions/modals/index.js";
 import Logger from "../util/Logger.js";
 import {
@@ -20,7 +20,8 @@ import {
     type InteractionOptionsSubCommandGroup,
     type InteractionOptionsWithValue,
     InteractionTypes,
-    MessageFlags
+    MessageFlags,
+    type PermissionName
 } from "oceanic.js";
 
 async function processRestrictions(this: MaidBoye, cmd: AnyCommand, interaction: CommandInteraction) {
@@ -162,7 +163,7 @@ export default new ClientEvent("interactionCreate", async function interactionCr
 
                     if ("guildID" in interaction && !Config.developers.includes(interaction.user.id)) {
                         if (cmd.userPermissions.length !== 0 && interaction.user) {
-                            const missingRequired: Array<string> = [], missingOptional: Array<string> = [];
+                            const missingRequired: Array<PermissionName> = [], missingOptional: Array<PermissionName> = [];
                             for (const [perm, optional] of cmd.userPermissions) {
                                 if (!interaction.member.permissions.has(perm)) {
                                     (optional ? missingOptional : missingRequired).push(perm);
@@ -171,15 +172,16 @@ export default new ClientEvent("interactionCreate", async function interactionCr
 
                             // we don't really use optional permissions, and I have no idea how to display them to the user if we did
                             if (missingRequired.length !== 0) {
+                                console.log(missingRequired);
                                 return interaction.reply({
-                                    content: `H-hey! You're missing some permissions needed to use that..\n${missingRequired.map(p => `- ${PermissionNames[p]}`).join("\n")}`,
+                                    content: `H-hey! You're missing some permissions needed to use that..\n${missingRequired.map(p => `- ${PermissionsByName[p]}`).join("\n")}`,
                                     flags:   MessageFlags.EPHEMERAL
                                 });
                             }
                         }
 
                         if (cmd.botPermissions.length !== 0 && interaction.guild) {
-                            const missingRequired: Array<string> = [], missingOptional: Array<string> = [];
+                            const missingRequired: Array<PermissionName> = [], missingOptional: Array<PermissionName> = [];
                             for (const [perm, optional] of cmd.botPermissions) {
                                 if (!(interaction.appPermissions || interaction.channel.permissionsOf(this.user.id)).has(perm)) {
                                     (optional ? missingOptional : missingRequired).push(perm);
@@ -187,7 +189,7 @@ export default new ClientEvent("interactionCreate", async function interactionCr
                             }
                             if (missingRequired.length !== 0) {
                                 return interaction.reply({
-                                    content: `H-hey! I'm missing some permissions needed to use that..\n${missingRequired.map(p => `- ${PermissionNames[p]}`).join("\n")}`,
+                                    content: `H-hey! I'm missing some permissions needed to use that..\n${missingRequired.map(p => `- ${PermissionsByName[p]}`).join("\n")}`,
                                     flags:   MessageFlags.EPHEMERAL
                                 });
                             }

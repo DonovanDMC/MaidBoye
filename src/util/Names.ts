@@ -252,7 +252,7 @@ export const MessageTypeNames = {
     [MessageTypes.GUILD_APPLICATION_PREMIUM_SUBSCRIPTION]:       "Guild Application Premium Subscription"
 } satisfies Record<MessageTypes, string>;
 
-export const PermissionNames = {
+export const PermissionsByValue = {
     [String(Permissions.CREATE_INSTANT_INVITE)]:               "Create Instant Invite",
     [String(Permissions.KICK_MEMBERS)]:                        "Kick Members",
     [String(Permissions.BAN_MEMBERS)]:                         "Ban Members",
@@ -297,7 +297,7 @@ export const PermissionNames = {
     [String(Permissions.VIEW_CREATOR_MONETIZATION_ANALYTICS)]: "View Creator Monetization Analytics"
 };
 export const PermissionsByName = Object.entries(Permissions).map(([name, value]) => ({
-    [name]: PermissionNames[String(value)]
+    [name]: PermissionsByValue[String(value)]
 })).reduce((a, b) => ({ ...a, ...b }), {}) as Record<PermissionName, string>;
 
 export const PremiumTierNames = {
