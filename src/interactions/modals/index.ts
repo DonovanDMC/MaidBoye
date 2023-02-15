@@ -5,6 +5,8 @@ import type { ModalSubmitInteraction } from "../../util/cmd/Command.js";
 import Debug from "../../util/Debug.js";
 import Logger from "../../util/Logger.js";
 import { State } from "../../util/State.js";
+import ExceptionHandler from "../../util/handlers/ExceptionHandler.js";
+import Config from "../../config/index.js";
 import { Timer } from "@uwu-codes/utils";
 import { MessageFlags } from "oceanic.js";
 import type { ModuleImport } from "@uwu-codes/types";
@@ -46,7 +48,20 @@ export default class Modals {
         const modal = this.get(data.command, data.action);
         Logger.getLogger("Modals").debug(`Handling modal "${data.command || "null"}$${data.action}" for ${interaction.user.tag} (${interaction.user.id}) in ${"guildID" in interaction ? interaction.guild.id : "DM"})`);
         assert(modal, `failed to find valid handler for "${data.command || "null"}$${data.action}" modal`);
-        await ("guildID" in interaction ? modal.handleGuild(interaction, components, data) : modal.handleDM(interaction, components, data));
+        await ("guildID" in interaction ? modal.handleGuild(interaction, components, data) : modal.handleDM(interaction, components, data))
+            .catch(async err => {
+                const code =  await ExceptionHandler.handle(err as Error, "modal", [
+                    `User: **${interaction.user.tag}** (${interaction.user.id})`,
+                    `Guild: **${interaction.inCachedGuildChannel() ? interaction.guild.name : "DM"}** (${"guildID" in interaction ? interaction.guildID : "DM"})`,
+                    `Channel: **${interaction.channel && "name" in interaction.channel ? interaction.channel.name : "DM"}** (${interaction.channelID})`,
+                    `Command: **${data.command || "null"}**`,
+                    `Data: \`\`\`json\n${JSON.stringify(data, null, 2)}\`\`\``
+                ].join("\n"));
+                await interaction.reply({
+                    content: `H-hey! Something went wrong while executing that command..\nYou can try again, or report it to one of my developers.\n\nCode: \`${code}\`\nSupport Server: <${Config.discordLink}>`,
+                    flags:   MessageFlags.EPHEMERAL
+                });
+            });
     }
 
     static async loadAll(dir = thisDirectory) {

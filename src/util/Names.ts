@@ -2,7 +2,6 @@ import Config from "../config/index.js";
 import type MaidBoye from "../main.js";
 import {
     type GuildFeature,
-    type PermissionName,
     GatewayOPCodes,
     InteractionTypes,
     ApplicationCommandTypes,
@@ -37,7 +36,8 @@ import {
     StickerFormatTypes,
     SortOrderTypes,
     GuildMemberFlags,
-    type Role
+    type Role,
+    type PermissionName
 } from "oceanic.js";
 const { badges, serverFeatures } = Config.emojis;
 
@@ -296,9 +296,7 @@ export const PermissionsByValue = {
     [String(Permissions.MODERATE_MEMBERS)]:                    "Moderate Members",
     [String(Permissions.VIEW_CREATOR_MONETIZATION_ANALYTICS)]: "View Creator Monetization Analytics"
 };
-export const PermissionsByName = Object.entries(Permissions).map(([name, value]) => ({
-    [name]: PermissionsByValue[String(value)]
-})).reduce((a, b) => ({ ...a, ...b }), {}) as Record<PermissionName, string>;
+export const PermissionsByName = Object.fromEntries(Object.entries(Permissions).map(([name, value]) => [name, PermissionsByValue[String(value)]])) as Record<PermissionName, string>;
 
 export const PremiumTierNames = {
     [PremiumTiers.NONE]:   "None",

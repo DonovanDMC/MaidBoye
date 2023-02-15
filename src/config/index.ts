@@ -457,14 +457,6 @@ export class Configuration extends PrivateConfiguration {
         return emojis;
     }
 
-    static override get encryptionKey() {
-        return super.encryptionKey;
-    }
-
-    static override get encryptionSalt() {
-        return super.encryptionSalt;
-    }
-
     static get botLists() {
         return botLists;
     }

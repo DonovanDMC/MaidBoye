@@ -4,6 +4,7 @@ import type EmptyAutocomplete from "./structure/Empty.js";
 import Logger from "../../util/Logger.js";
 import type { AutocompleteInteraction } from "../../util/cmd/Command.js";
 import Debug from "../../util/Debug.js";
+import ExceptionHandler from "../../util/handlers/ExceptionHandler.js";
 import { Timer } from "@uwu-codes/utils";
 import type { ModuleImport } from "@uwu-codes/types";
 import type { InteractionOptionsInteger, InteractionOptionsNumber, InteractionOptionsString } from "oceanic.js";
@@ -36,7 +37,21 @@ export default class Autocomplete {
         Logger.getLogger("Autocomplete").debug(`Handling autocomplete "${interaction.data.name}$${focused.name}" for user ${interaction.user.tag} (${interaction.user.id}) in guild ${"guildID" in interaction ? interaction.guildID : "DM"}`);
         const autocomplete = this.get(interaction.data.name, focused.name);
         assert(autocomplete, `failed to find valid handler for "${interaction.data.name}$${focused.name}" autocomplete`);
-        await ("guildID" in interaction ? autocomplete.handleGuild(interaction, focused) : autocomplete.handleDM(interaction, focused));
+        await ("guildID" in interaction ? autocomplete.handleGuild(interaction, focused) : autocomplete.handleDM(interaction, focused))
+            .catch(async err => {
+                const code =  await ExceptionHandler.handle(err as Error, "autocomplete", [
+                    `User: **${interaction.user.tag}** (${interaction.user.id})`,
+                    `Guild: **${interaction.inCachedGuildChannel() ? interaction.guild.name : "DM"}** (${"guildID" in interaction ? interaction.guildID : "DM"})`,
+                    `Channel: **${interaction.channel && "name" in interaction.channel ? interaction.channel.name : "DM"}** (${interaction.channelID})`,
+                    `Command: **${interaction.data.name}**`,
+                    `Focused: **${focused.name}**`,
+                    `Value: **${focused.value}**`
+                ].join("\n"));
+                await interaction.reply([{
+                    name:  `An error occured. Code: ${code}`,
+                    value: "invalid"
+                }]);
+            });
     }
 
     static async loadAll(dir = thisDirectory) {

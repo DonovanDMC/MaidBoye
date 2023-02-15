@@ -5,6 +5,8 @@ import { State } from "../../util/State.js";
 import type { ComponentInteraction, ValidLocation } from "../../util/cmd/Command.js";
 import Debug from "../../util/Debug.js";
 import Logger from "../../util/Logger.js";
+import ExceptionHandler from "../../util/handlers/ExceptionHandler.js";
+import Config from "../../config/index.js";
 import { Timer } from "@uwu-codes/utils";
 import type { ModuleImport } from "@uwu-codes/types";
 import { MessageFlags } from "oceanic.js";
@@ -40,7 +42,20 @@ export default class Components {
         const component = this.get(data.command, data.action);
         Logger.getLogger("Components").debug(`Handling component "${data.command || "null"}$${data.action}" for user ${interaction.user.tag} (${interaction.user.id}) in guild ${"guildID" in interaction ? interaction.guildID : "DM"}`);
         assert(component, `failed to find valid handler for "${data.command || "null"}$${data.action}" component`);
-        await ("guildID" in interaction ? component.handleGuild(interaction as ComponentInteraction<ValidLocation.GUILD>, data) : component.handleDM(interaction as ComponentInteraction<ValidLocation.PIVATE>, data));
+        await ("guildID" in interaction ? component.handleGuild(interaction as ComponentInteraction<ValidLocation.GUILD>, data) : component.handleDM(interaction as ComponentInteraction<ValidLocation.PIVATE>, data))
+            .catch(async err => {
+                const code =  await ExceptionHandler.handle(err as Error, "component", [
+                    `User: **${interaction.user.tag}** (${interaction.user.id})`,
+                    `Guild: **${interaction.inCachedGuildChannel() ? interaction.guild.name : "DM"}** (${"guildID" in interaction ? interaction.guildID : "DM"})`,
+                    `Channel: **${interaction.channel && "name" in interaction.channel ? interaction.channel.name : "DM"}** (${interaction.channelID})`,
+                    `Command: **${data.command || "null"}**`,
+                    `Data: \`\`\`json\n${JSON.stringify(data, null, 2)}\`\`\``
+                ].join("\n"));
+                await interaction.reply({
+                    content: `H-hey! Something went wrong while executing that command..\nYou can try again, or report it to one of my developers.\n\nCode: \`${code}\`\nSupport Server: <${Config.discordLink}>`,
+                    flags:   MessageFlags.EPHEMERAL
+                });
+            });
     }
 
     static async loadAll(dir = thisDirectory) {

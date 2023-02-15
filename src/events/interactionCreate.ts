@@ -14,6 +14,7 @@ import StatsHandler from "../util/StatsHandler.js";
 import { PermissionsByName } from "../util/Names.js";
 import Modals from "../interactions/modals/index.js";
 import Logger from "../util/Logger.js";
+import ExceptionHandler from "../util/handlers/ExceptionHandler.js";
 import {
     ApplicationCommandTypes,
     type InteractionOptionsSubCommand,
@@ -211,7 +212,20 @@ export default new ClientEvent("interactionCreate", async function interactionCr
                         return;
                     }
 
-                    void cmd.run.call(this, interaction, opt as Record<string, never>, gConfig as null, uConfig as null, cmd);
+                    void cmd.run.call(this, interaction, opt as Record<string, never>, gConfig as null, uConfig as null, cmd)
+                        .catch(async err => {
+                            const code =  await ExceptionHandler.handle(err as Error, "command", [
+                                `User: **${interaction.user.tag}** (${interaction.user.id})`,
+                                `Guild: **${interaction.inCachedGuildChannel() ? interaction.guild.name : "DM"}** (${"guildID" in interaction ? interaction.guildID : "DM"})`,
+                                `Channel: **${interaction.channel && "name" in interaction.channel ? interaction.channel.name : "DM"}** (${interaction.channelID})`,
+                                `Command: **${interaction.data.name}** (Chat Input)`,
+                                `Arguments: ${stringifyArguments(interaction) || "none"}`
+                            ].join("\n"));
+                            await interaction.reply({
+                                content: `H-hey! Something went wrong while executing that command..\nYou can try again, or report it to one of my developers.\n\nCode: \`${code}\`\nSupport Server: <${Config.discordLink}>`,
+                                flags:   MessageFlags.EPHEMERAL
+                            });
+                        });
                     if ("guildID" in interaction) {
                         await Leveling.run(interaction as unknown as CommandInteraction<ValidLocation.GUILD>);
                     }
@@ -245,7 +259,19 @@ export default new ClientEvent("interactionCreate", async function interactionCr
                     }
 
                     // generics do weird things
-                    void cmd.run.call(this, interaction, gConfig as null, uConfig as null, cmd);
+                    void cmd.run.call(this, interaction, gConfig as null, uConfig as null, cmd)
+                        .catch(async err => {
+                            const code =  await ExceptionHandler.handle(err as Error, "command", [
+                                `User: **${interaction.user.tag}** (${interaction.user.id})`,
+                                `Guild: **${interaction.inCachedGuildChannel() ? interaction.guild.name : "DM"}** (${"guildID" in interaction ? interaction.guildID : "DM"})`,
+                                `Channel: **${interaction.channel && "name" in interaction.channel ? interaction.channel.name : "DM"}** (${interaction.channelID})`,
+                                `Command: **${interaction.data.name}** (User)`
+                            ].join("\n"));
+                            await interaction.reply({
+                                content: `H-hey! Something went wrong while executing that command..\nYou can try again, or report it to one of my developers.\n\nCode: \`${code}\`\nSupport Server: <${Config.discordLink}>`,
+                                flags:   MessageFlags.EPHEMERAL
+                            });
+                        });
                     break;
                 }
 
@@ -276,7 +302,19 @@ export default new ClientEvent("interactionCreate", async function interactionCr
                         return;
                     }
                     // generics do weird things
-                    void cmd.run.call(this, interaction, gConfig as null, uConfig as null, cmd);
+                    void cmd.run.call(this, interaction, gConfig as null, uConfig as null, cmd)
+                        .catch(async err => {
+                            const code =  await ExceptionHandler.handle(err as Error, "command", [
+                                `User: **${interaction.user.tag}** (${interaction.user.id})`,
+                                `Guild: **${interaction.inCachedGuildChannel() ? interaction.guild.name : "DM"}** (${"guildID" in interaction ? interaction.guildID : "DM"})`,
+                                `Channel: **${interaction.channel && "name" in interaction.channel ? interaction.channel.name : "DM"}** (${interaction.channelID})`,
+                                `Command: **${interaction.data.name}** (Message)`
+                            ].join("\n"));
+                            await interaction.reply({
+                                content: `H-hey! Something went wrong while executing that command..\nYou can try again, or report it to one of my developers.\n\nCode: \`${code}\`\nSupport Server: <${Config.discordLink}>`,
+                                flags:   MessageFlags.EPHEMERAL
+                            });
+                        });
                     break;
                 }
             }
