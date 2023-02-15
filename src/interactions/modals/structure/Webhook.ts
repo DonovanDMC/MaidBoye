@@ -24,7 +24,7 @@ export default abstract class WebhookModal extends BaseModal {
             const head = await RequestProxy.head(components.avatar);
             if (head.status !== 200 && head.status !== 204) {
                 return interaction.reply({
-                    content: `A pre-check failed when trying to fetch the image "${components.avatar}".\nA \`HEAD\` request returned a non 200 OK/204 No Content responses (${head.status} ${STATUS_CODES[head.status] || "UNKNOWN"})\n\nThis means we either can't access the file, the server is configured incorrectly, or the file does not exist.`
+                    content: `A pre-check failed when trying to fetch the image "${components.avatar}".\nA \`HEAD\` request returned a non 200 OK/204 No Content response (${head.status} ${STATUS_CODES[head.status] || "UNKNOWN"})\n\nThis means we either can't access the file, the server is configured incorrectly, or the file does not exist.`
                 });
             }
 

@@ -44,6 +44,7 @@ export default class Modals {
             }
         }
         const modal = this.get(data.command, data.action);
+        Logger.getLogger("Modals").debug(`Handling modal "${data.command || "null"}$${data.action}" for ${interaction.user.tag} (${interaction.user.id}) in ${"guildID" in interaction ? interaction.guild.id : "DM"})`);
         assert(modal, `failed to find valid handler for "${data.command || "null"}$${data.action}" modal`);
         await ("guildID" in interaction ? modal.handleGuild(interaction, components, data) : modal.handleDM(interaction, components, data));
     }

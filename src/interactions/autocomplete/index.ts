@@ -33,6 +33,7 @@ export default class Autocomplete {
         if (focused === null) {
             throw new Error(`failed to find focused option for autocomplete interaction ${interaction.data.name}`);
         }
+        Logger.getLogger("Autocomplete").debug(`Handling autocomplete "${interaction.data.name}$${focused.name}" for user ${interaction.user.tag} (${interaction.user.id}) in guild ${"guildID" in interaction ? interaction.guildID : "DM"}`);
         const autocomplete = this.get(interaction.data.name, focused.name);
         assert(autocomplete, `failed to find valid handler for "${interaction.data.name}$${focused.name}" autocomplete`);
         await ("guildID" in interaction ? autocomplete.handleGuild(interaction, focused) : autocomplete.handleDM(interaction, focused));

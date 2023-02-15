@@ -133,7 +133,7 @@ export default new Command(import.meta.url, "steal")
         }
         const head = await RequestProxy.head(url);
         if (head.status !== 200 && head.status !== 204) {
-            return interaction.reply({ content: `A pre-check failed when trying to fetch the image "${url}".\nA \`HEAD\` request returned a non 200 OK/204 No Content responses (${head.status} ${STATUS_CODES[head.status] || "UNKNOWN"})\n\nThis means we either can't access the file, the server is configured incorrectly, or the file does not exist.` });
+            return interaction.reply({ content: `A pre-check failed when trying to fetch the image "${url}".\nA \`HEAD\` request returned a non 200 OK/204 No Content response (${head.status} ${STATUS_CODES[head.status] || "UNKNOWN"})\n\nThis means we either can't access the file, the server is configured incorrectly, or the file does not exist.` });
         }
         switch (outputType) {
             case "emoji": {

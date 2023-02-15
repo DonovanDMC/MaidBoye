@@ -38,6 +38,7 @@ export default class Components {
             return;
         }
         const component = this.get(data.command, data.action);
+        Logger.getLogger("Components").debug(`Handling component "${data.command || "null"}$${data.action}" for user ${interaction.user.tag} (${interaction.user.id}) in guild ${"guildID" in interaction ? interaction.guildID : "DM"}`);
         assert(component, `failed to find valid handler for "${data.command || "null"}$${data.action}" component`);
         await ("guildID" in interaction ? component.handleGuild(interaction as ComponentInteraction<ValidLocation.GUILD>, data) : component.handleDM(interaction as ComponentInteraction<ValidLocation.PIVATE>, data));
     }
