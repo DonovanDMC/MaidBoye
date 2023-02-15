@@ -6,6 +6,5 @@ export default new Command(import.meta.url, "birb")
     .setCooldown(1e4)
     .setAck("ephemeral-user")
     .setExecutor(async function(interaction) {
-        throw new Error("urgay");
         return Util.handleGenericImage(interaction, interaction.data.name);
     });
