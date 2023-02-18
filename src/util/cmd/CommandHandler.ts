@@ -82,7 +82,8 @@ export default class CommandHandler {
                 continue;
             }
             const { default: cat } = (await import(`${category}/index.js`)) as { default: Category; };
-            CommandHandler.registerCategory(cat);
+            const c = CommandHandler.registerCategory(cat);
+            await c.registerGeneric();
             await CommandHandler.loadCategoryCommands(cat.name, cat.dir);
         }
         const end = Timer.getTime();
@@ -114,6 +115,41 @@ export default class CommandHandler {
         return cat;
     }
 
+    static async registerCommand(category: Category, file: string, command?: Command, userCommand?: UserCommand, messageCommand?: MessageCommand) {
+        if (command) {
+            const [dup, dupName, dupCmd] = this.checkDuplicate(command.name);
+            if (dup) {
+                throw new Error(`Duplicate application command name "${dupName}" for file "${file}" (dup: ${dupCmd.file}, type: interaction)`);
+            }
+            command.category = category.name;
+            category.commands.push(command);
+            this.commandMap.set(command.name, command);
+            Debug("commands:register", `Registered the interaction command "${command.name}" (${file})`);
+        }
+
+        if (userCommand) {
+            const [dup, dupName, dupCmd] = this.checkDuplicate(userCommand.name);
+            if (dup) {
+                throw new Error(`Duplicate application command name "${dupName}" for file "${file}" (dup: ${dupCmd.file}, type: user)`);
+            }
+            userCommand.category = category.name;
+            category.userCommands.push(userCommand);
+            this.userCommandMap.set(userCommand.name, userCommand);
+            Debug("commands:register", `Registered the user command "${userCommand.name}" (${file})`);
+        }
+
+        if (messageCommand) {
+            const [dup, dupName, dupCmd] = this.checkDuplicate(messageCommand.name);
+            if (dup) {
+                throw new Error(`Duplicate application command name "${dupName}" for file "${file}" (dup: ${dupCmd.file}, type: message)`);
+            }
+            messageCommand.category = category.name;
+            category.messageCommands.push(messageCommand);
+            this.messageCommandMap.set(messageCommand.name, messageCommand);
+            Debug("commands:register", `Registered the message command "${messageCommand.name}" (${file})`);
+        }
+    }
+
     static async registerExports(category: string, file: string) {
         const cat = this.getCategory(category);
         if (!cat) {
@@ -126,38 +162,7 @@ export default class CommandHandler {
             return;
         }
 
-        if (command) {
-            const [dup, dupName, dupCmd] = this.checkDuplicate(command.name);
-            if (dup) {
-                throw new Error(`Duplicate application command name "${dupName}" for file "${file}" (dup: ${dupCmd.file}, type: interaction)`);
-            }
-            command.category = category;
-            cat.commands.push(command);
-            this.commandMap.set(command.name, command);
-            Debug("commands:register", `Registered the interaction command "${command.name}" (${file})`);
-        }
-
-        if (userCommand) {
-            const [dup, dupName, dupCmd] = this.checkDuplicate(userCommand.name);
-            if (dup) {
-                throw new Error(`Duplicate application command name "${dupName}" for file "${file}" (dup: ${dupCmd.file}, type: user)`);
-            }
-            userCommand.category = category;
-            cat.userCommands.push(userCommand);
-            this.userCommandMap.set(userCommand.name, userCommand);
-            Debug("commands:register", `Registered the user command "${userCommand.name}" (${file})`);
-        }
-
-        if (messageCommand) {
-            const [dup, dupName, dupCmd] = this.checkDuplicate(messageCommand.name);
-            if (dup) {
-                throw new Error(`Duplicate application command name "${dupName}" for file "${file}" (dup: ${dupCmd.file}, type: message)`);
-            }
-            messageCommand.category = category;
-            cat.messageCommands.push(messageCommand);
-            this.messageCommandMap.set(messageCommand.name, messageCommand);
-            Debug("commands:register", `Registered the message command "${messageCommand.name}" (${file})`);
-        }
+        await this.registerCommand(cat, file, command, userCommand, messageCommand);
     }
 
     static async reloadCategory(name: string) {

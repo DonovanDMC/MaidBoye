@@ -45,7 +45,7 @@
     "@types/fuzzy-search": "^2.1.2",
     "@types/markdown-it": "^12.2.3",
     "@types/morgan": "^1.9.4",
-    "@types/node": "^18.13.0",
+    "@types/node": "^18.14.0",
     "@types/pg": "^8.6.6",
     "@uwu-codes/eslint-config": "^1.1.18",
     "@uwu-codes/tsconfig": "^1.0.7",
@@ -69,7 +69,7 @@
     "express": "^4.18.2",
     "express-handlebars": "^6.0.7",
     "express-session": "^1.17.3",
-    "file-type": "^18.2.0",
+    "file-type": "^18.2.1",
     "fuzzy-search": "^3.2.1",
     "imgen": "^1.0.1",
     "ioredis": "^5.3.1",
@@ -80,7 +80,7 @@
     "short-uuid": "^4.2.2",
     "tsafe": "^1.4.3",
     "tslog": "^3.3.4",
-    "yiffy": "^2.3.0"
+    "yiffy": "^2.3.1"
   },
   "type": "module",
   "engines": {

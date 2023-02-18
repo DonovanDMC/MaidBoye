@@ -8,10 +8,12 @@ import type { CommandInteraction, ComponentInteraction } from "./cmd/Command.js"
 import type { ExtractConstructorArg } from "./@types/misc.js";
 import Logger from "./Logger.js";
 import { GuildMemberFlagNames, UserFlagNames } from "./Names.js";
+import Command from "./cmd/Command.js";
+import { type TypeToClass } from "./cmd/Category.js";
 import Config from "../config/index.js";
 import db, { DBLiteral, DBLiteralReverse } from "../db/index.js";
 import type { YiffTypes } from "../db/Models/UserConfig.js";
-import type { Post } from "e621";
+import { type Post } from "e621";
 import {
     CategoryChannel,
     ChannelTypes,
@@ -33,7 +35,8 @@ import {
     type MessageActionRow,
     type Guild,
     UserFlags,
-    GuildMemberFlags
+    GuildMemberFlags,
+    ApplicationCommandTypes
 } from "oceanic.js";
 import type { ModuleImport } from "@uwu-codes/types";
 import { ButtonColors, ComponentBuilder, EmbedBuilder } from "@oceanicjs/builders";
@@ -288,6 +291,27 @@ export default class Util {
         }
     }
 
+    static genericImageCommandExpander<T extends ApplicationCommandTypes>(this: void, type: T, file: string, name: string, description?: string): TypeToClass<T> {
+        switch (type) {
+            case ApplicationCommandTypes.CHAT_INPUT: {
+                if (!description) {
+                    throw new Error(`Description is required for chat input commands @${file}:${name}`);
+                }
+                return new Command(file, name)
+                    .setDescription(description)
+                    .setCooldown(1e4)
+                    .setAck("ephemeral-user")
+                    .setExecutor(async function(interaction) {
+                        return Util.handleGenericImage(interaction, name);
+                    }) as never;
+            }
+
+            default: {
+                throw new Error(`Invalid command type ${ApplicationCommandTypes[type] || type} @${file}:${name}`);
+            }
+        }
+    }
+
     static getAuditLogEntry(guild: Guild, type: AuditLogActionTypes, filter: (entry: AuditLogEntry) => boolean = () => true) {
         const entry = guild.auditLogEntries.find(e => e.actionType === type && filter(e));
         if (entry) {
@@ -448,92 +472,80 @@ export default class Util {
     }
 
     static async handleGenericImage(interaction: CommandInteraction | ComponentInteraction, cmd: string) {
-        const titles = {
-            birb:    "Birb!",
-            bunny:   "Bun-Bun!",
-            cat:     "Kitty!",
-            dikdik:  "Dik-Dik!",
-            dog:     "Woof Woof!",
-            duck:    "Quack!",
-            fox:     "Screeeeee!",
-            koala:   "Koala!",
-            otter:   "Cuuuuute!",
-            owl:     "Hoot Hoot!",
-            panda:   "Panda!",
-            snek:    "Snek!",
-            turtle:  "Tortle",
-            wah:     "Wah",
-            wolf:    "Wolf!",
-            fursuit: "Fursuit"
+        const map = {
+            "birb":            { d: true as const, f: Yiffy.images.animals.birb, t: "Birb!" },
+            "bunny":           { d: false as const, f: CheweyAPI.rabbit.bind(CheweyAPI), t: "Bun-Bun!" },
+            "cat":             { d: false as const, f: CheweyAPI.cat.bind(CheweyAPI), t: "kitty!" },
+            "dikdik":          { d: true as const, f: Yiffy.images.animals.dikdik, t: "Dik-Dik!" },
+            "dog":             { d: false as const, f: CheweyAPI.dog.bind(CheweyAPI), t: "Wool Woof!" },
+            "duck":            { d: false as const, f: CheweyAPI.duck.bind(CheweyAPI), t: "Quack!" },
+            "fox":             { d: false as const, f: CheweyAPI.fox.bind(CheweyAPI), t: "Screeeeee!" },
+            "koala":           { d: false as const, f: CheweyAPI.koala.bind(CheweyAPI), t: "Koala!" },
+            "otter":           { d: false as const, f: CheweyAPI.otter.bind(CheweyAPI), t: "Cuuuuute!" },
+            "owl":             { d: false as const, f: CheweyAPI.owl.bind(CheweyAPI), t: "Hoot Hoot!" },
+            "panda":           { d: false as const, f: CheweyAPI.panda.bind(CheweyAPI), t: "Panda!" },
+            "snek":            { d: false as const, f: CheweyAPI.snake.bind(CheweyAPI), t: "Snek!" },
+            "turtle":          { d: false as const, f: CheweyAPI.turtle.bind(CheweyAPI), t: "Tortle!" },
+            "wah":             { d: false as const, f: CheweyAPI["red-panda"].bind(CheweyAPI), t: "Wah!" },
+            "wolf":            { d: false as const, f: CheweyAPI.wolf.bind(CheweyAPI), t: "Wolf!" },
+            "fursuit":         { d: true as const, f: Yiffy.images.furry.fursuit, t: "Fursuit!" },
+            "fursuitbutt":     { d: true as const, f: Yiffy.images.furry.butts, t: "Fursuit Butt!" },
+            "bulge":           { d: true as const, f: Yiffy.images.furry.bulge, t: "Bulge!" },
+            "yiff.gay":        { d: true as const, f: Yiffy.images.furry.yiff.gay, t: "Gay Yiff!" },
+            "yiff.straight":   { d: true as const, f: Yiffy.images.furry.yiff.straight, t: "Straight Yiff!" },
+            "yiff.lesbian":    { d: true as const, f: Yiffy.images.furry.yiff.lesbian, t: "Lesbian Yiff!" },
+            "yiff.gynomorph":  { d: true as const, f: Yiffy.images.furry.yiff.gynomorph, t: "Gynomorph Yiff!" },
+            "yiff.andromorph": { d: true as const, f: Yiffy.images.furry.yiff.andromorph, t: "Andromorph Yiff!" }
         };
-        switch (cmd) {
-            case "bunny": case "cat": case "dog": case "duck": case "fox": case "koala": case "otter": case "owl": case "panda": case "snek": case "turtle": case "wah": case "wolf": {
-                // eslint-disable-next-line unicorn/no-nested-ternary
-                const img = await CheweyAPI[cmd === "bunny" ? "rabbit" : cmd === "snek" ? "snake" : cmd === "wah" ? "redPanda" : cmd]();
-                void (interaction.type === InteractionTypes.APPLICATION_COMMAND ? interaction.reply.bind(interaction) : interaction.editParent.bind(interaction))({
-                    embeds: Util.makeEmbed(true, interaction.user)
-                        .setTitle(titles[cmd])
-                        .setImage(img)
-                        .setColor(Colors.gold)
-                        .toJSON(true),
-                    components: new ComponentBuilder<MessageActionRow>(2)
-                        .addURLButton({
-                            label: "Full Image",
-                            url:   img
-                        })
-                        .addInteractionButton({
-                            customID: State.new(interaction.user.id, cmd, "new").encode(),
-                            label:    "New Image",
-                            style:    ButtonColors.GREY
-                        })
-                        .addInteractionButton({
-                            customID: State.partialExit(),
-                            label:    "Exit",
-                            style:    ButtonColors.RED
-                        })
-                        .toJSON()
+        if (!(cmd in map)) {
+            if (cmd.startsWith("yiff.")) {
+                cmd = "yiff.gay";
+            } else {
+                void interaction.reply({
+                    content: `S-ssomething broke.. Please report this to a developer.\n\nExtra info: \`cmd=${cmd}\``
                 });
-                break;
-            }
-
-            case "birb": case "dikdik": case "fursuit": {
-                const img = await (cmd === "birb" || cmd === "dikdik" ? Yiffy.images.animals[cmd]() : Yiffy.images.furry[cmd]());
-                void (interaction.type === InteractionTypes.APPLICATION_COMMAND ? interaction.reply.bind(interaction) : interaction.editParent.bind(interaction))({
-                    embeds: Util.makeEmbed(true, interaction.user)
-                        .setTitle(titles[cmd])
-                        .setImage(img.url)
-                        .setColor(Colors.gold)
-                        .toJSON(true),
-                    components: new ComponentBuilder<MessageActionRow>(3)
-                        .addURLButton({
-                            label: "Full Image",
-                            url:   img.shortURL
-                        })
-                        .addURLButton({
-                            disabled: img.sources.length === 0,
-                            label:    "Source",
-                            url:      img.sources[0] || "https://maid.gay"
-                        })
-                        .addURLButton({
-                            disabled: !img.reportURL,
-                            label:    "Report",
-                            url:      img.reportURL || "https://report.yiff.media"
-                        })
-                        .addInteractionButton({
-                            customID: State.new(interaction.user.id, cmd, "new").encode(),
-                            label:    "New Image",
-                            style:    ButtonColors.GREY
-                        })
-                        .addInteractionButton({
-                            customID: State.partialExit(),
-                            label:    "Exit",
-                            style:    ButtonColors.RED
-                        })
-                        .toJSON()
-                });
-                break;
+                return;
             }
         }
+        const c = map[cmd as keyof typeof map];
+        let url: string, linkURL: string, source: string | undefined;
+        if (c.d) {
+            const img = await c.f();
+            url = img.url;
+            linkURL = img.shortURL;
+            source = img.sources[0];
+        } else {
+            const img = await c.f();
+            url = linkURL = img;
+        }
+        void (interaction.type === InteractionTypes.APPLICATION_COMMAND ? interaction.reply.bind(interaction) : interaction.editParent.bind(interaction))({
+            embeds: Util.makeEmbed(true, interaction.user)
+                .setTitle(c.t)
+                .setImage(url)
+                .setColor(Colors.gold)
+                .toJSON(true),
+            components: new ComponentBuilder<MessageActionRow>(3)
+                .addURLButton({
+                    label: "Full Image",
+                    url:   linkURL
+                })
+                .addURLButton({
+                    disabled: source === undefined,
+                    label:    "Source",
+                    url:      source || "https://maid.gay"
+                })
+                .addInteractionButton({
+                    customID: State.new(interaction.user.id, "generic-image", "new").with("type", cmd).encode(),
+                    label:    "New Image",
+                    style:    ButtonColors.GREY
+                })
+                .addInteractionButton({
+                    customID: State.partialExit(),
+                    label:    "Exit",
+                    style:    ButtonColors.RED
+                })
+                .toJSON()
+        });
     }
 
     /**
