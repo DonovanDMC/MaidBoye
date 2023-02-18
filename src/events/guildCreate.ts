@@ -9,7 +9,7 @@ import { EmbedBuilder } from "@oceanicjs/builders";
 export default new ClientEvent("guildCreate", async function guildCreateEvent(guild) {
     await DailyGuildsHandler.trackJoin();
     Logger.getLogger("GuildCreate").info(`Joined guild ${guild.name} (${guild.id})`);
-    const owner = await this.getMember(guild.id, guild.ownerID);
+    const owner = await this.getUser(guild.ownerID);
     await WebhookHandler.execute("guilds", {
         embeds: new EmbedBuilder()
             .setAuthor(owner === null ? "Unknown#0000" : owner.tag, owner?.avatarURL() ?? Config.noIcon)

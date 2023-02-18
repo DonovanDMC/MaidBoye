@@ -14,7 +14,7 @@ export default new ClientEvent("guildDelete", async function guildDeleteEvent(gu
         return;
     }
     Logger.getLogger("GuildDelete").info(`Left guild ${guild.name} (${guild.id})`);
-    const owner = await this.getMember(guild.id, guild.ownerID);
+    const owner = await this.getUser(guild.ownerID);
     await WebhookHandler.execute("guilds", {
         embeds: new EmbedBuilder()
             .setAuthor(owner === null ? "Unknown#0000" : owner.tag, owner?.avatarURL() ?? Config.noIcon)
