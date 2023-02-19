@@ -1,4 +1,6 @@
-node_modules
-dist
-data
-.idea
+node_modules/
+dist/
+data/
+.idea/
+test/
+lists.txt

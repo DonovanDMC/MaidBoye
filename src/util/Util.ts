@@ -9,11 +9,11 @@ import type { ExtractConstructorArg } from "./@types/misc.js";
 import Logger from "./Logger.js";
 import { GuildMemberFlagNames, UserFlagNames } from "./Names.js";
 import Command from "./cmd/Command.js";
-import { type TypeToClass } from "./cmd/Category.js";
+import type { TypeToClass } from "./cmd/Category.js";
 import Config from "../config/index.js";
 import db, { DBLiteral, DBLiteralReverse } from "../db/index.js";
 import type { YiffTypes } from "../db/Models/UserConfig.js";
-import { type Post } from "e621";
+import type { Post } from "e621";
 import {
     CategoryChannel,
     ChannelTypes,

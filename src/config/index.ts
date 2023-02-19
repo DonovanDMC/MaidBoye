@@ -307,7 +307,10 @@ export class Configuration extends PrivateConfiguration {
         return "https://ko-fi.com/MaidBoye";
     }
     static get invitePermissions() {
-        return ([
+        return this.invitePermissionsList.reduce((a, b) => a | Permissions[b], 0n);
+    }
+    static get invitePermissionsList() {
+        return [
             "KICK_MEMBERS",
             "BAN_MEMBERS",
             "ADMINISTRATOR",
@@ -331,7 +334,7 @@ export class Configuration extends PrivateConfiguration {
             "MANAGE_THREADS",
             "SEND_MESSAGES_IN_THREADS",
             "MODERATE_MEMBERS"
-        ] as const).reduce((a, b) => a | Permissions[b], 0n);
+        ] as const;
     }
 
     /* statuses */
