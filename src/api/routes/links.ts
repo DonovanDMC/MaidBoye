@@ -42,7 +42,7 @@ app.route("/invite/done")
             source,
             permissions: req.query.permissions
         }));
-        res.status(200).render("invite-done", { prefix: "/", support: Config.discordLink });
+        return res.status(200).render("invite-done", { prefix: "/" });
     });
 
 app.route("/:link")
