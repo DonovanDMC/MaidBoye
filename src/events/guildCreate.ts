@@ -25,9 +25,9 @@ export default new ClientEvent("guildCreate", async function guildCreateEvent(gu
         infoText = [
             "",
             "**Invite Info**",
-            `Inviter: ${inviter === null ? "Unknown" : `${inviter.tag} (${inviter.id})`}`,
-            `Source: ${parsed.source === null ? "Unknown" : parsed.source}`,
-            `Permissions: ${parsed.permissions}`
+            `${Config.emojis.default.dot} Inviter: ${inviter === null ? "Unknown" : `${inviter.tag} (${inviter.id})`}`,
+            `${Config.emojis.default.dot} Source: ${parsed.source === null ? "Unknown" : parsed.source}`,
+            `${Config.emojis.default.dot} Permissions: ${parsed.permissions}`
         ].join("\n");
     }
     await WebhookHandler.execute("guilds", {
