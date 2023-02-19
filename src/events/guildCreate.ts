@@ -24,7 +24,7 @@ export default new ClientEvent("guildCreate", async function guildCreateEvent(gu
         const inviter = parsed.user === null ? null : await this.getUser(parsed.user);
         infoText = [
             "",
-            "**Invite Info**",
+            "**Invite Info**:",
             `${Config.emojis.default.dot} Inviter: ${inviter === null ? "Unknown" : `${inviter.tag} (${inviter.id})`}`,
             `${Config.emojis.default.dot} Source: ${parsed.source === null ? "Unknown" : parsed.source}`,
             `${Config.emojis.default.dot} Permissions: ${parsed.permissions}`
