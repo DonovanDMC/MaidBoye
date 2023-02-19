@@ -6,8 +6,10 @@ import { Colors } from "../util/Constants.js";
 import DailyGuildsHandler from "../util/handlers/DailyGuildsHandler.js";
 import db from "../db/index.js";
 import { EmbedBuilder } from "@oceanicjs/builders";
+import { setTimeout } from "node:timers/promises";
 
 export default new ClientEvent("guildCreate", async function guildCreateEvent(guild) {
+    await setTimeout(2000);
     await DailyGuildsHandler.trackJoin();
     Logger.getLogger("GuildCreate").info(`Joined guild ${guild.name} (${guild.id})`);
     const owner = await this.getUser(guild.ownerID);
