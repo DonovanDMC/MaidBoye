@@ -55,7 +55,7 @@ export default new Command(import.meta.url, "selfroles")
     )
     .setOptionsParser(interaction => ({
         type: interaction.data.options.getSubCommand<["list" | "join" | "leave" | "add" | "remove"]>(true),
-        role: interaction.data.options.getRoleOption("role")?.value
+        role: interaction.data.options.getString("role")
     }))
     .setValidLocation(ValidLocation.GUILD)
     .setAck("ephemeral")
