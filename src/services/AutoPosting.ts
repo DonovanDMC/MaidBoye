@@ -379,7 +379,7 @@ export default class AutoPostingService extends Service {
                         bulk[StringMap[entry.type as keyof typeof StringMap]] = (bulk[StringMap[entry.type as keyof typeof StringMap]] ?? 0) + 1;
                     }
                 }
-                console.log(bulk);
+
                 const bulkImages = Object.keys(bulk).length === 0 ? [] as never : await Yiffy.images.getBulk(bulk);
                 for (const entry of entries) {
                     await this.execute(entry, async() => {
