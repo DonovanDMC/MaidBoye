@@ -20,6 +20,7 @@ export default class ExceptionHandler {
         form.set("api_paste_name", name);
         form.set("api_paste_expire_date", expire);
         form.set("api_paste_private", privacy.toString());
+        form.set("api_folder_key", Config.pastebinFolder);
         const res = await fetch("https://pastebin.com/api/api_post.php", {
             method: "POST",
             body:   form
@@ -57,7 +58,7 @@ export default class ExceptionHandler {
         } */
         await WebhookHandler.execute("error", {
             embeds: Util.makeEmbed(true)
-                .setTitle(error.message)
+                .setTitle(error.message.slice(0, 100))
                 .setDescription(Strings.truncate([
                     `Source: **${Util.readableConstant(type.replace(/([A-Z])/g, "_$1"))}**`,
                     "",
