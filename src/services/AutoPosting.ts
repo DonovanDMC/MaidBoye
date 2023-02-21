@@ -369,18 +369,30 @@ export default class AutoPostingService extends Service {
         }
 
         if (times.length !== 0) {
+            const e: Record<number, Array<AutoPostingEntry>> = {};
+            const bulk: Partial<Record<StringCategories, number>> = {};
             for (const time of times) {
-                Logger.getLogger("AutoPosting").info(`Running "${time} minutes"`);
-                const entries = await AutoPostingEntry.getTime(time as 5);
-                const bulk: Partial<Record<StringCategories, number>> = {};
+                const entries = e[time] = await AutoPostingEntry.getTime(time as 5);
+                if (entries.length === 0) {
+                    continue;
+                }
                 const v = Object.keys(StringMap);
                 for (const entry of entries) {
                     if (v.includes(String(entry.type))) {
                         bulk[StringMap[entry.type as keyof typeof StringMap]] = (bulk[StringMap[entry.type as keyof typeof StringMap]] ?? 0) + 1;
                     }
                 }
+            }
 
-                const bulkImages = Object.keys(bulk).length === 0 ? [] as never : await Yiffy.images.getBulk(bulk);
+            if (Object.keys(bulk).length === 0) {
+                return;
+            }
+
+            const bulkImages = Object.keys(bulk).length === 0 ? [] as never : await Yiffy.images.getBulk(bulk);
+            for (const time of times) {
+                Logger.getLogger("AutoPosting").info(`Running "${time} minutes"`);
+                const entries = e[time];
+
                 for (const entry of entries) {
                     await this.execute(entry, async() => {
                         const img = bulkImages[StringMap[entry.type as keyof typeof StringMap]].shift();
