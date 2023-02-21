@@ -12,13 +12,12 @@ export default class AwooComponent extends BaseComponent {
 
     override async handleGuild(interaction: ComponentInteraction<ValidLocation.GUILD>, { starter }: BaseState & { starter: string; }) {
         const exists = await db.redis.exists(`awoo:${interaction.channel.id}:${starter}`);
-        const og = await interaction.getOriginal();
         if (!exists) {
             await db.redis.del(`awoo:${interaction.channel.id}:${starter}:message`);
             await interaction.editOriginal(Util.replaceContent({
                 embeds: Util.makeEmbed()
                     .setTitle("Howl Ended")
-                    .setDescription(og.embeds[0]!.description!)
+                    .setDescription(interaction.message.embeds[0]!.description!)
                     .toJSON(true)
             }));
             return;
@@ -34,7 +33,7 @@ export default class AwooComponent extends BaseComponent {
             members.push(interaction.user.id);
             await db.redis.sadd(`awoo:${interaction.channel.id}:${starter}`);
             await interaction.editParent({
-                embeds: Util.makeEmbed(true, undefined, og.embeds[0]!)
+                embeds: Util.makeEmbed(true, undefined, interaction.message.embeds[0]!)
                     .setDescription(`Howl Started By: <@!${starter}>\nCurrent Furs: **${members.length}**\n${Config.emojis.custom.awoo.repeat(Math.min(members.length, 10))}\n${members.slice(1).map((c, i) => `<@!${c}> joined a howl with **${i + 1}** furs`).join("\n")}`)
                     .toJSON(true)
             });
