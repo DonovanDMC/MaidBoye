@@ -32,7 +32,7 @@ export default new Command(import.meta.url, "shorten")
     })
     .setCooldown(3e3)
     .setExecutor(async function(interaction, { url, code }) {
-        void Yiffy.shortener.create(url, `Discord:${interaction.user.id}`, code, false)
+        void Yiffy.shortener.create(url, code, `Discord:${interaction.user.id}`, false)
             .then(short =>
                 interaction.reply({
                     embeds: Util.makeEmbed(true, interaction.user)
