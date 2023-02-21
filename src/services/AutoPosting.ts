@@ -7,9 +7,9 @@ import db from "../db/index.js";
 import ServicesManager from "../util/ServicesManager.js";
 import { Colors } from "../util/Constants.js";
 import Logger from "../util/Logger.js";
-import Util from "../util/Util.js";
 import { Client } from "oceanic.js";
 import { EmbedBuilder } from "@oceanicjs/builders";
+import { type StringCategories, type JSONResponse } from "yiffy";
 
 const AutoPostingTitles = {
     [AutoPostingTypes.BIRB]:            "Birb!",
@@ -43,8 +43,27 @@ const AutoPostingTitles = {
     [AutoPostingTypes.GYNOMORPH_YIFF]:  "Gynomorph Yiff!",
     [AutoPostingTypes.LESBIAN_YIFF]:    "Lesbian Yiff!",
     [AutoPostingTypes.STRAIGHT_YIFF]:   "Straight Yiff!"
-
 };
+const StringMap = {
+    [AutoPostingTypes.BIRB]:            "animals.birb",
+    [AutoPostingTypes.BLEP]:            "animals.blep",
+    [AutoPostingTypes.DIKDIK]:          "animals.dikdik",
+    [AutoPostingTypes.BOOP]:            "furry.boop",
+    [AutoPostingTypes.CUDDLE]:          "furry.cuddle",
+    [AutoPostingTypes.FLOP]:            "furry.flop",
+    [AutoPostingTypes.FURSUIT]:         "furry.fursuit",
+    [AutoPostingTypes.HOLD]:            "furry.hold",
+    [AutoPostingTypes.HOWL]:            "furry.howl",
+    [AutoPostingTypes.HUG]:             "furry.hug",
+    [AutoPostingTypes.KISS]:            "furry.kiss",
+    [AutoPostingTypes.LICK]:            "furry.lick",
+    [AutoPostingTypes.BULGE_YIFF]:      "furry.bulge",
+    [AutoPostingTypes.ANDROMORPH_YIFF]: "furry.yiff.andromorph",
+    [AutoPostingTypes.GAY_YIFF]:        "furry.yiff.gay",
+    [AutoPostingTypes.GYNOMORPH_YIFF]:  "furry.yiff.gynomorph",
+    [AutoPostingTypes.LESBIAN_YIFF]:    "furry.yiff.lesbian",
+    [AutoPostingTypes.STRAIGHT_YIFF]:   "furry.yiff.straight"
+} satisfies Partial<Record<AutoPostingTypes, StringCategories>>;
 
 export default class AutoPostingService extends Service {
     static INSTANCE: AutoPostingService;
@@ -68,17 +87,19 @@ export default class AutoPostingService extends Service {
         if (op === "RUN" && typeof data === "number") {
             const entries = await AutoPostingEntry.getTime(data as 5);
             for (const entry of entries) {
-                await this.execute(entry);
+                await this.execute(entry, async() => {
+                    const { [StringMap[entry.type as keyof typeof StringMap]]: [img] } = await Yiffy.images.getBulk({ [StringMap[entry.type as keyof typeof StringMap]]: 1 });
+                    return img;
+                });
             }
         }
     }
 
-    async execute(entry: AutoPostingEntry) {
-        Logger.getLogger("AutoPosting").info(`Processing entry ${entry.id} for guild ${entry.guildID} (type: ${Util.readableConstant(AutoPostingTypes[entry.type])})`);
+    async execute(entry: AutoPostingEntry, getBulk: () => Promise<JSONResponse>) {
         let image: string, api: string, shortURL: string | undefined, sources: Array<string> | undefined;
         switch (entry.type) {
             case AutoPostingTypes.BIRB: {
-                const img = await Yiffy.images.animals.birb();
+                const img = await getBulk();
                 image = img.url;
                 shortURL = img.shortURL;
                 sources = img.sources;
@@ -87,7 +108,7 @@ export default class AutoPostingService extends Service {
             }
 
             case AutoPostingTypes.BLEP: {
-                const img = await Yiffy.images.animals.blep();
+                const img = await getBulk();
                 image = img.url;
                 shortURL = img.shortURL;
                 sources = img.sources;
@@ -108,7 +129,7 @@ export default class AutoPostingService extends Service {
             }
 
             case AutoPostingTypes.DIKDIK: {
-                const img = await Yiffy.images.animals.dikdik();
+                const img = await getBulk();
                 image = img.url;
                 shortURL = img.shortURL;
                 sources = img.sources;
@@ -183,7 +204,7 @@ export default class AutoPostingService extends Service {
             }
 
             case AutoPostingTypes.BOOP: {
-                const img = await Yiffy.images.furry.boop();
+                const img = await getBulk();
                 image = img.url;
                 shortURL = img.shortURL;
                 sources = img.sources;
@@ -192,7 +213,7 @@ export default class AutoPostingService extends Service {
             }
 
             case AutoPostingTypes.CUDDLE: {
-                const img = await Yiffy.images.furry.cuddle();
+                const img = await getBulk();
                 image = img.url;
                 shortURL = img.shortURL;
                 sources = img.sources;
@@ -201,7 +222,7 @@ export default class AutoPostingService extends Service {
             }
 
             case AutoPostingTypes.FLOP: {
-                const img = await Yiffy.images.furry.flop();
+                const img = await getBulk();
                 image = img.url;
                 shortURL = img.shortURL;
                 sources = img.sources;
@@ -210,7 +231,7 @@ export default class AutoPostingService extends Service {
             }
 
             case AutoPostingTypes.FURSUIT: {
-                const img = await Yiffy.images.furry.fursuit();
+                const img = await getBulk();
                 image = img.url;
                 shortURL = img.shortURL;
                 sources = img.sources;
@@ -219,7 +240,7 @@ export default class AutoPostingService extends Service {
             }
 
             case AutoPostingTypes.HOLD: {
-                const img = await Yiffy.images.furry.hold();
+                const img = await getBulk();
                 image = img.url;
                 shortURL = img.shortURL;
                 sources = img.sources;
@@ -228,7 +249,7 @@ export default class AutoPostingService extends Service {
             }
 
             case AutoPostingTypes.HOWL: {
-                const img = await Yiffy.images.furry.howl();
+                const img = await getBulk();
                 image = img.url;
                 shortURL = img.shortURL;
                 sources = img.sources;
@@ -237,7 +258,7 @@ export default class AutoPostingService extends Service {
             }
 
             case AutoPostingTypes.HUG: {
-                const img = await Yiffy.images.furry.hug();
+                const img = await getBulk();
                 image = img.url;
                 shortURL = img.shortURL;
                 sources = img.sources;
@@ -246,7 +267,7 @@ export default class AutoPostingService extends Service {
             }
 
             case AutoPostingTypes.KISS: {
-                const img = await Yiffy.images.furry.kiss();
+                const img = await getBulk();
                 image = img.url;
                 shortURL = img.shortURL;
                 sources = img.sources;
@@ -255,7 +276,7 @@ export default class AutoPostingService extends Service {
             }
 
             case AutoPostingTypes.LICK: {
-                const img = await Yiffy.images.furry.lick();
+                const img = await getBulk();
                 image = img.url;
                 shortURL = img.shortURL;
                 sources = img.sources;
@@ -264,7 +285,7 @@ export default class AutoPostingService extends Service {
             }
 
             case AutoPostingTypes.BULGE_YIFF: {
-                const img = await Yiffy.images.furry.bulge();
+                const img = await getBulk();
                 image = img.url;
                 shortURL = img.shortURL;
                 sources = img.sources;
@@ -273,7 +294,7 @@ export default class AutoPostingService extends Service {
             }
 
             case AutoPostingTypes.ANDROMORPH_YIFF: {
-                const img = await Yiffy.images.furry.yiff.andromorph();
+                const img = await getBulk();
                 image = img.url;
                 shortURL = img.shortURL;
                 sources = img.sources;
@@ -282,7 +303,7 @@ export default class AutoPostingService extends Service {
             }
 
             case AutoPostingTypes.GAY_YIFF: {
-                const img = await Yiffy.images.furry.yiff.gay();
+                const img = await getBulk();
                 image = img.url;
                 shortURL = img.shortURL;
                 sources = img.sources;
@@ -291,7 +312,7 @@ export default class AutoPostingService extends Service {
             }
 
             case AutoPostingTypes.GYNOMORPH_YIFF: {
-                const img = await Yiffy.images.furry.yiff.gynomorph();
+                const img = await getBulk();
                 image = img.url;
                 shortURL = img.shortURL;
                 sources = img.sources;
@@ -300,7 +321,7 @@ export default class AutoPostingService extends Service {
             }
 
             case AutoPostingTypes.LESBIAN_YIFF: {
-                const img = await Yiffy.images.furry.yiff.lesbian();
+                const img = await getBulk();
                 image = img.url;
                 shortURL = img.shortURL;
                 sources = img.sources;
@@ -309,7 +330,7 @@ export default class AutoPostingService extends Service {
             }
 
             case AutoPostingTypes.STRAIGHT_YIFF: {
-                const img = await Yiffy.images.furry.yiff.straight();
+                const img = await getBulk();
                 image = img.url;
                 shortURL = img.shortURL;
                 sources = img.sources;
@@ -351,8 +372,25 @@ export default class AutoPostingService extends Service {
             for (const time of times) {
                 Logger.getLogger("AutoPosting").info(`Running "${time} minutes"`);
                 const entries = await AutoPostingEntry.getTime(time as 5);
+                const bulk: Partial<Record<StringCategories, number>> = {};
+                const v = Object.keys(StringMap);
                 for (const entry of entries) {
-                    await this.execute(entry).catch(err => {
+                    if (v.includes(String(entry.type))) {
+                        bulk[StringMap[entry.type as keyof typeof StringMap]] = (bulk[StringMap[entry.type as keyof typeof StringMap]] ?? 0) + 1;
+                    }
+                }
+                console.log(bulk);
+                const bulkImages = Object.keys(bulk).length === 0 ? [] as never : await Yiffy.images.getBulk(bulk);
+                for (const entry of entries) {
+                    await this.execute(entry, async() => {
+                        const img = bulkImages[StringMap[entry.type as keyof typeof StringMap]].shift();
+                        if (img) {
+                            return img;
+                        } else {
+                            const { [StringMap[entry.type as keyof typeof StringMap]]: [img2] } = await Yiffy.images.getBulk({ [StringMap[entry.type as keyof typeof StringMap]]: 1 });
+                            return img2;
+                        }
+                    }).catch(err => {
                         Logger.getLogger("AutoPosting").error(`Failed to execute entry ${entry.id} (${AutoPostingTypes[entry.type]})`);
                         Logger.getLogger("AutoPostingExecution").error(err);
                         console.error(err);
