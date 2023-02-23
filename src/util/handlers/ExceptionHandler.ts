@@ -53,9 +53,9 @@ export default class ExceptionHandler {
         const code = `err.${Config.isDevelopment ? "dev." : ""}${paste}`;
         Logger.getLogger(`Error Handler | ${code} | Error`).error(error);
         Logger.getLogger(`Error Handler | ${code} | Context`).error(context);
-        /*  if (Config.isDevelopment) {
+        if (Config.isDevelopment) {
             return code;
-        } */
+        }
         await WebhookHandler.execute("error", {
             embeds: Util.makeEmbed(true)
                 .setTitle(error.message.slice(0, 100))

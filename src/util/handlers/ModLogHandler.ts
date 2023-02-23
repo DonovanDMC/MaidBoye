@@ -102,7 +102,7 @@ export default class ModLogHandler {
                 text = [
                     `Target: <@!${target.id}> (\`${target.tag}\`)`,
                     `Reason: ${reason}`,
-                    `Message Delete Hours: **${deleteSeconds * 60}**`,
+                    `Message Delete Hours: **${deleteSeconds / 60 / 60}**`,
                     `Time: ${timed ? `${Time.ms(time, { words: true, seconds: true })} (expiry: ${Util.formatDiscordTime(timed.expiresAt.getTime(), "long-datetime")})` : "Permanent"}`
                 ].join("\n");
                 strike = await Strike.create({
