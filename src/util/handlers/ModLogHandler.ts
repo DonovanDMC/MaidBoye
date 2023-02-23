@@ -132,7 +132,7 @@ export default class ModLogHandler {
                 text = [
                     `Target: <@!${target.id}> (\`${target.tag}\`)`,
                     `Reason: ${reason}`,
-                    `Message Delete Hours: **${deleteSeconds * 60}**`
+                    `Message Delete Hours: **${deleteSeconds / 60 / 60}**`
                 ].join("\n");
                 color = Colors.red;
                 break;
