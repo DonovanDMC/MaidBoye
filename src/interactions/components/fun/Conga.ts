@@ -31,7 +31,7 @@ export default class CongaComponent extends BaseComponent {
             });
         } else {
             members.push(interaction.user.id);
-            await db.redis.sadd(`conga:${interaction.channel.id}:${starter}`);
+            await db.redis.sadd(`conga:${interaction.channel.id}:${starter}`, interaction.user.id);
             await interaction.editParent({
                 embeds: Util.makeEmbed(true, undefined, interaction.message.embeds[0]!)
                     .setDescription(`Conga Started By: <@!${starter}>\nCurrent Furs: **${members.length}**\n${Config.emojis.custom.furdancing.repeat(Math.min(members.length, 10))}\n${members.slice(1).map((c, i) => `<@!${c}> joined a conga with **${i + 1}** furs`).join("\n")}`)

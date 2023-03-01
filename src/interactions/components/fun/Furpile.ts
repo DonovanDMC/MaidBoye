@@ -31,7 +31,7 @@ export default class FurpileComponent extends BaseComponent {
             });
         } else {
             members.push(interaction.user.id);
-            await db.redis.sadd(`furpile:${interaction.channelID}:${starter}`);
+            await db.redis.sadd(`furpile:${interaction.channelID}:${starter}`, interaction.user.id);
             await interaction.editParent({
                 embeds: Util.makeEmbed(true, undefined, interaction.message.embeds[0]!)
                     .setDescription(`Furpile Started By: <@!${starter}> with <@!${secondary}>\nCurrent Furs: **${members.length}**\n${Config.emojis.custom.furdancing.repeat(Math.min(members.length, 10))}\n${members.slice(2).map((c, i) => `<@!${c}> joined a furpile with **${i + 1}** furs`).join("\n")}`)
