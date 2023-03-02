@@ -4,10 +4,10 @@ import Logger from "../util/Logger.js";
 import StatsHandler from "../util/StatsHandler.js";
 import express from "express";
 import session from "express-session";
-import { create } from "express-handlebars";
+import ehb from "express-handlebars";
 import morgan from "morgan";
 
-export const hbs = create({
+export const hbs = ehb.create({
     extname:       "hbs",
     defaultLayout: "default",
     layoutsDir:    `${Config.baseDir}/src/api/views/layouts`,
