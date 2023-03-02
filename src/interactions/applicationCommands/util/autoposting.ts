@@ -182,6 +182,11 @@ export default new Command(import.meta.url, "autoposting")
                 content: `H-hey! **${time}** is not a valid autoposting time..`
             });
         }
+        if (entry && !/^[\da-f]{8}-[\da-f]{4}-4[\da-f]{3}-[89ab][\da-f]{3}-[\da-f]{12}$/i.test(entry)) {
+            return interaction.reply({
+                content: "H-hey! That was not a valid autoposting entry.."
+            });
+        }
         switch (sub) {
             case "add": {
                 assert(rawType);
