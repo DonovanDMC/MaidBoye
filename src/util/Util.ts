@@ -50,19 +50,21 @@ export const expandUUID = (str: string) => short().toUUID(str);
 export const shrinkUUID = (str: string) => short().fromUUID(str);
 export type CompareResult = "higher" | "lower" | "same" | "invalid" | "unknown";
 export default class Util {
-    private static async getE621Image(tags: string, lastScoreTry = 300): Promise<Post | null> {
+    private static async getE621Image(tags: string, minScore = 250): Promise<Post | null> {
         const bl = ["animated", "young", "human", "humanoid", "comic", "urine", "feces", "bestiality", "vore", "inflation", "diaper"].map(b => `-${b}`).join(" ");
         const posts = await E621.posts.search({
-            // the starting score is meant to be 250, but I don't want to add special handling
-            tags:  `${tags} order:random score:>=${lastScoreTry - 50} ${bl} rating:e`,
+            tags:  `${tags} order:random score:>=${minScore} ${bl} rating:e`,
             limit: 100
-        });
+        }).catch(() => null);
+        if (posts === null) {
+            return null;
+        }
         if (posts.length === 0) {
-            if (lastScoreTry === 50) {
+            if (minScore === 0) {
                 return null;
             }
             try {
-                return this.getE621Image(tags, lastScoreTry - 50);
+                return this.getE621Image(tags, minScore - 50);
             } catch (err) {
                 if (err instanceof RangeError) {
                     return null;

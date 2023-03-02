@@ -6,6 +6,7 @@ import Util from "../../../util/Util.js";
 import type { E621ThumbnailType } from "../../../db/Models/UserConfig.js";
 import E621Thumbnail from "../../../util/E621Thumbnail.js";
 import Config from "../../../config/index.js";
+import Logger from "../../../util/Logger.js";
 import { ButtonColors, ComponentBuilder } from "@oceanicjs/builders";
 import type { Post } from "e621";
 import { ApplicationCommandOptionTypes, InteractionTypes, type MessageActionRow } from "oceanic.js";
@@ -44,11 +45,19 @@ export default new Command(import.meta.url, "e621")
     .setUserLookup(true)
     .setExecutor(async function(interaction, { tags, order }, gConfig, uConfig) {
         tags = tags.slice(0, 40);
-        const state = await E621TagsState.store(tags);
         if (!tags.some(t => t.startsWith("order:"))) {
             tags.push(`order:${order}`);
         }
-        const q = await E621.posts.search({ tags, limit: 100 });
+        let q: Array<Post>;
+        try {
+            q = await E621.posts.search({ tags, limit: 100 });
+        } catch (err) {
+            Logger.getLogger("Commands[e621]").error(err);
+            return interaction.reply({
+                content: "An error occurred while searching e621. Please try again later. You can also check <https://status.e621.ws> to see if e621 is down."
+            });
+        }
+        const state = await E621TagsState.store(tags);
         const posts = filterPosts(q, uConfig.preferences.e621NoVideo, uConfig.preferences.e621NoFlash);
         if (posts.length === 0) {
             return interaction.reply({ content: `Search returned no results.${q.length === posts.length ? "" : ` (${q.length} posts were filtered out due to Discord ToS)`}` });

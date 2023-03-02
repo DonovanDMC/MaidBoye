@@ -19,7 +19,7 @@ export default class E621TagsAutocomplete extends BaseAutocomplete {
                 { name: focused.value, value: focused.value }
             ]);
         } else {
-            const auto = await E621.tags.getAutocomplete(currentValue);
+            const auto = await E621.tags.getAutocomplete(currentValue).catch(() => null);
             if (auto === null) {
                 return interaction.reply([{ name: focused.value, value: focused.value }]);
             }

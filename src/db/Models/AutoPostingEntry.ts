@@ -106,9 +106,9 @@ if (Config.isDevelopment) {
 }
 export type AutoPostingTime = typeof ValidAutoPostingTimes[number];
 export default class AutoPostingEntry {
-    static MAX_ENABLED = 50;
+    static MAX_ENABLED = 30;
     static MAX_PER_TYPE = 3;
-    static MAX_TOTAL = 30;
+    static MAX_TOTAL = 50;
     static TABLE = "autoposting";
     _data: AutoPostingEntryData;
     channelID: string;
