@@ -64,7 +64,7 @@ export default new Command(import.meta.url, "avatar")
         });
     });
 
-export const userCommand = new UserCommand(import.meta.url, "avatar")
+export const userCommand = new UserCommand(import.meta.url, "Avatar")
     .setDescription("Get someone's avatar..")
     .setAck(async function (interaction) {
         const user = interaction.data.target as User;
