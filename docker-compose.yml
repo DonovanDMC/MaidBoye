@@ -10,6 +10,12 @@ services:
       interval: 10s
       timeout: 2s
       test: lsof -i :8080 || exit 1
+    deploy:
+        resources:
+          limits:
+            memory: 1024M
+          reservations:
+            memory: 256M
     depends_on:
       postgres:
         condition: service_healthy
@@ -35,6 +41,12 @@ services:
       interval: 5s
       timeout: 2s
       test: pg_isready -U maidboye
+    deploy:
+        resources:
+          limits:
+            memory: 512M
+          reservations:
+            memory: 128M
     networks:
       default:
         ipv4_address: 172.19.3.3
@@ -50,6 +62,12 @@ services:
       test: redis-cli ping
       interval: 10s
       timeout: 5s
+    deploy:
+        resources:
+          limits:
+            memory: 128M
+          reservations:
+            memory: 64M
     networks:
       default:
         ipv4_address: 172.19.3.4
