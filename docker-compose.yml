@@ -7,9 +7,9 @@ services:
       - /etc/hostname:/data/hostname
     restart: always
     healthcheck:
-      interval: 10s
-      timeout: 2s
-      test: lsof -i :8080 || exit 1
+      interval: 5s
+      timeout: 1s
+      test: wget -q --spider http://localhost:3621
     deploy:
         resources:
           limits:

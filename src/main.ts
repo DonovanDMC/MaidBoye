@@ -25,6 +25,7 @@ import {
     readFile,
     writeFile
 } from "node:fs/promises";
+import { type Server } from "node:http";
 
 export default class MaidBoye extends Client {
     static INSTANCE: MaidBoye;
@@ -34,7 +35,7 @@ export default class MaidBoye extends Client {
     initTime = 0n;
     presenceUpdateInterval: NodeJS.Timeout | null = null;
     readyTime = 0n;
-    server: typeof api;
+    server: Server;
     constructor(initTime: bigint) {
         super(Config.clientOptions);
         MaidBoye.INSTANCE = this;
@@ -221,9 +222,14 @@ export default class MaidBoye extends Client {
         await this.updateBotlistCommands(commands);
     }
 
+    shutdown() {
+        this.disconnect(false);
+        this.server.close();
+    }
+
     async startAPIServer() {
         return new Promise<void>(resolve => {
-            (this.server = api).listen(Config.apiPort, Config.apiListener,  () => {
+            this.server = api.listen(Config.apiPort, Config.apiListener,  () => {
                 Logger.getLogger("API").info(`API listening on ${Config.apiHost}:${Config.apiPort} (${Config.apiURL})`);
                 resolve();
             });
