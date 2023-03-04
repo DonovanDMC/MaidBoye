@@ -62,7 +62,11 @@ export const UserFlagNames: Record<UserFlags, string> = {
     [UserFlags.ACTIVE_DEVELOPER]:      `${badges.activeDeveloper} Active Developer`
 } satisfies Record<UserFlags, string>;
 
-export function getFeatureName(feature: GuildFeature) {
+export function getFeatureName(feature: GuildFeature, nameOnly = false) {
+    if (nameOnly) {
+        const val = GuildFeatureNames[feature];
+        return val.startsWith("<") ? val.split(">")[1] : val;
+    }
     return `${GuildFeatureNames[feature]}${GuildFeatureDescriptions[feature] ? `[*](${Config.apiURL}/features/${feature})` : ""}`;
 }
 export const GuildFeatureNames = {

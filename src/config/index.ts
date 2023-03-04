@@ -434,7 +434,7 @@ export class Configuration extends PrivateConfiguration {
         return this.isDevelopment ? this.apiListener : "api.maid.gay";
     }
     static get apiURL() {
-        return `http${this.apiSecure ? "s" : ""}://${this.apiHost}${[80, 443].includes(this.apiPort) ? "" : `:${this.apiPort}`}`;
+        return `http${this.apiSecure ? "s" : ""}://${this.apiHost}${[80, 443].includes(this.apiPort) || !this.isDevelopment ? "" : `:${this.apiPort}`}`;
     }
 
     /* leveling */

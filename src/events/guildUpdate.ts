@@ -135,8 +135,8 @@ export default new ClientEvent("guildUpdate", async function guildUpdateEvent(gu
                     "",
                     "**Changes**:",
                     "```diff",
-                    ...addedFeatures.map(f => `+ ${getFeatureName(f)}`),
-                    ...removedFeatures.map(f => `- ${getFeatureName(f)}`),
+                    ...addedFeatures.map(f => `+ ${getFeatureName(f, true)}`),
+                    ...removedFeatures.map(f => `- ${getFeatureName(f, true)}`),
                     "```"
                 ])
                 .toJSON()
