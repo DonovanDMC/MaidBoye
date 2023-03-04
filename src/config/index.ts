@@ -12,10 +12,19 @@ import { access, readFile } from "node:fs/promises";
 
 const host = await readFile("/data/hostname", "utf8").then(val => val.trim(), () => null);
 
+let debugLogging: boolean;
 const isDocker = await access("/.dockerenv").then(() => true, () => false) || await readFile("/proc/1/cgroup", "utf8").then(contents => contents.includes("docker"));
 export class Configuration extends PrivateConfiguration {
     static get isDevelopment() {
         return !isDocker || host === "DONOVAN-PC";
+    }
+
+    static get debugLogging() {
+        return debugLogging ?? this.isDevelopment;
+    }
+
+    static set debugLogging(val: boolean) {
+        debugLogging = val;
     }
 
     static get developers() {
