@@ -9,4 +9,5 @@ COPY package.json package-lock.json ./
 RUN npm install --force
 COPY . .
 RUN npm run build
+RUN npm prune --omit=dev
 CMD ["node", "/app/dist/src/index.js"]

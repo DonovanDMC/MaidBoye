@@ -4,8 +4,7 @@ import "./util/MonkeyPatch.js";
 import MaidBoye from "./main.js";
 import Config from "./config/index.js";
 import Logger from "./util/Logger.js";
-import { Time } from "@uwu-codes/utils";
-import { createServer } from "node:http";
+import { StatusServer, Time } from "@uwu-codes/utils";
 
 const bot = new MaidBoye(initTime);
 await bot.rest.getBotGateway().then(function preLaunchInfo({ sessionStartLimit: { remaining, total, resetAfter }, shards }) {
@@ -30,9 +29,4 @@ process
         process.exit(0);
     });
 
-const statusServer = createServer((req, res) => {
-    res.writeHead(bot.ready ? 204 : 503, {
-        "Content-Type":   "text/plain",
-        "Content-Length": 0
-    }).end();
-}).listen(3621, "127.0.0.1");
+const statusServer = StatusServer(() => bot.ready);
