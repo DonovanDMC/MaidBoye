@@ -18,15 +18,15 @@ await bot.rest.getBotGateway().then(function preLaunchInfo({ sessionStartLimit: 
 process
     .on("uncaughtException", err => Logger.getLogger("Uncaught Exception").error(err))
     .on("unhandledRejection", (r, p) => Logger.getLogger("Unhandled Rejection").error(r, p))
-    .on("SIGINT", () => {
+    .once("SIGINT", () => {
         bot.shutdown();
         statusServer.close();
-        process.exit(0);
+        process.kill(process.pid, "SIGINT");
     })
-    .on("SIGTERM", () => {
+    .once("SIGTERM", () => {
         bot.shutdown();
         statusServer.close();
-        process.exit(0);
+        process.kill(process.pid, "SIGTERM");
     });
 
 const statusServer = StatusServer(() => bot.ready);
