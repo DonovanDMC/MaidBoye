@@ -2,7 +2,7 @@
   "name": "maidboye",
   "version": "2.0.0",
   "description": "A cute little maid bot for keeping your server nice and tidy.",
-  "buildDate": null,
+  "buildDate": "02062023",
   "main": "dist/src/index.js",
   "scripts": {
     "build": "tsc && npx build-date $(pwd) && echo Build Finished",
