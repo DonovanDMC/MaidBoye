@@ -17,31 +17,21 @@ import type {
 } from "oceanic.js";
 import { ApplicationCommandOptionTypes } from "oceanic.js";
 
-type TypeToOption<T extends ApplicationCommandOptionTypes> =
-    T extends ApplicationCommandOptionTypes.SUB_COMMAND ?
-        ApplicationCommandOptionsSubCommand :
-        T extends ApplicationCommandOptionTypes.SUB_COMMAND_GROUP ?
-            ApplicationCommandOptionsSubCommandGroup :
-            T extends ApplicationCommandOptionTypes.STRING ?
-                ApplicationCommandOptionsString :
-                T extends ApplicationCommandOptionTypes.INTEGER ?
-                    ApplicationCommandOptionsInteger :
-                    T extends ApplicationCommandOptionTypes.BOOLEAN ?
-                        ApplicationCommandOptionsBoolean :
-                        T extends ApplicationCommandOptionTypes.USER ?
-                            ApplicationCommandOptionsUser :
-                            T extends ApplicationCommandOptionTypes.CHANNEL ?
-                                ApplicationCommandOptionsChannel :
-                                T extends ApplicationCommandOptionTypes.ROLE ?
-                                    ApplicationCommandOptionsRole :
-                                    T extends ApplicationCommandOptionTypes.MENTIONABLE ?
-                                        ApplicationCommandOptionsMentionable :
-                                        T extends ApplicationCommandOptionTypes.NUMBER ?
-                                            ApplicationCommandOptionsNumber :
-                                            T extends ApplicationCommandOptionTypes.ATTACHMENT ?
-                                                ApplicationCommandOptionsAttachment : never;
+interface OptionMap {
+    [ApplicationCommandOptionTypes.ATTACHMENT]: ApplicationCommandOptionsAttachment;
+    [ApplicationCommandOptionTypes.BOOLEAN]: ApplicationCommandOptionsBoolean;
+    [ApplicationCommandOptionTypes.CHANNEL]: ApplicationCommandOptionsChannel;
+    [ApplicationCommandOptionTypes.INTEGER]: ApplicationCommandOptionsInteger;
+    [ApplicationCommandOptionTypes.MENTIONABLE]: ApplicationCommandOptionsMentionable;
+    [ApplicationCommandOptionTypes.NUMBER]: ApplicationCommandOptionsNumber;
+    [ApplicationCommandOptionTypes.ROLE]: ApplicationCommandOptionsRole;
+    [ApplicationCommandOptionTypes.STRING]: ApplicationCommandOptionsString;
+    [ApplicationCommandOptionTypes.SUB_COMMAND]: ApplicationCommandOptionsSubCommand;
+    [ApplicationCommandOptionTypes.SUB_COMMAND_GROUP]: ApplicationCommandOptionsSubCommandGroup;
+    [ApplicationCommandOptionTypes.USER]: ApplicationCommandOptionsUser;
+}
 
-export default class CommandOption<T extends ApplicationCommandOptionTypes = ApplicationCommandOptionTypes, O extends ApplicationCommandOptions = TypeToOption<T>> {
+export default class CommandOption<T extends ApplicationCommandOptionTypes = ApplicationCommandOptionTypes, O extends ApplicationCommandOptions = OptionMap[T]> {
     autocomplete?: boolean;
     channelTypes?: Array<ChannelTypes>;
     choices: Array<ApplicationCommandOptionsChoice> = [];

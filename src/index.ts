@@ -5,6 +5,7 @@ import MaidBoye from "./main.js";
 import Config from "./config/index.js";
 import Logger from "./util/Logger.js";
 import { StatusServer, Time } from "@uwu-codes/utils";
+import { type Server } from "node:http";
 
 const bot = new MaidBoye(initTime);
 await bot.rest.getBotGateway().then(function preLaunchInfo({ sessionStartLimit: { remaining, total, resetAfter }, shards }) {
@@ -20,13 +21,17 @@ process
     .on("unhandledRejection", (r, p) => Logger.getLogger("Unhandled Rejection").error(r, p))
     .once("SIGINT", () => {
         bot.shutdown();
-        statusServer.close();
+        statusServer?.close();
         process.kill(process.pid, "SIGINT");
     })
     .once("SIGTERM", () => {
         bot.shutdown();
-        statusServer.close();
+        statusServer?.close();
         process.kill(process.pid, "SIGTERM");
     });
 
-const statusServer = StatusServer(() => bot.ready);
+let statusServer: Server | undefined;
+
+if (Config.isDocker) {
+    statusServer = StatusServer(() => bot.ready);
+}

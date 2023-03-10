@@ -1,4 +1,4 @@
-/// <reference path="../util/@types/express-session.d.ts" />
+/// <reference path="../util/@types/express.d.ts" />
 import Config from "../config/index.js";
 import Logger from "../util/Logger.js";
 import StatsHandler from "../util/StatsHandler.js";
@@ -36,6 +36,7 @@ const app = express()
     }))
     .use(morgan("dev"))
     .use(async(req, res, next) => {
+        req.data ??= {};
         res.header({
             "Referrer-Policy":  "no-referrer-when-downgrade",
             "X-XSS-Protection": [
@@ -67,6 +68,7 @@ const app = express()
     .get("/session", async(req, res) => res.status(200).json({ id: StatsHandler.SessionID }))
     .use("/features", (await import("./routes/features.js")).default)
     .use("/leveling", (await import("./routes/leveling.js")).default)
+    .use("/welcome", (await import("./routes/welcome.js")).default)
     .use("/links", (await import("./routes/links.js")).default)
     .use("/bulk-delete", (await import("./routes/bulkDelete.js")).default)
 // last 3 param handler = 404, 4 param handler = error

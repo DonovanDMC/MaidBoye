@@ -63,22 +63,23 @@ export default class WelcomeMessageHandler {
         };
     }
 
-    static async handle(member: Member, type: "join" | "leave") {
+    static async handle(member: Member, type: "join" | "leave", skipChecks = false) {
         const gConfig = await GuildConfig.get(member.guild.id);
 
         if (
-            !await this.check(gConfig) ||
-            (member.bot && gConfig.welcome.modifiers.includes("IGNORE_BOTS")) ||
-            (type === "join" && !gConfig.welcome.modifiers.includes("JOIN_ENABLED")) ||
-            (type === "leave" && !gConfig.welcome.modifiers.includes("LEAVE_ENABLED")) ||
-            (member.pending && gConfig.welcome.modifiers.includes("WAIT_FOR_PASSING_MEMBER_GATE")) ||
-            (!member.pending && !gConfig.welcome.modifiers.includes("WAIT_FOR_PASSING_MEMBER_GATE"))
-        ) {
-            return;
+            !await this.check(gConfig) || (!skipChecks && (
+                (member.bot && gConfig.welcome.modifiers.includes("IGNORE_BOTS")) ||
+                (type === "join" && !gConfig.welcome.modifiers.includes("JOIN_ENABLED")) ||
+                (type === "leave" && !gConfig.welcome.modifiers.includes("LEAVE_ENABLED")) ||
+                (member.pending && gConfig.welcome.modifiers.includes("WAIT_FOR_PASSING_MEMBER_GATE")) ||
+                (!member.pending && !gConfig.welcome.modifiers.includes("WAIT_FOR_PASSING_MEMBER_GATE"))
+            ))) {
+            return false;
         }
 
         const msg = this.format(gConfig, member, type);
         await this.client.rest.webhooks.execute(gConfig.welcome.webhook!.id, gConfig.welcome.webhook!.token, msg);
+        return true;
     }
 
     static async init(client: MaidBoye) {

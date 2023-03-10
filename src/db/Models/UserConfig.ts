@@ -6,6 +6,7 @@ import type Config from "../../config/index.js";
 import assert from "node:assert";
 
 export interface UserConfigData {
+    apikey: string | null;
     created_at: Date;
     id: string;
     levels: Record<string, number>;
@@ -25,6 +26,7 @@ export default class UserConfig {
     static TABLE = "users";
     _data: UserConfigData;
     _preferencesData: bigint;
+    apikey: string | null;
     createdAt: Date;
     id: string;
     levels: Record<string, number>;
@@ -85,6 +87,11 @@ export default class UserConfig {
         return new UserConfig(res);
     }
 
+    static async getByIDAndAPIKey(id: string, apikey: string) {
+        const { rows: [res] } = await db.query<UserConfigData>(`SELECT * FROM ${this.TABLE} WHERE id = $1 AND apikey = $2`, [id, apikey]);
+        return res ? new UserConfig(res) : null;
+    }
+
     static async getEphemeral(id: string) {
         try {
             const { rows: [{ preferences }] } = await db.query<{ preferences: string; }>(`SELECT preferences FROM ${this.TABLE} WHERE id = $1`, [id]);
@@ -106,6 +113,7 @@ export default class UserConfig {
         this._data            = data;
         this._preferencesData = BigInt(data.preferences);
         const preferences     = Preferences.parse(this._preferencesData);
+        this.apikey           = data.apikey;
         this.createdAt        = data.created_at;
         this.levels           = data.levels;
         this.marriagePartners = data.marriage_partners;

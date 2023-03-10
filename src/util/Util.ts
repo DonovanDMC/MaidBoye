@@ -10,9 +10,11 @@ import Logger from "./Logger.js";
 import { GuildMemberFlagNames, UserFlagNames } from "./Names.js";
 import Command from "./cmd/Command.js";
 import type { TypeToClass } from "./cmd/Category.js";
+import { getClient } from "./ClientInstanceHelper.js";
 import Config from "../config/index.js";
 import db, { DBLiteral, DBLiteralReverse } from "../db/index.js";
 import type { YiffTypes } from "../db/Models/UserConfig.js";
+import UserConfig from "../db/Models/UserConfig.js";
 import type { Post } from "e621";
 import {
     CategoryChannel,
@@ -42,6 +44,7 @@ import type { ModuleImport } from "@uwu-codes/types";
 import { ButtonColors, ComponentBuilder, EmbedBuilder } from "@oceanicjs/builders";
 import { Strings } from "@uwu-codes/utils";
 import short from "short-uuid";
+import { type NextFunction, type Request, type Response } from "express";
 import { access } from "node:fs/promises";
 import { request } from "node:https";
 import { AssertionError } from "node:assert";
@@ -88,6 +91,32 @@ export default class Util {
             current = (current | val) as T;
         }
         return current;
+    }
+
+    static apiAuth() {
+        return (async(req: Request, res: Response, next: NextFunction) => {
+            if (!req.headers.authorization || !req.headers.authorization.startsWith("Basic ")) {
+                res.status(401).json({ error: "Unauthorized" });
+                return;
+            }
+
+            const [id, apikey] = Buffer.from(req.headers.authorization.slice(6), "base64").toString("ascii").split(":");
+
+            if (!id || !apikey) {
+                res.status(401).json({ error: "Unauthorized" });
+                return;
+            }
+
+            const user = await UserConfig.getByIDAndAPIKey(id, apikey).catch(() => null);
+            if (user) {
+                req.data.uConfig = user;
+                const usr = await getClient().getUser(user.id);
+                Logger.getLogger("api").info(`API request from ${usr?.tag ?? "unknown"} (${user.id}) for ${req.method} ${req.path}`);
+                next();
+            } else {
+                res.status(401).json({ error: "Unauthorized" });
+            }
+        });
     }
 
     /** higher = from is higher than to */

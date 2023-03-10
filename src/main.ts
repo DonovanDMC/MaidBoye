@@ -6,6 +6,7 @@ import CommandHandler from "./util/cmd/CommandHandler.js";
 import api from "./api/index.js";
 import { ApplicationCommandTypeNames } from "./util/Names.js";
 import WebhookHandler from "./util/handlers/WebhookHandler.js";
+import { setClient } from "./util/ClientInstanceHelper.js";
 import { Strings, Timer } from "@uwu-codes/utils";
 import type { ModuleImport } from "@uwu-codes/types";
 import {
@@ -41,6 +42,7 @@ export default class MaidBoye extends Client {
         MaidBoye.INSTANCE = this;
         this.initTime = initTime;
         this.presenceUpdateInterval = null;
+        setClient(this);
     }
 
     async dirCheck() {
