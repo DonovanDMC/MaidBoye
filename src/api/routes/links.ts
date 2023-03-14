@@ -1,16 +1,12 @@
 import Config from "../../config/index.js";
-import type MaidBoye from "../../main.js";
 import db from "../../db/index.js";
+import { getClient } from "../../util/ClientInstanceHelper.js";
 import { Router, type Request } from "express";
 import { OAuthHelper, OAuthScopes } from "oceanic.js";
 
 const app = Router();
 
 
-let client: MaidBoye;
-export function setInvitesClient(c: MaidBoye) {
-    client = c;
-}
 app.route("/invite/done")
     .get(async(req: Request<object, never, never, { code: string; guild_id: string; permissions: string; state: string;}>, res) => {
         if (!req.query.code) {
@@ -19,7 +15,7 @@ app.route("/invite/done")
         if (!req.query.guild_id) {
             return res.status(400).end("Invalid Guild ID");
         }
-        const ex = await client.rest.oauth.exchangeCode({
+        const ex = await getClient().rest.oauth.exchangeCode({
             clientID:     Config.clientID,
             clientSecret: Config.clientSecret,
             code:         req.query.code,
@@ -27,7 +23,7 @@ app.route("/invite/done")
         }).catch(() => null);
         let user: string | null = null;
         if (ex !== null) {
-            user = (await client.rest.oauth.getHelper(`${ex.tokenType} ${ex.accessToken}`).getCurrentUser()).id;
+            user = (await getClient().rest.oauth.getHelper(`${ex.tokenType} ${ex.accessToken}`).getCurrentUser()).id;
         }
         await db.redis.incr("invites");
         let source: string | null = null;
