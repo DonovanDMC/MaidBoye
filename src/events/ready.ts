@@ -17,7 +17,6 @@ import FurryBotStatusService from "../services/FurryBotStatus.js";
 import AutoPostingWebhookFailureHandler from "../util/handlers/AutoPostingWebhookFailureHandler.js";
 import WelcomeMessageHandler from "../util/handlers/WelcomeMessageHandler.js";
 import BotListUpdater from "../util/handlers/BotListUpdater.js";
-import { setInvitesClient } from "../api/routes/links.js";
 import { Time } from "@uwu-codes/utils";
 
 export default new ClientEvent("ready", async function readyEvent() {
@@ -48,7 +47,6 @@ export default new ClientEvent("ready", async function readyEvent() {
     }, 1e3);
     await AutoPostingService.register();
     void FurryBotStatusService.register();
-    setInvitesClient(this);
     Logger.info(`Ready as ${this.user.username}#${this.user.discriminator} in ${Time.ms((this.readyTime - this.initTime) / 1000000n, { words: true, ms: true, shortMS: true })}`);
     StatsHandler.track("READY");
 });

@@ -116,6 +116,7 @@ export default new Command(import.meta.url, "logging")
                 if (!channel) {
                     channel = interaction.channel as AnyGuildTextChannelWithoutThreads;
                 }
+                const permissions = ("appPermissions" in channel ? channel.appPermissions : channel.permissionsOf(this.user.id));
                 assert(rawEvent);
                 if (!Object.hasOwn(LogEvents, rawEvent)) {
                     // Discord™️ - sometimes the name gets sent as the value
@@ -149,6 +150,12 @@ export default new Command(import.meta.url, "logging")
                     }));
                 }
 
+                if (event === LogEvents.INVITE_TRACKING && !permissions.has("MANAGE_GUILD")) {
+                    return interaction.reply(Util.replaceContent({
+                        content: "H-hey! I need the **Manage Server** permission to enable invite tracking.."
+                    }));
+                }
+
                 const toAdd = event === LogEvents.ALL ? LogEventsAllValue : 1;
                 if (total + toAdd > LogEvent.MAX_EVENTS) {
                     return interaction.reply(Util.replaceContent({
@@ -163,7 +170,7 @@ export default new Command(import.meta.url, "logging")
                         style:    ButtonColors.BLURPLE
                     });
 
-                if (("appPermissions" in channel ? channel.appPermissions : channel.permissionsOf(this.user.id)).has("MANAGE_WEBHOOKS")) {
+                if (permissions.has("MANAGE_WEBHOOKS")) {
                     const webhooks = (await this.rest.webhooks.getForChannel(channel.id)).filter(hook => hook.name !== null && hook.token !== undefined);
                     if (webhooks.length !== 0) {
                         components.addSelectMenu({

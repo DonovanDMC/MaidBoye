@@ -87,7 +87,6 @@ export class Configuration extends PrivateConfiguration {
                     "GUILD_INVITES",
                     "GUILD_VOICE_STATES",
                     "GUILD_MESSAGES",
-                    "GUILD_MESSAGE_REACTIONS",
                     "DIRECT_MESSAGES",
                     "MESSAGE_CONTENT",
                     "GUILD_SCHEDULED_EVENTS",

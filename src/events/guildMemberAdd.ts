@@ -3,9 +3,11 @@ import LogEvent, { LogEvents } from "../db/Models/LogEvent.js";
 import Util from "../util/Util.js";
 import { Colors } from "../util/Constants.js";
 import WelcomeMessageHandler from "../util/handlers/WelcomeMessageHandler.js";
+import InviteTracker from "../util/InviteTracker.js";
 
 export default new ClientEvent("guildMemberAdd", async function guildMemberAddEvent(member) {
     await WelcomeMessageHandler.handle(member, "join");
+    await InviteTracker.handleJoin(member);
 
     const events = await LogEvent.getType(member.guildID, LogEvents.MEMBER_ADD);
     if (events.length === 0) {

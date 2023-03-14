@@ -80,6 +80,7 @@ export enum LogEvents {
     VOICE_JOIN                  = 46,
     VOICE_LEAVE                 = 47,
     VOICE_STATE_UPDATE          = 48,
+    INVITE_TRACKING             = 49,
 }
 export const LogEventsTotal = Object.keys(LogEvents).length / 2;
 export const LogEventsAllValue = LogEventsTotal - 1;
@@ -90,7 +91,7 @@ export const LogCategories = {
     CHANNELS:         [LogEvents.CHANNEL_CREATE, LogEvents.CHANNEL_DELETE, LogEvents.CHANNEL_UPDATE],
     EMOJIS:           [LogEvents.EMOJI_CREATE, LogEvents.EMOJI_DELETE, LogEvents.EMOJI_UPDATE],
     INTEGRATIONS:     [LogEvents.INTEGRATION_CREATE, LogEvents.INTEGRATION_DELETE, LogEvents.INTEGRATION_UPDATE],
-    INVITES:          [LogEvents.INVITE_CREATE, LogEvents.INVITE_DELETE],
+    INVITES:          [LogEvents.INVITE_CREATE, LogEvents.INVITE_DELETE, LogEvents.INVITE_TRACKING],
     MEMBERS:          [LogEvents.MEMBER_ADD, LogEvents.MEMBER_REMOVE, LogEvents.MEMBER_KICK, LogEvents.MEMBER_UPDATE],
     MESSAGES:         [LogEvents.MESSAGE_DELETE, LogEvents.MESSAGE_DELETE_BULK, LogEvents.MESSAGE_UPDATE],
     MISC:             [LogEvents.ALL, LogEvents.GUILD_UPDATE, LogEvents.USER_UPDATE],

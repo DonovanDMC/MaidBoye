@@ -3,6 +3,7 @@ import LogEvent, { LogEvents } from "../db/Models/LogEvent.js";
 import Util from "../util/Util.js";
 import { Colors } from "../util/Constants.js";
 import { InviteTargetTypeNames } from "../util/Names.js";
+import InviteTracker from "../util/InviteTracker.js";
 import { AuditLogActionTypes } from "oceanic.js";
 import { Time } from "@uwu-codes/utils";
 
@@ -10,6 +11,8 @@ export default new ClientEvent("inviteCreate", async function inviteCreateEvent(
     if (invite.guildID === null) {
         return;
     }
+
+    await InviteTracker.trackCreate(invite.guildID, invite.code);
     const events = await LogEvent.getType(invite.guildID, LogEvents.INVITE_CREATE);
     if (events.length === 0) {
         return;

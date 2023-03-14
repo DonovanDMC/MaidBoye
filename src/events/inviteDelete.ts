@@ -3,6 +3,7 @@ import LogEvent, { LogEvents } from "../db/Models/LogEvent.js";
 import Util from "../util/Util.js";
 import { Colors } from "../util/Constants.js";
 import { InviteTargetTypeNames } from "../util/Names.js";
+import InviteTracker from "../util/InviteTracker.js";
 import { AuditLogActionTypes, Guild, Invite } from "oceanic.js";
 import { Time } from "@uwu-codes/utils";
 
@@ -10,6 +11,8 @@ export default new ClientEvent("inviteDelete", async function inviteDeleteEvent(
     if (!invite.guild?.id) {
         return;
     }
+
+    await InviteTracker.trackDelete(invite.guild.id, invite.code);
     const events = await LogEvent.getType(invite.guild.id, LogEvents.INVITE_DELETE);
     if (events.length === 0) {
         return;
