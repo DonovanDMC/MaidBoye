@@ -133,17 +133,17 @@ export async function modHistory(this: MaidBoye, interaction: CommandInteraction
 }
 
 export async function warningHistory(this: MaidBoye, interaction: CommandInteraction<ValidLocation.GUILD> | ComponentInteraction<ValidLocation.GUILD>, user: User, page: number) {
-    const warnings = await ModLog.getWarningsForUser(interaction.guildID, user.id, "DESC");
+    const { logs, warnings } = await ModLog.getWarningsForUser(interaction.guildID, user.id, "DESC");
     const pages = chunk(warnings, 5);
     await (interaction.type === InteractionTypes.APPLICATION_COMMAND ? interaction.editOriginal.bind(interaction) : interaction.editParent.bind(interaction))(Util.replaceContent({
         embeds: Util.makeEmbed(true, interaction.user)
-            .setTitle(`Strike History: ${user.tag}`)
-            .setDescription(warnings.length === 0 ? "This user has no warning history." : (await Promise.all(pages[page - 1].map(async entry => {
+            .setTitle(`Warning History: ${user.tag}`)
+            .setDescription(warnings.length === 0 ? "This user has no warning history." : (await Promise.all(pages[page - 1].map(async (entry, index) => {
                 const blame = (await this.getUser(entry.blameID || this.user.id)) || { id: "000000000000000000", tag: "Unknown#0000" };
                 return [
-                    `**#${entry.warningID!}**`,
+                    `**#${entry.warningID}**`,
                     `Blame: <@!${blame.id}> (\`${blame.tag}\`)`,
-                    `Reason: ${entry.shouldShowReasonFor(interaction.member) ? Strings.truncateWords(entry.reason, 100) : "**[HIDDEN]**"}`,
+                    `Reason: ${logs[index].shouldShowReasonFor(interaction.member) ? Strings.truncateWords(entry.reason, 100) : "**[HIDDEN]**"}`,
                     `Date Created: ${Util.formatDiscordTime(entry.createdAt.getTime(), "short-datetime", true)}`
                 ].join("\n");
             }))).join("\n"))

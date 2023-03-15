@@ -128,9 +128,20 @@ export default class ModLog {
         return case_id + 1;
     }
 
-    static async getWarningsForUser(guild: string, user: string, order: "ASC" | "DESC" = "ASC", withDeleted = false) {
-        const { rows: res } = await db.query<ModLogData>(`SELECT * FROM ${this.TABLE} WHERE guild_id = $1 AND target_id = $2 AND type = $3${withDeleted ? "" : " AND deleted = FALSE"} ORDER BY case_id ${order}`, [guild, user, ModLogType.WARNING]);
-        return res.map(r => new ModLog(r));
+    static async getWarningsForUser(guild: string, user: string, order: "ASC" | "DESC" = "ASC") {
+        const { rows: res } = await db.query<ModLogData>(`SELECT * FROM ${this.TABLE} WHERE guild_id = $1 AND target_id = $2 AND type = $3 AND deleted = FALSE ORDER BY case_id ${order}`, [guild, user, ModLogType.WARNING]);
+        const logs = res.map(r => new ModLog(r));
+        const warnings: Array<Warning> = [];
+        for (const row of logs) {
+            const w = await row.getWarning();
+            if (w === null || !await w.check()) {
+                logs.splice(logs.indexOf(row), 1);
+                continue;
+            }
+            warnings.push(w);
+        }
+
+        return { logs, warnings };
     }
 
     get typeName() {

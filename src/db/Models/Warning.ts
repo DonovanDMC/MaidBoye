@@ -1,4 +1,5 @@
 import GuildConfig from "./GuildConfig.js";
+import { type ModLogData } from "./ModLog.js";
 import db from "../index.js";
 import type MaidBoye from "../../main.js";
 import Debug from "../../util/Debug.js";
@@ -72,7 +73,13 @@ export default class Warning {
 
     static async getForUser(guild: string, user: string, order: "ASC" | "DESC" = "ASC") {
         const { rows: res } = await db.query<WarningData>(`SELECT * FROM ${this.TABLE} WHERE guild_id = $1 AND user_id = $2 ORDER BY warning_id ${order}`, [guild, user]);
-        return res.map(r => new Warning(r));
+        const warnings = res.map(r => new Warning(r));
+        for (const w of warnings) {
+            if (!await w.check()) {
+                warnings.splice(warnings.indexOf(w), 1);
+            }
+        }
+        return warnings;
     }
 
     static async getNextID(guild: string, user: string) {
@@ -88,6 +95,17 @@ export default class Warning {
         this.updatedAt = data.updated_at;
         this.userID    = data.user_id;
         this.warningID = data.warning_id;
+    }
+
+    async check() {
+        const { rows: [log = null] } = await db.query<ModLogData>("SELECT * FROM modlog WHERE warning_id = $1", [this.id]);
+        // if we don't have an accompanying modlog entry, delete the warning (if it doesnt exist IN ANY WAY, not if it's marked as deleted)
+        if (log === null) {
+            await this.delete();
+            return false;
+        }
+
+        return !log.deleted;
     }
 
     async delete() {
