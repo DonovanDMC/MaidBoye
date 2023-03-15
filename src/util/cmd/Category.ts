@@ -31,15 +31,27 @@ export default class Category {
         this.setDisplayName(name, null, null);
     }
 
-    addGenericCommands(expander: <T extends ApplicationCommandTypes>(type: T, file: string, name: string, description?: string) => TypeToClass<T>, map: Record<string, string | [type: ApplicationCommandTypes.CHAT_INPUT, description: string] | [type: ApplicationCommandTypes.MESSAGE | ApplicationCommandTypes.USER]>) {
+    addGenericCommands(expander: <T extends ApplicationCommandTypes>(type: T, file: string, name: string) => TypeToClass<T>, map: Record<string, string | ((cmd: Command) => unknown) | [type: ApplicationCommandTypes.CHAT_INPUT, extra: string | ((cmd: Command) => unknown)] | [type: ApplicationCommandTypes.MESSAGE, extra?: ((cmd: MessageCommand) => unknown)] | [type: ApplicationCommandTypes.USER,  extra?: ((cmd: UserCommand) => unknown)]>) {
         for (const [name, data] of Object.entries(map)) {
             if (Array.isArray(data)) {
-                const [type, description] = data;
+                const [type, extra] = data;
+                const cmd = expander(type, this.file, name);
+                if (typeof extra === "string") {
+                    cmd.setDescription(extra);
+                } else {
+                    extra?.(cmd as never);
+                }
                 const store = this.generic[type === ApplicationCommandTypes.MESSAGE ? "message" as const : (type === ApplicationCommandTypes.USER ? "user" as const : "command" as const)];
-                store.push(expander(type, this.file, name, description) as never);
+                store.push(cmd as never);
             } else {
                 const store = this.generic.command;
-                store.push(expander(ApplicationCommandTypes.CHAT_INPUT, this.file, name, data));
+                const cmd = expander(ApplicationCommandTypes.CHAT_INPUT, this.file, name);
+                if (typeof data === "string") {
+                    cmd.setDescription(data);
+                } else {
+                    data?.(cmd as never);
+                }
+                store.push(cmd);
             }
         }
 

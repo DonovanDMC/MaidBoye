@@ -322,14 +322,10 @@ export default class Util {
         }
     }
 
-    static genericImageCommandExpander<T extends ApplicationCommandTypes>(this: void, type: T, file: string, name: string, description?: string): TypeToClass<T> {
+    static genericImageCommandExpander<T extends ApplicationCommandTypes>(this: void, type: T, file: string, name: string): TypeToClass<T> {
         switch (type) {
             case ApplicationCommandTypes.CHAT_INPUT: {
-                if (!description) {
-                    throw new Error(`Description is required for chat input commands @${file}:${name}`);
-                }
                 return new Command(file, name)
-                    .setDescription(description)
                     .setCooldown(1e4)
                     .setAck("ephemeral-user")
                     .setExecutor(async function(interaction) {
