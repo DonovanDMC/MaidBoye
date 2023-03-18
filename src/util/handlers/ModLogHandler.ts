@@ -2,7 +2,6 @@ import TimedModerationHandler from "./TimedModerationHandler.js";
 import type GuildConfig from "../../db/Models/GuildConfig.js";
 import type MaidBoye from "../../main";
 import UserConfig from "../../db/Models/UserConfig.js";
-import Logger from "../Logger.js";
 import type { ModLogCreationData } from "../../db/Models/ModLog.js";
 import ModLog, { ModLogType } from "../../db/Models/ModLog.js";
 import Util from "../Util.js";
@@ -32,6 +31,7 @@ import type {
     WarningOptions
 } from "../@types/modlog.js";
 import Warning from "../../db/Models/Warning.js";
+import Logger from "@uwu-codes/logger";
 import { Time } from "@uwu-codes/utils";
 import { type Guild, Member, User } from "oceanic.js";
 import { randomUUID } from "node:crypto";

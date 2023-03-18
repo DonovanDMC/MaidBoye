@@ -3,7 +3,7 @@ import Config from "../../config/index.js";
 import type MaidBoye from "../../main.js";
 import Util from "../Util.js";
 import { Colors } from "../Constants.js";
-import Logger from "../Logger.js";
+import Logger from "@uwu-codes/logger";
 import { Strings } from "@uwu-codes/utils";
 
 export default class ExceptionHandler {

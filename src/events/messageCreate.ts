@@ -5,10 +5,10 @@ import Util from "../util/Util.js";
 import RequestProxy from "../util/RequestProxy.js";
 import { Colors } from "../util/Constants.js";
 import { State } from "../util/State.js";
-import Logger from "../util/Logger.js";
 import Leveling from "../util/Leveling.js";
 import GuildConfig from "../db/Models/GuildConfig.js";
 import UserConfig from "../db/Models/UserConfig.js";
+import Logger from "@uwu-codes/logger";
 import {
     Internal,
     Strings,

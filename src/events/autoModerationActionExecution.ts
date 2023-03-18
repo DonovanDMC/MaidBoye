@@ -26,10 +26,10 @@ export default new ClientEvent("autoModerationActionExecution", async function a
             actionInfo = `${AutoModerationActionTypeNames[options.action.type]}`; break;
         }
         case AutoModerationActionTypes.SEND_ALERT_MESSAGE: {
-            actionInfo = `${AutoModerationActionTypeNames[options.action.type]} - <#${options.action.metadata.channelID}>`; break;
+            actionInfo = `${AutoModerationActionTypeNames[options.action.type]} - <#${options.action.metadata.channelID!}>`; break;
         }
         case AutoModerationActionTypes.TIMEOUT: {
-            actionInfo = `${AutoModerationActionTypeNames[options.action.type]} - ${Time.ms(options.action.metadata.durationSeconds * 1000, { words: true })}`; break;
+            actionInfo = `${AutoModerationActionTypeNames[options.action.type]} - ${Time.ms(options.action.metadata.durationSeconds! * 1000, { words: true })}`; break;
         }
     }
     const embed = Util.makeEmbed(true)

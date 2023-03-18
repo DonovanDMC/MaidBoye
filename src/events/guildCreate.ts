@@ -1,10 +1,10 @@
 import ClientEvent from "../util/ClientEvent.js";
-import Logger from "../util/Logger.js";
 import WebhookHandler from "../util/handlers/WebhookHandler.js";
 import Config from "../config/index.js";
 import { Colors } from "../util/Constants.js";
 import DailyGuildsHandler from "../util/handlers/DailyGuildsHandler.js";
 import db from "../db/index.js";
+import Logger from "@uwu-codes/logger";
 import { EmbedBuilder } from "@oceanicjs/builders";
 import { setTimeout } from "node:timers/promises";
 

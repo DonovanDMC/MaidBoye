@@ -1,9 +1,9 @@
 import ClientEvent from "../util/ClientEvent.js";
-import Logger from "../util/Logger.js";
 import StatsHandler from "../util/StatsHandler.js";
 import WebhookHandler from "../util/handlers/WebhookHandler.js";
 import Config from "../config/index.js";
 import { Colors } from "../util/Constants.js";
+import Logger from "@uwu-codes/logger";
 import { EmbedBuilder } from "@oceanicjs/builders";
 
 export default new ClientEvent("shardResume", async function shardResumeEvent(id) {

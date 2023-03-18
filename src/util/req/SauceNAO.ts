@@ -1,5 +1,5 @@
-import Logger from "../Logger.js";
 import Config from "../../config/index.js";
+import Logger from "@uwu-codes/logger";
 import { fetch } from "undici";
 // only used for types, because saucenao sucks ass and they
 // abandoned the module

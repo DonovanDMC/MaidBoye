@@ -1,7 +1,7 @@
 import Config from "../config/index.js";
 import Service from "../util/Service.js";
-import Logger from "../util/Logger.js";
 import ServicesManager from "../util/ServicesManager.js";
+import Logger from "@uwu-codes/logger";
 import { ActivityTypes, Client } from "oceanic.js";
 
 export default class FurryBotStatusService extends Service {

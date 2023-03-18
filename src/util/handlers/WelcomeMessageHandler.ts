@@ -1,7 +1,7 @@
 import GuildConfig from "../../db/Models/GuildConfig.js";
 import type MaidBoye from "../../main";
-import Logger from "../Logger.js";
 import Util from "../Util.js";
+import Logger from "@uwu-codes/logger";
 import { MessageFlags, type Member, type AllowedMentions } from "oceanic.js";
 
 export default class WelcomeMessageHandler {

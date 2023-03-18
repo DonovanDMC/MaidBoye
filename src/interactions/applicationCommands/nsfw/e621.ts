@@ -6,7 +6,7 @@ import Util from "../../../util/Util.js";
 import type { E621ThumbnailType } from "../../../db/Models/UserConfig.js";
 import E621Thumbnail from "../../../util/E621Thumbnail.js";
 import Config from "../../../config/index.js";
-import Logger from "../../../util/Logger.js";
+import Logger from "@uwu-codes/logger";
 import { ButtonColors, ComponentBuilder } from "@oceanicjs/builders";
 import type { Post } from "e621";
 import { ApplicationCommandOptionTypes, InteractionTypes, type MessageActionRow } from "oceanic.js";

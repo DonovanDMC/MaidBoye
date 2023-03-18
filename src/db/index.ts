@@ -1,7 +1,7 @@
 import Config from "../config/index.js";
-import Logger from "../util/Logger.js";
 import Debug from "../util/Debug.js";
 import StatsHandler from "../util/StatsHandler.js";
+import Logger from "@uwu-codes/logger";
 import type { QueryConfig, QueryResultRow } from "pg";
 import pg from "pg";
 import Redis from "ioredis";

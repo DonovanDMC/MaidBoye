@@ -6,7 +6,6 @@ import E621 from "./req/E621.js";
 import type { AnyImageFormat, FailResponse, TextFormat } from "./@types/fluxpoint.js";
 import type { CommandInteraction, ComponentInteraction } from "./cmd/Command.js";
 import type { ExtractConstructorArg } from "./@types/misc.js";
-import Logger from "./Logger.js";
 import { GuildMemberFlagNames, UserFlagNames } from "./Names.js";
 import Command from "./cmd/Command.js";
 import type { TypeToClass } from "./cmd/Category.js";
@@ -15,6 +14,7 @@ import Config from "../config/index.js";
 import db, { DBLiteral, DBLiteralReverse } from "../db/index.js";
 import type { YiffTypes } from "../db/Models/UserConfig.js";
 import UserConfig from "../db/Models/UserConfig.js";
+import Logger from "@uwu-codes/logger";
 import type { Post } from "e621";
 import {
     CategoryChannel,

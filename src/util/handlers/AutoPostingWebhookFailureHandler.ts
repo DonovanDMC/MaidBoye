@@ -1,10 +1,10 @@
 import type MaidBoye from "../../main.js";
 import { Colors } from "../Constants.js";
-import Logger from "../Logger.js";
 import Util from "../Util.js";
 import type AutoPostingEntry from "../../db/Models/AutoPostingEntry.js";
 import { AutoPostingStatus, AutoPostingTypes } from "../../db/Models/AutoPostingEntry.js";
 import { ServiceEvents } from "../ServicesManager.js";
+import Logger from "@uwu-codes/logger";
 import { isMainThread, parentPort } from "node:worker_threads";
 import { randomUUID } from "node:crypto";
 

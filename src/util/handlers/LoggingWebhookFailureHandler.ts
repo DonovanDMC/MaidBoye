@@ -2,8 +2,8 @@ import type LogEvent from "../../db/Models/LogEvent.js";
 import { LogEvents } from "../../db/Models/LogEvent.js";
 import type MaidBoye from "../../main.js";
 import { Colors } from "../Constants.js";
-import Logger from "../Logger.js";
 import Util from "../Util.js";
+import Logger from "@uwu-codes/logger";
 import { Strings } from "@uwu-codes/utils";
 
 export default class LoggingWebhookFailureHandler {

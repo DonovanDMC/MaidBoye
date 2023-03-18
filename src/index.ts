@@ -3,9 +3,10 @@ const initTime = process.hrtime.bigint();
 import "./util/MonkeyPatch.js";
 import MaidBoye from "./main.js";
 import Config from "./config/index.js";
-import Logger from "./util/Logger.js";
-import { StatusServer, Time } from "@uwu-codes/utils";
-import { type Server } from "node:http";
+import Logger from "@uwu-codes/logger";
+import { Time } from "@uwu-codes/utils";
+import StatusServer, { type AnyServer } from "@uwu-codes/status-server";
+Logger._saveToRotatingFile(Config.logsDirectory);
 
 const bot = new MaidBoye(initTime);
 await bot.rest.getBotGateway().then(function preLaunchInfo({ sessionStartLimit: { remaining, total, resetAfter }, shards }) {
@@ -18,7 +19,11 @@ await bot.rest.getBotGateway().then(function preLaunchInfo({ sessionStartLimit: 
 
 process
     .on("uncaughtException", err => Logger.getLogger("Uncaught Exception").error(err))
-    .on("unhandledRejection", (r, p) => Logger.getLogger("Unhandled Rejection").error(r, p))
+    .on("unhandledRejection", (r, p) => {
+        console.error(r, p);
+        Logger.getLogger("Unhandled Rejection | Reason").error(r);
+        Logger.getLogger("Unhandled Rejection | Promise").error(p);
+    })
     .once("SIGINT", () => {
         bot.shutdown();
         statusServer?.close();
@@ -30,7 +35,7 @@ process
         process.kill(process.pid, "SIGTERM");
     });
 
-let statusServer: Server | undefined;
+let statusServer: AnyServer | undefined;
 
 if (Config.isDocker) {
     statusServer = StatusServer(() => bot.ready);

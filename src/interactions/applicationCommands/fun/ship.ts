@@ -1,7 +1,7 @@
 import Command from "../../../util/cmd/Command.js";
 import Util from "../../../util/Util.js";
-import Logger from "../../../util/Logger.js";
 import Config from "../../../config/index.js";
+import Logger from "@uwu-codes/logger";
 import { ApplicationCommandOptionTypes } from "oceanic.js";
 
 export default new Command(import.meta.url, "ship")

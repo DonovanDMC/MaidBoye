@@ -20,10 +20,10 @@ export default new ClientEvent("autoModerationRuleDelete", async function autoMo
                 actions.push(`${Config.emojis.default.dot} ${AutoModerationActionTypeNames[action.type]}`); break;
             }
             case AutoModerationActionTypes.SEND_ALERT_MESSAGE: {
-                actions.push(`${Config.emojis.default.dot} ${AutoModerationActionTypeNames[action.type]} - <#${action.metadata.channelID}>`); break;
+                actions.push(`${Config.emojis.default.dot} ${AutoModerationActionTypeNames[action.type]} - <#${action.metadata.channelID!}>`); break;
             }
             case AutoModerationActionTypes.TIMEOUT: {
-                actions.push(`${Config.emojis.default.dot} ${AutoModerationActionTypeNames[action.type]} - ${Time.ms(action.metadata.durationSeconds * 1000, { words: true })}`); break;
+                actions.push(`${Config.emojis.default.dot} ${AutoModerationActionTypeNames[action.type]} - ${Time.ms(action.metadata.durationSeconds! * 1000, { words: true })}`); break;
             }
         }
     }

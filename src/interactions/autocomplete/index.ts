@@ -1,10 +1,10 @@
 /// <reference path="../../util/@types/Oceanic.d.ts" />
 import BaseAutocomplete from "./structure/BaseAutocomplete.js";
 import type EmptyAutocomplete from "./structure/Empty.js";
-import Logger from "../../util/Logger.js";
 import type { AutocompleteInteraction } from "../../util/cmd/Command.js";
 import Debug from "../../util/Debug.js";
 import ExceptionHandler from "../../util/handlers/ExceptionHandler.js";
+import Logger from "@uwu-codes/logger";
 import { Timer } from "@uwu-codes/utils";
 import type { ModuleImport } from "@uwu-codes/types";
 import type { InteractionOptionsInteger, InteractionOptionsNumber, InteractionOptionsString } from "oceanic.js";

@@ -3,12 +3,12 @@ import db from "../../db/index.js";
 import type { TimedData } from "../../db/Models/Timed.js";
 import Timed, { TimedType } from "../../db/Models/Timed.js";
 import type MaidBoye from "../../main.js";
-import Logger from "../Logger.js";
 import UserConfig from "../../db/Models/UserConfig.js";
 import GuildConfig from "../../db/Models/GuildConfig.js";
 import type { ModLogData } from "../../db/Models/ModLog.js";
 import ModLog, { ModLogType } from "../../db/Models/ModLog.js";
 import { Colors } from "../Constants.js";
+import Logger from "@uwu-codes/logger";
 import { randomUUID } from "node:crypto";
 
 export default class TimedModerationHandler {

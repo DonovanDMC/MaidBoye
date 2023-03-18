@@ -1,12 +1,12 @@
 import Config from "./config/index.js";
 import Util from "./util/Util.js";
 import ClientEvent from "./util/ClientEvent.js";
-import Logger from "./util/Logger.js";
 import CommandHandler from "./util/cmd/CommandHandler.js";
 import api from "./api/index.js";
 import { ApplicationCommandTypeNames } from "./util/Names.js";
 import WebhookHandler from "./util/handlers/WebhookHandler.js";
 import { setClient } from "./util/ClientInstanceHelper.js";
+import Logger from "@uwu-codes/logger";
 import { Strings, Timer } from "@uwu-codes/utils";
 import type { ModuleImport } from "@uwu-codes/types";
 import {

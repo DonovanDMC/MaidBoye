@@ -3,8 +3,8 @@ import db, { type CountResult } from "../index.js";
 import AutoPostingWebhookFailureHandler from "../../util/handlers/AutoPostingWebhookFailureHandler.js";
 import Config from "../../config/index.js";
 import { Colors } from "../../util/Constants.js";
-import Logger from "../../util/Logger.js";
 import Util from "../../util/Util.js";
+import Logger from "@uwu-codes/logger";
 import {
     type AnyGuildTextChannelWithoutThreads,
     type ApplicationCommandOptionsChoice,

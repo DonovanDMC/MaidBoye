@@ -3,7 +3,6 @@ import db from "../db/index.js";
 import Autocomplete from "../interactions/autocomplete/index.js";
 import ClientEvent from "../util/ClientEvent.js";
 import Components from "../interactions/components/index.js";
-import Logger from "../util/Logger.js";
 import Preferences from "../util/preferences/index.js";
 import Settings from "../util/settings/index.js";
 import ModLogHandler from "../util/handlers/ModLogHandler.js";
@@ -17,6 +16,7 @@ import FurryBotStatusService from "../services/FurryBotStatus.js";
 import AutoPostingWebhookFailureHandler from "../util/handlers/AutoPostingWebhookFailureHandler.js";
 import WelcomeMessageHandler from "../util/handlers/WelcomeMessageHandler.js";
 import BotListUpdater from "../util/handlers/BotListUpdater.js";
+import Logger from "@uwu-codes/logger";
 import { Time } from "@uwu-codes/utils";
 
 export default new ClientEvent("ready", async function readyEvent() {

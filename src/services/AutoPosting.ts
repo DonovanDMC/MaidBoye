@@ -6,7 +6,7 @@ import CheweyAPI from "../util/req/CheweyAPI.js";
 import db from "../db/index.js";
 import ServicesManager from "../util/ServicesManager.js";
 import { Colors } from "../util/Constants.js";
-import Logger from "../util/Logger.js";
+import Logger from "@uwu-codes/logger";
 import { Client } from "oceanic.js";
 import { EmbedBuilder } from "@oceanicjs/builders";
 import { type StringCategories, type JSONResponse } from "yiffy";

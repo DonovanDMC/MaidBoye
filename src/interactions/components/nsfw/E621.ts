@@ -5,7 +5,7 @@ import E621TagsState from "../E621TagsState.js";
 import E621, { filterPosts } from "../../../util/req/E621.js";
 import UserConfig from "../../../db/Models/UserConfig.js";
 import { makeMessage, orders } from "../../applicationCommands/nsfw/e621.js";
-import Logger from "../../../util/Logger.js";
+import Logger from "@uwu-codes/logger";
 import { type Post } from "e621";
 
 export default class E621Component extends BaseComponent {

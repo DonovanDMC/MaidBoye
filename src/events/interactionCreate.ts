@@ -13,8 +13,8 @@ import Leveling from "../util/Leveling.js";
 import StatsHandler from "../util/StatsHandler.js";
 import { PermissionsByName } from "../util/Names.js";
 import Modals from "../interactions/modals/index.js";
-import Logger from "../util/Logger.js";
 import ExceptionHandler from "../util/handlers/ExceptionHandler.js";
+import Logger from "@uwu-codes/logger";
 import {
     ApplicationCommandTypes,
     type InteractionOptionsSubCommand,

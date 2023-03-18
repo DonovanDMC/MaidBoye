@@ -3,10 +3,10 @@ import type Category from "./Category.js";
 import type Command from "./Command.js";
 import type { CommandExport }  from "./Command.js";
 import type { MessageCommand, UserCommand } from "./OtherCommand.js";
-import Logger from "../Logger.js";
 import Debug from "../Debug.js";
 import Util from "../Util.js";
 import Config from "../../config/index.js";
+import Logger from "@uwu-codes/logger";
 import { Strings, Timer } from "@uwu-codes/utils";
 import { readdir } from "node:fs/promises";
 

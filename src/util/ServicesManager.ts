@@ -1,9 +1,9 @@
-import Logger from "./Logger.js";
 import Debug from "./Debug.js";
 import AutoPostingWebhookFailureHandler from "./handlers/AutoPostingWebhookFailureHandler.js";
 import MaidBoye from "../main.js";
 import Config from "../config/index.js";
 import AutoPostingEntry from "../db/Models/AutoPostingEntry.js";
+import Logger from "@uwu-codes/logger";
 import { ChannelTypes } from "oceanic.js";
 import { randomUUID } from "node:crypto";
 import { Worker } from "node:worker_threads";

@@ -1,5 +1,5 @@
 import Base91 from "./Base91.js";
-import Logger from "./Logger.js";
+import Logger from "@uwu-codes/logger";
 
 export default class TextEncoding {
     static decode(data: string) {
