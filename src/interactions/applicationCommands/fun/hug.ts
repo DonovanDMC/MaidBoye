@@ -34,7 +34,7 @@ export default new Command(import.meta.url, "hug")
             }
         }
 
-        return interaction.reply({
+        await interaction.reply({
             embeds: embed.toJSON(true),
             components
         });

@@ -276,15 +276,13 @@ export default class AutoPostingEntry {
 
     async disable(type: Exclude<AutoPostingStatus, AutoPostingStatus.ENABLED>) {
         await db.query(`UPDATE ${AutoPostingEntry.TABLE} SET status = $1 WHERE id = $2`, [type, this.id]);
-        this._data.status = type;
-        this.status       = type;
+        this._data.status = this.status = type;
         return this;
     }
 
     async enable() {
         await db.query(`UPDATE ${AutoPostingEntry.TABLE} SET status = $1 WHERE id = $2`, [AutoPostingStatus.ENABLED, this.id]);
-        this._data.status = AutoPostingStatus.ENABLED;
-        this.status       = AutoPostingStatus.ENABLED;
+        this._data.status = this.status = AutoPostingStatus.ENABLED;
         return this;
     }
 
@@ -299,7 +297,7 @@ export default class AutoPostingEntry {
         try {
             return (await client.rest.webhooks.execute(this.webhook.id, this.webhook.token, { ...options, wait: true })).id;
         } catch (err) {
-            Logger.getLogger("AutoPostingExecution").error(`Failed to execute autoposting entry ${this.id} for guild ${this.guildID} (type: ${Util.readableConstant(AutoPostingTypes[this.type])}):`);
+            Logger.getLogger("AutoPostingExecution").error(`Failed to execute autoposting entry ${this.id} for guild ${this.guildID} (type: ${Util.readableConstant(AutoPostingTypes[this.type])})`);
             if (!(err instanceof DiscordRESTError && (err.code === JSONErrorCodes.UNKNOWN_WEBHOOK || err.code === JSONErrorCodes.INVALID_WEBHOOK_TOKEN))) {
                 Logger.getLogger("AutoPostingExecution").error(err);
             }
