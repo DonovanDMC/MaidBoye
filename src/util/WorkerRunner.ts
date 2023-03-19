@@ -1,9 +1,9 @@
 import type { EmptyService } from "./Service";
-import tsNode from "ts-node";
 import type { ModuleImport } from "@uwu-codes/types";
 import { workerData } from "node:worker_threads";
 if (import.meta.url.endsWith(".ts")) {
-    tsNode.register({
+    const { register } = await import("ts-node");
+    register({
         esm: true,
         swc: true
     });

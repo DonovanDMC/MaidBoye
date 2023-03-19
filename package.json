@@ -88,12 +88,5 @@
   "engines": {
     "node": ">=19.x"
   },
-  "engineStrict": true,
-  "overrides": {
-    "@uwu-codes/eslint-config": {
-      "eslint-plugin-import": {
-        "tsconfig-paths": "4.x"
-      }
-    }
-  }
+  "engineStrict": true
 }
