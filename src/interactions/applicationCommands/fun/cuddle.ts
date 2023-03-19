@@ -1,6 +1,6 @@
 import Command, { ValidLocation } from "../../../util/cmd/Command.js";
 import Util from "../../../util/Util.js";
-import { ApplicationCommandOptionTypes, type MessageActionRow, MessageFlags } from "oceanic.js";
+import { ApplicationCommandOptionTypes, type MessageActionRow } from "oceanic.js";
 
 const strings = (author: string, text: string) => [
     `<@!${author}> has cuddled ${text}!\nAren't they cute?`,
@@ -10,29 +10,17 @@ export default new Command(import.meta.url, "cuddle")
     .setDescription("Cuddle someone ^w^")
     .setValidLocation(ValidLocation.GUILD)
     .addOption(
-        new Command.Option(ApplicationCommandOptionTypes.USER, "user")
-            .setDescription("The user to cuddle.")
-    )
-    .addOption(
         new Command.Option(ApplicationCommandOptionTypes.STRING, "text")
-            .setDescription("Any extra text")
+            .setDescription("The person to cuddle, and any other spicy text you want~!")
+            .setRequired()
     )
     .setOptionsParser(interaction => ({
-        user: interaction.data.options.getUserOption("user")?.value,
-        text: interaction.data.options.getString("text")
+        text: interaction.data.options.getString("text", true)
     }))
-    .setAck(async function(interaction, { user, text }) {
-        if (!user && !text) {
-            return interaction.reply({
-                flags:   MessageFlags.EPHEMERAL,
-                content: "H-hey! You have to specify a user or some text.."
-            });
-        }
-        return "command-images-check";
-    })
+    .setAck("command-images-check")
     .setGuildLookup(true)
-    .setExecutor(async function(interaction, { user, text }, gConfig) {
-        const r = strings(interaction.user.id, user && text ? `<@!${user}> ${text}` : (user ? `<@!${user}>` : text!));
+    .setExecutor(async function(interaction, { text }, gConfig) {
+        const r = strings(interaction.user.id, text);
 
         const embed = Util.makeEmbed(true, interaction.user)
             .setTitle("Aww!")

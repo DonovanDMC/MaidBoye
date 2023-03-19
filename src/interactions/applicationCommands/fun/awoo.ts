@@ -11,7 +11,6 @@ export default new Command(import.meta.url, "awoo")
     .setCooldown(3e3)
     .setValidLocation(ValidLocation.GUILD)
     .setExecutor(async function(interaction) {
-
         await interaction.reply({
             embeds: Util.makeEmbed(true, interaction.user)
                 .setTitle("Active Howl")

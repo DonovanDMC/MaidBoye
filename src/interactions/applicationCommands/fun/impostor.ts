@@ -5,24 +5,19 @@ export default new Command(import.meta.url, "impostor")
     .setDescription("amogus")
     .setValidLocation(ValidLocation.GUILD)
     .addOption(
-        new Command.Option(ApplicationCommandOptionTypes.USER, "user")
-            .setDescription("The user to sus")
-    )
-    .addOption(
         new Command.Option(ApplicationCommandOptionTypes.STRING, "text")
-            .setDescription("Any extra text")
+            .setDescription("The sus")
     )
     .setOptionsParser(interaction => ({
-        user: interaction.data.options.getUserOption("user")?.value || interaction.user.id,
-        text: interaction.data.options.getString("text")
+        text: interaction.data.options.getString("text") || interaction.user.mention
     }))
-    .setExecutor(async function(interaction, { user, text }) {
+    .setExecutor(async function(interaction, { text }) {
         return interaction.reply({
             content: [
                 "。　　　　•　    　ﾟ　　。",
                 " 　　.　　　.　　　  　　.　　　　　。　　   。　.",
                 " 　.　　      。　        ඞ   。　    .    •",
-                `    •                ${text ? (user === interaction.user.id ? text : `<@!${user}> ${text}`) : `<@!${user}>`} was ${Math.random() > .5 ? "not The" : "An"} Impostor.   。  .`,
+                `    •                ${text} was ${Math.random() > .5 ? "not The" : "An"} Impostor.   。  .`,
                 "　 　　。　　 　　　　ﾟ　　　.　    　　　."
             ].join("\n"),
             allowedMentions: {

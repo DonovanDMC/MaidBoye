@@ -11,19 +11,15 @@ export default new Command(import.meta.url, "dictionary")
     .setDescription("Throw the dictionary at someone")
     .setValidLocation(ValidLocation.GUILD)
     .addOption(
-        new Command.Option(ApplicationCommandOptionTypes.USER, "user")
-            .setDescription("The user to throw a dictionary at.")
-    )
-    .addOption(
         new Command.Option(ApplicationCommandOptionTypes.STRING, "text")
-            .setDescription("Any extra text")
+            .setDescription("The person to throw a dictionary at, and any other spicy text you want~!")
+            .setRequired()
     )
     .setOptionsParser(interaction => ({
-        user: interaction.data.options.getUserOption("user")?.value,
-        text: interaction.data.options.getString("text")
+        text: interaction.data.options.getString("text", true)
     }))
-    .setExecutor(async function(interaction, { user, text }) {
-        const r = strings(interaction.user.id, user && text ? `<@!${user}> ${text}` : (user ? `<@!${user}>` : text!));
+    .setExecutor(async function(interaction, { text }) {
+        const r = strings(interaction.user.id, text);
 
         return interaction.reply({
             embeds: Util.makeEmbed(true, interaction.user)

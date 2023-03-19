@@ -1,6 +1,6 @@
 import Command, { ValidLocation } from "../../../util/cmd/Command.js";
 import Util from "../../../util/Util.js";
-import { ApplicationCommandOptionTypes, type MessageActionRow, MessageFlags } from "oceanic.js";
+import { ApplicationCommandOptionTypes, type MessageActionRow } from "oceanic.js";
 
 const strings = (author: string, text: string) => [
     `<@!${author}> sneaks up being ${text}, and when they aren't looking, tackles them from behind in the biggest hug ever!`,
@@ -10,29 +10,16 @@ export default new Command(import.meta.url, "hug")
     .setDescription("Hug someone")
     .setValidLocation(ValidLocation.GUILD)
     .addOption(
-        new Command.Option(ApplicationCommandOptionTypes.USER, "user")
-            .setDescription("The user to hug")
-    )
-    .addOption(
         new Command.Option(ApplicationCommandOptionTypes.STRING, "text")
-            .setDescription("Any extra text")
+            .setDescription("The person to hug, and any other spicy text you want~!")
+            .setRequired()
     )
     .setOptionsParser(interaction => ({
-        user: interaction.data.options.getUserOption("user")?.value,
-        text: interaction.data.options.getString("text")
+        text: interaction.data.options.getString("text", true)
     }))
-    .setAck(async function(interaction, { user, text }) {
-        if (!user && !text) {
-            return interaction.reply({
-                flags:   MessageFlags.EPHEMERAL,
-                content: "H-hey! You have to specify a user or some text.."
-            });
-        }
-        return interaction.defer();
-    })
     .setGuildLookup(true)
-    .setExecutor(async function(interaction, { user, text }, gConfig) {
-        const r = strings(interaction.user.id, user && text ? `<@!${user}> ${text}` : (user ? `<@!${user}>` : text!));
+    .setExecutor(async function(interaction, { text }, gConfig) {
+        const r = strings(interaction.user.id, text);
 
         const embed = Util.makeEmbed(true, interaction.user)
             .setTitle("<3")

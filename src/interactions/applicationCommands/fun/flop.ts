@@ -1,7 +1,7 @@
 import Command, { ValidLocation } from "../../../util/cmd/Command.js";
 import Util from "../../../util/Util.js";
 import Yiffy from "../../../util/req/Yiffy.js";
-import { ApplicationCommandOptionTypes, MessageFlags } from "oceanic.js";
+import { ApplicationCommandOptionTypes } from "oceanic.js";
 
 const strings = (author: string, text: string) => [
     `<@!${author}> flops over onto ${text}\nuwu`,
@@ -11,28 +11,16 @@ export default new Command(import.meta.url, "flop")
     .setDescription("Flop on to someone")
     .setValidLocation(ValidLocation.GUILD)
     .addOption(
-        new Command.Option(ApplicationCommandOptionTypes.USER, "user")
-            .setDescription("The user to flop on.")
-    )
-    .addOption(
         new Command.Option(ApplicationCommandOptionTypes.STRING, "text")
-            .setDescription("Any extra text")
+            .setDescription("The person to flop on to, and any other spicy text you want~!")
+            .setRequired()
     )
     .setOptionsParser(interaction => ({
-        user: interaction.data.options.getUserOption("user")?.value,
-        text: interaction.data.options.getString("text")
+        text: interaction.data.options.getString("text", true)
     }))
-    .setAck(async function(interaction, { user, text }) {
-        if (!user && !text) {
-            return interaction.reply({
-                flags:   MessageFlags.EPHEMERAL,
-                content: "H-hey! You have to specify a user or some text.."
-            });
-        }
-        return "command-images-check";
-    })
-    .setExecutor(async function(interaction, { user, text }) {
-        const r = strings(interaction.user.id, user && text ? `<@!${user}> ${text}` : (user ? `<@!${user}>` : text!));
+    .setAck("command-images-check")
+    .setExecutor(async function(interaction, { text }) {
+        const r = strings(interaction.user.id, text);
 
         const img = await Yiffy.images.furry.flop();
 

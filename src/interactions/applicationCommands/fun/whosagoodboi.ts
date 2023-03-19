@@ -9,7 +9,7 @@ export default new Command(import.meta.url, "whosagoodboi")
             .setDescription("The user to depict as a good boi")
     )
     .setOptionsParser(interaction => ({
-        user: interaction.data.options.getUserOption("user")?.value || interaction.user.id
+        user: interaction.data.options.getUserOption("user")?.value ?? interaction.user.id
     }))
     .setExecutor(async function(interaction, { user }) {
         return interaction.reply({

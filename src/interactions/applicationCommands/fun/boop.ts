@@ -8,32 +8,19 @@ const strings = (author: string, text: string) => [
     `<@!${author}> lightly pokes the nose of ${text}\nOwO`
 ];
 export default new Command(import.meta.url, "boop")
-    .setDescription("Stick your tongue out!")
+    .setDescription("Boop someone's nose!")
     .setGuildLookup(true)
     .setValidLocation(ValidLocation.GUILD)
     .addOption(
-        new Command.Option(ApplicationCommandOptionTypes.USER, "user")
-            .setDescription("The user to boop.")
-    )
-    .addOption(
         new Command.Option(ApplicationCommandOptionTypes.STRING, "text")
-            .setDescription("Any extra text")
+            .setDescription("The person to boop, and any other spicy text you want~!")
+            .setRequired()
     )
     .setOptionsParser(interaction => ({
-        user: interaction.data.options.getUserOption("user")?.value,
-        text: interaction.data.options.getString("text")
+        text: interaction.data.options.getString("text", true)
     }))
-    .setAck(async function(interaction, { user, text }) {
-        if (!user && !text) {
-            return interaction.reply({
-                flags:   MessageFlags.EPHEMERAL,
-                content: "H-hey! You have to specify a user or some text.."
-            });
-        }
-        return interaction.defer();
-    })
-    .setExecutor(async function(interaction, { user, text }, gConfig) {
-        const r = strings(interaction.user.id, user && text ? `<@!${user}> ${text}` : (user ? `<@!${user}>` : text!));
+    .setExecutor(async function(interaction, { text }, gConfig) {
+        const r = strings(interaction.user.id, text);
 
         const embed = Util.makeEmbed(true, interaction.user)
             .setTitle("Boop!")
