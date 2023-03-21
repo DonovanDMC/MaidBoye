@@ -17,7 +17,7 @@ export default new ClientEvent("guildMemberRemove", async function guildMemberRe
     const content  = [
         `User: **${user.tag}** (${user.mention})`,
         ...(member?.nick ? [`Nickname: **${member.nick}**`] : []),
-        ...(member && member.roles.length !== 0 ? member.roles.map(r => `<@&${r}>`).join(" ") : []),
+        ...(member && member.roles.length !== 0 ? member.roles.map(r => `<@&${r}>`) : []),
         `Created At: ${Util.formatDiscordTime(user.createdAt, "short-datetime", true)}`,
         ...(member?.joinedAt ? [`Joined At: ${Util.formatDiscordTime(member.joinedAt, "short-datetime", true)}`] : []),
         `Pending: **${member?.pending ? "Yes" : "No"}**`,
