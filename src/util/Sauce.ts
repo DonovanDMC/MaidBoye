@@ -103,6 +103,13 @@ export default async function Sauce(input: string, simularity = 75, skipCheck = 
             } // so we don't tell the user we both couldn't try & tried saucenao
         }
 
+        if (post && post.flags.deleted && post.relationships.parent_id !== null) {
+            const parent = await E621.posts.get(post.relationships.parent_id);
+            if (parent !== null) {
+                post = parent;
+            }
+        }
+
         return {
             method,
             tried,
