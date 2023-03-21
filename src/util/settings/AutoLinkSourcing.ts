@@ -8,7 +8,7 @@ export default class AutoLinkSourcingSetting extends BooleanSetting {
     emojiType = "default" as const;
     name = "Auto Link Sourcing";
     constructor() {
-        super(Type.YES_NO, "AUTO_SOURCING");
+        super(Type.ENABLED_DISABLED, "AUTO_SOURCING");
     }
 
     override get shortDescription() {
