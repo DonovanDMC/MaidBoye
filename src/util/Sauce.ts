@@ -1,6 +1,7 @@
 import E621 from "./req/E621.js";
 import SauceNAO from "./req/SauceNAO.js";
 import RequestProxy from "./RequestProxy.js";
+import Yiffy from "./req/Yiffy.js";
 import Config from "../config/index.js";
 import type { Post } from "e621";
 import type { JSONResponse } from "yiffy";
@@ -18,12 +19,13 @@ export const autoMimeTypes = [
     "image/png",
     "image/webp"
 ];
-export default async function Sauce(input: string, simularity = 75, skipCheck = false) {
+export default async function Sauce(input: string, simularity = 75, skipCheck = false, skipSauceNao = false) {
     // I could include file extensions, but I couldn't be bothered since I only need the md5
+    const yrRegex = /(?:https?:\/\/)?yiff\.rocks\/([A-Z_-\da-z]+)/;
     // E621 - e621.net
     const e621Regex = /(?:https?:\/\/)?static\d\.(?:e621|e926)\.net\/data\/(?:sample\/)?(?:[\da-z]{2}\/){2}([\da-z]+)\.[\da-z]+/;
     // YiffyAPI V2 - v2.yiff.res
-    const yiffyRegex_2 = /(?:https?:\/\/)?(?:v2\.yiff\.media|yiff\.media\/V2)\/(?:.*\/)+([\da-z]+)\.[\da-z]+/;
+    const yiffy2Regex = /(?:https?:\/\/)?(?:v2\.yiff\.media|yiff\.media\/V2)\/(?:.*\/)+([\da-z]+)\.[\da-z]+/;
     let post: Post | null = null,
         method: typeof tried[number] | null = null,
         sourceOverride: string | Array<string> | undefined,
@@ -40,8 +42,15 @@ export default async function Sauce(input: string, simularity = 75, skipCheck = 
             }
         }
 
+        const yr = yrRegex.exec(input);
+        if (yr?.[1]) {
+            const res = await Yiffy.shortener.get(yr[1]);
+            if (res !== null) {
+                input = res.fullURL;
+            }
+        }
         const e6 = e621Regex.exec(input);
-        const y2 = yiffyRegex_2.exec(input);
+        const y2 = yiffy2Regex.exec(input);
         if (e6?.[1]) {
             tried.push("e621");
             post = await E621.posts.getByMD5(e6[1]);
@@ -52,7 +61,7 @@ export default async function Sauce(input: string, simularity = 75, skipCheck = 
 
         if (y2?.[1] && !method) {
             tried.push("yiffy2");
-            const d = await fetch(`https://v2.yiff.rest/images/${y2[1]}.json`, {
+            const d = await fetch(`https://v2.yiff.rest/images/${y2[1]}`, {
                 headers: {
                     "User-Agent": Config.userAgent
                 }
@@ -76,7 +85,7 @@ export default async function Sauce(input: string, simularity = 75, skipCheck = 
         }
 
         // saucenao is fucky and their api sucks
-        if (!method) {
+        if (!skipSauceNao && !method) {
             const sa = await SauceNAO(input, [29, 40, 41, 42]).catch(() => null);
             if (sa !== null && Array.isArray(sa) && sa.length !== 0) {
                 const top = sa.sort((a, b)=> a.header.similarity - b.header.similarity).find(v => v.header.similarity >= simularity);

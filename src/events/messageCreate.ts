@@ -8,6 +8,7 @@ import { State } from "../util/State.js";
 import Leveling from "../util/Leveling.js";
 import GuildConfig from "../db/Models/GuildConfig.js";
 import UserConfig from "../db/Models/UserConfig.js";
+import Sauce from "../util/Sauce.js";
 import Logger from "@uwu-codes/logger";
 import {
     Internal,
@@ -51,7 +52,7 @@ const evalVariables: Record<string, unknown> = {
 };
 
 export default new ClientEvent("messageCreate", async function messageCreateEvent(msg) {
-    if (msg.channel && "guildID" in msg.channel && msg.channel.guildID) {
+    if (msg.channel && "guildID" in msg.channel && msg.channel.guildID !== null) {
         await Leveling.run(msg as Message<AnyGuildTextChannel>);
     }
     if (Config.developers.includes(msg.author.id)) {
@@ -138,7 +139,7 @@ export default new ClientEvent("messageCreate", async function messageCreateEven
                             }] : undefined
                         });
                     }
-                    break;
+                    return;
                 }
             }
         }
@@ -155,6 +156,30 @@ export default new ClientEvent("messageCreate", async function messageCreateEven
         }
         if (content.startsWith("bend over")) {
             return this.rest.channels.createMessage(msg.channelID, { content: "N-no ~w~" });
+        }
+    }
+
+    if (msg.guildID !== null) {
+        const gConfig = await GuildConfig.get(msg.guildID);
+        if (gConfig.settings.autoSourcing && Strings.validateURL(msg.content)) {
+            const sauce = await Sauce(msg.content, 0, true, true);
+            if (sauce?.post !== null) {
+                await this.rest.channels.createMessage(msg.channelID, {
+                    content:          `https://e${sauce!.post.rating === "s" ? "926" : "621"}.net/posts/${sauce!.post.id}`,
+                    messageReference: {
+                        channelID:       msg.channelID,
+                        guildID:         msg.guildID,
+                        messageID:       msg.id,
+                        failIfNotExists: false
+                    },
+                    allowedMentions: {
+                        users:       false,
+                        roles:       false,
+                        everyone:    false,
+                        repliedUser: false
+                    }
+                });
+            }
         }
     }
 });
