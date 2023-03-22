@@ -65,8 +65,7 @@ export default new Command(import.meta.url, "avatar")
     });
 
 export const userCommand = new UserCommand(import.meta.url, "Avatar")
-    .setDescription("Get someone's avatar..")
-    .setAck(async function (interaction) {
+    .setExecutor(async function (interaction) {
         const user = interaction.data.target as User;
         const member = "guild" in interaction ? interaction.guild.members.get(user.id) : undefined;
         const c = new ComponentBuilder<MessageActionRow>();
