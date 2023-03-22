@@ -192,7 +192,6 @@ export default new ClientEvent("messageCreate", async function messageCreateEven
                 }
             } else if (msg.attachments.size !== 0) {
                 for (const attachment of msg.attachments.values()) {
-                    console.log(attachment.filename);
                     let match: RegExpExecArray | null;
                     if ((match = /^(?<md5>[\da-f]{32})\.(?:png|jpe?g|webp|webm|gif|apng)$/.exec(attachment.filename))) {
                         const sauce = await directMD5(match.groups!.md5);
