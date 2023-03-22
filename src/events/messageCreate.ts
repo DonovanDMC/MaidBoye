@@ -186,7 +186,8 @@ export default new ClientEvent("messageCreate", async function messageCreateEven
                             roles:       false,
                             everyone:    false,
                             repliedUser: false
-                        }
+                        },
+                        flags: Oceanic.MessageFlags.SUPPRESS_EMBEDS
                     });
                 }
             } else if (msg.attachments.size !== 0) {
@@ -213,7 +214,8 @@ export default new ClientEvent("messageCreate", async function messageCreateEven
                                     roles:       false,
                                     everyone:    false,
                                     repliedUser: false
-                                }
+                                },
+                                flags: Oceanic.MessageFlags.SUPPRESS_EMBEDS
                             });
                             continue;
                         }
@@ -254,7 +256,8 @@ export default new ClientEvent("messageCreate", async function messageCreateEven
                                 roles:       false,
                                 everyone:    false,
                                 repliedUser: false
-                            }
+                            },
+                            flags: Oceanic.MessageFlags.SUPPRESS_EMBEDS
                         });
                     }
                 }
