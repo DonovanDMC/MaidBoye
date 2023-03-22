@@ -123,3 +123,55 @@ export default async function Sauce(input: string, simularity = 75, skipCheck = 
         return null;
     }
 }
+
+export async function directMD5(md5: string) {
+    let post = await E621.posts.getByMD5(md5),
+        method: "e621" | "yiffy2" | null = null,
+        sourceOverride: string | Array<string> | undefined,
+        url: string | null = null;
+    if (post !== null) {
+        if (post.flags.deleted && post.relationships.parent_id !== null) {
+            const parent = await E621.posts.get(post.relationships.parent_id);
+            if (parent !== null) {
+                post = parent;
+            }
+        }
+        url = post.file.url;
+        method = "e621";
+    }
+
+    if (post === null) {
+        const yapi = await Yiffy.images.getImage(md5);
+        if (yapi !== null) {
+            const e = yapi.sources.find(source => source.startsWith("https://e621.net/posts/"));
+            let match: RegExpExecArray | null;
+            if (e) {
+                if ((match = /https:\/\/e621\.net\/posts\/(\d+)/.exec(e))) {
+                    post = await E621.posts.get(Number(match[1]));
+                    if (post !== null) {
+                        if (post.flags.deleted && post.relationships.parent_id !== null) {
+                            const parent = await E621.posts.get(post.relationships.parent_id);
+                            if (parent !== null) {
+                                post = parent;
+                            }
+                        }
+                        url = post.file.url;
+                        method = "e621";
+                    }
+                } else {
+                    url = yapi.url;
+                    method = "yiffy2";
+                    sourceOverride = yapi.sources;
+                    post = null;
+                }
+            }
+        }
+    }
+
+    return {
+        method,
+        post,
+        sourceOverride,
+        url
+    };
+}

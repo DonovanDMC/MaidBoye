@@ -8,7 +8,7 @@ import { State } from "../util/State.js";
 import Leveling from "../util/Leveling.js";
 import GuildConfig from "../db/Models/GuildConfig.js";
 import UserConfig from "../db/Models/UserConfig.js";
-import Sauce from "../util/Sauce.js";
+import Sauce, { directMD5 } from "../util/Sauce.js";
 import Logger from "@uwu-codes/logger";
 import {
     Internal,
@@ -23,6 +23,7 @@ import { parse, strip } from "dashargs";
 import { ButtonColors, ComponentBuilder } from "@oceanicjs/builders";
 import type { AnyGuildTextChannel, MessageActionRow , Message } from "oceanic.js";
 import { inspect } from "node:util";
+import { createHash } from "node:crypto";
 
 async function format(obj: unknown) {
     if (obj instanceof Promise) {
@@ -52,6 +53,9 @@ const evalVariables: Record<string, unknown> = {
 };
 
 export default new ClientEvent("messageCreate", async function messageCreateEvent(msg) {
+    if (msg.author.bot) {
+        return;
+    }
     if (msg.channel && "guildID" in msg.channel && msg.channel.guildID !== null) {
         await Leveling.run(msg as Message<AnyGuildTextChannel>);
     }
@@ -161,24 +165,99 @@ export default new ClientEvent("messageCreate", async function messageCreateEven
 
     if (msg.guildID !== null) {
         const gConfig = await GuildConfig.get(msg.guildID);
-        if (gConfig.settings.autoSourcing && Strings.validateURL(msg.content)) {
-            const sauce = await Sauce(msg.content, 0, true, true);
-            if (sauce?.post !== null) {
-                await this.rest.channels.createMessage(msg.channelID, {
-                    content:          `https://e${sauce!.post.rating === "s" ? "926" : "621"}.net/posts/${sauce!.post.id}`,
-                    messageReference: {
-                        channelID:       msg.channelID,
-                        guildID:         msg.guildID,
-                        messageID:       msg.id,
-                        failIfNotExists: false
-                    },
-                    allowedMentions: {
-                        users:       false,
-                        roles:       false,
-                        everyone:    false,
-                        repliedUser: false
+        if (gConfig.settings.autoSourcing) {
+            if (Strings.validateURL(msg.content)) {
+                const sauce = await Sauce(msg.content, 0, true, true);
+                if (sauce !== null) {
+                    const sources = Array.isArray(sauce.sourceOverride) ? sauce.sourceOverride : (sauce.sourceOverride === undefined ? [] : [sauce.sourceOverride]);
+                    if (sauce.post !== null && !sources.some(s => s.startsWith("https://e621.net/posts/"))) {
+                        sources.unshift(`https://e621.net/posts/${sauce.post.id}`);
                     }
-                });
+                    await this.rest.channels.createMessage(msg.channelID, {
+                        content:          sources.join("\n"),
+                        messageReference: {
+                            channelID:       msg.channelID,
+                            guildID:         msg.guildID,
+                            messageID:       msg.id,
+                            failIfNotExists: false
+                        },
+                        allowedMentions: {
+                            users:       false,
+                            roles:       false,
+                            everyone:    false,
+                            repliedUser: false
+                        }
+                    });
+                }
+            } else if (msg.attachments.size !== 0) {
+                for (const attachment of msg.attachments.values()) {
+                    console.log(attachment.filename);
+                    let match: RegExpExecArray | null;
+                    if ((match = /^(?<md5>[\da-f]{32})\.(?:png|jpe?g|webp|webm|gif|apng)$/.exec(attachment.filename))) {
+                        const sauce = await directMD5(match.groups!.md5);
+                        if (sauce !== null) {
+                            const sources = Array.isArray(sauce.sourceOverride) ? sauce.sourceOverride : (sauce.sourceOverride === undefined ? [] : [sauce.sourceOverride]);
+                            if (sauce.post !== null && !sources.some(s => s.startsWith("https://e621.net/posts/"))) {
+                                sources.unshift(`https://e621.net/posts/${sauce.post.id}`);
+                            }
+                            await this.rest.channels.createMessage(msg.channelID, {
+                                content:          sources.join("\n"),
+                                messageReference: {
+                                    channelID:       msg.channelID,
+                                    guildID:         msg.guildID,
+                                    messageID:       msg.id,
+                                    failIfNotExists: false
+                                },
+                                allowedMentions: {
+                                    users:       false,
+                                    roles:       false,
+                                    everyone:    false,
+                                    repliedUser: false
+                                }
+                            });
+                            continue;
+                        }
+                    }
+
+                    if (!/\.(?:png|jpe?g|webp|webm|gif|apng)$/.test(attachment.filename)) {
+                        return;
+                    }
+
+                    if (attachment.size > 1024 * 1024 * 10) {
+                        continue;
+                    }
+
+
+                    const file = await fetch(attachment.url, {
+                        method:  "GET",
+                        headers: {
+                            "User-Agent": Config.userAgent
+                        }
+                    });
+                    const md5 = createHash("md5").update(Buffer.from(await file.arrayBuffer())).digest("hex");
+                    const att = await directMD5(md5);
+                    if (att !== null) {
+                        const sources = Array.isArray(att.sourceOverride) ? att.sourceOverride : (att.sourceOverride === undefined ? [] : [att.sourceOverride]);
+                        if (att.post !== null && !sources.some(s => s.startsWith("https://e621.net/posts/"))) {
+                            sources.unshift(`https://e621.net/posts/${att.post.id}`);
+                        }
+                        await this.rest.channels.createMessage(msg.channelID, {
+                            content:          sources.join("\n"),
+                            messageReference: {
+                                channelID:       msg.channelID,
+                                guildID:         msg.guildID,
+                                messageID:       msg.id,
+                                failIfNotExists: false
+                            },
+                            allowedMentions: {
+                                users:       false,
+                                roles:       false,
+                                everyone:    false,
+                                repliedUser: false
+                            }
+                        });
+                    }
+                }
             }
         }
     }
