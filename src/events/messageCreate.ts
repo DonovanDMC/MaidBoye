@@ -193,7 +193,7 @@ export default new ClientEvent("messageCreate", async function messageCreateEven
             } else if (msg.attachments.size !== 0) {
                 for (const attachment of msg.attachments.values()) {
                     let match: RegExpExecArray | null;
-                    if ((match = /^(?<md5>[\da-f]{32})\.(?:png|jpe?g|webp|webm|gif|apng)$/.exec(attachment.filename))) {
+                    if ((match = /^(?<md5>[\da-f]{32})\.(?:a?png|jpe?g|webp|webm|gif)$/.exec(attachment.filename))) {
                         const sauce = await directMD5(match.groups!.md5);
                         if (sauce !== null) {
                             const sources = Array.isArray(sauce.sourceOverride) ? sauce.sourceOverride : (sauce.sourceOverride === undefined ? [] : [sauce.sourceOverride]);
@@ -220,7 +220,7 @@ export default new ClientEvent("messageCreate", async function messageCreateEven
                         }
                     }
 
-                    if (!/\.(?:png|jpe?g|webp|webm|gif|apng)$/.test(attachment.filename)) {
+                    if (!/\.(?:a?png|jpe?g|webp|webm|gif)$/.test(attachment.filename)) {
                         return;
                     }
 

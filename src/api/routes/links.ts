@@ -33,11 +33,11 @@ app.route("/invite/done")
         } catch {
             // ignore
         }
-        await db.redis.setex(`invites:${req.query.guild_id}`, JSON.stringify({
+        await db.redis.setex(`invites:${req.query.guild_id}`, 15, JSON.stringify({
             user,
             source,
             permissions: req.query.permissions
-        }), 15);
+        }));
         return res.status(200).render("invite-done", { prefix: "/" });
     });
 
