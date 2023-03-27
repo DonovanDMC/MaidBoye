@@ -38,14 +38,27 @@ export default new Command(import.meta.url, "marry")
         return interaction.defer();
     })
     .setExecutor(async function(interaction, { member }, gConfig, uConfig) {
-        const other = await UserConfig.get(member.id);
+        if (uConfig.marriagePartners.length >= 5) {
+            return interaction.reply({
+                content: "H-hey! Polyamory is great and all, but surely there's a limit?",
+                flags:   MessageFlags.EPHEMERAL
+            });
+        }
         if (uConfig.marriagePartners.includes(member.id)) {
             return interaction.reply({
-                content:         `H-hey! You're already married to <@!${member.id}>..`,
+                content:         `H-hey! You're already married to ${member.mention}..`,
                 flags:           MessageFlags.EPHEMERAL,
                 allowedMentions: {
                     users: false
                 }
+            });
+        }
+
+        const other = await UserConfig.get(member.id);
+        if (other.marriagePartners.length >= 5) {
+            return interaction.reply({
+                content: "H-hey! They're already married to 5 or more people..",
+                flags:   MessageFlags.EPHEMERAL
             });
         }
 
@@ -54,9 +67,9 @@ export default new Command(import.meta.url, "marry")
         return interaction.reply({
             embeds: Util.makeEmbed(true, interaction.user)
                 .setTitle("Marriage Proposal")
-                .setDescription(`<@!${interaction.user.id}> has proposed to <@!${member.id}>!\n<@!${member.id}> do you accept?`)
+                .setDescription(`${interaction.user.mention} has proposed to ${member.mention}!\n${member.mention} do you accept?`)
                 .setImage(img.url)
-                .setFooter(`${member.tag} Is Marred To ${other.marriagePartners.length} People.`, Config.botIcon)
+                .setFooter(`${member.mention} rs marred to ${other.marriagePartners.length} ${other.marriagePartners.length === 1 ? "person" : "people"}.`, Config.botIcon)
                 .toJSON(true),
             components: new ComponentBuilder<MessageActionRow>(2)
                 .addInteractionButton({
