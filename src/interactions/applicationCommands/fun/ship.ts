@@ -23,7 +23,7 @@ export default new Command(import.meta.url, "ship")
             second = first;
             first = interaction.user;
         }
-        const amount = Number((BigInt(first.id) + BigInt(first.id)) % 100n) + 1;
+        const amount = Number((BigInt(first.id) + BigInt(second.id)) % 100n) + 1;
         const name = first.username.slice(0, Math.floor(Math.random() * 5) + 3) + second.username.slice(-(Math.floor(Math.random() * 5) + 3));
         let image: string;
         if (amount === 100)    {
