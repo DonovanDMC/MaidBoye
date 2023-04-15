@@ -67,7 +67,7 @@ export default new Command(import.meta.url, "avatar")
 export const userCommand = new UserCommand(import.meta.url, "Avatar")
     .setExecutor(async function (interaction) {
         const user = interaction.data.target as User;
-        const member = "guild" in interaction ? interaction.guild.members.get(user.id) : undefined;
+        const member = "guild" in interaction && interaction.guild ? interaction.guild.members.get(user.id) : undefined;
         const c = new ComponentBuilder<MessageActionRow>();
         if (member) {
             c.addURLButton({

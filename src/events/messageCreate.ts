@@ -80,7 +80,7 @@ export default new ClientEvent("messageCreate", async function messageCreateEven
                     }
                     let res: unknown;
                     const flags = parse(args.join(" "), {
-                        parseArgs: false
+                        parseArgs: true
                     });
                     const arg = strip(args.join(" "), {
                         removeFlags: true
@@ -108,7 +108,14 @@ export default new ClientEvent("messageCreate", async function messageCreateEven
                         let file: string | undefined, out = String(flags.has("raw") || flags.has("r") ? res : f);
                         if (out.length >= 750) {
                             try {
-                                file = inspect(JSON.parse(out), { depth: 1 });
+                                let depth = 1;
+                                if (flags.has("depth")) {
+                                    depth = Number(flags.get("depth"));
+                                    if (isNaN(depth)) {
+                                        depth = 1;
+                                    }
+                                }
+                                file = inspect(JSON.parse(out), { depth, colors: false, showHidden: false });
                             } catch {
                                 file = out;
                             }
