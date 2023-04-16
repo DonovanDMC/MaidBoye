@@ -3,6 +3,7 @@ import Service from "../util/Service.js";
 import ServicesManager from "../util/ServicesManager.js";
 import Logger from "@uwu-codes/logger";
 import { ActivityTypes, Client } from "oceanic.js";
+import { memoryUsage } from "node:process";
 
 export default class FurryBotStatusService extends Service {
     furrybot: Client;
@@ -20,8 +21,12 @@ export default class FurryBotStatusService extends Service {
         }
     }
 
-    protected async handleMessage() {
-        throw new Error("Not Implemented");
+    protected async handleMessage(op: string) {
+        if (op === "STATS") {
+            return memoryUsage();
+        }
+
+        throw new Error(`Not Implemented: [OP:${op}]`);
     }
 
     async init() {
@@ -39,6 +44,25 @@ export default class FurryBotStatusService extends Service {
                             name: "Visit https://maid.gay"
                         }]
                     }
+                },
+                collectionLimits: {
+                    auditLogEntries:     0,
+                    autoModerationRules: 0,
+                    channelThreads:      0,
+                    channels:            0,
+                    groupChannels:       0,
+                    guildThreads:        0,
+                    guilds:              0,
+                    integrations:        0,
+                    members:             0,
+                    privateChannels:     0,
+                    roles:               0,
+                    scheduledEvents:     0,
+                    stageInstances:      0,
+                    unavailableGuilds:   0,
+                    users:               0,
+                    voiceMembers:        0,
+                    voiceStates:         0
                 }
             })
                 .on("shardReady", shard => Logger.getLogger("FurryBotStatusService | FurryBot").info(`Shard ${shard} is ready!`))
@@ -68,6 +92,25 @@ export default class FurryBotStatusService extends Service {
                             name: "Visit https://maid.gay"
                         }]
                     }
+                },
+                collectionLimits: {
+                    auditLogEntries:     0,
+                    autoModerationRules: 0,
+                    channelThreads:      0,
+                    channels:            0,
+                    groupChannels:       0,
+                    guildThreads:        0,
+                    guilds:              0,
+                    integrations:        0,
+                    members:             0,
+                    privateChannels:     0,
+                    roles:               0,
+                    scheduledEvents:     0,
+                    stageInstances:      0,
+                    unavailableGuilds:   0,
+                    users:               0,
+                    voiceMembers:        0,
+                    voiceStates:         0
                 }
             })
                 .on("shardReady", shard => Logger.getLogger("FurryBotStatusService | FurryBotBeta").info(`Shard ${shard} is ready!`))

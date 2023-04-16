@@ -10,6 +10,7 @@ import Logger from "@uwu-codes/logger";
 import { Client } from "oceanic.js";
 import { EmbedBuilder } from "@oceanicjs/builders";
 import { type StringCategories, type JSONResponse } from "yiffy";
+import { memoryUsage } from "node:process";
 
 const AutoPostingTitles = {
     [AutoPostingTypes.BIRB]:            "Birb!",
@@ -93,6 +94,12 @@ export default class AutoPostingService extends Service {
                 });
             }
         }
+
+        if (op === "STATS") {
+            return memoryUsage();
+        }
+
+        throw new Error(`Not Implemented: [OP:${op}]`);
     }
 
     async execute(entry: AutoPostingEntry, getBulk: () => Promise<JSONResponse>) {

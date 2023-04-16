@@ -78,8 +78,19 @@ export default class ServicesManager {
             }
         }
     }
+
     private static workerToName(worker: Worker) {
         return [...this.services.entries()].find(([, w]) => w === worker)?.[0];
+    }
+
+    static async getMemoryUsage() {
+        const usages: Record<string, NodeJS.MemoryUsage> = {};
+        for (const name of this.services.keys()) {
+            const usage = await this.send<NodeJS.MemoryUsage>(name, "STATS", null, true);
+            usages[name] = usage;
+        }
+
+        return usages;
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars

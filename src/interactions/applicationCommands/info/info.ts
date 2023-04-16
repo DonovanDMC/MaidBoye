@@ -4,6 +4,7 @@ import CommandHandler from "../../../util/cmd/CommandHandler.js";
 import Config from "../../../config/index.js";
 import pkg from "../../../../package.json" assert { type: "json" };
 import lock from "../../../../package-lock.json" assert { type: "json" };
+import ServicesManager from "../../../util/ServicesManager.js";
 import { ComponentBuilder } from "@oceanicjs/builders";
 import { Strings, Time } from "@uwu-codes/utils";
 import { GATEWAY_VERSION, REST_VERSION, VERSION, type MessageActionRow } from "oceanic.js";
@@ -15,12 +16,18 @@ export default new Command(import.meta.url, "info")
     .setAck("ephemeral-user")
     .setCooldown(3e3)
     .setExecutor(async function(interaction) {
+        const usage = await ServicesManager.getMemoryUsage();
+        const names: Record<string, string> = {
+            "auto-posting":     "Autoposting",
+            "furry-bot-status": "FurryBot Status"
+        };
         return interaction.reply({
             embeds: Util.makeEmbed(true, interaction.user)
                 .setDescription(
                     "**Stats/General**:",
                     `${Config.emojis.default.dot} System Memory: **${Strings.formatBytes(totalmem() - freemem(), 2)}** / **${Strings.formatBytes(totalmem(), 2)}**`,
                     `${Config.emojis.default.dot} Process Memory: **${Strings.formatBytes(memoryUsage().heapUsed, 2)}** / **${Strings.formatBytes(memoryUsage().heapTotal, 2)}**`,
+                    ...Object.entries(usage).map(([k, v]) => `${Config.emojis.default.dot} [Service] ${names[k] ?? k}: **${Strings.formatBytes(v.heapUsed, 2)}** / **${Strings.formatBytes(v.heapTotal, 2)}**`),
                     `${Config.emojis.default.dot} CPU Usage: **${this.cpuUsage}%**`,
                     `${Config.emojis.default.dot} Uptime: ${Time.ms(uptime() * 1000, { seconds: true, ms: false })} (${Time.secondsToHMS(uptime())})`,
                     ...("guild" in interaction && interaction.guild ? [`${Config.emojis.default.dot} Shard: **${interaction.guild.shard.id + 1}**/**${this.shards.size}**`] : []),
