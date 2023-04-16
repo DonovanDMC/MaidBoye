@@ -3,6 +3,7 @@ import Debug from "./Debug.js";
 import { randomUUID } from "node:crypto";
 import { parentPort } from "node:worker_threads";
 
+export const NOT_HANDLED = Symbol("Service.NOT_HANDLED");
 export default abstract class Service {
     private cb: Map<string, {
         reject(reason?: unknown): void;
@@ -10,7 +11,7 @@ export default abstract class Service {
     }> = new Map();
     file: string;
     name: string;
-    protected abstract handleMessage(op: string, data?: unknown, from?: string): Promise<unknown>;
+
     constructor(file: string, name: string) {
         this.file = file;
         this.name = name;
@@ -50,6 +51,16 @@ export default abstract class Service {
                 break;
             }
         }
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    protected async handleMessage(op: string, data?: unknown, from?: string): Promise<unknown> {
+        if (op === "EVAL" && typeof data === "string") {
+            // eslint-disable-next-line no-eval, @typescript-eslint/no-unsafe-return
+            return eval(data);
+        }
+
+        return NOT_HANDLED;
     }
 
     async masterCommand<T = unknown>(op: string, data: unknown | string, responsive: true): Promise<T>;
@@ -111,8 +122,4 @@ export default abstract class Service {
     }
 }
 
-export class EmptyService extends Service {
-    protected handleMessage(): Promise<unknown> {
-        throw new Error("Method not implemented.");
-    }
-}
+export class EmptyService extends Service {}

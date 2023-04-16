@@ -9,6 +9,9 @@ import Leveling from "../util/Leveling.js";
 import GuildConfig from "../db/Models/GuildConfig.js";
 import UserConfig from "../db/Models/UserConfig.js";
 import Sauce, { directMD5 } from "../util/Sauce.js";
+import ServicesManager from "../util/ServicesManager.js";
+import AutoPostingService from "../services/AutoPosting.js";
+import FurryBotStatusService from "../services/FurryBotStatus.js";
 import Logger from "@uwu-codes/logger";
 import {
     Internal,
@@ -35,6 +38,7 @@ async function format(obj: unknown) {
     return inspect(obj, { depth: 1, colors: false, showHidden: false });
 }
 
+
 const evalVariables: Record<string, unknown> = {
     Oceanic,
     db,
@@ -49,7 +53,10 @@ const evalVariables: Record<string, unknown> = {
     RequestProxy,
     Config,
     GuildConfig,
-    UserConfig
+    UserConfig,
+    ServicesManager,
+    AutoPostingService,
+    FurryBotStatusService
 };
 
 export default new ClientEvent("messageCreate", async function messageCreateEvent(msg) {

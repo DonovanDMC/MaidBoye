@@ -83,6 +83,18 @@ export default class ServicesManager {
         return [...this.services.entries()].find(([, w]) => w === worker)?.[0];
     }
 
+    static async eval<T = unknown>(name: string, code: string) {
+        return this.send<T>(name, "EVAL", code, true);
+    }
+
+    static async evalAll<T = unknown>(code: string) {
+        const results: Record<string, T> = {};
+        for (const name of this.services.keys()) {
+            results[name] = await this.send<T>(name, "EVAL", code, true);
+        }
+        return results;
+    }
+
     static async getMemoryUsage() {
         const usages: Record<string, NodeJS.MemoryUsage> = {};
         for (const name of this.services.keys()) {

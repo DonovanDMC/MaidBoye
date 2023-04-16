@@ -1,5 +1,5 @@
 import Config from "../config/index.js";
-import Service from "../util/Service.js";
+import Service, { NOT_HANDLED } from "../util/Service.js";
 import ServicesManager from "../util/ServicesManager.js";
 import Logger from "@uwu-codes/logger";
 import { ActivityTypes, Client } from "oceanic.js";
@@ -21,7 +21,12 @@ export default class FurryBotStatusService extends Service {
         }
     }
 
-    protected async handleMessage(op: string) {
+    protected override async handleMessage(op: string, data: unknown, from: string) {
+        const r = await super.handleMessage(op, data, from);
+        if (r !== NOT_HANDLED) {
+            return r;
+        }
+
         if (op === "STATS") {
             return memoryUsage();
         }

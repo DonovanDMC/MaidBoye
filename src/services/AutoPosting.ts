@@ -1,5 +1,5 @@
 import Config from "../config/index.js";
-import Service from "../util/Service.js";
+import Service, { NOT_HANDLED } from "../util/Service.js";
 import AutoPostingEntry, { type AutoPostingTime, AutoPostingTypes, ValidAutoPostingTimes } from "../db/Models/AutoPostingEntry.js";
 import Yiffy from "../util/req/Yiffy.js";
 import CheweyAPI from "../util/req/CheweyAPI.js";
@@ -84,7 +84,11 @@ export default class AutoPostingService extends Service {
         return ServicesManager.register("auto-posting", import.meta.url);
     }
 
-    protected async handleMessage(op: string, data: unknown) {
+    protected override async handleMessage(op: string, data: unknown, from: string) {
+        const r = await super.handleMessage(op, data, from);
+        if (r !== NOT_HANDLED) {
+            return r;
+        }
         if (op === "RUN" && typeof data === "number") {
             const entries = await AutoPostingEntry.getTime(data as 5);
             for (const entry of entries) {
