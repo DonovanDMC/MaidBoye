@@ -17,7 +17,7 @@ import { ApplicationCommandOptionTypes, ChannelTypes, type InteractionContent, t
 
 export type SectionNames = keyof Awaited<ReturnType<typeof generateSections>>;
 export async function generateSections(this: MaidBoye, interaction: CommandInteraction<ValidLocation.GUILD> | ComponentInteraction<ValidLocation.GUILD>) {
-    const o = await this.getUser(interaction.guild.ownerID);
+    const o = interaction.guild.ownerID === null ? null : await this.getUser(interaction.guild.ownerID);
     const owner = o === null ? `Unknown#0000 (**${interaction.guild.ownerID}**)` : `**${o.username}#${o.discriminator}** (${o.id})`;
 
     const icon = interaction.guild.iconURL();

@@ -12,7 +12,7 @@ export default new ClientEvent("guildCreate", async function guildCreateEvent(gu
     await setTimeout(2000);
     await DailyGuildsHandler.trackJoin();
     Logger.getLogger("GuildCreate").info(`Joined guild ${guild.name} (${guild.id})`);
-    const owner = await this.getUser(guild.ownerID);
+    const owner = guild.ownerID === null ? null : await this.getUser(guild.ownerID);
     const info = await db.redis.get(`invites:${guild.id}`);
     let infoText = "";
     if (info !== null) {

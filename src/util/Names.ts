@@ -70,40 +70,49 @@ export function getFeatureName(feature: GuildFeature, nameOnly = false) {
     return `${GuildFeatureNames[feature]}${GuildFeatureDescriptions[feature] ? `[*](${Config.apiURL}/features/${feature})` : ""}`;
 }
 export const GuildFeatureNames = {
-    AUTO_MODERATION:                           "Auto Moderation",
     ANIMATED_BANNER:                           `${serverFeatures.animatedBanner} Animated Banner`,
     ANIMATED_ICON:                             `${serverFeatures.animatedIcon} Animated Icon`,
     APPLICATION_COMMAND_PERMISSIONS_V2:        "Application Command Permissions V2",
+    AUTO_MODERATION:                           "Auto Moderation",
     BANNER:                                    `${serverFeatures.banner} Banner`,
     BOT_DEVELOPER_EARLY_ACCESS:                "Bot Developer Early Access",
+    CLYDE_ENABLED:                             "Clyde Enabled",
+    COMMUNITY_EXP_LARGE_GATED:                 "Community Exp (Large Gated)",
+    COMMUNITY_EXP_LARGE_UNGATED:               "Community Exp (Large Ungated)",
+    COMMUNITY_EXP_MEDIUM:                      "Community Exp (Medium Gated)",
     COMMUNITY:                                 `${serverFeatures.community} Community`,
-    CREATOR_MONETIZABLE:                       "Creator Monetizable",
     CREATOR_MONETIZABLE_DISABLED:              "Creator Monetizable Disabled",
     CREATOR_MONETIZABLE_PROVISIONAL:           "Creator Monetizable Provisional",
+    CREATOR_MONETIZABLE:                       "Creator Monetizable",
     CREATOR_STORE_PAGE:                        "Creator Store Page",
     DEVELOPER_SUPPORT_SERVER:                  "Developer Support Server",
-    DISCOVERABLE:                              `${serverFeatures.discoverable} Discoverable`,
     DISCOVERABLE_DISABLED:                     "Discoverable Disabled",
+    DISCOVERABLE:                              `${serverFeatures.discoverable} Discoverable`,
     ENABLED_DISCOVERABLE_BEFORE:               "Enabled Discoverable Before",
     EXPOSED_TO_ACTIVITIES_WTP_EXPERIMENT:      "Exposed to Activities WTP Experiment",
     FEATURABLE:                                `${serverFeatures.featurable} Featurable`,
     GUILD_HOME_TEST:                           "Guild Home Test",
+    GUILD_ONBOARDING_EVER_ENABLED:             "Guild Onboarding Ever Enabled",
+    GUILD_ONBOARDING_HAS_PROMPTS:              "Guild Onboarding Has Prompts",
+    GUILD_ONBOARDING:                          "Guild Onboarding",
+    GUILD_WEB_PAGE_VANITY_URL:                 "Guild Web Page Vanity URL",
     HAD_EARLY_ACTIVITIES_ACCESS:               "Had Early Activities Access",
     HAS_DIRECTORY_ENTRY:                       "Has Directory Entry",
     HUB:                                       "Hub",
     INCREASED_THREAD_LIMIT:                    "Increased Thread Limit",
     INTERNAL_EMPLOYEE_ONLY:                    "Internal Employee Only",
-    INVITES_DISABLED:                          "Invites Disabled",
     INVITE_SPLASH:                             `${serverFeatures.inviteSplash} Invite Splash`,
+    INVITES_DISABLED:                          "Invites Disabled",
     LINKED_TO_HUB:                             "Linked To Hub",
+    MARKETPLACES_CONNECTION_ROLES:             "Marketplaces Connection Roles",
     MEMBER_PROFILES:                           "Member Profiles",
     MEMBER_VERIFICATION_GATE_ENABLED:          `${serverFeatures.memberVerificationGateEnabled} Member Verification Gate Enabled`,
     MONETIZATION_ENABLED:                      `${serverFeatures.monitizationEnabled} Monitization Enabled`,
     MORE_EMOJI:                                `${serverFeatures.moreEmojis} More Emojis`,
     MORE_EMOJIS:                               `${serverFeatures.moreEmojis} More Emojis`,
     MORE_STICKERS:                             `${serverFeatures.moreStickers} More Stickers`,
-    NEWS:                                      `${serverFeatures.news} Announcement Channels (NEWS)`,
     NEW_THREAD_PERMISSIONS:                    `${serverFeatures.newThreadPermissions} New Thread Permissions`,
+    NEWS:                                      `${serverFeatures.news} Announcement Channels (NEWS)`,
     PARTNERED:                                 `${serverFeatures.partnered} Partnered`,
     PREVIEW_ENABLED:                           `${serverFeatures.previewEnabled} Preview Enabled`,
     PREVIOUSLY_DISCOVERABLE:                   `${serverFeatures.previouslyDiscoverable} Previously Discoverable`,
@@ -113,9 +122,10 @@ export const GuildFeatureNames = {
     ROLE_SUBSCRIPTIONS_AVAILABLE_FOR_PURCHASE: "Role Subscriptions Available For Purchase",
     ROLE_SUBSCRIPTIONS_ENABLED:                `${serverFeatures.roleSubscriptionsEnabled} Role Subscriptions Enabled`,
     SEVEN_DAY_THREAD_ARCHIVE:                  `${serverFeatures.sevenDayThreadArchive} Seven Day Thread Archive`,
+    SOUNDBOARD:                                "Soundboard",
     TEXT_IN_VOICE_ENABLED:                     `${serverFeatures.textInVoiceEnabled} Text In Voice Enabled`,
-    THREADS_ENABLED:                           `${serverFeatures.threadsEnabled} Threads Enabled`,
     THREADS_ENABLED_TESTING:                   "Threads Enabled Testing",
+    THREADS_ENABLED:                           `${serverFeatures.threadsEnabled} Threads Enabled`,
     THREE_DAY_THREAD_ARCHIVE:                  `${serverFeatures.threeDayThreadArchive} Three Day Thread Archive`,
     TICKETED_EVENTS_ENABLED:                   `${serverFeatures.ticketedEventsEnabled} Ticketed Events Enabled`,
     VANITY_URL:                                `${serverFeatures.vanityURL} Vanity URL`,
@@ -126,40 +136,49 @@ export const GuildFeatureNames = {
 
 // anything with an asterisk uses an unofficial description made by me
 export const GuildFeatureDescriptions = {
-    AUTO_MODERATION:                           "Guild has set up auto moderation rules",
     ANIMATED_BANNER:                           "Guild has access to set an animated guild banner image",
     ANIMATED_ICON:                             "Guild has access to set an animated guild icon",
     APPLICATION_COMMAND_PERMISSIONS_V2:        "Guild has enabled application command permissions v2. // *",
+    AUTO_MODERATION:                           "Guild has set up auto moderation rules",
     BANNER:                                    "Guild has access to set a guild banner image",
     BOT_DEVELOPER_EARLY_ACCESS:                "Bot Developer Early Access",
+    CLYDE_ENABLED:                             null,
+    COMMUNITY_EXP_LARGE_GATED:                 null,
+    COMMUNITY_EXP_LARGE_UNGATED:               null,
+    COMMUNITY_EXP_MEDIUM:                      null,
     COMMUNITY:                                 "Guild can enable welcome screen, Membership Screening, stage channels and discovery, and receives community updates",
-    CREATOR_MONETIZABLE:                       null,
     CREATOR_MONETIZABLE_DISABLED:              null,
     CREATOR_MONETIZABLE_PROVISIONAL:           null,
+    CREATOR_MONETIZABLE:                       null,
     CREATOR_STORE_PAGE:                        null,
     DEVELOPER_SUPPORT_SERVER:                  null,
-    DISCOVERABLE:                              "Guild is able to be discovered in the directory",
     DISCOVERABLE_DISABLED:                     "Guild is not able to be discovered in the directory, and it cannot be enabled", // *
+    DISCOVERABLE:                              "Guild is able to be discovered in the directory",
     ENABLED_DISCOVERABLE_BEFORE:               "Guild has previously been discoverable in the directory, but is not currently", // *
     EXPOSED_TO_ACTIVITIES_WTP_EXPERIMENT:      null,
     FEATURABLE:                                "Guild is able to be featured in the directory",
     GUILD_HOME_TEST:                           null,
+    GUILD_ONBOARDING_EVER_ENABLED:             null,
+    GUILD_ONBOARDING_HAS_PROMPTS:              null,
+    GUILD_ONBOARDING:                          null,
+    GUILD_WEB_PAGE_VANITY_URL:                 null,
     HAD_EARLY_ACTIVITIES_ACCESS:               null,
     HAS_DIRECTORY_ENTRY:                       null,
     HUB:                                       "Guild is a hub for other servers", // *
     INCREASED_THREAD_LIMIT:                    "Guild has increased thread limits",
     INTERNAL_EMPLOYEE_ONLY:                    null,
-    INVITES_DISABLED:                          "Guild has invites temporarily disabled",
     INVITE_SPLASH:                             "Guild has access to set an invite splash background",
+    INVITES_DISABLED:                          "Guild has invites temporarily disabled",
     LINKED_TO_HUB:                             "Guild is linked to a hub", // *
+    MARKETPLACES_CONNECTION_ROLES:             null,
     MEMBER_PROFILES:                           null,
     MEMBER_VERIFICATION_GATE_ENABLED:          "Guild has enabled [Membership Screening](https://discord.com/developers/docs/resources/guild#membership-screening-object)",
     MONETIZATION_ENABLED:                      "Guild has enabled monetization",
     MORE_EMOJI:                                "Guild has increased custom emoji slots", // *
     MORE_EMOJIS:                               "Guild has increased custom emoji slots", // *
     MORE_STICKERS:                             "Guild has increased custom sticker slots",
-    NEWS:                                      "Guild has access to create news channels",
     NEW_THREAD_PERMISSIONS:                    "Guild has access to new thread permissions", // *
+    NEWS:                                      "Guild has access to create news channels",
     PARTNERED:                                 "Guild is partnered",
     PREVIEW_ENABLED:                           "Guild can be previewed before joining via Membership Screening or the directory",
     PREVIOUSLY_DISCOVERABLE:                   "Guild has previously been discoverable, but is not currently", // *
@@ -169,9 +188,10 @@ export const GuildFeatureDescriptions = {
     ROLE_SUBSCRIPTIONS_AVAILABLE_FOR_PURCHASE: "Guild has role subscriptions that can be purchased", // *
     ROLE_SUBSCRIPTIONS_ENABLED:                "Guild has access to role subscriptions", // *
     SEVEN_DAY_THREAD_ARCHIVE:                  "Guild has access to 7 day thread automatic achiving", // *
+    SOUNDBOARD:                                null,
     TEXT_IN_VOICE_ENABLED:                     "Guild has enabled text in voice", // *
-    THREADS_ENABLED:                           "Guild has enabled threads", // *
     THREADS_ENABLED_TESTING:                   "Guild has enabled thread testing", // *
+    THREADS_ENABLED:                           "Guild has enabled threads", // *
     THREE_DAY_THREAD_ARCHIVE:                  "Guild has access to 3 day thread automatic achiving", // *
     TICKETED_EVENTS_ENABLED:                   "Guild has enabled ticketed events",
     VANITY_URL:                                "Guild has access to set a vanity URL",
@@ -217,7 +237,8 @@ export const MessageFlagNames = {
     [MessageFlags.LOADING]:                                "Loading",
     [MessageFlags.FAILED_TO_MENTION_SOME_ROLES_IN_THREAD]: "Failed to Mention Some Roles in Thread",
     [MessageFlags.SHOULD_SHOW_LINK_NOT_DISCORD_WARNING]:   "Should Show Link Not Discord Warning",
-    [MessageFlags.SUPPRESS_NOTIFICATIONS]:                 "Suppress Notifications"
+    [MessageFlags.SUPPRESS_NOTIFICATIONS]:                 "Suppress Notifications",
+    [MessageFlags.IS_VOICE_MESSAGE]:                       "Is Voice Message"
 } satisfies Record<MessageFlags, string>;
 
 export const MessageTypeNames = {
@@ -448,14 +469,16 @@ export const SortOrderTypeNames = {
 export const AutoModerationActionTypeNames = {
     [AutoModerationActionTypes.BLOCK_MESSAGE]:      "Block Message",
     [AutoModerationActionTypes.SEND_ALERT_MESSAGE]: "Send Alert Message",
-    [AutoModerationActionTypes.TIMEOUT]:            "Timeout"
+    [AutoModerationActionTypes.TIMEOUT]:            "Timeout",
+    [AutoModerationActionTypes.QUARANTINE_USER]:    "Quarantine User"
 } satisfies Record<AutoModerationActionTypes, string>;
 
 export const AutoModerationTriggerTypeNames = {
     [AutoModerationTriggerTypes.KEYWORD]:        "Keyword",
     [AutoModerationTriggerTypes.SPAM]:           "Spam",
     [AutoModerationTriggerTypes.KEYWORD_PRESET]: "Keyword Preset",
-    [AutoModerationTriggerTypes.MENTION_SPAM]:   "Mention Spam"
+    [AutoModerationTriggerTypes.MENTION_SPAM]:   "Mention Spam",
+    [AutoModerationTriggerTypes.MEMBER_PROFILE]: "Member Profile"
 } satisfies Record<AutoModerationTriggerTypes, string>;
 
 export const AutoModerationKeywordPresetTypeNames = {
