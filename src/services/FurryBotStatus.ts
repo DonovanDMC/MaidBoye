@@ -50,25 +50,7 @@ export default class FurryBotStatusService extends Service {
                         }]
                     }
                 },
-                collectionLimits: {
-                    auditLogEntries:     0,
-                    autoModerationRules: 0,
-                    channelThreads:      0,
-                    channels:            0,
-                    groupChannels:       0,
-                    guildThreads:        0,
-                    guilds:              0,
-                    integrations:        0,
-                    members:             0,
-                    privateChannels:     0,
-                    roles:               0,
-                    scheduledEvents:     0,
-                    stageInstances:      0,
-                    unavailableGuilds:   0,
-                    users:               0,
-                    voiceMembers:        0,
-                    voiceStates:         0
-                }
+                disableCache: true
             })
                 .on("shardReady", shard => Logger.getLogger("FurryBotStatusService | FurryBot").info(`Shard ${shard} is ready!`))
                 .on("shardDisconnect", (error, shard) => Logger.getLogger("FurryBotStatusService | FurryBot").warn(`Shard ${shard} disconnected.`))
@@ -98,25 +80,7 @@ export default class FurryBotStatusService extends Service {
                         }]
                     }
                 },
-                collectionLimits: {
-                    auditLogEntries:     0,
-                    autoModerationRules: 0,
-                    channelThreads:      0,
-                    channels:            0,
-                    groupChannels:       0,
-                    guildThreads:        0,
-                    guilds:              0,
-                    integrations:        0,
-                    members:             0,
-                    privateChannels:     0,
-                    roles:               0,
-                    scheduledEvents:     0,
-                    stageInstances:      0,
-                    unavailableGuilds:   0,
-                    users:               0,
-                    voiceMembers:        0,
-                    voiceStates:         0
-                }
+                disableCache: true
             })
                 .on("shardReady", shard => Logger.getLogger("FurryBotStatusService | FurryBotBeta").info(`Shard ${shard} is ready!`))
                 .on("shardDisconnect", (error, shard) => Logger.getLogger("FurryBotStatusService | FurryBotBeta").warn(`Shard ${shard} disconnected.`))

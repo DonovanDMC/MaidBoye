@@ -114,7 +114,7 @@ export default new Command(import.meta.url, "levelroles")
                 await gConfig.addLevelingRole(role.id, level);
                 // await db.query(`UPDATE ${GuildConfig.TABLE} SET leveling_roles=ARRAY[${[...gConfig.levelingRoles, [role.id, level]].map(([r, l]) => `ROW('${r}', ${l})::LEVELING_ROLE`).join(", ")}], updated_at=CURRENT_TIMESTAMP(3) WHERE id = $1`, [interaction.guildID]);
                 return interaction.reply({
-                    content:         `Members will not gain the role <@&${role.id}> when they reach the level **${level}**\n(if they are already this level, they will get it the next time they level up)`,
+                    content:         `Members will now gain the role <@&${role.id}> when they reach the level **${level}**\n(if they are already at this level or higher, they will get it the next time they level up)`,
                     allowedMentions: {
                         roles: false
                     }
