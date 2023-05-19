@@ -29,15 +29,25 @@ export interface CommandExport {
 export enum ValidLocation {
     BOTH   = 0,
     GUILD  = 1,
-    PIVATE = 2
+    PIVATE = 2,
 }
 
-export type AutocompleteInteraction<V extends ValidLocation = ValidLocation.BOTH> = V extends ValidLocation.BOTH ? GuildAutocompleteInteraction | PrivateAutocompleteInteraction : V extends ValidLocation.GUILD ? GuildAutocompleteInteraction : V extends ValidLocation.PIVATE ? PrivateAutocompleteInteraction : never;
-export type CommandInteraction<V extends ValidLocation = ValidLocation.BOTH> = V extends ValidLocation.BOTH ? GuildCommandInteraction | PrivateCommandInteraction : V extends ValidLocation.GUILD ? GuildCommandInteraction : V extends ValidLocation.PIVATE ? PrivateCommandInteraction : never;
+type AnyGuildInteraction = GuildAutocompleteInteraction | GuildCommandInteraction | GuildComponentButtonInteraction | GuildComponentSelectMenuInteraction | GuildModalSubmitInteraction;
+type AnyPrivateInteraction = PrivateAutocompleteInteraction | PrivateCommandInteraction | PrivateComponentButtonInteraction | PrivateComponentSelectMenuInteraction | PrivateModalSubmitInteraction;
+
+interface ValidLocationMap<G extends AnyGuildInteraction, P extends AnyPrivateInteraction> {
+    [ValidLocation.BOTH]: G | P;
+    [ValidLocation.GUILD]: G;
+    [ValidLocation.PIVATE]: P;
+}
+
+export type AutocompleteInteraction<V extends ValidLocation = ValidLocation.BOTH> = ValidLocationMap<GuildAutocompleteInteraction, PrivateAutocompleteInteraction>[V];
+export type CommandInteraction<V extends ValidLocation = ValidLocation.BOTH> = ValidLocationMap<GuildCommandInteraction, PrivateCommandInteraction>[V];
 export type ComponentInteraction<V extends ValidLocation = ValidLocation.BOTH> = ButtonComponentInteraction<V> | SelectMenuComponentInteraction<V>;
-export type ButtonComponentInteraction<V extends ValidLocation = ValidLocation.BOTH> = V extends ValidLocation.BOTH ? GuildComponentButtonInteraction | PrivateComponentButtonInteraction : V extends ValidLocation.GUILD ? GuildComponentButtonInteraction : V extends ValidLocation.PIVATE ? PrivateComponentButtonInteraction : never;
-export type SelectMenuComponentInteraction<V extends ValidLocation = ValidLocation.BOTH> = V extends ValidLocation.BOTH ? GuildComponentSelectMenuInteraction | PrivateComponentSelectMenuInteraction : V extends ValidLocation.GUILD ? GuildComponentSelectMenuInteraction : V extends ValidLocation.PIVATE ? PrivateComponentSelectMenuInteraction : never;
-export type ModalSubmitInteraction<V extends ValidLocation = ValidLocation.BOTH> = V extends ValidLocation.BOTH ? GuildModalSubmitInteraction | PrivateModalSubmitInteraction : V extends ValidLocation.GUILD ? GuildModalSubmitInteraction : V extends ValidLocation.PIVATE ? PrivateModalSubmitInteraction : never;
+export type ButtonComponentInteraction<V extends ValidLocation = ValidLocation.BOTH> = ValidLocationMap<GuildComponentButtonInteraction, PrivateComponentButtonInteraction>[V];
+export type SelectMenuComponentInteraction<V extends ValidLocation = ValidLocation.BOTH> = ValidLocationMap<GuildComponentSelectMenuInteraction, PrivateComponentSelectMenuInteraction>[V];
+export type ModalSubmitInteraction<V extends ValidLocation = ValidLocation.BOTH> = ValidLocationMap<GuildModalSubmitInteraction, PrivateModalSubmitInteraction>[V];
+
 export type AckString = "none" | "ephemeral" | "ephemeral-user" | "command-images-check";
 export type RunnerFunction<T extends Record<string, unknown>, G extends boolean, U extends boolean, V extends ValidLocation> = (this: MaidBoye, interaction: CommandInteraction<V>, options: T, gConfig: G extends true ? GuildConfig : null, uConfig: U extends true ? UserConfig : null, cmd: Command<T>) => Promise<unknown>;
 export type AcknowledgementFunction<T extends Record<string, unknown>, G extends boolean, U extends boolean, V extends ValidLocation> = (this: MaidBoye, interaction: CommandInteraction<V>, options: T, ephemeralUser: boolean, cmd: Command<T, G, U, V>) => Promise<false | void | AckString>;
