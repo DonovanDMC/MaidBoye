@@ -41,16 +41,12 @@ export default new Command(import.meta.url, "info")
                     `${Config.emojis.default.dot} [Creator] [Donovan_DMC](${Config.devLink})`,
                     "",
                     "**Other**:",
-                    `${Config.emojis.default.dot} Library: ${VERSION.includes("-dev") ? `[Oceanic@dev](https://github.com/OceanicJS/Oceanic/tree/${VERSION.slice(VERSION.lastIndexOf(".") + 1)}) (**${VERSION}**, \`${VERSION.split(".").slice(-1)[0]}\`)` : `[Oceanic](https://github.com/OceanicJS/Oceanic/tree/${VERSION}) (**${VERSION}**)`}`,
+                    `${Config.emojis.default.dot} Library: ${VERSION.includes("-dev") ? `[Oceanic@${VERSION.split(".").at(-1)!}](https://github.com/OceanicJS/Oceanic/tree/${VERSION.split(".").at(-1)!}) (**${VERSION}**, \`${VERSION.split(".").at(-1)!}\`)` : `[Oceanic](https://github.com/OceanicJS/Oceanic/tree/${VERSION}) (**${VERSION}**)`}`,
                     `${Config.emojis.default.dot} API Version: **v${REST_VERSION}**`,
                     `${Config.emojis.default.dot} Gateway Version: **v${GATEWAY_VERSION}**`,
                     `${Config.emojis.default.dot} Version: **${pkg.version}** (Build Date: ${pkg.buildDate === null ? "Unknown" : `${String(pkg.buildDate).slice(0, 2)}/${String(pkg.buildDate).slice(2, 4)}/${String(pkg.buildDate).slice(4, 8)}`})`,
                     `${Config.emojis.default.dot} Node Version: **${process.version}**`,
-                    `${Config.emojis.default.dot} Typescript Version: **${lock.dependencies.typescript.version}**`,
-                    `${Config.emojis.default.dot} Support Server: [${Config.discordLink}](${Config.discordLink})`,
-                    `${Config.emojis.default.dot} Website: [${Config.webLink}](${Config.webLink})`,
-                    `${Config.emojis.default.dot} Privacy Policy: [${Config.privacyPolicyLink}](${Config.privacyPolicyLink})`,
-                    `${Config.emojis.default.dot} Donate: [${Config.donationLink}](${Config.donationLink})`
+                    `${Config.emojis.default.dot} Typescript Version: **${lock.dependencies.typescript.version}**`
                 )
                 .toJSON(true),
             components: new ComponentBuilder<MessageActionRow>()
@@ -61,6 +57,10 @@ export default new Command(import.meta.url, "info")
                 .addURLButton({
                     url:   Config.webLink,
                     label: "Website"
+                })
+                .addURLButton({
+                    url:   Config.privacyPolicyLink,
+                    label: "Privacy Policy"
                 })
                 .addURLButton({
                     url:   Config.devLink,
