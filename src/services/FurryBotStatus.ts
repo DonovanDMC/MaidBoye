@@ -46,7 +46,7 @@ export default class FurryBotStatusService extends Service {
                         status:     "dnd",
                         activities: [{
                             type: ActivityTypes.WATCHING,
-                            name: "Visit https://maid.gay"
+                            name: "Visit https://maidboye.cafe"
                         }]
                     }
                 },
@@ -60,7 +60,7 @@ export default class FurryBotStatusService extends Service {
                     setInterval(async() => {
                         await this.furrybot.editStatus("dnd", [{
                             type: ActivityTypes.WATCHING,
-                            name: "Visit https://maid.gay"
+                            name: "Visit https://maidboye.cafe"
                         }]);
                     }, 6e4);
                 })).connect();
@@ -76,7 +76,7 @@ export default class FurryBotStatusService extends Service {
                         status:     "dnd",
                         activities: [{
                             type: ActivityTypes.WATCHING,
-                            name: "Visit https://maid.gay"
+                            name: "Visit https://maidboye.cafe"
                         }]
                     }
                 },
@@ -90,7 +90,7 @@ export default class FurryBotStatusService extends Service {
                     setInterval(async() => {
                         await this.furrybotBeta.editStatus("dnd", [{
                             type: ActivityTypes.WATCHING,
-                            name: "Visit https://maid.gay"
+                            name: "Visit https://maidboye.cafe"
                         }]);
                     }, 6e4);
                 })).connect();

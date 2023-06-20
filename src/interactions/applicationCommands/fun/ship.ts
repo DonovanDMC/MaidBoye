@@ -63,7 +63,7 @@ export default new Command(import.meta.url, "ship")
             },
             {
                 type:   "url",
-                url:    `https://assets.maid.gay/ship/${image}.png`,
+                url:    `https://assets.maidboye.cafe/ship/${image}.png`,
                 x:      256,
                 y:      0,
                 round:  0,

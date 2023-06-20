@@ -24,7 +24,7 @@ export default new Command(import.meta.url, "dadjoke")
         return interaction.reply({
             embeds: Util.makeEmbed(true, interaction.user)
                 .setDescription(joke)
-                .setThumbnail("https://assets.maid.gay/dadjoke.png")
+                .setThumbnail("https://assets.maidboye.cafe/dadjoke.png")
                 .setColor(Colors.gold)
                 .toJSON(true),
             components: new ComponentBuilder<MessageActionRow>()

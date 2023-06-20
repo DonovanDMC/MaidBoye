@@ -559,7 +559,7 @@ export default class Util {
                 .addURLButton({
                     disabled: source === undefined,
                     label:    "Source",
-                    url:      source || "https://maid.gay"
+                    url:      source || "https://maidboye.cafe"
                 })
                 .addInteractionButton({
                     customID: State.new(interaction.user.id, "generic-image", "new").with("type", cmd).encode(),
