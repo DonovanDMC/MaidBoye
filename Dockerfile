@@ -1,4 +1,4 @@
-FROM node:19-alpine
+FROM node:20-alpine
 
 WORKDIR /app
 RUN apk add --no-cache --virtual build python3 build-base g++ cairo-dev jpeg-dev pango-dev giflib-dev 
