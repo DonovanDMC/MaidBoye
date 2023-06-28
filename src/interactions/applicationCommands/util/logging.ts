@@ -120,7 +120,7 @@ export default new Command(import.meta.url, "logging")
                 assert(rawEvent);
                 if (!Object.hasOwn(LogEvents, rawEvent)) {
                     // Discord™️ - sometimes the name gets sent as the value
-                    rawEvent = rawEvent.toUpperCase().replace(/\s/g, "_") as typeof rawEvent;
+                    rawEvent = rawEvent.toUpperCase().replaceAll(/\s/g, "_") as typeof rawEvent;
                 }
                 const event = LogEvents[rawEvent];
                 const total = await LogEvent.getCount(interaction.guild.id);

@@ -74,7 +74,7 @@ export default class Strike {
     }
 
     get typeName() {
-        return Strings.ucwords(StrikeType[this.type].replace(/_/g, " "));
+        return Strings.ucwords(StrikeType[this.type].replaceAll("_", " "));
     }
 
     private load(data: StrikeData) {

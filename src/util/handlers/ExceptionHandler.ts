@@ -60,7 +60,7 @@ export default class ExceptionHandler {
             embeds: Util.makeEmbed(true)
                 .setTitle(error.message.slice(0, 100))
                 .setDescription(Strings.truncate([
-                    `Source: **${Util.readableConstant(type.replace(/([A-Z])/g, "_$1"))}**`,
+                    `Source: **${Util.readableConstant(type.replaceAll(/([A-Z])/g, "_$1"))}**`,
                     "",
                     `Code: \`${code}\``,
                     `Paste: ${Config.isDevelopment ? "**None**" : `https://pastebin.com/${paste}`}`,

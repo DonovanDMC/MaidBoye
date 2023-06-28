@@ -63,7 +63,7 @@ export const ModlogSettingChoices = Object.entries(ModlogSettingNames).map(([val
 }));
 export const GuildWelcomeModifierKeys = Object.keys(GuildWelcomeModifiers).filter(k => isNaN(Number(k))) as Array<keyof typeof GuildWelcomeModifiers>;
 export const GuildWelcomeModifiersChoices = GuildWelcomeModifierKeys.map(key => ({
-    name:  Strings.ucwords(key.replace(/_/g, " ")),
+    name:  Strings.ucwords(key.replaceAll("_", " ")),
     value: key
 }));
 

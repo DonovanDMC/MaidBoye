@@ -196,7 +196,7 @@ export default new Command(import.meta.url, "autoposting")
                 }
                 if (!Object.hasOwn(AutoPostingTypes, rawType)) {
                     // Discord™️ - sometimes the name gets sent as the value
-                    rawType = rawType.toUpperCase().replace(/\s/g, "_") as typeof rawType;
+                    rawType = rawType.toUpperCase().replaceAll(/\s/g, "_") as typeof rawType;
                 }
                 const type = AutoPostingTypes[rawType];
                 const autos = await AutoPostingEntry.getAll(interaction.guild.id);

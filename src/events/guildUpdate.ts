@@ -240,8 +240,8 @@ export default new ClientEvent("guildUpdate", async function guildUpdateEvent(gu
                 .setTitle("Server Updated")
                 .setColor(Colors.gold)
                 .setDescription("This server's owner was changed.")
-                .addField("Old Owner", `<@!${oldGuild.ownerID}>`, false)
-                .addField("New Owner", `<@!${guild.ownerID}>`, false)
+                .addField("Old Owner", oldGuild.ownerID === null ? "Unknown" : `<@!${oldGuild.ownerID}>`, false)
+                .addField("New Owner", guild.ownerID === null ? "Unknown" : `<@!${guild.ownerID}>`, false)
                 .toJSON()
             );
         }

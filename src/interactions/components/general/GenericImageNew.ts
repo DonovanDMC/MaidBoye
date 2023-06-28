@@ -1,5 +1,5 @@
 import type { ComponentInteraction } from "../../../util/cmd/Command.js";
-import { type BaseState } from "../../../util/State.js";
+import type { BaseState } from "../../../util/State.js";
 import Util from "../../../util/Util.js";
 import BaseComponent from "../structure/BaseComponent.js";
 

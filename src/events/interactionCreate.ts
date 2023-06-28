@@ -51,7 +51,7 @@ async function processRestrictions(this: MaidBoye, cmd: AnyCommand, interaction:
 
 async function processAck(this: MaidBoye, cmd: AnyCommand, interaction: CommandInteraction, ephemeralUser: boolean, options?:  Record<string, unknown>) {
     if (typeof cmd.ack === "function") {
-        let ack: false | void | AckString;
+        let ack: false | undefined | AckString | void;
         if (cmd instanceof Command) {
             ack = await cmd.ack.call(this, interaction, options! as Record<string, never>, ephemeralUser, cmd);
         } else if (cmd instanceof UserCommand) {

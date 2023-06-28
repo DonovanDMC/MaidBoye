@@ -44,7 +44,7 @@ import type { ModuleImport } from "@uwu-codes/types";
 import { ButtonColors, ComponentBuilder, EmbedBuilder } from "@oceanicjs/builders";
 import { Strings } from "@uwu-codes/utils";
 import short from "short-uuid";
-import { type NextFunction, type Request, type Response } from "express";
+import type { NextFunction, Request, Response } from "express";
 import { access } from "node:fs/promises";
 import { request } from "node:https";
 import { AssertionError } from "node:assert";
@@ -624,7 +624,7 @@ export default class Util {
     }
 
     static readableConstant(str: string) {
-        return Strings.ucwords(str.toLowerCase().replace(/_/g, " "));
+        return Strings.ucwords(str.toLowerCase().replaceAll("_", " "));
     }
 
     /**

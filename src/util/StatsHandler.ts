@@ -112,8 +112,8 @@ export default class StatsHandler {
             }
         }
         let tags: Array<string> = [];
-        if (Array.isArray(args[args.length - 1])) {
-            tags = args[args.length - 1] as Array<string>;
+        if (Array.isArray(args.at(-1))) {
+            tags = args.at(-1) as Array<string>;
         }
         tags.push(`env:${Config.isDevelopment ? "development" : "production"}`, `env:${Config.isDocker ? "docker" : "other"}`, `host:${hostname()}`);
         props.type = StatType[type];

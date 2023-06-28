@@ -12,7 +12,7 @@ export default class E621TagsAutocomplete extends BaseAutocomplete {
     protected override async handle(interaction: AutocompleteInteraction, focused: AnyAutocompleteFocus) {
         assert(typeof focused.value === "string");
         const tags = focused.value.split(" ");
-        const currentValue = tags[tags.length - 1];
+        const currentValue = tags.at(-1);
         try {
             if (!currentValue || currentValue.length < 3) {
                 return interaction.reply(focused.value === "" ? [

@@ -145,7 +145,7 @@ export default class ModLog {
     }
 
     get typeName() {
-        return Strings.ucwords(ModLogType[this.type].replace(/_/g, " "));
+        return Strings.ucwords(ModLogType[this.type].replaceAll("_", " "));
     }
 
     private load(data: ModLogData) {

@@ -26,7 +26,7 @@ import {
     readFile,
     writeFile
 } from "node:fs/promises";
-import { type Server } from "node:http";
+import type { Server } from "node:http";
 
 export default class MaidBoye extends Client {
     static INSTANCE: MaidBoye;

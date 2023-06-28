@@ -78,7 +78,7 @@ export default class CommandHandler {
                 continue;
             }
             // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-            if (Config.isDevelopment && (Array.isArray(loadWhitelist) && !(loadWhitelist as Array<string>).includes(category.split("/").slice(-1)[0]))) {
+            if (Config.isDevelopment && (Array.isArray(loadWhitelist) && !(loadWhitelist as Array<string>).includes(category.split("/").at(-1)!))) {
                 continue;
             }
             const { default: cat } = (await import(`${category}/index.js`)) as { default: Category; };

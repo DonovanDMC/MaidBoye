@@ -1,5 +1,5 @@
 import GuildConfig from "./GuildConfig.js";
-import { type ModLogData } from "./ModLog.js";
+import type { ModLogData } from "./ModLog.js";
 import db from "../index.js";
 import type MaidBoye from "../../main.js";
 import Debug from "../../util/Debug.js";

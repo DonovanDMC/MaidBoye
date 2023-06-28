@@ -28,7 +28,7 @@ export default abstract class BaseSetting {
     abstract open(interaction: ComponentInteraction<ValidLocation.GUILD>, gConfig: GuildConfig): Promise<void>;
 
     get interactionsName() {
-        return this.name.toLowerCase().replace(/\s/g, "-");
+        return this.name.toLowerCase().replaceAll(/\s/g, "-");
     }
 
     get shortDescription() {

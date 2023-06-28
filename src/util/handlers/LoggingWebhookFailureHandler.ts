@@ -49,7 +49,7 @@ export default class LoggingWebhookFailureHandler {
                         embeds: [
                             Util.makeEmbed()
                                 .setTitle("Logging Disabled")
-                                .setDescription(`Logging of the event "${Strings.ucwords(LogEvents[log.event].toLowerCase().replace(/_/g, " "))}" was disabled due to repeated failures.`)
+                                .setDescription(`Logging of the event "${Strings.ucwords(LogEvents[log.event].toLowerCase().replaceAll("_", " "))}" was disabled due to repeated failures.`)
                                 .setColor(Colors.red)
                                 .toJSON()
                         ]

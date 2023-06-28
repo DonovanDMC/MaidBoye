@@ -28,7 +28,7 @@ export default abstract class BasePreference {
     abstract open(interaction: GuildComponentSelectMenuInteraction | PrivateComponentSelectMenuInteraction, uConfig: UserConfig): Promise<void>;
 
     get interactionsName() {
-        return this.name.toLowerCase().replace(/\s/g, "-");
+        return this.name.toLowerCase().replaceAll(/\s/g, "-");
     }
 
     get shortDescription() {

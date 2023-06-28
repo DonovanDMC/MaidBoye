@@ -3,14 +3,16 @@ import Util from "../../../util/Util.js";
 import CommandHandler from "../../../util/cmd/CommandHandler.js";
 import Config from "../../../config/index.js";
 import pkg from "../../../../package.json" assert { type: "json" };
-import lock from "../../../../package-lock.json" assert { type: "json" };
 import ServicesManager from "../../../util/ServicesManager.js";
 import { ComponentBuilder } from "@oceanicjs/builders";
 import { Strings, Time } from "@uwu-codes/utils";
 import { GATEWAY_VERSION, REST_VERSION, VERSION, type MessageActionRow } from "oceanic.js";
+import { parse } from "yaml";
 import { freemem, totalmem } from "node:os";
 import { memoryUsage, uptime } from "node:process";
-
+import { readFile } from "node:fs/promises";
+const lock = parse(await readFile(`${Config.baseDir}/pnpm-lock.yaml`, "utf8")) as { devDependencies: Record<string, { specifier: string; version: string; }>; };
+console.log(lock);
 export default new Command(import.meta.url, "info")
     .setDescription("Get some information about me..")
     .setAck("ephemeral-user")
@@ -46,7 +48,7 @@ export default new Command(import.meta.url, "info")
                     `${Config.emojis.default.dot} Gateway Version: **v${GATEWAY_VERSION}**`,
                     `${Config.emojis.default.dot} Version: **${pkg.version}** (Build Date: ${pkg.buildDate === null ? "Unknown" : `${String(pkg.buildDate).slice(0, 2)}/${String(pkg.buildDate).slice(2, 4)}/${String(pkg.buildDate).slice(4, 8)}`})`,
                     `${Config.emojis.default.dot} Node Version: **${process.version}**`,
-                    `${Config.emojis.default.dot} Typescript Version: **${lock.dependencies.typescript.version}**`
+                    `${Config.emojis.default.dot} Typescript Version: **${lock.devDependencies.typescript.version}**`
                 )
                 .toJSON(true),
             components: new ComponentBuilder<MessageActionRow>()

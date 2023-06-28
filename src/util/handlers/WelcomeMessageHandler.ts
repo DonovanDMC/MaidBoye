@@ -42,7 +42,7 @@ export default class WelcomeMessageHandler {
     static format(gConfig: GuildConfig, member: Member, type: "join" | "leave", content = type === "join" ? gConfig.welcome.joinMessage : gConfig.welcome.leaveMessage): { allowedMentions: AllowedMentions; content: string; flags: number;} {
         const map = Replacements(member);
         for (const [key, value] of Object.entries(map)) {
-            content = content.replace(new RegExp(key, "g"), value);
+            content = content.replaceAll(new RegExp(key, "g"), value);
         }
 
         let flags = 0;

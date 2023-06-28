@@ -214,7 +214,7 @@ export default new Command(import.meta.url, "welcome")
                         }
 
                         return interaction.reply({
-                            content: `The modifier **${Strings.ucwords(modifier.replace(/_/g, " "))}** has been ${modifierValue ? "enabled" : "disabled"}.`
+                            content: `The modifier **${Strings.ucwords(modifier.replaceAll("_", " "))}** has been ${modifierValue ? "enabled" : "disabled"}.`
                         });
                     }
 
@@ -232,7 +232,7 @@ export default new Command(import.meta.url, "welcome")
                                     `Channel: <#${gConfig.welcome.webhook.channelID ?? "Unknown"}>`,
                                     `Webhook: ${hook ? `**${hook.name ?? hook.id}**` : "Unknown"}`
                                 ])
-                                .addField("Modifiers", gConfig.welcome.modifiers.map(mod => `${Config.emojis.default.dot} **${Strings.ucwords(mod.replace(/_/g, " "))}**`).join("\n") || "None", false)
+                                .addField("Modifiers", gConfig.welcome.modifiers.map(mod => `${Config.emojis.default.dot} **${Strings.ucwords(mod.replaceAll("_", " "))}**`).join("\n") || "None", false)
                                 .addField("Raw Join Message", `\`\`\`\n${gConfig.welcome.joinMessage}\`\`\``, false)
                                 .addField("Message Join Preview", WelcomeMessageHandler.format(gConfig, interaction.member, "join").content, false)
                                 .addField("Raw Leave Message", `\`\`\`\n${gConfig.welcome.leaveMessage}\`\`\``, false)
