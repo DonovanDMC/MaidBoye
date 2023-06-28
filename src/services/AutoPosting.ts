@@ -9,7 +9,7 @@ import { Colors } from "../util/Constants.js";
 import Logger from "@uwu-codes/logger";
 import { Client } from "oceanic.js";
 import { EmbedBuilder } from "@oceanicjs/builders";
-import { type StringCategories, type JSONResponse } from "yiffy";
+import type { StringCategories, JSONResponse } from "yiffy";
 import { memoryUsage } from "node:process";
 
 const AutoPostingTitles = {

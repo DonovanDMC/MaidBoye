@@ -50,7 +50,7 @@ export default class FurryBotStatusService extends Service {
                         }]
                     }
                 },
-                disableCache: true
+                disableCache: "no-warning"
             })
                 .on("shardReady", shard => Logger.getLogger("FurryBotStatusService | FurryBot").info(`Shard ${shard} is ready!`))
                 .on("shardDisconnect", (error, shard) => Logger.getLogger("FurryBotStatusService | FurryBot").warn(`Shard ${shard} disconnected.`))
@@ -80,7 +80,7 @@ export default class FurryBotStatusService extends Service {
                         }]
                     }
                 },
-                disableCache: true
+                disableCache: "no-warning"
             })
                 .on("shardReady", shard => Logger.getLogger("FurryBotStatusService | FurryBotBeta").info(`Shard ${shard} is ready!`))
                 .on("shardDisconnect", (error, shard) => Logger.getLogger("FurryBotStatusService | FurryBotBeta").warn(`Shard ${shard} disconnected.`))

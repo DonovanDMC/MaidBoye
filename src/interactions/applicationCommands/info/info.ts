@@ -12,7 +12,7 @@ import { freemem, totalmem } from "node:os";
 import { memoryUsage, uptime } from "node:process";
 import { readFile } from "node:fs/promises";
 const lock = parse(await readFile(`${Config.baseDir}/pnpm-lock.yaml`, "utf8")) as { devDependencies: Record<string, { specifier: string; version: string; }>; };
-console.log(lock);
+
 export default new Command(import.meta.url, "info")
     .setDescription("Get some information about me..")
     .setAck("ephemeral-user")

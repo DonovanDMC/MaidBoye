@@ -186,7 +186,7 @@ export default class ServicesManager {
     static async send(name: string, op: string, data?: unknown, responsive?: false, from?: string): Promise<void>;
     static async send<T = unknown>(name: string, op: string, data?: unknown, responsive = false, from?: string): Promise<T | void> {
         if (this.serviceStatuses.get(name) !== "ready") {
-            throw new Error(`Attempted to send message to service "${name}" that is not ready.`);
+            throw new Error(`Attempted to send message (op: ${op}) to service "${name}" that is not ready.`);
         }
 
         const id = randomUUID();
