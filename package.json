@@ -5,7 +5,8 @@
   "buildDate": "02062023",
   "main": "dist/src/index.js",
   "scripts": {
-    "build": "tsc && npx build-date $(pwd) && echo Build Finished",
+    "start": "node --no-warnings --no-deprecation --experimental-specifier-resolution=node dist/src/index.js",
+    "build": "rm -rf dist && tsc && npx build-date $(pwd)",
     "create-migration": "node -e \"require('fs').writeFileSync('./src/db/migrations/' + Date.now() + '_' + (process.argv[1] || 'name') + '.sql', '')\"",
     "lint": "eslint src --ext .ts",
     "lint:fix": "eslint src --ext .ts --fix",
@@ -14,9 +15,9 @@
     "up:db": "sudo docker compose pull && sudo docker compose up -d postgres redis",
     "down": "sudo docker compose down",
     "up:dev": "sudo docker compose up",
-    "dev": "npm run down && npm run up:dev",
-    "dev:build": "npm run down && npm run up",
-    "update": "git pull && git submodule update --init --recursive --remote && docker compose pull && npm run down && npm run up:d"
+    "dev": "pnpm run down && pnpm run up:dev",
+    "dev:build": "pnpm run down && pnpm run up",
+    "update": "git pull && git submodule update --init --recursive --remote && docker compose pull && pnpm run down && pnpm run up:d"
   },
   "repository": {
     "type": "git",
