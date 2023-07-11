@@ -28,7 +28,9 @@ export default class InviteTracker {
             return;
         }
 
-        await db.redis.mset(invites.flatMap(i => [`invites:${member.guildID}:${i.code}`, i.uses]));
+        if (invites.length !== 0) {
+            await db.redis.mset(invites.flatMap(i => [`invites:${member.guildID}:${i.code}`, i.uses]));
+        }
         for (const event of events) {
             await event.execute(member.client as MaidBoye, {
                 embeds: Util.makeEmbed(true, member)

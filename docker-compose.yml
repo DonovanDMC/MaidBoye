@@ -21,7 +21,9 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
-    hostname: maidboye.bots.containers.local
+    hostname: maidboye.containers.local
+    labels:
+      - "hostname=maidboye.containers.local"
     networks:
       default:
         ipv4_address: 172.19.3.2
@@ -47,6 +49,9 @@ services:
             memory: 512M
           reservations:
             memory: 128M
+    hostname: postgres.maidboye.containers.local
+    labels:
+      - "hostname=postgres.maidboye.containers.local"
     networks:
       default:
         ipv4_address: 172.19.3.3
@@ -68,6 +73,9 @@ services:
             memory: 128M
           reservations:
             memory: 64M
+    hostname: redis.maidboye.containers.local
+    labels:
+      - "hostname=redis.maidboye.containers.local"
     networks:
       default:
         ipv4_address: 172.19.3.4

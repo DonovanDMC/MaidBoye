@@ -25,7 +25,9 @@ export default class LoggingSelectWebhookComponent extends SelectWebhookComponen
             }
 
             const invites = await interaction.guild.getInvites();
-            await db.redis.mset(invites.flatMap(i => [`invites:${interaction.guildID}:${i.code}`, i.uses]));
+            if (invites.length !== 0) {
+                await db.redis.mset(invites.flatMap(i => [`invites:${interaction.guildID}:${i.code}`, i.uses]));
+            }
         }
         return enableLogging(interaction, state.channel, webhook, state.event);
     }
