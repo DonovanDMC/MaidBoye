@@ -38,7 +38,7 @@ export async function generateSections(this: MaidBoye, interaction: CommandInter
                     `${Config.emojis.default.dot} 2FA Requirement: **${MFALevelNames[interaction.guild.mfaLevel]}**`,
                     `${Config.emojis.default.dot} Explicit Content Filter: **${ExplicitContentFilterLevelNames[interaction.guild.explicitContentFilter]}**`,
                     `${Config.emojis.default.dot} Default Notifications: **${DefaultMessageNotificationLevelNames[interaction.guild.defaultMessageNotifications]}**`,
-                    `${Config.emojis.default.dot} Vanity URL: **${interaction.guild.features.includes("VANITY_URL") && interaction.guild.vanityURLCode !== null ? `[https://discord.gg/${interaction.guild.vanityURLCode}](https://discord.gg/${interaction.guild.vanityURLCode})` : "None"}**`,
+                    `${Config.emojis.default.dot} Vanity URL: **${interaction.guild.features.includes("VANITY_URL") && interaction.guild.vanityURLCode !== null ? `https://discord.gg/${interaction.guild.vanityURLCode}` : "None"}**`,
                     `${Config.emojis.default.dot} NSFW level: **${GuildNSFWLevelNames[interaction.guild.nsfwLevel]}**`,
                     `${Config.emojis.default.dot} Members: **${interaction.guild.memberCount}**`,
                     `${Config.emojis.default.dot} Locale: **${interaction.guild.preferredLocale || "NONE"}**`,
