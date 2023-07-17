@@ -2,10 +2,10 @@ import Command, { ValidLocation } from "../../../util/cmd/Command.js";
 import ModLogHandler from "../../../util/handlers/ModLogHandler.js";
 import { ModLogType } from "../../../db/Models/ModLog.js";
 import Util from "../../../util/Util.js";
-import { Colors, lockPermissions, lockPermissionsList, TextableGuildChannels } from "../../../util/Constants.js";
+import { Colors, lockPermissions, lockPermissionsList } from "../../../util/Constants.js";
 import db from "../../../db/index.js";
 import { Strings } from "@uwu-codes/utils";
-import { type AnyGuildTextChannelWithoutThreads, ApplicationCommandOptionTypes, OverwriteTypes } from "oceanic.js";
+import { type AnyTextableGuildChannelWithoutThreads, ApplicationCommandOptionTypes, OverwriteTypes, TextableGuildChannelsWithoutThreadsTypes } from "oceanic.js";
 
 export default new Command(import.meta.url, "lock")
     .setDescription("Block messages in a channel..")
@@ -14,7 +14,7 @@ export default new Command(import.meta.url, "lock")
     .addOption(
         new Command.Option(ApplicationCommandOptionTypes.CHANNEL, "channel")
             .setDescription("The channel to lock (default: current channel)")
-            .setChannelTypes(TextableGuildChannels)
+            .setChannelTypes(TextableGuildChannelsWithoutThreadsTypes)
     )
     .addOption(
         new Command.Option(ApplicationCommandOptionTypes.STRING, "reason")
@@ -22,7 +22,7 @@ export default new Command(import.meta.url, "lock")
             .setMinMax(1, 500)
     )
     .setOptionsParser(interaction => ({
-        channel: interaction.data.options.getCompleteChannel<AnyGuildTextChannelWithoutThreads>("channel", true),
+        channel: interaction.data.options.getCompleteChannel<AnyTextableGuildChannelWithoutThreads>("channel", true),
         reason:  interaction.data.options.getString("reason") || "None Provided"
     }))
     .setValidLocation(ValidLocation.GUILD)

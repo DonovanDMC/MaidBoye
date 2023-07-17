@@ -1,4 +1,4 @@
-import { ChannelTypes, type PermissionName, Permissions } from "oceanic.js";
+import { type PermissionName, Permissions } from "oceanic.js";
 
 export const moderatorPermissions = [
     "KICK_MEMBERS",
@@ -49,19 +49,6 @@ export const Colors = {
         return Math.floor(Math.random() * 0xFFFFFF);
     }
 };
-
-export const TextableGuildChannels = [
-    ChannelTypes.GUILD_TEXT,
-    ChannelTypes.GUILD_VOICE,
-    ChannelTypes.GUILD_ANNOUNCEMENT
-];
-
-export const TextableGuildChannelsWithThreads = [
-    ...TextableGuildChannels,
-    ChannelTypes.ANNOUNCEMENT_THREAD,
-    ChannelTypes.PUBLIC_THREAD,
-    ChannelTypes.PRIVATE_THREAD
-];
 
 export const lockPermissionsList = [
     Permissions.ADD_REACTIONS,

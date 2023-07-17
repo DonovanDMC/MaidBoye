@@ -6,7 +6,7 @@ import { Colors } from "../../util/Constants.js";
 import Util from "../../util/Util.js";
 import Logger from "@uwu-codes/logger";
 import {
-    type AnyGuildTextChannelWithoutThreads,
+    type AnyTextableGuildChannelWithoutThreads,
     type ApplicationCommandOptionsChoice,
     type ApplicationCommandOptionTypes,
     type Client,
@@ -236,7 +236,7 @@ export default class AutoPostingEntry {
         if (!AutoPostingNSFW.includes(this.type)) {
             return true;
         }
-        const channel = await client.rest.channels.get<AnyGuildTextChannelWithoutThreads>(this.channelID).catch(() => null);
+        const channel = await client.rest.channels.get<AnyTextableGuildChannelWithoutThreads>(this.channelID).catch(() => null);
         if (channel === null) {
             const check = await this.checkWebhook(client);
             if (check !== null) {

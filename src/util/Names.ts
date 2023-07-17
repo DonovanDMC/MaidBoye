@@ -1,5 +1,6 @@
 import Config from "../config/index.js";
 import type MaidBoye from "../main.js";
+import { Time } from "@uwu-codes/utils";
 import {
     type GuildFeature,
     GatewayOPCodes,
@@ -37,29 +38,49 @@ import {
     SortOrderTypes,
     GuildMemberFlags,
     type Role,
-    type PermissionName
+    type PermissionName,
+    type AutoModerationAction,
+    type AnyGuildInteraction,
+    type AnyPrivateInteraction
 } from "oceanic.js";
 const { badges, serverFeatures } = Config.emojis;
 
 export const UserFlagNames: Record<UserFlags, string> = {
     // None
-    [UserFlags.STAFF]:                 `${badges.staff} Discord Staff`,
-    [UserFlags.PARTNER]:               `${badges.partner} Discord Partner`,
-    [UserFlags.HYPESQUAD]:             `${badges.hypesquad} Hypesquad`,
-    [UserFlags.BUG_HUNTER_LEVEL_1]:    `${badges.bugHunterLevel1} Bug Hunter Level 1`,
-    [UserFlags.HYPESQUAD_BRAVERY]:     `${badges.hypesquadBravery} Hypesquad Bravery`,
-    [UserFlags.HYPESQUAD_BRILLIANCE]:  `${badges.hypesquadBrilliance} Hypesquad Brilliance`,
-    [UserFlags.HYPESQUAD_BALANCE]:     `${badges.hypesquad_balance} Hypesquad Balance`,
-    [UserFlags.EARLY_SUPPORTER]:       `${badges.premiumEarlySupporter} Premium Early Supporter`,
-    [UserFlags.PSEUDO_TEAM_USER]:      `${badges.teamPsuedoUser} Team Psuedo User`,
-    [UserFlags.SYSTEM]:                `${badges.system} System`,
-    [UserFlags.BUG_HUNTER_LEVEL_2]:    `${badges.bugHunterLevel2} Bug Hunter Level 2`,
-    [UserFlags.VERIFIED_BOT]:          `${badges.verifiedBot} Verified Bot`,
-    [UserFlags.VERIFIED_DEVELOPER]:    `${badges.verifiedDeveloper} Verified Bot Developer`,
-    [UserFlags.CERTIFIED_MODERATOR]:   `${badges.certifiedModerator} Certified Moderator`,
-    [UserFlags.BOT_HTTP_INTERACTIONS]: `${badges.botHTTPInteractions} HTTP Interactions Bot`,
-    [UserFlags.SPAMMER]:               `${badges.spammer} Spammer`,
-    [UserFlags.ACTIVE_DEVELOPER]:      `${badges.activeDeveloper} Active Developer`
+    [UserFlags.STAFF]:                        `${badges.staff} Discord Staff`,
+    [UserFlags.PARTNER]:                      `${badges.partner} Discord Partner`,
+    [UserFlags.HYPESQUAD]:                    `${badges.hypesquad} Hypesquad`,
+    [UserFlags.BUG_HUNTER_LEVEL_1]:           `${badges.bugHunterLevel1} Bug Hunter Level 1`,
+    [UserFlags.MFA_SMS]:                      "MFA SMS",
+    [UserFlags.PREMIUM_PROMO_DISMISSED]:      "Premium Promo Dismissed",
+    [UserFlags.HYPESQUAD_BRAVERY]:            `${badges.hypesquadBravery} Hypesquad Bravery`,
+    [UserFlags.HYPESQUAD_BRILLIANCE]:         `${badges.hypesquadBrilliance} Hypesquad Brilliance`,
+    [UserFlags.HYPESQUAD_BALANCE]:            `${badges.hypesquad_balance} Hypesquad Balance`,
+    [UserFlags.EARLY_SUPPORTER]:              `${badges.premiumEarlySupporter} Premium Early Supporter`,
+    [UserFlags.PSEUDO_TEAM_USER]:             `${badges.teamPsuedoUser} Team Psuedo User`,
+    [UserFlags.INTERNAL_APPLICATION]:         "Internal Application",
+    [UserFlags.SYSTEM]:                       `${badges.system} System`,
+    [UserFlags.HAS_UNREAD_URGENT_MESSAGES]:   "Has Unread Urgent Messages",
+    [UserFlags.BUG_HUNTER_LEVEL_2]:           `${badges.bugHunterLevel2} Bug Hunter Level 2`,
+    [UserFlags.VERIFIED_BOT]:                 `${badges.verifiedBot} Verified Bot`,
+    [UserFlags.VERIFIED_DEVELOPER]:           `${badges.verifiedDeveloper} Verified Bot Developer`,
+    [UserFlags.CERTIFIED_MODERATOR]:          `${badges.certifiedModerator} Certified Moderator`,
+    [UserFlags.BOT_HTTP_INTERACTIONS]:        `${badges.botHTTPInteractions} HTTP Interactions Bot`,
+    [UserFlags.SPAMMER]:                      `${badges.spammer} Spammer`,
+    [UserFlags.ACTIVE_DEVELOPER]:             `${badges.activeDeveloper} Active Developer`,
+    [UserFlags.HIGH_GLOBAL_RATE_LIMIT]:       "High Global Rate Limit",
+    [UserFlags.DELETED]:                      "Deleted",
+    [UserFlags.DISABLED_SUSPICIOUS_ACTIVITY]: "Disabled Suspicious Activity",
+    [UserFlags.SELF_DELETED]:                 "Self Deleted",
+    [UserFlags.PREMIUM_DISCRIMINATOR]:        "Premium Discriminator",
+    [UserFlags.USED_DESKTOP_CLIENT]:          "Used Desktop Client",
+    [UserFlags.USED_WEB_CLIENT]:              "Used Web Client",
+    [UserFlags.USED_MOBILE_CLIENT]:           "Used Mobile Client",
+    [UserFlags.DISABLED]:                     "Disabled",
+    [UserFlags.VERIFIED_EMAIL]:               "Verified Email",
+    [UserFlags.QUARANTINED]:                  "Quarantined",
+    [UserFlags.COLLABORATOR]:                 "Collaborator",
+    [UserFlags.RESTRICTED_COLLABORATOR]:      "Restricted Collaborator"
 } satisfies Record<UserFlags, string>;
 
 export function getFeatureName(feature: GuildFeature, nameOnly = false) {
@@ -91,6 +112,7 @@ export const GuildFeatureNames = {
     ENABLED_DISCOVERABLE_BEFORE:               "Enabled Discoverable Before",
     EXPOSED_TO_ACTIVITIES_WTP_EXPERIMENT:      "Exposed to Activities WTP Experiment",
     FEATURABLE:                                `${serverFeatures.featurable} Featurable`,
+    GUESTS_ENABLED:                            "Guests Enabled",
     GUILD_HOME_TEST:                           "Guild Home Test",
     GUILD_ONBOARDING_EVER_ENABLED:             "Guild Onboarding Ever Enabled",
     GUILD_ONBOARDING_HAS_PROMPTS:              "Guild Onboarding Has Prompts",
@@ -157,6 +179,7 @@ export const GuildFeatureDescriptions = {
     ENABLED_DISCOVERABLE_BEFORE:               "Guild has previously been discoverable in the directory, but is not currently", // *
     EXPOSED_TO_ACTIVITIES_WTP_EXPERIMENT:      null,
     FEATURABLE:                                "Guild is able to be featured in the directory",
+    GUESTS_ENABLED:                            "Guild has enabled guest invites.",
     GUILD_HOME_TEST:                           null,
     GUILD_ONBOARDING_EVER_ENABLED:             null,
     GUILD_ONBOARDING_HAS_PROMPTS:              null,
@@ -274,7 +297,10 @@ export const MessageTypeNames = {
     [MessageTypes.STAGE_SPEAKER]:                                "Stage Speaker",
     [MessageTypes.STAGE_RAISE_HAND]:                             "Stage Raise Hand",
     [MessageTypes.STAGE_TOPIC_CHANGE]:                           "Stage Topic Change",
-    [MessageTypes.GUILD_APPLICATION_PREMIUM_SUBSCRIPTION]:       "Guild Application Premium Subscription"
+    [MessageTypes.GUILD_APPLICATION_PREMIUM_SUBSCRIPTION]:       "Guild Application Premium Subscription",
+    [MessageTypes.PRIVATE_CHANNEL_INTEGRATION_ADDED]:            "Private Channel Integration Added",
+    [MessageTypes.PRIVATE_CHANNEL_INTEGRATION_REMOVED]:          "Private Channel Integration Removed",
+    [MessageTypes.PREMIUM_REFERRAL]:                             "Premium Referral"
 } satisfies Record<MessageTypes, string>;
 
 export const PermissionsByValue = {
@@ -411,7 +437,8 @@ export const ChannelTypeNames = {
     [ChannelTypes.PRIVATE_THREAD]:      "Private Thread",
     [ChannelTypes.GUILD_STAGE_VOICE]:   "Stage Voice",
     [ChannelTypes.GUILD_DIRECTORY]:     "Directory",
-    [ChannelTypes.GUILD_FORUM]:         "Forum"
+    [ChannelTypes.GUILD_FORUM]:         "Forum",
+    [ChannelTypes.GUILD_MEDIA]:         "Media"
 } satisfies Record<ChannelTypes, string>;
 
 export const MFALevelNames = {
@@ -473,6 +500,13 @@ export const AutoModerationActionTypeNames = {
     [AutoModerationActionTypes.QUARANTINE_USER]:    "Quarantine User"
 } satisfies Record<AutoModerationActionTypes, string>;
 
+export const AutoModerationActionTypeDescriptions = {
+    [AutoModerationActionTypes.BLOCK_MESSAGE]:      (action: AutoModerationAction) => ApplicationCommandOptionTypeNames[action.type],
+    [AutoModerationActionTypes.SEND_ALERT_MESSAGE]: (action: AutoModerationAction) => `${AutoModerationActionTypeNames[action.type]} - <#${action.metadata.channelID!}>`,
+    [AutoModerationActionTypes.TIMEOUT]:            (action: AutoModerationAction) => `${AutoModerationActionTypeNames[action.type]} - ${Time.ms(action.metadata.durationSeconds! * 1000, { words: true })}`,
+    [AutoModerationActionTypes.QUARANTINE_USER]:    (action: AutoModerationAction) => ApplicationCommandOptionTypeNames[action.type]
+} satisfies Record<AutoModerationActionTypes, (action: AutoModerationAction) => string>;
+
 export const AutoModerationTriggerTypeNames = {
     [AutoModerationTriggerTypes.KEYWORD]:        "Keyword",
     [AutoModerationTriggerTypes.SPAM]:           "Spam",
@@ -504,10 +538,15 @@ export const StickerFormatTypeNames = {
 } satisfies Record<StickerFormatTypes, string>;
 
 export const GuildMemberFlagNames = {
-    [GuildMemberFlags.DID_REJOIN]:            "Rejoined",
-    [GuildMemberFlags.COMPLETED_ONBOARDING]:  "Completed Onboarding",
-    [GuildMemberFlags.BYPASSES_VERIFICATION]: "Bypasses Verification",
-    [GuildMemberFlags.STARTED_ONBOARDING]:    "Started Onboarding"
+    [GuildMemberFlags.DID_REJOIN]:                                     "Rejoined",
+    [GuildMemberFlags.COMPLETED_ONBOARDING]:                           "Completed Onboarding",
+    [GuildMemberFlags.BYPASSES_VERIFICATION]:                          "Bypasses Verification",
+    [GuildMemberFlags.STARTED_ONBOARDING]:                             "Started Onboarding",
+    [GuildMemberFlags.IS_GUEST]:                                       "Guest",
+    [GuildMemberFlags.STARTED_HOME_ACTIONS]:                           "Started Home Actions",
+    [GuildMemberFlags.COMPLETED_HOME_ACTIONS]:                         "Completed Home Actions",
+    [GuildMemberFlags.AUTOMOD_QUARANTINED_USERNAME_OR_GUILD_NICKNAME]: "Quarantined Username or Guild Nickname",
+    [GuildMemberFlags.AUTOMOD_QUARANTINED_BIO]:                        "Quarantined Bio"
 } satisfies Record<GuildMemberFlags, string>;
 
 export async function getRoleManagedType(role: Role) {
@@ -526,4 +565,12 @@ export async function getRoleManagedType(role: Role) {
     }
 
     return managedType;
+}
+
+export function interactionGuildName(interaction: AnyGuildInteraction | AnyPrivateInteraction): string {
+    return interaction.guildID === undefined ? (interaction.channel && interaction.channel.type === ChannelTypes.GROUP_DM ? "Group DM" : "DM") : interaction.guild.name;
+}
+
+export function interactionChannelName(interaction: AnyGuildInteraction | AnyPrivateInteraction): string {
+    return interaction.channel && "name" in interaction.channel ? (interaction.channel.type === ChannelTypes.GROUP_DM || interaction.channel.name === null ? "Group DM" : interaction.channel.name) : "DM";
 }

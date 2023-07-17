@@ -2,7 +2,7 @@
   "name": "maidboye",
   "version": "2.0.0",
   "description": "A cute little maid bot for keeping your server nice and tidy.",
-  "buildDate": "02062023",
+  "buildDate": 1689609755398,
   "main": "dist/src/index.js",
   "scripts": {
     "start": "node --no-warnings --no-deprecation --experimental-specifier-resolution=node dist/src/index.js",
@@ -37,7 +37,7 @@
   },
   "homepage": "https://github.com/DonovanDMC/MaidBoye#readme",
   "devDependencies": {
-    "@swc/core": "^1.3.66",
+    "@swc/core": "^1.3.69",
     "@swc/helpers": "^0.5.1",
     "@types/chunk": "^0.0.0",
     "@types/debug": "^4.1.8",
@@ -46,7 +46,7 @@
     "@types/fuzzy-search": "^2.1.2",
     "@types/markdown-it": "^12.2.3",
     "@types/morgan": "^1.9.4",
-    "@types/node": "^20.3.2",
+    "@types/node": "^20.4.2",
     "@types/pg": "^8.10.2",
     "@uwu-codes/eslint-config": "^1.1.24",
     "@uwu-codes/tsconfig": "^1.0.7",
@@ -54,13 +54,13 @@
     "eslint-plugin-import": "^2.27.5",
     "sagiri": "^3.4.0",
     "ts-node": "^10.9.1",
-    "typescript": "^5.1.5"
+    "typescript": "^5.1.6"
   },
   "dependencies": {
-    "@oceanicjs/builders": "^1.1.7",
+    "@oceanicjs/builders": "^1.1.9",
     "@uwu-codes/logger": "^2.0.7",
     "@uwu-codes/status-server": "^1.0.1",
-    "@uwu-codes/utils": "^1.3.3",
+    "@uwu-codes/utils": "^1.3.4",
     "blapi": "^3.1.2",
     "cheweyapi": "^1.0.3",
     "chunk": "^0.0.3",
@@ -78,12 +78,12 @@
     "ioredis": "^5.3.2",
     "markdown-it": "^13.0.1",
     "morgan": "^1.10.0",
-    "oceanic.js": "1.6.1-dev.a35b6b3",
+    "oceanic.js": "1.7.2-dev.f0d6aa4",
     "pg": "^8.11.1",
     "short-uuid": "^4.2.2",
     "tsafe": "^1.6.4",
     "tsconfig-paths": "^4.2.0",
-    "winston": "^3.9.0",
+    "winston": "^3.10.0",
     "yaml": "^2.3.1",
     "yiffy": "^2.3.2"
   },

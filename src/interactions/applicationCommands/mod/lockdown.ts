@@ -1,10 +1,17 @@
 import Command, { ValidLocation } from "../../../util/cmd/Command.js";
 import ModLogHandler from "../../../util/handlers/ModLogHandler.js";
 import { ModLogType } from "../../../db/Models/ModLog.js";
-import { lockPermissions, lockPermissionsList, TextableGuildChannels } from "../../../util/Constants.js";
+import { lockPermissions, lockPermissionsList } from "../../../util/Constants.js";
 import db from "../../../db/index.js";
 import { Strings } from "@uwu-codes/utils";
-import { type AnyGuildTextChannelWithoutThreads, ApplicationCommandOptionTypes, OverwriteTypes, Permissions } from "oceanic.js";
+import {
+    type AnyTextableGuildChannelWithoutThreads,
+    ApplicationCommandOptionTypes,
+    OverwriteTypes,
+    Permissions,
+    TextableGuildChannelsWithoutThreadsTypes,
+    type TextableGuildChannelsWithoutThreads
+} from "oceanic.js";
 
 export default new Command(import.meta.url, "lockdown")
     .setDescription("Lock all channels in the server")
@@ -27,7 +34,7 @@ export default new Command(import.meta.url, "lockdown")
             return interaction.reply({ content: "H-hey! This server has already been locked down.." });
         }
         reason = Strings.truncateWords(reason, 500);
-        const channels = interaction.guild.channels.filter(({ type }) => TextableGuildChannels.includes(type as typeof TextableGuildChannels[number])) as Array<AnyGuildTextChannelWithoutThreads>;
+        const channels = interaction.guild.channels.filter(({ type }) => TextableGuildChannelsWithoutThreadsTypes.includes(type as TextableGuildChannelsWithoutThreads)) as Array<AnyTextableGuildChannelWithoutThreads>;
         const original: Array<[id: string, allow: string, deny: string]> = [];
         const errors: Array<Error> = [];
         for (const channel of channels) {

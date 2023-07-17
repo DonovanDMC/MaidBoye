@@ -11,7 +11,7 @@ import Autocomplete from "../interactions/autocomplete/index.js";
 import { UserCommand, MessageCommand } from "../util/cmd/OtherCommand.js";
 import Leveling from "../util/Leveling.js";
 import StatsHandler from "../util/StatsHandler.js";
-import { PermissionsByName } from "../util/Names.js";
+import { PermissionsByName, interactionChannelName, interactionGuildName } from "../util/Names.js";
 import Modals from "../interactions/modals/index.js";
 import ExceptionHandler from "../util/handlers/ExceptionHandler.js";
 import Logger from "@uwu-codes/logger";
@@ -22,10 +22,12 @@ import {
     type InteractionOptionsWithValue,
     InteractionTypes,
     MessageFlags,
-    type PermissionName
+    type PermissionName,
+    type AnyCommandInteraction,
+    type GuildCommandInteraction
 } from "oceanic.js";
 
-async function processRestrictions(this: MaidBoye, cmd: AnyCommand, interaction: CommandInteraction) {
+async function processRestrictions(this: MaidBoye, cmd: AnyCommand, interaction: AnyCommandInteraction) {
     if (cmd.restrictions.includes("beta") && !Config.isDevelopment) {
         StatsHandler.track("FAILED_RESTRICTION", "beta");
         await interaction.reply({
@@ -36,7 +38,7 @@ async function processRestrictions(this: MaidBoye, cmd: AnyCommand, interaction:
     }
     if (cmd.restrictions.includes("nsfw")) {
         // if guild is not present & user is present, we can safely assume we are dm
-        const nsfw = "guild" in interaction && interaction.guild !== undefined ? ("nsfw" in interaction.channel && interaction.channel.nsfw !== undefined ? interaction.channel.nsfw : false) : "user" in interaction && interaction.user !== undefined;
+        const nsfw = "guild" in interaction && interaction.guild !== undefined && interaction.channel !== undefined ? ("nsfw" in interaction.channel && interaction.channel.nsfw !== undefined ? interaction.channel.nsfw : false) : "user" in interaction && interaction.user !== undefined;
         if (!nsfw) {
             StatsHandler.track("FAILED_RESTRICTION", "nsfw");
             await interaction.reply({
@@ -118,7 +120,7 @@ async function processAck(this: MaidBoye, cmd: AnyCommand, interaction: CommandI
     return true;
 }
 
-function stringifyArguments(interaction: CommandInteraction) {
+function stringifyArguments(interaction: AnyCommandInteraction) {
     if (interaction.data.options.raw.length === 0) {
         return null;
     }
@@ -166,7 +168,7 @@ export default new ClientEvent("interactionCreate", async function interactionCr
                         if (cmd.userPermissions.length !== 0 && interaction.user) {
                             const missingRequired: Array<PermissionName> = [], missingOptional: Array<PermissionName> = [];
                             for (const [perm, optional] of cmd.userPermissions) {
-                                if (!interaction.member.permissions.has(perm)) {
+                                if (!interaction.member!.permissions.has(perm)) {
                                     (optional ? missingOptional : missingRequired).push(perm);
                                 }
                             }
@@ -184,7 +186,8 @@ export default new ClientEvent("interactionCreate", async function interactionCr
                         if (cmd.botPermissions.length !== 0 && interaction.guild) {
                             const missingRequired: Array<PermissionName> = [], missingOptional: Array<PermissionName> = [];
                             for (const [perm, optional] of cmd.botPermissions) {
-                                if (!(interaction.appPermissions || interaction.channel.permissionsOf(this.user.id)).has(perm)) {
+                                // gets narrowed to none after the nullish coalescing
+                                if (!(interaction.appPermissions ?? (interaction as GuildCommandInteraction).channel.permissionsOf(this.user.id)).has(perm)) {
                                     (optional ? missingOptional : missingRequired).push(perm);
                                 }
                             }
@@ -199,7 +202,7 @@ export default new ClientEvent("interactionCreate", async function interactionCr
 
                     let gConfig: GuildConfig | null = null, uConfig: UserConfig | null = null;
                     if (cmd.doGuildLookup && "guildID" in interaction) {
-                        gConfig = await GuildConfig.get(interaction.guildID);
+                        gConfig = await GuildConfig.get(interaction.guildID!);
                     }
                     if (cmd.doUserLookup) {
                         uConfig = await UserConfig.get(interaction.user.id);
@@ -216,8 +219,8 @@ export default new ClientEvent("interactionCreate", async function interactionCr
                         .catch(async err => {
                             const code =  await ExceptionHandler.handle(err as Error, "command", [
                                 `User: **${interaction.user.tag}** (${interaction.user.id})`,
-                                `Guild: **${interaction.inCachedGuildChannel() ? interaction.guild.name : "DM"}** (${"guildID" in interaction ? interaction.guildID : "DM"})`,
-                                `Channel: **${interaction.channel && "name" in interaction.channel ? interaction.channel.name : "DM"}** (${interaction.channelID})`,
+                                `Guild: **${interactionGuildName(interaction)}** (${interaction.guildID ?? "DM"})`,
+                                `Channel: **${interactionChannelName(interaction)}** (${interaction.channelID})`,
                                 `Command: **${interaction.data.name}** (Chat Input)`,
                                 `Arguments: ${stringifyArguments(interaction) || "none"}`
                             ].join("\n"));
@@ -246,7 +249,7 @@ export default new ClientEvent("interactionCreate", async function interactionCr
                     }
 
                     let gConfig: GuildConfig | null = null, uConfig: UserConfig | null = null;
-                    if (cmd.doGuildLookup && "guildID" in interaction) {
+                    if (cmd.doGuildLookup && interaction.guildID !== undefined) {
                         gConfig = await GuildConfig.get(interaction.guildID);
                     }
                     if (cmd.doUserLookup) {
@@ -263,8 +266,8 @@ export default new ClientEvent("interactionCreate", async function interactionCr
                         .catch(async err => {
                             const code =  await ExceptionHandler.handle(err as Error, "command", [
                                 `User: **${interaction.user.tag}** (${interaction.user.id})`,
-                                `Guild: **${interaction.inCachedGuildChannel() ? interaction.guild.name : "DM"}** (${"guildID" in interaction ? interaction.guildID : "DM"})`,
-                                `Channel: **${interaction.channel && "name" in interaction.channel ? interaction.channel.name : "DM"}** (${interaction.channelID})`,
+                                `Guild: **${interactionGuildName(interaction)}** (${interaction.guildID ?? "DM"})`,
+                                `Channel: **${interactionChannelName(interaction)}** (${interaction.channelID})`,
                                 `Command: **${interaction.data.name}** (User)`
                             ].join("\n"));
                             await interaction.reply({
@@ -290,7 +293,7 @@ export default new ClientEvent("interactionCreate", async function interactionCr
                     }
 
                     let gConfig: GuildConfig | null = null, uConfig: UserConfig | null = null;
-                    if (cmd.doGuildLookup && "guildID" in interaction) {
+                    if (cmd.doGuildLookup && interaction.guildID !== undefined) {
                         gConfig = await GuildConfig.get(interaction.guildID);
                     }
                     if (cmd.doUserLookup) {
@@ -306,8 +309,8 @@ export default new ClientEvent("interactionCreate", async function interactionCr
                         .catch(async err => {
                             const code =  await ExceptionHandler.handle(err as Error, "command", [
                                 `User: **${interaction.user.tag}** (${interaction.user.id})`,
-                                `Guild: **${interaction.inCachedGuildChannel() ? interaction.guild.name : "DM"}** (${"guildID" in interaction ? interaction.guildID : "DM"})`,
-                                `Channel: **${interaction.channel && "name" in interaction.channel ? interaction.channel.name : "DM"}** (${interaction.channelID})`,
+                                `Guild: **${interactionGuildName(interaction)}** (${interaction.guildID ?? "DM"})`,
+                                `Channel: **${interactionChannelName(interaction)}** (${interaction.channelID})`,
                                 `Command: **${interaction.data.name}** (Message)`
                             ].join("\n"));
                             await interaction.reply({

@@ -1,15 +1,17 @@
 import Command, { type ComponentInteraction, type ModalSubmitInteraction, ValidLocation } from "../../../util/cmd/Command.js";
-import { Colors, TextableGuildChannels } from "../../../util/Constants.js";
+import { Colors } from "../../../util/Constants.js";
 import LogEvent, { LogCategoriesChoices, LogEvents, LogEventsAllValue } from "../../../db/Models/LogEvent.js";
 import Util from "../../../util/Util.js";
 import { State } from "../../../util/State.js";
 import {
-    type AnyGuildTextChannelWithoutThreads,
+    type AnyTextableGuildChannelWithoutThreads,
     ApplicationCommandOptionTypes,
     ComponentTypes,
     type InteractionResolvedChannel,
     type MessageActionRow,
-    type Webhook
+    type Webhook,
+    TextableGuildChannelsWithoutThreadsTypes,
+    type TextableGuildChannelsWithoutThreads
 } from "oceanic.js";
 import { ButtonColors, ComponentBuilder } from "@oceanicjs/builders";
 import chunk from "chunk";
@@ -66,7 +68,7 @@ export default new Command(import.meta.url, "logging")
             .addOption(
                 new Command.Option(ApplicationCommandOptionTypes.CHANNEL, "channel")
                     .setDescription("The channel to log to. Defaults to the current channel.")
-                    .setChannelTypes(TextableGuildChannels)
+                    .setChannelTypes(TextableGuildChannelsWithoutThreadsTypes)
             )
     )
     .addOption(
@@ -75,7 +77,7 @@ export default new Command(import.meta.url, "logging")
             .addOption(
                 new Command.Option(ApplicationCommandOptionTypes.CHANNEL, "channel")
                     .setDescription("The channel to clear. Defaults to global.")
-                    .setChannelTypes(TextableGuildChannels)
+                    .setChannelTypes(TextableGuildChannelsWithoutThreadsTypes)
             )
     )
     .addOption(
@@ -84,7 +86,7 @@ export default new Command(import.meta.url, "logging")
             .addOption(
                 new Command.Option(ApplicationCommandOptionTypes.CHANNEL, "channel")
                     .setDescription("The channel to list. Defaults to global.")
-                    .setChannelTypes(TextableGuildChannels)
+                    .setChannelTypes(TextableGuildChannelsWithoutThreadsTypes)
             )
     )
     .addOption(
@@ -100,13 +102,13 @@ export default new Command(import.meta.url, "logging")
     .setOptionsParser(interaction => ({
         type:    interaction.data.options.getSubCommand<["add" | "clear" | "list" | "remove"]>(true)[0],
         event:   interaction.data.options.getString<keyof typeof LogEvents>("event"),
-        channel: interaction.data.options.getChannel("channel") as InteractionResolvedChannel | AnyGuildTextChannelWithoutThreads,
+        channel: interaction.data.options.getChannel("channel") as InteractionResolvedChannel | AnyTextableGuildChannelWithoutThreads,
         entry:   interaction.data.options.getString("entry")
     }))
     .setValidLocation(ValidLocation.GUILD)
     .setAck("ephemeral")
     .setExecutor(async function(interaction, { type, event: rawEvent, channel, entry }) {
-        if (channel && !TextableGuildChannels.includes(channel.type)) {
+        if (channel && !TextableGuildChannelsWithoutThreadsTypes.includes(channel.type as TextableGuildChannelsWithoutThreads)) {
             return interaction.reply({
                 content: `H-hey! <#${channel.id}> is not a valid textable channel..`
             });
@@ -114,7 +116,7 @@ export default new Command(import.meta.url, "logging")
         switch (type) {
             case "add": {
                 if (!channel) {
-                    channel = interaction.channel as AnyGuildTextChannelWithoutThreads;
+                    channel = interaction.channel as AnyTextableGuildChannelWithoutThreads;
                 }
                 const permissions = ("appPermissions" in channel ? channel.appPermissions : channel.permissionsOf(this.user.id));
                 assert(rawEvent);

@@ -6,7 +6,7 @@ import GuildConfig from "../db/Models/GuildConfig.js";
 import Config from "../config/index.js";
 import { Utility } from "@uwu-codes/utils";
 import chunk from "chunk";
-import { type AnyGuildTextChannel, type GuildCommandInteraction, type Message, Interaction } from "oceanic.js";
+import { type AnyTextableGuildChannel, type GuildCommandInteraction, Message, Interaction } from "oceanic.js";
 
 export default class Leveling {
 
@@ -100,8 +100,8 @@ export default class Leveling {
         return { rank: index === -1 ? -1 : index + 1, total };
     }
 
-    static async run(input: GuildCommandInteraction | Message<AnyGuildTextChannel>) {
-        const user = input instanceof Interaction ? input.user : input.author;
+    static async run(input: GuildCommandInteraction | Message<AnyTextableGuildChannel>) {
+        const user = input instanceof Message ? input.author : input.user;
         if (user.bot) {
             return;
         }

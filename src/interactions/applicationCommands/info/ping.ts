@@ -8,7 +8,7 @@ export default new Command(import.meta.url, "ping")
     .setAck("ephemeral-user")
     .setCooldown(3e3)
     .setExecutor(async function(interaction) {
-        const shard = "guildID" in interaction ? interaction.guild.shard : interaction.client.shards.first()!;
+        const shard = interaction.guildID === undefined ? interaction.client.shards.first()! : interaction.guild.shard;
         await interaction.reply(Util.replaceContent({
             embeds: Util.makeEmbed(true, interaction.user)
                 .setTitle("Pong!")

@@ -24,7 +24,7 @@ import {
 import * as Oceanic from "oceanic.js";
 import { parse, strip } from "dashargs";
 import { ButtonColors, ComponentBuilder } from "@oceanicjs/builders";
-import type { AnyGuildTextChannel, MessageActionRow , Message } from "oceanic.js";
+import type { AnyTextableGuildChannel, MessageActionRow , Message } from "oceanic.js";
 import { inspect } from "node:util";
 import { createHash } from "node:crypto";
 
@@ -64,7 +64,7 @@ export default new ClientEvent("messageCreate", async function messageCreateEven
         return;
     }
     if (msg.channel && "guildID" in msg.channel && msg.channel.guildID !== null) {
-        await Leveling.run(msg as Message<AnyGuildTextChannel>);
+        await Leveling.run(msg as Message<AnyTextableGuildChannel>);
     }
     if (Config.developers.includes(msg.author.id)) {
         const [prefix, command, ...args] = msg.content.split(" ");

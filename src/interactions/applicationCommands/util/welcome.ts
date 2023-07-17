@@ -4,15 +4,16 @@ import { State } from "../../../util/State.js";
 import GuildConfig, { GuildWelcomeModifierKeys, GuildWelcomeModifiersChoices  } from "../../../db/Models/GuildConfig.js";
 import WelcomeMessageHandler, { Replacements } from "../../../util/handlers/WelcomeMessageHandler.js";
 import Config from "../../../config/index.js";
-import { TextableGuildChannels } from "../../../util/Constants.js";
 import { ButtonColors, ComponentBuilder } from "@oceanicjs/builders";
 import {
-    type AnyGuildTextChannelWithoutThreads,
+    type AnyTextableGuildChannelWithoutThreads,
     ApplicationCommandOptionTypes,
     type MessageActionRow,
     type InteractionResolvedChannel,
     ComponentTypes,
-    type Webhook
+    type Webhook,
+    TextableGuildChannelsWithoutThreadsTypes,
+    type TextableGuildChannelsWithoutThreads
 } from "oceanic.js";
 import { Strings } from "@uwu-codes/utils";
 import assert from "node:assert";
@@ -48,7 +49,7 @@ export default new Command(import.meta.url, "welcome")
         .addOption(
             new Command.Option(ApplicationCommandOptionTypes.CHANNEL, "channel")
                 .setDescription("The channel to send the welcome message in. Defaults to the current channel.")
-                .setChannelTypes(TextableGuildChannels)
+                .setChannelTypes(TextableGuildChannelsWithoutThreadsTypes)
         )
     )
     .addOption(new Command.Option(ApplicationCommandOptionTypes.SUB_COMMAND, "reset")
@@ -83,7 +84,7 @@ export default new Command(import.meta.url, "welcome")
     )
     .setOptionsParser(interaction => ({
         type:          interaction.data.options.getSubCommand<["config", "message" | "set-modifier" | "get"] | ["setup" | "reset"]>(true),
-        channel:       interaction.data.options.getChannel("channel") as InteractionResolvedChannel | AnyGuildTextChannelWithoutThreads ?? null,
+        channel:       interaction.data.options.getChannel("channel") as InteractionResolvedChannel | AnyTextableGuildChannelWithoutThreads ?? null,
         modifier:      interaction.data.options.getString<typeof GuildWelcomeModifierKeys[number]>("modifier", false) ?? null,
         modifierValue: interaction.data.options.getBoolean("value", false) ?? null
     }))
@@ -92,7 +93,7 @@ export default new Command(import.meta.url, "welcome")
     .setGuildLookup(true)
     .setExecutor(async function(interaction, { type: [type, configType], channel, modifier, modifierValue }, gConfig) {
         const enabled = await WelcomeMessageHandler.check(gConfig);
-        if (channel && !TextableGuildChannels.includes(channel.type)) {
+        if (channel && !TextableGuildChannelsWithoutThreadsTypes.includes(channel.type as TextableGuildChannelsWithoutThreads)) {
             return interaction.reply({
                 content: `H-hey! <#${channel.id}> is not a valid textable channel..`
             });
@@ -100,7 +101,7 @@ export default new Command(import.meta.url, "welcome")
         switch (type) {
             case "setup": {
                 if (!channel) {
-                    channel = interaction.channel as AnyGuildTextChannelWithoutThreads;
+                    channel = interaction.channel as AnyTextableGuildChannelWithoutThreads;
                 }
                 if (enabled) {
                     return interaction.reply({ content: "H-hey! The welcome message has already been set up. Reset it before changing it" });

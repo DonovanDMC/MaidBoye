@@ -4,6 +4,7 @@ import type EmptyAutocomplete from "./structure/Empty.js";
 import type { AutocompleteInteraction } from "../../util/cmd/Command.js";
 import Debug from "../../util/Debug.js";
 import ExceptionHandler from "../../util/handlers/ExceptionHandler.js";
+import { interactionChannelName, interactionGuildName } from "../../util/Names.js";
 import Logger from "@uwu-codes/logger";
 import { Timer } from "@uwu-codes/utils";
 import type { ModuleImport } from "@uwu-codes/types";
@@ -34,15 +35,15 @@ export default class Autocomplete {
         if (focused === null) {
             throw new Error(`failed to find focused option for autocomplete interaction ${interaction.data.name}`);
         }
-        Logger.getLogger("Autocomplete").debug(`Handling autocomplete "${interaction.data.name}$${focused.name}" for user ${interaction.user.tag} (${interaction.user.id}) in guild ${"guildID" in interaction ? interaction.guildID : "DM"}`);
+        Logger.getLogger("Autocomplete").debug(`Handling autocomplete "${interaction.data.name}$${focused.name}" for user ${interaction.user.tag} (${interaction.user.id}) in guild ${interactionGuildName(interaction)}`);
         const autocomplete = this.get(interaction.data.name, focused.name);
         assert(autocomplete, `failed to find valid handler for "${interaction.data.name}$${focused.name}" autocomplete`);
-        await ("guildID" in interaction ? autocomplete.handleGuild(interaction, focused) : autocomplete.handleDM(interaction, focused))
+        await (interaction.guildID === undefined ? autocomplete.handleDM(interaction, focused) : autocomplete.handleGuild(interaction, focused))
             .catch(async err => {
                 const code =  await ExceptionHandler.handle(err as Error, "autocomplete", [
                     `User: **${interaction.user.tag}** (${interaction.user.id})`,
-                    `Guild: **${interaction.inCachedGuildChannel() ? interaction.guild.name : "DM"}** (${"guildID" in interaction ? interaction.guildID : "DM"})`,
-                    `Channel: **${interaction.channel && "name" in interaction.channel ? interaction.channel.name : "DM"}** (${interaction.channelID})`,
+                    `Guild: **${interactionGuildName(interaction)}** (${interaction.guildID ?? "DM"})`,
+                    `Channel: **${interactionChannelName(interaction)}** (${interaction.channelID})`,
                     `Command: **${interaction.data.name}**`,
                     `Focused: **${focused.name}**`,
                     `Value: **${focused.value}**`

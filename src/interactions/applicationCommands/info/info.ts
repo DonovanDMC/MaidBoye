@@ -46,7 +46,7 @@ export default new Command(import.meta.url, "info")
                     `${Config.emojis.default.dot} Library: ${VERSION.includes("-dev") ? `[Oceanic@${VERSION.split(".").at(-1)!}](https://github.com/OceanicJS/Oceanic/tree/${VERSION.split(".").at(-1)!}) (**${VERSION}**, \`${VERSION.split(".").at(-1)!}\`)` : `[Oceanic](https://github.com/OceanicJS/Oceanic/tree/${VERSION}) (**${VERSION}**)`}`,
                     `${Config.emojis.default.dot} API Version: **v${REST_VERSION}**`,
                     `${Config.emojis.default.dot} Gateway Version: **v${GATEWAY_VERSION}**`,
-                    `${Config.emojis.default.dot} Version: **${pkg.version}** (Build Date: ${pkg.buildDate === null ? "Unknown" : `${String(pkg.buildDate).slice(0, 2)}/${String(pkg.buildDate).slice(2, 4)}/${String(pkg.buildDate).slice(4, 8)}`})`,
+                    `${Config.emojis.default.dot} Version: **${pkg.version}** (Build Date: ${pkg.buildDate === null ? "Unknown" : Util.formatDiscordTime(Number(pkg.buildDate), "short-date", true)})`,
                     `${Config.emojis.default.dot} Node Version: **${process.version}**`,
                     `${Config.emojis.default.dot} Typescript Version: **${lock.devDependencies.typescript.version}**`
                 )

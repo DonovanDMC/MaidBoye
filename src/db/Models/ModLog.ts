@@ -6,7 +6,7 @@ import db from "../index.js";
 import type MaidBoye from "../../main.js";
 import Util from "../../util/Util.js";
 import { Strings } from "@uwu-codes/utils";
-import type { AnyGuildTextChannel, Member } from "oceanic.js";
+import type { AnyTextableGuildChannel, Member } from "oceanic.js";
 import assert from "node:assert";
 
 
@@ -219,7 +219,7 @@ export default class ModLog {
 
             case ModLogType.LOCK:
             case ModLogType.UNLOCK: {
-                return client.getChannel<AnyGuildTextChannel>(this.targetID);
+                return client.getChannel<AnyTextableGuildChannel>(this.targetID);
             }
 
             default: {

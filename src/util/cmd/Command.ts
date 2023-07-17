@@ -4,6 +4,8 @@ import type MaidBoye from "../../main.js";
 import type GuildConfig from "../../db/Models/GuildConfig.js";
 import type UserConfig from "../../db/Models/UserConfig.js";
 import type {
+    AnyGuildInteraction,
+    AnyPrivateInteraction,
     ApplicationCommandOptions,
     CreateChatInputApplicationCommandOptions,
     GuildAutocompleteInteraction,
@@ -32,8 +34,6 @@ export enum ValidLocation {
     PIVATE = 2,
 }
 
-type AnyGuildInteraction = GuildAutocompleteInteraction | GuildCommandInteraction | GuildComponentButtonInteraction | GuildComponentSelectMenuInteraction | GuildModalSubmitInteraction;
-type AnyPrivateInteraction = PrivateAutocompleteInteraction | PrivateCommandInteraction | PrivateComponentButtonInteraction | PrivateComponentSelectMenuInteraction | PrivateModalSubmitInteraction;
 
 interface ValidLocationMap<G extends AnyGuildInteraction, P extends AnyPrivateInteraction> {
     [ValidLocation.BOTH]: G | P;

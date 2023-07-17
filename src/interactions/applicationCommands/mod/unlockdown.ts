@@ -1,10 +1,10 @@
 import Command, { ValidLocation } from "../../../util/cmd/Command.js";
 import ModLogHandler from "../../../util/handlers/ModLogHandler.js";
 import { ModLogType } from "../../../db/Models/ModLog.js";
-import { lockPermissions, lockPermissionsList, TextableGuildChannels } from "../../../util/Constants.js";
+import { lockPermissions, lockPermissionsList } from "../../../util/Constants.js";
 import db from "../../../db/index.js";
 import { Strings } from "@uwu-codes/utils";
-import { ApplicationCommandOptionTypes, OverwriteTypes } from "oceanic.js";
+import { ApplicationCommandOptionTypes, OverwriteTypes, TextableGuildChannelsWithoutThreadsTypes, type TextableGuildChannelsWithoutThreads } from "oceanic.js";
 
 export default new Command(import.meta.url, "unlockdown")
     .setDescription("Undo a lockdown")
@@ -27,7 +27,7 @@ export default new Command(import.meta.url, "unlockdown")
             return interaction.reply({ content: "H-hey! This server hasn't been locked down.." });
         }
         reason = Strings.truncateWords(reason, 500);
-        const channels = interaction.guild.channels.filter(({ type }) => TextableGuildChannels.includes(type as typeof TextableGuildChannels[number])) ;
+        const channels = interaction.guild.channels.filter(({ type }) => TextableGuildChannelsWithoutThreadsTypes.includes(type as TextableGuildChannelsWithoutThreads));
         const original = JSON.parse(old) as Array<[id: string, allow: string, deny: string]>;
         const errors: Array<Error> = [];
         let changes = 0;

@@ -6,6 +6,7 @@ import type { ComponentInteraction, ValidLocation } from "../../util/cmd/Command
 import Debug from "../../util/Debug.js";
 import ExceptionHandler from "../../util/handlers/ExceptionHandler.js";
 import Config from "../../config/index.js";
+import { interactionChannelName, interactionGuildName } from "../../util/Names.js";
 import Logger from "@uwu-codes/logger";
 import { Timer } from "@uwu-codes/utils";
 import type { ModuleImport } from "@uwu-codes/types";
@@ -40,14 +41,14 @@ export default class Components {
             return;
         }
         const component = this.get(data.command, data.action);
-        Logger.getLogger("Components").debug(`Handling component "${data.command || "null"}$${data.action}" for user ${interaction.user.tag} (${interaction.user.id}) in guild ${"guildID" in interaction ? interaction.guildID : "DM"}`);
+        Logger.getLogger("Components").debug(`Handling component "${data.command || "null"}$${data.action}" for user ${interaction.user.tag} (${interaction.user.id}) in guild ${interactionGuildName(interaction)}`);
         assert(component, `failed to find valid handler for "${data.command || "null"}$${data.action}" component`);
         await ("guildID" in interaction ? component.handleGuild(interaction as ComponentInteraction<ValidLocation.GUILD>, data) : component.handleDM(interaction as ComponentInteraction<ValidLocation.PIVATE>, data))
             .catch(async err => {
                 const code =  await ExceptionHandler.handle(err as Error, "component", [
                     `User: **${interaction.user.tag}** (${interaction.user.id})`,
-                    `Guild: **${interaction.inCachedGuildChannel() ? interaction.guild.name : "DM"}** (${"guildID" in interaction ? interaction.guildID : "DM"})`,
-                    `Channel: **${interaction.channel && "name" in interaction.channel ? interaction.channel.name : "DM"}** (${interaction.channelID})`,
+                    `Guild: **${interactionGuildName(interaction)}** (${interaction.guildID ?? "DM"})`,
+                    `Channel: **${interactionChannelName(interaction)}** (${interaction.channelID})`,
                     `Command: **${data.command || "null"}**`,
                     `Data: \`\`\`json\n${JSON.stringify(data, null, 2)}\`\`\``
                 ].join("\n"));

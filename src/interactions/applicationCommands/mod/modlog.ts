@@ -4,7 +4,6 @@ import ModLog from "../../../db/Models/ModLog.js";
 import Util from "../../../util/Util.js";
 import { State } from "../../../util/State.js";
 import GuildConfig, { ModlogSettingChoices, ModlogSettingKeys, ModlogSettingNames } from "../../../db/Models/GuildConfig.js";
-import { TextableGuildChannels } from "../../../util/Constants.js";
 import Config from "../../../config/index.js";
 import { SettingsBits } from "../../../util/settings/index.js";
 import { Strings } from "@uwu-codes/utils";
@@ -14,8 +13,10 @@ import {
     type Webhook,
     type MessageActionRow,
     type InteractionResolvedChannel,
-    type AnyGuildTextChannelWithoutThreads,
-    ComponentTypes
+    type AnyTextableGuildChannelWithoutThreads,
+    ComponentTypes,
+    TextableGuildChannelsWithoutThreadsTypes,
+    type TextableGuildChannelsWithoutThreads
 } from "oceanic.js";
 import assert from "node:assert";
 
@@ -51,7 +52,7 @@ export default new Command(import.meta.url, "modlog")
                     .addOption(
                         new Command.Option(ApplicationCommandOptionTypes.CHANNEL, "channel")
                             .setDescription("The channel to setup the modlog in. Defaults to the current channel.")
-                            .setChannelTypes(TextableGuildChannels)
+                            .setChannelTypes(TextableGuildChannelsWithoutThreadsTypes)
                     )
             )
             .addOption(
@@ -109,7 +110,7 @@ export default new Command(import.meta.url, "modlog")
     )
     .setOptionsParser(interaction => ({
         type:         interaction.data.options.getSubCommand<["config", "setup" | "reset" | "get" | "set"] | ["edit-case"] | ["delete-case"]>(true),
-        channel:      interaction.data.options.getChannel("channel") as InteractionResolvedChannel | AnyGuildTextChannelWithoutThreads ?? null,
+        channel:      interaction.data.options.getChannel("channel") as InteractionResolvedChannel | AnyTextableGuildChannelWithoutThreads ?? null,
         setting:      interaction.data.options.getString<typeof ModlogSettingKeys[number]>("setting", false) ?? null,
         settingValue: interaction.data.options.getBoolean("value", false) ?? null,
         caseID:       interaction.data.options.getInteger("case", false) ?? null,
@@ -121,7 +122,7 @@ export default new Command(import.meta.url, "modlog")
     .setGuildLookup(true)
     .setExecutor(async function(interaction, { type: [type, configType], channel, setting, settingValue, caseID, reason, reasonHidden }, gConfig) {
         const enabled = await ModLogHandler.check(gConfig);
-        if (channel && !TextableGuildChannels.includes(channel.type)) {
+        if (channel && !TextableGuildChannelsWithoutThreadsTypes.includes(channel.type as TextableGuildChannelsWithoutThreads)) {
             return interaction.reply({
                 content: `H-hey! <#${channel.id}> is not a valid textable channel..`
             });
@@ -132,7 +133,7 @@ export default new Command(import.meta.url, "modlog")
                 switch (configType) {
                     case "setup": {
                         if (!channel) {
-                            channel = interaction.channel as AnyGuildTextChannelWithoutThreads;
+                            channel = interaction.channel as AnyTextableGuildChannelWithoutThreads;
                         }
                         if (enabled) {
                             return interaction.reply({ content: "H-hey! The modlog has already been set up. Reset it before changing it" });

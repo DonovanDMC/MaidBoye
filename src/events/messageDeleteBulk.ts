@@ -5,13 +5,13 @@ import { Colors } from "../util/Constants.js";
 import Config from "../config/index.js";
 import EncryptionHandler from "../util/handlers/EncryptionHandler.js";
 import type { BulkDeleteReport } from "../util/@types/misc.js";
-import { type AnyGuildTextChannel, AuditLogActionTypes, type Message, type Uncached } from "oceanic.js";
+import { type AnyTextableGuildChannel, AuditLogActionTypes, type Message, type Uncached } from "oceanic.js";
 import { writeFile } from "node:fs/promises";
 import { randomBytes } from "node:crypto";
 
 // this requires the messageContent intent
 export default new ClientEvent("messageDeleteBulk", async function messageDeleteBulkEvent(messages) {
-    const guild = (messages.find(msg  => "guildID" in msg) as Message<Uncached | AnyGuildTextChannel>)?.guild;
+    const guild = (messages.find(msg  => "guildID" in msg) as Message<Uncached | AnyTextableGuildChannel>)?.guild;
     if (!guild) {
         return;
     }

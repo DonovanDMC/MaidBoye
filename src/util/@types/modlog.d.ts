@@ -6,7 +6,7 @@ import type {
     Member,
     Guild,
     User,
-    AnyGuildTextChannel,
+    AnyTextableGuildChannel,
     Message
 } from "oceanic.js";
 
@@ -55,12 +55,12 @@ declare namespace ModLog {
     }
 
     export interface LockOptions extends BaseOptions {
-        target: AnyGuildTextChannel;
+        target: AnyTextableGuildChannel;
         type: ModLogType.LOCK;
     }
 
     export interface UnlockOptions extends BaseOptions {
-        target: AnyGuildTextChannel;
+        target: AnyTextableGuildChannel;
         type: ModLogType.UNLOCK;
     }
 
@@ -104,7 +104,7 @@ declare namespace ModLog {
         active: boolean;
         caseID: number;
         entry: ModLogEntry;
-        message: Message<AnyGuildTextChannel>;
+        message: Message<AnyTextableGuildChannel>;
         strike: Strike;
         timed: Timed | null;
     }
@@ -112,7 +112,7 @@ declare namespace ModLog {
         active: boolean;
         caseID: number;
         entry: ModLogEntry;
-        message: Message<AnyGuildTextChannel>;
+        message: Message<AnyTextableGuildChannel>;
         strike: Strike;
         timed: null;
     }
@@ -120,7 +120,7 @@ declare namespace ModLog {
         active: boolean;
         caseID: number;
         entry: ModLogEntry;
-        message: Message<AnyGuildTextChannel>;
+        message: Message<AnyTextableGuildChannel>;
         strike: null;
         timed: null;
     }

@@ -2,10 +2,9 @@ import ClientEvent from "../util/ClientEvent.js";
 import LogEvent, { LogEvents } from "../db/Models/LogEvent.js";
 import Util from "../util/Util.js";
 import { Colors } from "../util/Constants.js";
-import { AutoModerationActionTypeNames, AutoModerationEventTypeNames, AutoModerationKeywordPresetTypeNames, AutoModerationTriggerTypeNames } from "../util/Names.js";
+import { AutoModerationActionTypeDescriptions, AutoModerationEventTypeNames, AutoModerationKeywordPresetTypeNames, AutoModerationTriggerTypeNames } from "../util/Names.js";
 import Config from "../config/index.js";
-import { AuditLogActionTypes, AutoModerationActionTypes, AutoModerationTriggerTypes } from "oceanic.js";
-import { Time } from "@uwu-codes/utils";
+import { AuditLogActionTypes, AutoModerationTriggerTypes } from "oceanic.js";
 
 export default new ClientEvent("autoModerationRuleCreate", async function autoModerationRuleCreateEvent(rule) {
     const events = await LogEvent.getType(rule.guildID, LogEvents.AUTOMOD_RULE_CREATE);
@@ -13,20 +12,7 @@ export default new ClientEvent("autoModerationRuleCreate", async function autoMo
         return;
     }
 
-    const actions: Array<string> = [];
-    for (const action of rule.actions) {
-        switch (action.type) {
-            case AutoModerationActionTypes.BLOCK_MESSAGE: {
-                actions.push(`${Config.emojis.default.dot} ${AutoModerationActionTypeNames[action.type]}`); break;
-            }
-            case AutoModerationActionTypes.SEND_ALERT_MESSAGE: {
-                actions.push(`${Config.emojis.default.dot} ${AutoModerationActionTypeNames[action.type]} - <#${action.metadata.channelID!}>`); break;
-            }
-            case AutoModerationActionTypes.TIMEOUT: {
-                actions.push(`${Config.emojis.default.dot} ${AutoModerationActionTypeNames[action.type]} - ${Time.ms(action.metadata.durationSeconds! * 1000, { words: true })}`); break;
-            }
-        }
-    }
+    const actions = rule.actions.map(action => AutoModerationActionTypeDescriptions[action.type](action));
 
     const trigger = [`${AutoModerationTriggerTypeNames[rule.triggerType]}}`];
     switch (rule.triggerType) {

@@ -1,10 +1,10 @@
 import Command, { ValidLocation } from "../../../util/cmd/Command.js";
 import ModLogHandler from "../../../util/handlers/ModLogHandler.js";
 import { ModLogType } from "../../../db/Models/ModLog.js";
-import { lockPermissions, lockPermissionsList, TextableGuildChannels } from "../../../util/Constants.js";
+import { lockPermissions, lockPermissionsList } from "../../../util/Constants.js";
 import db from "../../../db/index.js";
 import { Strings } from "@uwu-codes/utils";
-import { type AnyGuildTextChannelWithoutThreads, ApplicationCommandOptionTypes, OverwriteTypes } from "oceanic.js";
+import { type AnyTextableGuildChannelWithoutThreads, ApplicationCommandOptionTypes, OverwriteTypes, TextableGuildChannelsWithoutThreadsTypes } from "oceanic.js";
 
 export default new Command(import.meta.url, "unlock")
     .setDescription("Undo a lock")
@@ -13,7 +13,7 @@ export default new Command(import.meta.url, "unlock")
     .addOption(
         new Command.Option(ApplicationCommandOptionTypes.CHANNEL, "channel")
             .setDescription("The channel to unlock (default: current channel)")
-            .setChannelTypes(TextableGuildChannels)
+            .setChannelTypes(TextableGuildChannelsWithoutThreadsTypes)
             .setMinMax(1, 500)
     )
     .addOption(
@@ -22,7 +22,7 @@ export default new Command(import.meta.url, "unlock")
             .setMinMax(1, 500)
     )
     .setOptionsParser(interaction => ({
-        channel: interaction.data.options.getCompleteChannel<AnyGuildTextChannelWithoutThreads>("channel", true),
+        channel: interaction.data.options.getCompleteChannel<AnyTextableGuildChannelWithoutThreads>("channel", true),
         reason:  interaction.data.options.getString("reason") || "None Provided"
     }))
     .setValidLocation(ValidLocation.GUILD)

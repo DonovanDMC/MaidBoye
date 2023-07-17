@@ -2,8 +2,8 @@ import ClientEvent from "../util/ClientEvent.js";
 import LogEvent, { LogEvents } from "../db/Models/LogEvent.js";
 import Util from "../util/Util.js";
 import { Colors } from "../util/Constants.js";
-import { SortOrderTypeNames, VideoQualityModeNames } from "../util/Names.js";
-import { AuditLogActionTypes, ChannelTypes, type EmbedOptions } from "oceanic.js";
+import { ChannelTypeNames, SortOrderTypeNames, VideoQualityModeNames } from "../util/Names.js";
+import { AuditLogActionTypes, type EmbedOptions } from "oceanic.js";
 import { Time } from "@uwu-codes/utils";
 
 export default new ClientEvent("channelUpdate", async function channelUpdateEvent(channel, oldChannel) {
@@ -17,25 +17,14 @@ export default new ClientEvent("channelUpdate", async function channelUpdateEven
 
 
     const embeds: Array<EmbedOptions> = [];
-    if (channel.type === ChannelTypes.GUILD_TEXT && oldChannel.type === ChannelTypes.GUILD_ANNOUNCEMENT) {
+    if (channel.type !== oldChannel.type) {
+        const newName = ChannelTypeNames[channel.type];
         embeds.push(Util.makeEmbed(true)
             .setTitle("Channel Updated")
             .setColor(Colors.gold)
             .setDescription([
                 `Channel: <#${channel.id}>`,
-                "This channel was converted into an announcement channel."
-            ])
-            .toJSON()
-        );
-    }
-
-    if (channel.type === ChannelTypes.GUILD_ANNOUNCEMENT && oldChannel.type === ChannelTypes.GUILD_TEXT) {
-        embeds.push(Util.makeEmbed(true)
-            .setTitle("Channel Updated")
-            .setColor(Colors.gold)
-            .setDescription([
-                `Channel: <#${channel.id}>`,
-                "This channel was converted into a text channel."
+                `This channel was converted into a${["a","e","i","o","u"].some(v => newName.startsWith(v)) ? "n" : ""} ${newName}.`
             ])
             .toJSON()
         );

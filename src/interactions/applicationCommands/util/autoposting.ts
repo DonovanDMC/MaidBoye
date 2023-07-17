@@ -1,5 +1,5 @@
 import Command, { type ComponentInteraction, type ModalSubmitInteraction, ValidLocation } from "../../../util/cmd/Command.js";
-import { Colors, TextableGuildChannels } from "../../../util/Constants.js";
+import { Colors } from "../../../util/Constants.js";
 import Util from "../../../util/Util.js";
 import { State } from "../../../util/State.js";
 import AutoPostingEntry, {
@@ -13,14 +13,16 @@ import AutoPostingEntry, {
 } from "../../../db/Models/AutoPostingEntry.js";
 import Config from "../../../config/index.js";
 import {
-    type AnyGuildTextChannelWithoutThreads,
+    type AnyTextableGuildChannelWithoutThreads,
     ApplicationCommandOptionTypes,
     ComponentTypes,
     InteractionResolvedChannel,
     type MessageActionRow,
     type Webhook,
     type GuildCommandInteraction,
-    type GuildComponentInteraction
+    type GuildComponentInteraction,
+    TextableGuildChannelsWithoutThreadsTypes,
+    type TextableGuildChannelsWithoutThreads
 } from "oceanic.js";
 import { ButtonColors, ComponentBuilder } from "@oceanicjs/builders";
 import chunk from "chunk";
@@ -113,7 +115,7 @@ export default new Command(import.meta.url, "autoposting")
             .addOption(
                 new Command.Option(ApplicationCommandOptionTypes.CHANNEL, "channel")
                     .setDescription("The channel to post to. Defaults to the current channel.")
-                    .setChannelTypes(TextableGuildChannels)
+                    .setChannelTypes(TextableGuildChannelsWithoutThreadsTypes)
             )
     )
     .addOption(
@@ -122,7 +124,7 @@ export default new Command(import.meta.url, "autoposting")
             .addOption(
                 new Command.Option(ApplicationCommandOptionTypes.CHANNEL, "channel")
                     .setDescription("The channel to clear. Defaults to global.")
-                    .setChannelTypes(TextableGuildChannels)
+                    .setChannelTypes(TextableGuildChannelsWithoutThreadsTypes)
             )
     )
     .addOption(
@@ -131,7 +133,7 @@ export default new Command(import.meta.url, "autoposting")
             .addOption(
                 new Command.Option(ApplicationCommandOptionTypes.CHANNEL, "channel")
                     .setDescription("The channel to list. Defaults to global.")
-                    .setChannelTypes(TextableGuildChannels)
+                    .setChannelTypes(TextableGuildChannelsWithoutThreadsTypes)
             )
     )
     .addOption(
@@ -165,14 +167,14 @@ export default new Command(import.meta.url, "autoposting")
     .setOptionsParser(interaction => ({
         sub:     interaction.data.options.getSubCommand<["add" | "clear" | "list" | "remove" | "enable" | "disable"]>(true)[0],
         type:    interaction.data.options.getString<keyof typeof AutoPostingTypes>("type"),
-        channel: interaction.data.options.getChannel("channel") as InteractionResolvedChannel | AnyGuildTextChannelWithoutThreads | undefined,
+        channel: interaction.data.options.getChannel("channel") as InteractionResolvedChannel | AnyTextableGuildChannelWithoutThreads | undefined,
         entry:   interaction.data.options.getString("entry"),
         time:    interaction.data.options.getNumber("time")
     }))
     .setValidLocation(ValidLocation.GUILD)
     .setAck("ephemeral")
     .setExecutor(async function(interaction, { sub, type: rawType, channel, entry, time }) {
-        if (channel && !TextableGuildChannels.includes(channel.type)) {
+        if (channel && !TextableGuildChannelsWithoutThreadsTypes.includes(channel.type as TextableGuildChannelsWithoutThreads)) {
             return interaction.reply({
                 content: `H-hey! <#${channel.id}> is not a valid textable channel..`
             });
@@ -190,7 +192,7 @@ export default new Command(import.meta.url, "autoposting")
         switch (sub) {
             case "add": {
                 assert(rawType);
-                channel ??= interaction.channel as AnyGuildTextChannelWithoutThreads;
+                channel ??= interaction.channel as AnyTextableGuildChannelWithoutThreads;
                 if (!time) {
                     time = 60;
                 }
@@ -232,7 +234,7 @@ export default new Command(import.meta.url, "autoposting")
                     }));
                 }
 
-                if (AutoPostingNSFW.includes(type) && !(channel instanceof InteractionResolvedChannel ? (channel.completeChannel as AnyGuildTextChannelWithoutThreads | undefined)?.nsfw ?? false : channel.nsfw)) {
+                if (AutoPostingNSFW.includes(type) && !(channel instanceof InteractionResolvedChannel ? (channel.completeChannel as AnyTextableGuildChannelWithoutThreads | undefined)?.nsfw ?? false : channel.nsfw)) {
                     return interaction.reply({
                         content: `H-hey! Autoposting of **${Util.readableConstant(AutoPostingTypes[type])}** must be done in an nsfw channel.`
                     });

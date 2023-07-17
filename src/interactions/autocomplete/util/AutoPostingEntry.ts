@@ -3,7 +3,7 @@ import type { AutocompleteInteraction, ValidLocation } from "../../../util/cmd/C
 import BaseAutocomplete from "../structure/BaseAutocomplete.js";
 import Util from "../../../util/Util.js";
 import AutoPostingEntry, { AutoPostingTypes } from "../../../db/Models/AutoPostingEntry.js";
-import type { AnyGuildTextChannelWithoutThreads } from "oceanic.js";
+import type { AnyTextableGuildChannelWithoutThreads } from "oceanic.js";
 import FuzzySearch from "fuzzy-search";
 import assert from "node:assert";
 
@@ -15,7 +15,7 @@ export default class AutoPostingEntryAutocomplete extends BaseAutocomplete {
         assert(typeof focused.value === "string");
         const filter = interaction.data.options.raw[0].name === "enable" ? "disabled" :  (interaction.data.options.raw[0].name === "disable" ? "enabled" : undefined);
         const autos = await AutoPostingEntry.getAll(interaction.guild.id, filter);
-        const choices = autos.map(a => ({ name: `${Util.readableConstant(AutoPostingTypes[a.type])} in #${interaction.client.getChannel<AnyGuildTextChannelWithoutThreads>(a.channelID)?.name ?? a.channelID}`, value: a.id }));
+        const choices = autos.map(a => ({ name: `${Util.readableConstant(AutoPostingTypes[a.type])} in #${interaction.client.getChannel<AnyTextableGuildChannelWithoutThreads>(a.channelID)?.name ?? a.channelID}`, value: a.id }));
         const fuzzy = new FuzzySearch(choices, ["name"], { caseSensitive: false });
         const ch = fuzzy.search(focused.value);
         if (filter !== undefined && ch.length !== 0) {
