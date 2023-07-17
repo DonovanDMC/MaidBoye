@@ -16,7 +16,8 @@ import {
     type AnyTextableGuildChannelWithoutThreads,
     ComponentTypes,
     TextableGuildChannelsWithoutThreadsTypes,
-    type TextableGuildChannelsWithoutThreads
+    type TextableGuildChannelsWithoutThreads,
+    type TextButton
 } from "oceanic.js";
 import assert from "node:assert";
 
@@ -140,16 +141,30 @@ export default new Command(import.meta.url, "modlog")
                         }
 
 
-                        const components = new ComponentBuilder<MessageActionRow>()
+                        let components = new ComponentBuilder<MessageActionRow>()
                             .addInteractionButton({
                                 customID: State.new(interaction.user.id, "modlog", "create-webhook").with("channel", channel.id).encode(),
                                 label:    "Create Webhook",
                                 style:    ButtonColors.BLURPLE
                             });
 
+                        let disableCreation = false, noUsable = true;
                         if (("appPermissions" in channel ? channel.appPermissions : channel.permissionsOf(this.user.id)).has("MANAGE_WEBHOOKS")) {
-                            const webhooks = (await this.rest.webhooks.getForChannel(channel.id)).filter(hook => hook.name !== null && hook.token !== undefined);
+                            let all: Array<Webhook>;
+                            const webhooks = (all = await this.rest.webhooks.getForChannel(channel.id)).filter(hook => hook.name !== null && hook.token !== undefined);
+                            if (all.length >= 15) {
+                                disableCreation = true;
+                                const c = components.toJSON()[0].components[0] as TextButton;
+                                components = new ComponentBuilder<MessageActionRow>();
+                                components.addInteractionButton({
+                                    customID: c.customID,
+                                    label:    c.label,
+                                    style:    c.style,
+                                    disabled: true
+                                });
+                            }
                             if (webhooks.length !== 0) {
+                                noUsable = false;
                                 components.addSelectMenu({
                                     customID: State.new(interaction.user.id, "modlog", "select-webhook").with("channel", channel.id).encode(),
                                     options:  webhooks.map(hook => ({ label: hook.name!, value: hook.id })),
@@ -158,8 +173,14 @@ export default new Command(import.meta.url, "modlog")
                             }
                         }
 
+                        if (disableCreation && noUsable) {
+                            return interaction.reply({
+                                content: "H-hey! This channel has the maximum amount of webhooks (**15**), and none of them are usable by us. Keep in mind we can't use webhooks created by other bots. Delete some of them and try again."
+                            });
+                        }
+
                         return interaction.reply({
-                            content:    `Please select an option for enabling the modlog in <#${channel.id}>.`,
+                            content:    `Please select an option for enabling the modlog in <#${channel.id}>.${disableCreation ? "\nWebhook creation has been disabled because this channel has the maximum amount of webhooks (**15**)." : ""}`,
                             components: components.toJSON()
                         });
                     }

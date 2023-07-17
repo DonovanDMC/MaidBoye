@@ -2,7 +2,7 @@ import type { ModalSubmitInteraction, ValidLocation } from "../../../util/cmd/Co
 import type { BaseState } from "../../../util/State.js";
 import BaseModal from "../structure/BaseModal.js";
 import RequestProxy from "../../../util/RequestProxy.js";
-import { MessageFlags, type Webhook } from "oceanic.js";
+import { DiscordRESTError, JSONErrorCodes, MessageFlags, type Webhook } from "oceanic.js";
 import { Strings } from "@uwu-codes/utils";
 import { STATUS_CODES } from "node:http";
 
@@ -36,7 +36,20 @@ export default abstract class WebhookModal extends BaseModal {
             name,
             avatar,
             reason: this.getReason(interaction, state)
-        });
+        })
+            .catch(err => {
+                if (err instanceof DiscordRESTError && err.code === JSONErrorCodes.MAXIMUM_NUMBER_OF_WEBHOOKS) {
+                    return null;
+                } else {
+                    throw err;
+                }
+            });
+
+        if (webhook === null) {
+            return interaction.reply({
+                content: "H-hey! This channel has the maximum amount of webhooks (**15**)."
+            });
+        }
 
         await interaction.deferUpdate(MessageFlags.EPHEMERAL);
         return this.doAfter(interaction, webhook, state);
