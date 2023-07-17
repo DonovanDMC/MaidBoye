@@ -50,7 +50,7 @@ export async function enableAutoposting(interaction: ComponentInteraction<ValidL
         embeds: embed.toJSON(true)
     });
 
-    await interaction.editParent(Util.replaceContent({
+    await (interaction.acknowledged ? interaction.editOriginal.bind(interaction) : interaction.editParent.bind(interaction))(Util.replaceContent({
         content: `Autoposting of **${Util.readableConstant(AutoPostingTypes[type])}** has been enabled every **${time} Minutes** in <#${channel}> via **${webhook.name!}**.`
     }));
 }

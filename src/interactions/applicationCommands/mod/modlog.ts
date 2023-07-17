@@ -34,7 +34,7 @@ export async function enableModlog(interaction: ComponentInteraction<ValidLocati
         embeds: embed.toJSON(true)
     });
 
-    await interaction.editParent(Util.replaceContent({
+    await (interaction.acknowledged ? interaction.editOriginal.bind(interaction) : interaction.editParent.bind(interaction))(Util.replaceContent({
         content: `ModLog enabled in <#${channel}> via **${webhook.name!}**.`
     }));
 }

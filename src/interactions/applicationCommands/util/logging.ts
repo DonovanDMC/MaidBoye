@@ -43,7 +43,7 @@ export async function enableLogging(interaction: ComponentInteraction<ValidLocat
         embeds: embed.toJSON(true)
     });
 
-    await interaction.editParent(Util.replaceContent({
+    await (interaction.acknowledged ? interaction.editOriginal.bind(interaction) : interaction.editParent.bind(interaction))(Util.replaceContent({
         content: `Logging of **${Util.readableConstant(LogEvents[event])}** has been enabled in <#${channel}> via **${webhook.name!}**.`
     }));
 }

@@ -35,7 +35,7 @@ export async function enableWelcome(interaction: ComponentInteraction<ValidLocat
         embeds: embed.toJSON(true)
     });
 
-    await interaction.editParent(Util.replaceContent({
+    await (interaction.acknowledged ? interaction.editOriginal.bind(interaction) : interaction.editParent.bind(interaction))(Util.replaceContent({
         content: `Welcome message enabled in <#${channel}> via **${webhook.name!}**.`
     }));
 }

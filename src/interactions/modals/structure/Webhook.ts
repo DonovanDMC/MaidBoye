@@ -2,7 +2,7 @@ import type { ModalSubmitInteraction, ValidLocation } from "../../../util/cmd/Co
 import type { BaseState } from "../../../util/State.js";
 import BaseModal from "../structure/BaseModal.js";
 import RequestProxy from "../../../util/RequestProxy.js";
-import { type Webhook } from "oceanic.js";
+import { MessageFlags, type Webhook } from "oceanic.js";
 import { Strings } from "@uwu-codes/utils";
 import { STATUS_CODES } from "node:http";
 
@@ -38,6 +38,7 @@ export default abstract class WebhookModal extends BaseModal {
             reason: this.getReason(interaction, state)
         });
 
+        await interaction.deferUpdate(MessageFlags.EPHEMERAL);
         return this.doAfter(interaction, webhook, state);
     }
 }
