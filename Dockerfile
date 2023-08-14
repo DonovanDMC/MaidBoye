@@ -11,4 +11,4 @@ RUN npx pnpm install
 COPY . .
 RUN npx pnpm run build
 RUN npx pnpm prune --prod
-CMD npx pnpm start
+CMD ["node", "--no-warnings", "--no-deprecation", "--experimental-specifier-resolution=node", "dist/src/index.js"]

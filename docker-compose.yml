@@ -6,16 +6,17 @@ services:
       - ./data/bot:/data
       - /etc/hostname:/data/hostname
     restart: always
+    init: true
     healthcheck:
       interval: 5s
       timeout: 1s
       test: wget -q --spider http://localhost:3621
     deploy:
-        resources:
-          limits:
-            memory: 2048M
-          reservations:
-            memory: 512M
+      resources:
+        limits:
+          memory: 2048M
+        reservations:
+          memory: 512M
     depends_on:
       postgres:
         condition: service_healthy
@@ -44,11 +45,11 @@ services:
       timeout: 2s
       test: pg_isready -U maidboye
     deploy:
-        resources:
-          limits:
-            memory: 512M
-          reservations:
-            memory: 128M
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 128M
     hostname: postgres.maidboye.containers.local
     labels:
       - "hostname=postgres.maidboye.containers.local"
@@ -68,11 +69,11 @@ services:
       interval: 10s
       timeout: 5s
     deploy:
-        resources:
-          limits:
-            memory: 128M
-          reservations:
-            memory: 64M
+      resources:
+        limits:
+          memory: 128M
+        reservations:
+          memory: 64M
     hostname: redis.maidboye.containers.local
     labels:
       - "hostname=redis.maidboye.containers.local"
