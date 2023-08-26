@@ -27,6 +27,9 @@ services:
     hostname: maidboye.containers.local
     labels:
       - "hostname=maidboye.containers.local"
+    networks:
+      - default
+
   proxy:
     image: docker.io/gelbpunkt/gateway-proxy
     container_name: proxy.maidboye
@@ -37,7 +40,7 @@ services:
     healthcheck:
       interval: 5s
       timeout: 1s
-      test: wget -q --spider http://localhost:8787/metrics
+      test: wget -q --spider http://localhost/metrics
     deploy:
       resources:
         limits:
@@ -47,6 +50,8 @@ services:
     hostname: proxy.maidboye.containers.local
     labels:
       - "hostname=proxy.maidboye.containers.local"
+    networks:
+      - default
 
   postgres:
     image: postgres:14-alpine
@@ -73,8 +78,7 @@ services:
     labels:
       - "hostname=postgres.maidboye.containers.local"
     networks:
-      default:
-        ipv4_address: 172.19.3.3
+      - default
 
   redis:
     image: redis:alpine
@@ -97,8 +101,7 @@ services:
     labels:
       - "hostname=redis.maidboye.containers.local"
     networks:
-      default:
-        ipv4_address: 172.19.3.4
+      - default
 
 networks:
   default:
