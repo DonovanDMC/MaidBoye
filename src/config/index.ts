@@ -101,7 +101,7 @@ export class Configuration extends PrivateConfiguration {
                     }],
                     status: "dnd"
                 },
-                gatewayOverride: this.isDevelopment ? {} : {
+                override: this.isDevelopment ? {} : {
                     timeBetweenShardConnects: 0,
                     async url() {
                         return "ws://proxy.maidboye.containers.local";
