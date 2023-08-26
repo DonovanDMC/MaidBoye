@@ -17,7 +17,7 @@
     "up:dev": "sudo docker compose up",
     "dev": "pnpm run down && pnpm run up:dev",
     "dev:build": "pnpm run down && pnpm run up",
-    "update": "git pull && git submodule update --init --recursive --remote && docker compose pull && pnpm run down && pnpm run up:d"
+    "update": "git pull && git submodule update --init --recursive && docker compose pull && pnpm run down && pnpm run up:d"
   },
   "repository": {
     "type": "git",
