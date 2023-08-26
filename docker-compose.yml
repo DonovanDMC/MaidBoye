@@ -22,12 +22,31 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+      proxy:
+        condition: service_healthy
     hostname: maidboye.containers.local
     labels:
       - "hostname=maidboye.containers.local"
-    networks:
-      default:
-        ipv4_address: 172.19.3.2
+  proxy:
+    image: docker.io/gelbpunkt/gateway-proxy
+    container_name: proxy.maidboye
+    volumes:
+      - ./src/config/private/proxy.json:/config.json
+    restart: always
+    init: true
+    healthcheck:
+      interval: 5s
+      timeout: 1s
+      test: wget -q --spider http://localhost:8787/metrics
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 128M
+    hostname: proxy.maidboye.containers.local
+    labels:
+      - "hostname=proxy.maidboye.containers.local"
 
   postgres:
     image: postgres:14-alpine

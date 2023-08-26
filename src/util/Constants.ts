@@ -1,6 +1,6 @@
 import { type PermissionName, Permissions } from "oceanic.js";
 
-export const moderatorPermissions = [
+export const moderatorPermissions: Array<PermissionName> = [
     "KICK_MEMBERS",
     "BAN_MEMBERS",
     "ADMINISTRATOR",
@@ -14,11 +14,11 @@ export const moderatorPermissions = [
     "MANAGE_NICKNAMES",
     "MANAGE_ROLES",
     "MANAGE_WEBHOOKS",
-    "MANAGE_EMOJIS_AND_STICKERS",
+    "MANAGE_GUILD_EXPRESSIONS",
     "MANAGE_EVENTS",
     "MANAGE_THREADS",
     "MODERATE_MEMBERS"
-] as const;
+];
 export type ModeratorPermissions = (typeof moderatorPermissions)[number];
 
 export const AllPermissions = Object.keys(Permissions) as Array<PermissionName>;

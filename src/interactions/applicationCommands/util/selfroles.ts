@@ -139,8 +139,8 @@ export default new Command(import.meta.url, "selfroles")
                 for (const perm of AllPermissions) {
                     if (r.permissions.has(perm)) {
                         perms++;
-                        if (moderatorPermissions.includes(perm as ModeratorPermissions)) {
-                            modPerms.push(perm as ModeratorPermissions);
+                        if (moderatorPermissions.includes(perm)) {
+                            modPerms.push(perm);
                         }
                     }
                 }

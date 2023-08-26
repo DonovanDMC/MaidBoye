@@ -91,17 +91,24 @@ export function getFeatureName(feature: GuildFeature, nameOnly = false) {
     return `${GuildFeatureNames[feature]}${GuildFeatureDescriptions[feature] ? `[*](${Config.apiURL}/features/${feature})` : ""}`;
 }
 export const GuildFeatureNames = {
+    ACTIVITIES_ALPHA:                          "Activities Alpha",
+    ACTIVITIES_EMPLOYEE:                       "Activities Employee",
+    ACTIVITIES_INTERNAL_DEV:                   "Activities Internal Dev",
     ANIMATED_BANNER:                           `${serverFeatures.animatedBanner} Animated Banner`,
     ANIMATED_ICON:                             `${serverFeatures.animatedIcon} Animated Icon`,
     APPLICATION_COMMAND_PERMISSIONS_V2:        "Application Command Permissions V2",
     AUTO_MODERATION:                           "Auto Moderation",
     BANNER:                                    `${serverFeatures.banner} Banner`,
     BOT_DEVELOPER_EARLY_ACCESS:                "Bot Developer Early Access",
+    CHANNEL_ICON_EMOJIS_GENERATED:             "Channel Icon Emojis Generated",
     CLYDE_ENABLED:                             "Clyde Enabled",
+    CLYDE_EXPERIMENT_ENABLED:                  "Clyde Experiment Enabled",
+    COMMUNITY_CANARY:                          "Community Canary",
     COMMUNITY_EXP_LARGE_GATED:                 "Community Exp (Large Gated)",
     COMMUNITY_EXP_LARGE_UNGATED:               "Community Exp (Large Ungated)",
     COMMUNITY_EXP_MEDIUM:                      "Community Exp (Medium Gated)",
     COMMUNITY:                                 `${serverFeatures.community} Community`,
+    CREATOR_ACCEPTED_NEW_TERMS:                "Creator Accepted New Terms",
     CREATOR_MONETIZABLE_DISABLED:              "Creator Monetizable Disabled",
     CREATOR_MONETIZABLE_PROVISIONAL:           "Creator Monetizable Provisional",
     CREATOR_MONETIZABLE:                       "Creator Monetizable",
@@ -117,6 +124,7 @@ export const GuildFeatureNames = {
     GUILD_ONBOARDING_EVER_ENABLED:             "Guild Onboarding Ever Enabled",
     GUILD_ONBOARDING_HAS_PROMPTS:              "Guild Onboarding Has Prompts",
     GUILD_ONBOARDING:                          "Guild Onboarding",
+    GUILD_ROLE_SUBSCRIPTION_TIER_TEMPLATE:     "Guild Role Subscription Tier Template",
     GUILD_WEB_PAGE_VANITY_URL:                 "Guild Web Page Vanity URL",
     HAD_EARLY_ACTIVITIES_ACCESS:               "Had Early Activities Access",
     HAS_DIRECTORY_ENTRY:                       "Has Directory Entry",
@@ -128,6 +136,7 @@ export const GuildFeatureNames = {
     LINKED_TO_HUB:                             "Linked To Hub",
     MARKETPLACES_CONNECTION_ROLES:             "Marketplaces Connection Roles",
     MEMBER_PROFILES:                           "Member Profiles",
+    MEMBER_SAFETY_PAGE_ROLLOUT:                "Member Safety Page Rollout",
     MEMBER_VERIFICATION_GATE_ENABLED:          `${serverFeatures.memberVerificationGateEnabled} Member Verification Gate Enabled`,
     MONETIZATION_ENABLED:                      `${serverFeatures.monitizationEnabled} Monitization Enabled`,
     MORE_EMOJI:                                `${serverFeatures.moreEmojis} More Emojis`,
@@ -145,6 +154,8 @@ export const GuildFeatureNames = {
     ROLE_SUBSCRIPTIONS_ENABLED:                `${serverFeatures.roleSubscriptionsEnabled} Role Subscriptions Enabled`,
     SEVEN_DAY_THREAD_ARCHIVE:                  `${serverFeatures.sevenDayThreadArchive} Seven Day Thread Archive`,
     SOUNDBOARD:                                "Soundboard",
+    SUMMARIES_ENABLED_GA:                      "Summaries Enabled GA",
+    SUMMARIES_ENABLED:                         "Summaries Enabled",
     TEXT_IN_VOICE_ENABLED:                     `${serverFeatures.textInVoiceEnabled} Text In Voice Enabled`,
     THREADS_ENABLED_TESTING:                   "Threads Enabled Testing",
     THREADS_ENABLED:                           `${serverFeatures.threadsEnabled} Threads Enabled`,
@@ -153,22 +164,30 @@ export const GuildFeatureNames = {
     VANITY_URL:                                `${serverFeatures.vanityURL} Vanity URL`,
     VERIFIED:                                  `${serverFeatures.verified} Verified`,
     VIP_REGIONS:                               `${serverFeatures.vipRegions} 384kbps Voice Bitrate`,
+    VOICE_IN_THREADS:                          "Voice In Threads",
     WELCOME_SCREEN_ENABLED:                    `${serverFeatures.welcomeScreenEnabled} Welcome Screen Enabled`
 } satisfies Record<GuildFeature, string>;
 
 // anything with an asterisk uses an unofficial description made by me
 export const GuildFeatureDescriptions = {
+    ACTIVITIES_ALPHA:                          null,
+    ACTIVITIES_EMPLOYEE:                       null,
+    ACTIVITIES_INTERNAL_DEV:                   null,
     ANIMATED_BANNER:                           "Guild has access to set an animated guild banner image",
     ANIMATED_ICON:                             "Guild has access to set an animated guild icon",
-    APPLICATION_COMMAND_PERMISSIONS_V2:        "Guild has enabled application command permissions v2. // *",
+    APPLICATION_COMMAND_PERMISSIONS_V2:        "Guild has enabled application command permissions v2.", // *
     AUTO_MODERATION:                           "Guild has set up auto moderation rules",
     BANNER:                                    "Guild has access to set a guild banner image",
     BOT_DEVELOPER_EARLY_ACCESS:                "Bot Developer Early Access",
+    CHANNEL_ICON_EMOJIS_GENERATED:             null,
     CLYDE_ENABLED:                             null,
+    CLYDE_EXPERIMENT_ENABLED:                  null,
+    COMMUNITY_CANARY:                          null,
     COMMUNITY_EXP_LARGE_GATED:                 null,
     COMMUNITY_EXP_LARGE_UNGATED:               null,
     COMMUNITY_EXP_MEDIUM:                      null,
     COMMUNITY:                                 "Guild can enable welcome screen, Membership Screening, stage channels and discovery, and receives community updates",
+    CREATOR_ACCEPTED_NEW_TERMS:                null,
     CREATOR_MONETIZABLE_DISABLED:              null,
     CREATOR_MONETIZABLE_PROVISIONAL:           null,
     CREATOR_MONETIZABLE:                       null,
@@ -184,6 +203,7 @@ export const GuildFeatureDescriptions = {
     GUILD_ONBOARDING_EVER_ENABLED:             null,
     GUILD_ONBOARDING_HAS_PROMPTS:              null,
     GUILD_ONBOARDING:                          null,
+    GUILD_ROLE_SUBSCRIPTION_TIER_TEMPLATE:     null,
     GUILD_WEB_PAGE_VANITY_URL:                 null,
     HAD_EARLY_ACTIVITIES_ACCESS:               null,
     HAS_DIRECTORY_ENTRY:                       null,
@@ -195,6 +215,7 @@ export const GuildFeatureDescriptions = {
     LINKED_TO_HUB:                             "Guild is linked to a hub", // *
     MARKETPLACES_CONNECTION_ROLES:             null,
     MEMBER_PROFILES:                           null,
+    MEMBER_SAFETY_PAGE_ROLLOUT:                null,
     MEMBER_VERIFICATION_GATE_ENABLED:          "Guild has enabled [Membership Screening](https://discord.com/developers/docs/resources/guild#membership-screening-object)",
     MONETIZATION_ENABLED:                      "Guild has enabled monetization",
     MORE_EMOJI:                                "Guild has increased custom emoji slots", // *
@@ -212,6 +233,8 @@ export const GuildFeatureDescriptions = {
     ROLE_SUBSCRIPTIONS_ENABLED:                "Guild has access to role subscriptions", // *
     SEVEN_DAY_THREAD_ARCHIVE:                  "Guild has access to 7 day thread automatic achiving", // *
     SOUNDBOARD:                                null,
+    SUMMARIES_ENABLED_GA:                      null,
+    SUMMARIES_ENABLED:                         null,
     TEXT_IN_VOICE_ENABLED:                     "Guild has enabled text in voice", // *
     THREADS_ENABLED_TESTING:                   "Guild has enabled thread testing", // *
     THREADS_ENABLED:                           "Guild has enabled threads", // *
@@ -220,6 +243,7 @@ export const GuildFeatureDescriptions = {
     VANITY_URL:                                "Guild has access to set a vanity URL",
     VERIFIED:                                  "Guild is verified",
     VIP_REGIONS:                               "Guild has access to set 384kbps bitrate in voice (previously VIP voice servers)",
+    VOICE_IN_THREADS:                          null,
     WELCOME_SCREEN_ENABLED:                    "Guild has enabled the welcome screen"
 } satisfies Record<GuildFeature, string | null>;
 
@@ -334,7 +358,7 @@ export const PermissionsByValue = {
     [String(Permissions.MANAGE_NICKNAMES)]:                    "Manage Nicknames",
     [String(Permissions.MANAGE_ROLES)]:                        "Manage Roles",
     [String(Permissions.MANAGE_WEBHOOKS)]:                     "Manage Webhooks",
-    [String(Permissions.MANAGE_EMOJIS_AND_STICKERS)]:          "Manage Emojis and Stickers",
+    [String(Permissions.MANAGE_GUILD_EXPRESSIONS)]:            "Manage Guild Expressions",
     [String(Permissions.USE_APPLICATION_COMMANDS)]:            "Use Application Commands",
     [String(Permissions.REQUEST_TO_SPEAK)]:                    "Request To Speak",
     [String(Permissions.MANAGE_EVENTS)]:                       "Manage Events",
@@ -345,7 +369,13 @@ export const PermissionsByValue = {
     [String(Permissions.SEND_MESSAGES_IN_THREADS)]:            "Send Messages In Threads",
     [String(Permissions.USE_EMBEDDED_ACTIVITIES)]:             "Use Embedded Activities",
     [String(Permissions.MODERATE_MEMBERS)]:                    "Moderate Members",
-    [String(Permissions.VIEW_CREATOR_MONETIZATION_ANALYTICS)]: "View Creator Monetization Analytics"
+    [String(Permissions.VIEW_CREATOR_MONETIZATION_ANALYTICS)]: "View Creator Monetization Analytics",
+    [String(Permissions.USE_SOUNDBOARD)]:                      "Use Soundboard",
+    [String(Permissions.CREATE_GUILD_EXPRESSIONS)]:            "Create Guild Expressions",
+    [String(Permissions.CREATE_EVENTS)]:                       "Create Events",
+    [String(Permissions.USE_EXTERNAL_SOUNDS)]:                 "Use External Sounds",
+    [String(Permissions.SEND_VOICE_MESSAGES)]:                 "Send Voice Messages",
+    [String(Permissions.USE_CLYDE_AI)]:                        "Use Clyde AI"
 };
 export const PermissionsByName = Object.fromEntries(Object.entries(Permissions).map(([name, value]) => [name, PermissionsByValue[String(value)]])) as Record<PermissionName, string>;
 

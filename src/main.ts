@@ -11,11 +11,8 @@ import { Strings, Timer } from "@uwu-codes/utils";
 import type { ModuleImport } from "@uwu-codes/types";
 import {
     type AnyGuildChannel,
-    type AnyThreadChannel,
     ApplicationCommandTypes,
     type CreateApplicationCommandOptions,
-    type RawThreadChannel,
-    type TypedCollection,
     Client,
     ThreadChannel
 } from "oceanic.js";
@@ -78,10 +75,6 @@ export default class MaidBoye extends Client {
                 if (channel instanceof ThreadChannel) {
                     guild.threads.add(channel);
                     this.threadGuildMap[channel.id] = guild.id;
-                    const parent = await this.getGuildChannel(channel.parentID);
-                    if (parent && "threads" in parent) {
-                        (parent.threads as TypedCollection<string, RawThreadChannel, AnyThreadChannel>).add(channel);
-                    }
                 } else {
                     guild.channels.add(channel);
                     this.channelGuildMap[channel.id] = guild.id;

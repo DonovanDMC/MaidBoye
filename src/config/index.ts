@@ -96,10 +96,16 @@ export class Configuration extends PrivateConfiguration {
                 maxShards: "auto",
                 presence:  {
                     activities: [{
-                        type: ActivityTypes.GAME,
+                        type: ActivityTypes.CUSTOM,
                         name: "Starting.."
                     }],
                     status: "dnd"
+                },
+                gatewayOverride: this.isDevelopment ? {} : {
+                    timeBetweenShardConnects: 0,
+                    async url() {
+                        return "ws://proxy.maidboye.containers.local";
+                    }
                 }
             },
             rest: {
@@ -337,7 +343,7 @@ export class Configuration extends PrivateConfiguration {
             "MOVE_MEMBERS",
             "MANAGE_ROLES",
             "MANAGE_WEBHOOKS",
-            "MANAGE_EMOJIS_AND_STICKERS",
+            "MANAGE_GUILD_EXPRESSIONS",
             "MANAGE_EVENTS",
             "MANAGE_THREADS",
             "SEND_MESSAGES_IN_THREADS",

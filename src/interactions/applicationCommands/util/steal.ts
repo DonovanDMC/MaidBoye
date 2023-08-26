@@ -15,8 +15,8 @@ import { STATUS_CODES } from "node:http";
 
 export default new Command(import.meta.url, "steal")
     .setDescription("Steal an emoji for this server, or create one from a url")
-    .setPermissions("user", "MANAGE_EMOJIS_AND_STICKERS")
-    .setPermissions("bot", "MANAGE_EMOJIS_AND_STICKERS")
+    .setPermissions("user", "MANAGE_GUILD_EXPRESSIONS")
+    .setPermissions("bot", "MANAGE_GUILD_EXPRESSIONS")
     .addOption(new Command.Option(ApplicationCommandOptionTypes.SUB_COMMAND_GROUP, "emoji")
         .setDescription("Create an emoji from an emoji, url, or file")
         .addOption(
