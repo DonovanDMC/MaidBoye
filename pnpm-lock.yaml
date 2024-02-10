@@ -83,6 +83,9 @@ dependencies:
   tsconfig-paths:
     specifier: ^4.2.0
     version: 4.2.0
+  undici:
+    specifier: ^6.6.2
+    version: 6.6.2
   winston:
     specifier: ^3.10.0
     version: 3.10.0
@@ -323,6 +326,11 @@ packages:
   /@eslint/js@8.48.0:
     resolution: {integrity: sha512-ZSjtmelB7IJfWD2Fvb7+Z+ChTIKWq6kjda95fLcQKNS5aheVHn4IkfgRQE3sIIzTcSLwLcLZUD9UBt+V7+h+Pw==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
+
+  /@fastify/busboy@2.1.0:
+    resolution: {integrity: sha512-+KpH+QxZU7O4675t3mnkQKcZZg56u+K/Ct2K+N2AZYNVK8kyeo/bI18tI8aPm3tvNNRyTWfj6s5tnGNlcbQRsA==}
+    engines: {node: '>=14'}
+    dev: false
 
   /@humanwhocodes/config-array@0.11.10:
     resolution: {integrity: sha512-KVVjQmNUepDVGXNuoRRdmmEjruj0KfiGSbS8LVc12LMsWDQzRXJ0qdhN8L8uUigKpfEHRhlaQFY0ib1tnUbNeQ==}
@@ -2585,7 +2593,7 @@ packages:
     resolution: {integrity: sha512-lIttsyVoobK5p4Y24B3Uen4nC9FS1MgZP/lR8aSzSFaymBb2SwazUjpaNEcnHdjD7ykaMylTuGmRaFsYiAtQkQ==}
     dependencies:
       file-type: 16.5.4
-      undici: 5.22.1
+      undici: 5.23.0
     dev: false
 
   /import-fresh@3.3.0:
@@ -4108,18 +4116,18 @@ packages:
       which-boxed-primitive: 1.0.2
     dev: true
 
-  /undici@5.22.1:
-    resolution: {integrity: sha512-Ji2IJhFXZY0x/0tVBXeQwgPlLWw13GVzpsWPQ3rV50IFMMof2I55PZZxtm4P6iNq+L5znYN9nSTAq0ZyE6lSJw==}
-    engines: {node: '>=14.0'}
-    dependencies:
-      busboy: 1.6.0
-    dev: false
-
   /undici@5.23.0:
     resolution: {integrity: sha512-1D7w+fvRsqlQ9GscLBwcAJinqcZGHUKjbOmXdlE/v8BvEGXjeWAax+341q44EuTcHXXnfyKNbKRq4Lg7OzhMmg==}
     engines: {node: '>=14.0'}
     dependencies:
       busboy: 1.6.0
+    dev: false
+
+  /undici@6.6.2:
+    resolution: {integrity: sha512-vSqvUE5skSxQJ5sztTZ/CdeJb1Wq0Hf44hlYMciqHghvz+K88U0l7D6u1VsndoFgskDcnU+nG3gYmMzJVzd9Qg==}
+    engines: {node: '>=18.0'}
+    dependencies:
+      '@fastify/busboy': 2.1.0
     dev: false
 
   /unpipe@1.0.0:
@@ -4326,7 +4334,7 @@ packages:
   /yiffy@2.3.2:
     resolution: {integrity: sha512-D7ZXTvPyRqRBr5tasRtbfRLwnza34J4nE8b/JY6708oCJpvZjHhMggNZs+88pmWLN3skLB+lF953XUlxiJMlQQ==}
     dependencies:
-      undici: 5.22.1
+      undici: 5.23.0
     dev: false
 
   /yn@3.1.1:

@@ -6,6 +6,7 @@ import CheweyAPI from "../util/req/CheweyAPI.js";
 import db from "../db/index.js";
 import ServicesManager from "../util/ServicesManager.js";
 import { Colors } from "../util/Constants.js";
+import debugEvent from "../events/debug.js";
 import Logger from "@uwu-codes/logger";
 import { Client } from "oceanic.js";
 import { EmbedBuilder } from "@oceanicjs/builders";
@@ -71,6 +72,7 @@ export default class AutoPostingService extends Service {
     client = new Client({ auth: `Bot ${Config.clientToken}` });
     constructor(file: string, name: string) {
         super(file, name);
+        this.client.on("debug", debugEvent.listener);
         AutoPostingService.INSTANCE = this;
         void db.initIfNotReady().then(this.ready.bind(this));
         setInterval(this.run.bind(this), 1e3);
