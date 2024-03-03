@@ -100,12 +100,6 @@ export class Configuration extends PrivateConfiguration {
                         name: "Starting.."
                     }],
                     status: "dnd"
-                },
-                override: this.isDevelopment ? {} : {
-                    timeBetweenShardConnects: 0,
-                    async url() {
-                        return "ws://proxy.maidboye.containers.local";
-                    }
                 }
             },
             rest: {
