@@ -3,7 +3,7 @@ import Util from "../../../util/Util.js";
 import { ApplicationCommandOptionTypes, type MessageActionRow } from "oceanic.js";
 
 const strings = (author: string, text: string) => [
-    `<@!${author}> sneaks up being ${text}, and when they aren't looking, tackles them from behind in the biggest hug ever!`,
+    `<@!${author}> sneaks up behind ${text}, and when they aren't looking, tackles them from behind in the biggest hug ever!`,
     `<@!${author}> gently wraps their arms around ${text}, giving them a big warm hug!`
 ];
 export default new Command(import.meta.url, "hug")
