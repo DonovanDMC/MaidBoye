@@ -139,7 +139,7 @@ export class Configuration extends PrivateConfiguration {
 
     /* db */
     static get dbHost() {
-        return "172.19.3.3";
+        return "postgres";
     }
     static get dbPort() {
         return 5432;
@@ -161,7 +161,7 @@ export class Configuration extends PrivateConfiguration {
 
     /* redis */
     static get redisHost() {
-        return "172.19.3.4";
+        return "redis";
     }
     static get redisPort() {
         return 6379;
