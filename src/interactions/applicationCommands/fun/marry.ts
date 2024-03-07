@@ -69,7 +69,7 @@ export default new Command(import.meta.url, "marry")
                 .setTitle("Marriage Proposal")
                 .setDescription(`${interaction.user.mention} has proposed to ${member.mention}!\n${member.mention} do you accept?`)
                 .setImage(img.url)
-                .setFooter(`${member.mention} rs marred to ${other.marriagePartners.length} ${other.marriagePartners.length === 1 ? "person" : "people"}.`, Config.botIcon)
+                .setFooter(`${member.mention} is married to ${other.marriagePartners.length} ${other.marriagePartners.length === 1 ? "person" : "people"}.`, Config.botIcon)
                 .toJSON(true),
             components: new ComponentBuilder<MessageActionRow>(2)
                 .addInteractionButton({
