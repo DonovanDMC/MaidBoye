@@ -78,6 +78,7 @@
     "ioredis": "^5.3.2",
     "markdown-it": "^13.0.1",
     "morgan": "^1.10.0",
+    "mozuku": "^1.0.7",
     "oceanic.js": "1.8.1-dev.6d610bc",
     "pg": "^8.11.3",
     "short-uuid": "^4.2.2",
