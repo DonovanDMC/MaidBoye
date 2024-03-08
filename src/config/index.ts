@@ -139,7 +139,7 @@ export class Configuration extends PrivateConfiguration {
 
     /* db */
     static get dbHost() {
-        return "postgres";
+        return this.isDevelopment ? "postgres.maidboye.containers.local" : "postgres";
     }
     static get dbPort() {
         return 5432;
@@ -161,7 +161,7 @@ export class Configuration extends PrivateConfiguration {
 
     /* redis */
     static get redisHost() {
-        return "redis";
+        return this.isDevelopment ? "redis.maidboye.containers.local" : "redis";
     }
     static get redisPort() {
         return 6379;
