@@ -13,8 +13,14 @@ export default new Command(import.meta.url, "prntsc")
         const data = await prntsc();
 
         return interaction.reply({
+            files: [
+                {
+                    name: `prntsc.${data.image.split(".").pop()}`,
+                    contents: Buffer.from(await (await fetch(data.image)).arrayBuffer())
+                }
+            ],
             embeds: Util.makeEmbed(true, interaction.user)
-                .setImage(data.image)
+                .setImage(`attachment://prntsc.${data.image.split(".").pop()}`)
                 .setURL(data.link)
                 .setDescription(`${data.link}\nWe are not responsible for the contents of this message. The code is randomly generated.`)
                 .toJSON(true),
