@@ -29,7 +29,7 @@ export async function prntsc(): Promise<{ image: string; link: string; }> {
         valid = status.headers.get("location") === "https://i.imgur.com/removed.png" ? false : status.status === 200;
     }
 
-    if (!valid) {
+    if (!image || !valid) {
         Logger.getLogger("Prntsc").warn(`Invalid image (${image}), retrying...`);
         return prntsc();
     }
