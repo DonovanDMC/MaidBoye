@@ -1,5 +1,5 @@
 import db from "../index.js";
-import StatsHandler from "../../util/StatsHandler.js";
+// import StatsHandler from "../../util/StatsHandler.js";
 import type { ApplicationCommandTypes, InteractionTypes } from "oceanic.js";
 import assert from "node:assert";
 
@@ -92,7 +92,7 @@ export default class Stat {
     }
 
     static async create(data: StatCreationData) {
-        return null;
+        return Promise.resolve(null);
         /* data = ({ ...data, session_id: StatsHandler.SessionID }) as typeof data & { session_id: string; };
         const res = await db.insert<string>(this.TABLE, data);
         const createdObject = await this.get(res);

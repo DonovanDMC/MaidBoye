@@ -117,7 +117,6 @@ export default class StatsHandler {
         }
         tags.push(`env:${Config.isDevelopment ? "development" : "production"}`, `env:${Config.isDocker ? "docker" : "other"}`, `host:${hostname()}`);
         props.type = StatType[type];
-        void Stat.create(props);
         if (db.ready) {
             const p = new Promise((resolve, reject) => {
                 void Stat.create(props).then(() => {
@@ -135,7 +134,7 @@ export default class StatsHandler {
                     });
                 })
                     .catch(err => {
-                        this.pendingDB.push(props);
+                        // this.pendingDB.push(props);
                         this.pendingRedis.push(...rstats);
                         reject(err);
                     });
@@ -147,7 +146,7 @@ export default class StatsHandler {
                 }
             };
         } else {
-            this.pendingDB.push(props);
+            // this.pendingDB.push(props);
             this.pendingRedis.push(...rstats);
             return {
                 promise() {
