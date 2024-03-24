@@ -92,11 +92,12 @@ export default class Stat {
     }
 
     static async create(data: StatCreationData) {
-        data = ({ ...data, session_id: StatsHandler.SessionID }) as typeof data & { session_id: string; };
+        return null;
+        /* data = ({ ...data, session_id: StatsHandler.SessionID }) as typeof data & { session_id: string; };
         const res = await db.insert<string>(this.TABLE, data);
         const createdObject = await this.get(res);
         assert(createdObject !== null, "failed to create new Stat object");
-        return createdObject;
+        return createdObject; */
     }
 
     static async delete(id: string) {
@@ -109,7 +110,7 @@ export default class Stat {
     }
 
     private load(data: StatData) {
-        this._data                        = data;
+        this._data                      = data;
         this.applicationCommandType     = data.application_command_type;
         this.applicationCommandTypeName = data.application_command_type_name;
         this.closeCode                  = data.close_code;
