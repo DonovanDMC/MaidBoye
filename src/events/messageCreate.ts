@@ -181,7 +181,7 @@ export default new ClientEvent("messageCreate", async function messageCreateEven
         const gConfig = await GuildConfig.get(msg.guildID);
         if (gConfig.settings.autoSourcing) {
             if (Strings.validateURL(msg.content)) {
-                const sauce = await Sauce(msg.content, 0, true, true);
+                const sauce = await Sauce(msg.content, 80, true, true);
                 if (sauce !== null) {
                     const sources = Array.isArray(sauce.sourceOverride) ? sauce.sourceOverride : (sauce.sourceOverride === undefined ? [] : [sauce.sourceOverride]);
                     if (sauce.post !== null && !sources.some(s => s.startsWith("https://e621.net/posts/"))) {

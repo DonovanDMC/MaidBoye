@@ -8,6 +8,8 @@ import type { JSONResponse } from "yiffy";
 import { Strings } from "@uwu-codes/utils";
 import { fetch } from "undici";
 import { STATUS_CODES } from "node:http";
+import { Blob } from "node:buffer";
+import { fileTypeFromBuffer } from "file-type";
 
 export class PreCheckError extends Error {
     override name = "PreCheckError";
@@ -19,12 +21,12 @@ export const autoMimeTypes = [
     "image/png",
     "image/webp"
 ];
-export default async function Sauce(input: string, simularity = 75, skipCheck = false, skipSauceNao = false) {
+export default async function Sauce(input: string, simularity = 80, skipCheck = false, skipSauceNao = false) {
     // I could include file extensions, but I couldn't be bothered since I only need the md5
     const yrRegex = /(?:https?:\/\/)?yiff\.rocks\/([A-Z_-\da-z]+)/;
     // E621 - e621.net
     const e621Regex = /(?:https?:\/\/)?static\d\.(?:e621|e926)\.net\/data\/(?:sample\/)?(?:[\da-z]{2}\/){2}([\da-z]+)\.[\da-z]+/;
-    // YiffyAPI V2 - v2.yiff.res
+    // YiffyAPI V2 - v2.yiff.rest
     const yiffy2Regex = /(?:https?:\/\/)?(?:v2\.yiff\.media|yiff\.media\/V2)\/(?:.*\/)+([\da-z]+)\.[\da-z]+/;
     let post: Post | null = null,
         method: typeof tried[number] | null = null,
@@ -32,7 +34,7 @@ export default async function Sauce(input: string, simularity = 75, skipCheck = 
         saucePercent = 0,
         snRateLimited = false;
 
-    const tried: Array<"e621" | "yiffy2" | "saucenao"> = [];
+    const tried: Array<"e621" | "yiffy2" | "iqdb" | "saucenao"> = [];
 
     if (Strings.validateURL(input)) {
         if (skipCheck === false) {
@@ -101,6 +103,28 @@ export default async function Sauce(input: string, simularity = 75, skipCheck = 
             } else {
                 tried.push("saucenao");
             } // so we don't tell the user we both couldn't try & tried saucenao
+        }
+
+        iqdb: if (!method) {
+            const img = await RequestProxy.get(input);
+            if (!img.ok) break iqdb;
+        
+            const content = Buffer.from(await img.response.arrayBuffer())
+            const type = (await fileTypeFromBuffer(content))!;
+            const result = await fetch(`https://e621.net/iqdb_queries.json?search[score_cutoff]=${simularity}`, {
+                method: "POST",
+                body: new Blob([content], { type: type.mime })
+            });
+
+            if (result.status !== 200) break iqdb;
+
+            const res = (await result.json()) as Array<{ post_id: number; score: number; }>;
+
+            if(res.length > 0) {
+                method = "iqdb";
+                post = await E621.posts.get(res[0].post_id);
+                saucePercent = res[0].score;
+            }
         }
 
         if (post && post.flags.deleted && post.relationships.parent_id !== null) {
