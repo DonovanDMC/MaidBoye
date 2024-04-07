@@ -26,9 +26,6 @@ dependencies:
   chunk:
     specifier: ^0.0.3
     version: 0.0.3
-  dashargs:
-    specifier: ^4.1.6
-    version: 4.1.6
   debug:
     specifier: ^4.3.4
     version: 4.3.4
@@ -1574,11 +1571,6 @@ packages:
     engines: {node: '>=18'}
     dependencies:
       rrweb-cssom: 0.6.0
-    dev: false
-
-  /dashargs@4.1.6:
-    resolution: {integrity: sha512-GNAuGJQcsNMhbjKh7qdpJzMRd1pYySwXNR7CxjoOFJxYEBMH47u6NxWmiq4eAgg4sXakW1ewxI3mJ9vLthNs3w==}
-    engines: {node: '>=12'}
     dev: false
 
   /data-urls@5.0.0:

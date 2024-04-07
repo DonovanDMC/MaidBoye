@@ -22,7 +22,6 @@ import {
     ReNice
 } from "@uwu-codes/utils";
 import * as Oceanic from "oceanic.js";
-import { parse, strip } from "dashargs";
 import { ButtonColors, ComponentBuilder } from "@oceanicjs/builders";
 import type { AnyTextableGuildChannel, MessageActionRow , Message } from "oceanic.js";
 import { inspect } from "node:util";
@@ -85,13 +84,24 @@ export default new ClientEvent("messageCreate", async function messageCreateEven
                         // eslint-disable-next-line guard-for-in, @typescript-eslint/no-implied-eval, no-new-func -- typescript messes with variable names so we have to remake them
                         new Function("value", `${k} = value`)(evalVariables[k]);
                     }
-                    let res: unknown;
-                    const flags = parse(args.join(" "), {
-                        parseArgs: true
-                    });
-                    const arg = strip(args.join(" "), {
-                        removeFlags: true
-                    });
+                    let res: unknown
+                    let arg = args.join(" ");
+                    function flag(text: string) {
+                        const r = new RegExp(`/(?<!\S)-${text}(?!\S)`, "g")
+                        if (r.exec(arg)) {
+                            arg = arg.replace(r, "");
+                            return true;
+                        }
+
+                        return false;
+                    }
+
+                    const deleteMessage = flag("d"), silent = flag("s"), raw = flag("r");
+
+                    if (deleteMessage) {
+                        await msg.delete().catch(() => null);
+                    }
+
                     const start = Timer.getTime();
                     try {
                     // eslint-disable-next-line no-eval
@@ -104,25 +114,15 @@ export default new ClientEvent("messageCreate", async function messageCreateEven
                     const f = await format(res);
                     const t = Timer.calc(start, end, 3, false);
 
-                    if (flags.has("delete") || flags.has("d")) {
-                        await msg.delete().catch(() => null);
-                    }
-                    if (flags.has("silent") || flags.has("s")) {
+                    if (silent) {
                         Logger.getLogger("Eval").info("Silent Eval Return (formatted):", f);
                         Logger.getLogger("Eval").info("Silent Eval Return (raw):", res);
                         Logger.getLogger("Eval").info("Silent Eval Time:", t);
                     } else {
-                        let file: string | undefined, out = String(flags.has("raw") || flags.has("r") ? res : f);
+                        let file: string | undefined, out = String(raw ? res : f);
                         if (out.length >= 750) {
                             try {
-                                let depth = 1;
-                                if (flags.has("depth")) {
-                                    depth = Number(flags.get("depth"));
-                                    if (isNaN(depth)) {
-                                        depth = 1;
-                                    }
-                                }
-                                file = inspect(JSON.parse(out), { depth, colors: false, showHidden: false });
+                                file = inspect(JSON.parse(out), { depth: 1, colors: false, showHidden: false });
                             } catch {
                                 file = out;
                             }
