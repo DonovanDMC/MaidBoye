@@ -10,7 +10,7 @@ services:
     healthcheck:
       interval: 5s
       timeout: 1s
-      test: wget -q --spider http://localhost:3621
+      test: wget -q --spider http://127.0.0.1:3621
     deploy:
       resources:
         limits:
@@ -25,6 +25,11 @@ services:
     hostname: maidboye.containers.local
     labels:
       - "hostname=maidboye.containers.local"
+      - "traefik.enable=true"
+      - "traefik.http.routers.maidboye.rule=HostRegexp(`api.maidboye.cafe`)"
+      - "traefik.http.routers.maidboye.entrypoints=https"
+      - "traefik.http.routers.maidboye.tls=true"
+      - "traefik.http.services.maidboye.loadbalancer.server.port=8080"
     networks:
       - default
 
@@ -86,4 +91,3 @@ networks:
       driver: default
       config:
         - subnet: 172.19.3.0/29
-          gateway: 172.19.3.1

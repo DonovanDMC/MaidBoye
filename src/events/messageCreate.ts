@@ -87,7 +87,7 @@ export default new ClientEvent("messageCreate", async function messageCreateEven
                     let res: unknown
                     let arg = args.join(" ");
                     function flag(text: string) {
-                        const r = new RegExp(`/(?<!\S)-${text}(?!\S)`, "g")
+                        const r = new RegExp(`(?<!\S)-${text}(?!\S)`, "g")
                         if (r.exec(arg)) {
                             arg = arg.replace(r, "");
                             return true;
