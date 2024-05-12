@@ -80,9 +80,6 @@ export async function makeMessage(interaction: CommandInteraction | ComponentInt
             if (thumbType === "image") {
                 embed.setDescription(`${embed.getDescription()!}\n\n(note: generating image thumbnails can take 10+ seconds)`);
             }
-            if (thumbType === "gif") {
-                embed.setDescription(`${embed.getDescription()!}\n\n(note: generating gif thumbnails can take 20+ seconds)`);
-            }
 
         }
     } else if (post.file.ext === "swf") {

@@ -196,9 +196,7 @@ export default class UserConfig {
                     PreferenceBits.E621_THUMBNAIL_TYPE_GIF
                 ),
                 PreferenceBits[
-                    type === "image" ?
-                        "E621_THUMBNAIL_TYPE_IMAGE" : (type === "gif" ?
-                            "E621_THUMBNAIL_TYPE_GIF" : "E621_THUMBNAIL_TYPE_NONE")
+                    type === "image" ? "E621_THUMBNAIL_TYPE_IMAGE" : "E621_THUMBNAIL_TYPE_NONE"
                 ])
         );
 

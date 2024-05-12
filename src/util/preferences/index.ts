@@ -100,7 +100,7 @@ export default class Preferences {
         } else if (Util.hasBits(val, PreferenceBits.E621_THUMBNAIL_TYPE_IMAGE)) {
             e621ThumbnailType = "image";
         } else if (Util.hasBits(val, PreferenceBits.E621_THUMBNAIL_TYPE_GIF)) {
-            e621ThumbnailType = "gif";
+            e621ThumbnailType = "image";
         }
         return {
             disableSnipes:           Util.hasBits(val, PreferenceBits.DISABLE_SNIPES),
@@ -151,6 +151,7 @@ export const PreferenceBits = {
     DEFAULT_YIFF_TYPE_ANDROMORPH: 1n << 7n,
     E621_THUMBNAIL_TYPE_NONE:     1n << 8n,
     E621_THUMBNAIL_TYPE_IMAGE:    1n << 9n,
+    /** @deprecated disabled at service */
     E621_THUMBNAIL_TYPE_GIF:      1n << 10n,
     E621_NO_VIDEO:                1n << 11n,
     E621_NO_FLASH:                1n << 12n

@@ -191,8 +191,7 @@ export class Configuration extends PrivateConfiguration {
     static get e621ThumbnailTypes() {
         return [
             "none",
-            "image",
-            "gif"
+            "image"
         ] as const;
     }
 
