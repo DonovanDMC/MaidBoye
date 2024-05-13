@@ -29,16 +29,16 @@ export default new ClientEvent("messageDelete", async function messageDeleteEven
         }
         await db.redis
             .multi()
-            .lpush(`snipe:delete:${message.channelID}`, JSON.stringify({
-                content: EncryptionHandler.encrypt(message.content),
+            .lpush(`snipe:delete:${message.channelID}`, EncryptionHandler.encrypt(JSON.stringify({
+                content: message.content,
                 author:  message.author.id,
                 time:    Date.now(),
                 ref:     message.referencedMessage ? {
                     link:    message.referencedMessage.jumpLink,
                     author:  message.referencedMessage.author.id,
-                    content: EncryptionHandler.encrypt(message.referencedMessage.content)
+                    content: message.referencedMessage.content
                 } : null
-            }))
+            })))
             .ltrim(`snipe:delete:${message.channelID}`, 0, 2)
             .expire(`snipe:delete:${message.channelID}`, 21600)
             .exec();

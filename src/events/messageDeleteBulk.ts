@@ -19,17 +19,17 @@ export default new ClientEvent("messageDeleteBulk", async function messageDelete
     const time = Date.now();
     const channel = (await this.getGuildChannel(messages[0]!.channelID))!;
     const report: BulkDeleteReport = {
-        channel:      [channel.id, EncryptionHandler.encrypt(channel.name)],
+        channel:      [channel.id, channel.name],
         createdAt:    time,
         expiresAt:    time + 2592000000, // expires after 30 days
-        guild:        [guild.id, EncryptionHandler.encrypt(guild.name)],
+        guild:        [guild.id, guild.name],
         messageCount: messages.length,
         messages:     messages.map(m => {
-            const author = EncryptionHandler.encrypt("author" in m ? `${m.author.tag} (${m.author.id})` : "Unknown Author");
+            const author = "author" in m ? `${m.author.tag} (${m.author.id})` : "Unknown Author";
             const d = Number((BigInt(m.id) / 4194304n) + 1420070400000n);
             return {
                 author,
-                content:   "content" in m ? EncryptionHandler.encrypt(m.content) : null,
+                content:   "content" in m ? m.content : null,
                 timestamp: d
             };
         })
@@ -40,7 +40,7 @@ export default new ClientEvent("messageDeleteBulk", async function messageDelete
     }
 
     const id = randomBytes(16).toString("hex");
-    await writeFile(`${Config.bulkDeleteDir}/${id}.json`, JSON.stringify(report));
+    await writeFile(`${Config.bulkDeleteDir}/${id}.json`, EncryptionHandler.encrypt(JSON.stringify(report)));
     const embed = Util.makeEmbed(true)
         .setTitle("Bulk Message Deletion")
         .setDescription([

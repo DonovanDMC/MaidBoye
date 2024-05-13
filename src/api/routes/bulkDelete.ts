@@ -10,7 +10,7 @@ const app = Router();
 app.route("/:id")
     .get(async(req,res) => {
         if (await access(`${Config.bulkDeleteDir}/${req.params.id}.json`).then(() => true, () => false)) {
-            const { channel: [channelID, channelName], createdAt, expiresAt, guild: [guildID, guildName], messageCount, messages } = JSON.parse(await readFile(`${Config.bulkDeleteDir}/${req.params.id}.json`, "utf8")) as BulkDeleteReport;
+            const { channel: [channelID, channelName], createdAt, expiresAt, guild: [guildID, guildName], messageCount, messages } = JSON.parse(EncryptionHandler.decrypt(await readFile(`${Config.bulkDeleteDir}/${req.params.id}.json`, "utf8"))) as BulkDeleteReport;
             const text = [
                 "-- Begin Bulk Deletion Report --",
                 `Created At: ${new Date(createdAt).toUTCString()}`,

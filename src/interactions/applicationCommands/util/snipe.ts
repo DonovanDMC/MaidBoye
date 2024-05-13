@@ -39,18 +39,18 @@ export default new Command(import.meta.url, "snipe")
                 flags:   MessageFlags.EPHEMERAL
             });
         }
-        const d = JSON.parse(snipe) as Snipe;
+        const d = JSON.parse(EncryptionHandler.decrypt(snipe)) as Snipe;
         const len = await db.redis.llen(`snipe:delete:${channel}`);
         return interaction.reply({
             embeds: Util.makeEmbed(true, interaction.user)
                 .setTitle("Delete Snipe")
                 .setDescription([
                     `From <@!${d.author}> - Deleted At ${Util.formatDiscordTime(d.time, "short-datetime", true)}`,
-                    `> ${Strings.truncateWords(EncryptionHandler.decrypt(d.content), 250, true)}`,
+                    `> ${Strings.truncateWords(d.content, 250, true)}`,
                     "",
                     ...(d.ref === null ? [] : [
                         `Replied Message - <@!${d.ref.author}>:`,
-                        `> ${Strings.truncateWords(EncryptionHandler.decrypt(d.ref.content), 100, true)} [[Jump](${d.ref.link})]`
+                        `> ${Strings.truncateWords(d.ref.content, 100, true)} [[Jump](${d.ref.link})]`
                     ])
                 ].join("\n"))
                 .setFooter(`UwU | ${len} Snipe${len === 1 ? "" : "s"} Remaining`)

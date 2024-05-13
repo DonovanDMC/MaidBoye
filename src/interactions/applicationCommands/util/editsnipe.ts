@@ -25,15 +25,15 @@ export default new Command(import.meta.url, "editsnipe")
                 flags:   MessageFlags.EPHEMERAL
             });
         }
-        const d = JSON.parse(snipe) as EditSnipe;
+        const d = JSON.parse(EncryptionHandler.decrypt(snipe)) as EditSnipe;
         const len = await db.redis.llen(`snipe:edit:${channel}`);
         return interaction.reply({
             embeds: Util.makeEmbed(true, interaction.user)
                 .setTitle("Edit Snipe")
                 .setDescription([
                     `From <@!${d.author}> - Edited At ${Util.formatDiscordTime(d.time, "short-datetime", true)}`,
-                    `Old Content: ${Strings.truncateWords(EncryptionHandler.decrypt(d.oldContent), 250, true)}`,
-                    `New Content: ${Strings.truncateWords(EncryptionHandler.decrypt(d.newContent), 250, true)}`,
+                    `Old Content: ${Strings.truncateWords(d.oldContent, 250, true)}`,
+                    `New Content: ${Strings.truncateWords(d.newContent, 250, true)}`,
                     ""
                 ].join("\n"))
                 .setFooter(`UwU | ${len} Snipe${len === 1 ? "" : "s"} Remaining`)

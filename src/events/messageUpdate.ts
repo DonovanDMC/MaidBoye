@@ -23,12 +23,12 @@ export default new ClientEvent("messageUpdate", async function debugEvent(messag
         }
         await db.redis
             .multi()
-            .lpush(`snipe:edit:${message.channelID}`, JSON.stringify({
-                newContent: EncryptionHandler.encrypt(message.content),
-                oldContent: EncryptionHandler.encrypt(oldMessage.content),
+            .lpush(`snipe:edit:${message.channelID}`, EncryptionHandler.encrypt(JSON.stringify({
+                newContent: message.content,
+                oldContent: oldMessage.content,
                 author:     message.author.id,
                 time:       Date.now()
-            }))
+            })))
             .ltrim(`snipe:edit:${message.channelID}`, 0, 2)
             .expire(`snipe:edit:${message.channelID}`, 21600)
             .exec();
