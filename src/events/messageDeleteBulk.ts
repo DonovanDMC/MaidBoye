@@ -2,12 +2,7 @@ import ClientEvent from "../util/ClientEvent.js";
 import LogEvent, { LogEvents } from "../db/Models/LogEvent.js";
 import Util from "../util/Util.js";
 import { Colors } from "../util/Constants.js";
-import Config from "../config/index.js";
-import EncryptionHandler from "../util/handlers/EncryptionHandler.js";
-import type { BulkDeleteReport } from "../util/@types/misc.js";
-import { type AnyTextableGuildChannel, AuditLogActionTypes, type Message, type Uncached } from "oceanic.js";
-import { writeFile } from "node:fs/promises";
-import { randomBytes } from "node:crypto";
+import { type AnyTextableGuildChannel, AuditLogActionTypes, type Message, type Uncached, Base } from "oceanic.js";
 
 // this requires the messageContent intent
 export default new ClientEvent("messageDeleteBulk", async function messageDeleteBulkEvent(messages) {
@@ -16,37 +11,33 @@ export default new ClientEvent("messageDeleteBulk", async function messageDelete
         return;
     }
 
-    const time = Date.now();
     const channel = (await this.getGuildChannel(messages[0]!.channelID))!;
-    const report: BulkDeleteReport = {
-        channel:      [channel.id, channel.name],
-        createdAt:    time,
-        expiresAt:    time + 2592000000, // expires after 30 days
-        guild:        [guild.id, guild.name],
-        messageCount: messages.length,
-        messages:     messages.map(m => {
-            const author = "author" in m ? `${m.author.tag} (${m.author.id})` : "Unknown Author";
-            const d = Number((BigInt(m.id) / 4194304n) + 1420070400000n);
-            return {
-                author,
-                content:   "content" in m ? m.content : null,
-                timestamp: d
-            };
-        })
-    };
     const events = await LogEvent.getType(guild.id, LogEvents.MESSAGE_DELETE_BULK);
     if (events.length === 0) {
         return;
     }
 
-    const id = randomBytes(16).toString("hex");
-    await writeFile(`${Config.bulkDeleteDir}/${id}.json`, EncryptionHandler.encrypt(JSON.stringify(report)));
+    const text = [
+        "-- Begin Bulk Deletion Report --",
+        `Total Messages: ${messages.length}`,
+        `Server: ${guild.name} (${guild.id})`,
+        `Channel: ${channel.name} (${channel.id})`,
+        "",
+        "-- Begin Messages --",
+        ...messages.map(msg => `[${Base.getCreatedAt(msg.id).toUTCString()}][${"author" in msg ? msg.author.tag : "Unknown Author"}]: ${"content" in msg ? msg.content : "[No Content]"}`),
+        "-- End Messages --",
+        "",
+        "-- Begin Disclaimers --",
+        "* If you do not want bulk delete reports to be made, disable logging for Bulk Message Delete.",
+        "-- End Disclaimers --",
+        "-- End Bulk Deletion Report --"
+    ].join("\n");
+
     const embed = Util.makeEmbed(true)
         .setTitle("Bulk Message Deletion")
         .setDescription([
             `Channel: ${channel.mention}`,
-            `Total Deleted: **${messages.length}**`,
-            `Report: [here](${Config.apiURL}/bulk-delete/${id})`
+            `Total Deleted: **${messages.length}**`
         ])
         .setColor(Colors.red);
 
@@ -62,6 +53,6 @@ export default new ClientEvent("messageDeleteBulk", async function messageDelete
     }
 
     for (const log of events) {
-        await log.execute(this, { embeds: embed.toJSON(true) });
+        await log.execute(this, { embeds: embed.toJSON(true), files: [{ name: "report.txt", contents: Buffer.from(text) }] });
     }
 });

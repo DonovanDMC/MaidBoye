@@ -70,7 +70,6 @@ const app = express()
     .use("/leveling", (await import("./routes/leveling.js")).default)
     .use("/welcome", (await import("./routes/welcome.js")).default)
     .use("/links", (await import("./routes/links.js")).default)
-    .use("/bulk-delete", (await import("./routes/bulkDelete.js")).default)
 // last 3 param handler = 404, 4 param handler = error
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
     .use(async (req, res, next) => res.status(404).end("Not Found"))

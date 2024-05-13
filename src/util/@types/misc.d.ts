@@ -16,19 +16,6 @@ export interface Snipe {
     time: number;
 }
 
-export interface BulkDeleteReport {
-    channel: [id: string, name: string];
-    createdAt: number;
-    expiresAt: number;
-    guild: [id: string, name: string];
-    messageCount: number;
-    messages: Array<{
-        author: string;
-        content: string | null;
-        timestamp: number;
-    }>;
-}
-
 export type AllowSymbol<T extends Record<string, unknown>> = {
     [K in keyof T]: T[K] | symbol;
 };
