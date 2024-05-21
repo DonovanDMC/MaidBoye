@@ -358,7 +358,7 @@ export default class Util {
     static getFlags<T extends string, N extends number | bigint>(list: Record<T, N>, flags: N, skipEnumReverseKeys = true) {
         const res = {} as Record<T, boolean>;
         for (const [key, value] of Object.entries(list) as Array<[T, N]>) {
-            if (skipEnumReverseKeys && /\d/.test(key)) {
+            if (skipEnumReverseKeys && !isNaN(Number(key))) {
                 continue;
             }
             res[key] = (flags & value) === value;
@@ -369,7 +369,7 @@ export default class Util {
     static getFlagsArray<T extends string, N extends number | bigint>(list: Record<T, N>, flags: N, skipEnumReverseKeys = true) {
         const res = [] as Array<T>;
         for (const [key, value] of Object.entries(list) as Array<[T, N]>) {
-            if (skipEnumReverseKeys && /\d/.test(key)) {
+            if (skipEnumReverseKeys && !isNaN(Number(key))) {
                 continue;
             }
             if ((flags & value) === value) {
