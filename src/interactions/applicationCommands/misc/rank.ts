@@ -6,6 +6,10 @@ import { Colors } from "../../../util/Constants.js";
 import { ApplicationCommandOptionTypes } from "oceanic.js";
 import { profileImage } from "discord-arts";
 
+(global as unknown as { customBadges: Record<string, Array<string> | undefined>; }).customBadges = {
+    "242843345402069002": ["https://cdn.discordapp.com/emojis/786675436243077140.png"],
+    "935392548506189884": ["https://cdn.discordapp.com/emojis/1213921250708168814.png"]
+};
 export default new Command(import.meta.url, "rank")
     .setDescription("Get a user's rank")
     .addOption(
@@ -20,14 +24,10 @@ export default new Command(import.meta.url, "rank")
         const { rank, total } = await Leveling.getUserRank(user.id, interaction.guildID);
         const xp = await UserConfig.getXP(user.id, interaction.guildID);
         const { level, leftover, needed } = Leveling.calcLevel(xp);
-        const customBadges: Array<string> = [];
-        if (user.id === "242843345402069002") {
-            customBadges.push("https://cdn.discordapp.com/emojis/851308838959579152.png?size=4096");
-        }
         const img = await profileImage(user.id, {
-            badgesFrame: true,
-            customBadges,
-            rankData:    {
+            badgesFrame:  true,
+            customBadges: (global as unknown as { customBadges: Record<string, Array<string> | undefined>; }).customBadges[user.id],
+            rankData:     {
                 currentXp:     leftover,
                 requiredXp:    leftover + needed,
                 rank,
