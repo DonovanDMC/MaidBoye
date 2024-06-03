@@ -67,6 +67,7 @@
     "cheweyapi": "^2.0.4",
     "chunk": "^0.0.3",
     "debug": "^4.3.5",
+    "discord-arts": "^0.6.1",
     "discord-command-parser": "^1.5.3",
     "e621": "^2.2.6",
     "eslint-plugin-unicorn": "^53.0.0",
