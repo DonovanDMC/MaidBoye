@@ -1,21 +1,25 @@
 import Command from "../../../util/cmd/Command.js";
-import { State } from "../../../util/State.js";
+/* import { State } from "../../../util/State.js";
 import Util from "../../../util/Util.js";
 import { prntsc } from "../../../util/prntsc.js";
 import { ButtonColors, ComponentBuilder } from "@oceanicjs/builders";
-import { type MessageActionRow } from "oceanic.js";
+import { type MessageActionRow } from "oceanic.js"; */
 
 export default new Command(import.meta.url, "prntsc")
     .setDescription("Get a random screenshot from prnt.sc")
     .setRestrictions("nsfw")
     .setCooldown(3e3)
     .setExecutor(async function(interaction) {
-        const data = await prntsc();
+        return interaction.reply({
+            content: "This command has been disabled."
+        });
+
+        /* const data = await prntsc();
 
         return interaction.reply({
             files: [
                 {
-                    name: `prntsc.${data.image.split(".").pop()}`,
+                    name:     `prntsc.${data.image.split(".").pop()}`,
                     contents: Buffer.from(await (await fetch(data.image)).arrayBuffer())
                 }
             ],
@@ -30,5 +34,5 @@ export default new Command(import.meta.url, "prntsc")
                     label:    "New Image",
                     style:    ButtonColors.BLURPLE
                 }).toJSON()
-        });
+        }); */
     });
