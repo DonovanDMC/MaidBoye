@@ -2,16 +2,14 @@ import Command from "../../../util/cmd/Command.js";
 import Util from "../../../util/Util.js";
 import CommandHandler from "../../../util/cmd/CommandHandler.js";
 import Config from "../../../config/index.js";
+import lock from "../../../../package-lock.json" assert { type: "json" };
 import pkg from "../../../../package.json" assert { type: "json" };
 import ServicesManager from "../../../util/ServicesManager.js";
 import { ComponentBuilder } from "@oceanicjs/builders";
 import { Strings, Time } from "@uwu-codes/utils";
 import { GATEWAY_VERSION, REST_VERSION, VERSION, type MessageActionRow } from "oceanic.js";
-import { parse } from "yaml";
 import { freemem, totalmem } from "node:os";
 import { memoryUsage, uptime } from "node:process";
-import { readFile } from "node:fs/promises";
-const lock = parse(await readFile(`${Config.baseDir}/pnpm-lock.yaml`, "utf8")) as { devDependencies: Record<string, { specifier: string; version: string; }>; };
 
 export default new Command(import.meta.url, "info")
     .setDescription("Get some information about me..")
@@ -48,7 +46,7 @@ export default new Command(import.meta.url, "info")
                     `${Config.emojis.default.dot} Gateway Version: **v${GATEWAY_VERSION}**`,
                     `${Config.emojis.default.dot} Version: **${pkg.version}** (Build Date: ${pkg.buildDate === null ? "Unknown" : Util.formatDiscordTime(Number(pkg.buildDate), "short-date", true)})`,
                     `${Config.emojis.default.dot} Node Version: **${process.version}**`,
-                    `${Config.emojis.default.dot} Typescript Version: **${lock.devDependencies.typescript.version}**`
+                    `${Config.emojis.default.dot} Typescript Version: **${lock.packages["node_modules/typescript"].version}**`
                 )
                 .toJSON(true),
             components: new ComponentBuilder<MessageActionRow>()

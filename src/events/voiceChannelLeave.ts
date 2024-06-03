@@ -5,6 +5,10 @@ import { Colors } from "../util/Constants.js";
 import { AuditLogActionTypes, Channel, type StageChannel, type VoiceChannel } from "oceanic.js";
 
 export default new ClientEvent("voiceChannelLeave", async function voiceChannelLeaveEvent(member, inputChannel) {
+    if (inputChannel === null) {
+        return;
+    }
+
     if (!(inputChannel instanceof Channel)) {
         inputChannel = await this.rest.channels.get(inputChannel.id);
     }

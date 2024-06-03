@@ -41,7 +41,7 @@ export default class Modals {
             return;
         }
         const components: Record<string, string | undefined> = {};
-        for (const row of interaction.data.components) {
+        for (const row of interaction.data.components.raw) {
             for (const component of row.components) {
                 components[component.customID] = component.value;
             }

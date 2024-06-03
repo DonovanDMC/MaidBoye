@@ -142,7 +142,7 @@ export default class Leveling {
                         content:         `Congrats <@!${user.id}> on leveling up from **${oldLevel}** to **${level}**!${roles.length === 0 ? "" : `\n\nRoles Gained:\n${roles.map(r => `- <@&${r}>`).join("\n")}`}`,
                         allowedMentions: { users: false, roles: false }
                     };
-                    m = await (input instanceof Interaction ? input.createFollowup(content) : input.channel.createMessage(content));
+                    m = await (input instanceof Interaction ? input.createFollowup(content).then(f => f.getMessage()) : input.channel.createMessage(content));
                     setTimeout(async() => {
                         await m.delete().catch(() => null);
                     }, 2e4);

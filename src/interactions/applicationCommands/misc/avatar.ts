@@ -15,12 +15,13 @@ export default new Command(import.meta.url, "avatar")
     .setOptionsParser(interaction => ({
         user: interaction.data.options.getUser("user") || interaction.user
     }))
-    .setAck((interaction, { user }, ephemeralUser) => {
+    .setAck(async(interaction, { user }, ephemeralUser) => {
         if (!user) {
-            return interaction.reply({
+            await interaction.reply({
                 flags:   MessageFlags.EPHEMERAL,
                 content: "H-hey! That wasn't a valid user.."
             });
+            return;
         }
         return ephemeralUser ? interaction.defer(MessageFlags.EPHEMERAL) : interaction.defer();
     })

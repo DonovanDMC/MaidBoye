@@ -7,14 +7,18 @@ import { AuditLogActionTypes, ChannelTypes, ThreadChannel } from "oceanic.js";
 import { Time } from "@uwu-codes/utils";
 
 export default new ClientEvent("threadDelete", async function threadDeleteEvent(thread) {
+    if (thread.guildID === undefined) {
+        return;
+    }
+
     const events = await LogEvent.getType(thread.guildID, LogEvents.THREAD_DELETE);
     if (events.length === 0) {
         return;
     }
 
     const embed = Util.makeEmbed(true)
-        .setTitle("Thread Created")
-        .setColor(Colors.green)
+        .setTitle("Thread Deleted")
+        .setColor(Colors.red)
         .addField("Thread Info", (thread instanceof ThreadChannel ? [
             `Thread: **${thread.name}** (${thread.id})`,
             `Owner: **${(await this.getUser(thread.ownerID))!.tag}** (${thread.ownerID})`,

@@ -15,27 +15,27 @@ export default class EmptyPreference extends BasePreference {
     name: string;
     validValues: string;
 
-    protected override validateInput(value: unknown): boolean {
+    protected override validateInput(_value: unknown): boolean {
         throw new NotImplementedError(`${this.constructor.name}#validateInput`);
     }
 
-    override formatValue(value: unknown): string {
+    override formatValue(_value: unknown): string {
         throw new NotImplementedError(`${this.constructor.name}#formatValue`);
     }
 
-    override async getValue(uConfig: UserConfig) {
+    override async getValue(_uConfig: UserConfig) {
         throw new NotImplementedError(`${this.constructor.name}#getValue`);
     }
 
-    override async handleInteraction(interaction: CommandInteraction, uConfig: UserConfig, value: unknown) {
+    override async handleInteraction(_interaction: CommandInteraction, _uConfig: UserConfig, _value: unknown) {
         throw new NotImplementedError(`${this.constructor.name}#handleInteraction`);
     }
 
-    override async handlePick(interaction: ComponentInteraction, uConfig: UserConfig, value: unknown) {
+    override async handlePick(_interaction: ComponentInteraction, _uConfig: UserConfig, _value: unknown) {
         throw new NotImplementedError(`${this.constructor.name}#handlePick`);
     }
 
-    override async open(interaction: SelectMenuComponentInteraction, uConfig: UserConfig) {
+    override async open(_interaction: SelectMenuComponentInteraction, _uConfig: UserConfig) {
         throw new NotImplementedError(`${this.constructor.name}#open`);
     }
 }

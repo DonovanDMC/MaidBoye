@@ -1,6 +1,6 @@
 import Util from "../../util/Util.js";
 import db from "../index.js";
-import type { ExcludedPreferences } from "../../util/preferences/index";
+import type { ExcludedPreferences } from "../../util/preferences/index.js";
 import Preferences, { PreferenceBits } from "../../util/preferences/index.js";
 import type Config from "../../config/index.js";
 import assert from "node:assert";

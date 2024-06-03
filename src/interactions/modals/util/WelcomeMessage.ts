@@ -64,20 +64,14 @@ export default class WelcomeMessageModal extends BaseModal {
             if (oldJoin !== null) {
                 const [token, id] = EncryptionHandler.decrypt(oldJoin).split(":");
                 console.log("join", token.slice(0, 20), id);
-                newFollowupJoin = await interaction.client.rest.interactions.editFollowupMessage(interaction.applicationID, token, id, {
-                    ...WelcomeMessageHandler.format(gConfig, interaction.member, "join", joinMessage),
-                    flags: MessageFlags.EPHEMERAL
-                }).then(() => false);
+                newFollowupJoin = await interaction.client.rest.interactions.editFollowupMessage(interaction.applicationID, token, id, WelcomeMessageHandler.format(gConfig, interaction.member, "join", joinMessage)).then(() => false);
             }
 
             const oldLeave = await db.redis.get(`welcome-edit:${interaction.guildID}:${state.uuid}:leave`);
             if (oldLeave !== null) {
                 const [token, id] = EncryptionHandler.decrypt(oldLeave).split(":");
                 console.log("leave", token.slice(0, 20), id);
-                newFollowupLeave = await interaction.client.rest.interactions.editFollowupMessage(interaction.applicationID, token, id, {
-                    ...WelcomeMessageHandler.format(gConfig, interaction.member, "leave", leaveMessage),
-                    flags: MessageFlags.EPHEMERAL
-                }).then(() => false);
+                newFollowupLeave = await interaction.client.rest.interactions.editFollowupMessage(interaction.applicationID, token, id, WelcomeMessageHandler.format(gConfig, interaction.member, "leave", leaveMessage)).then(() => false);
             }
         }
 
@@ -85,7 +79,7 @@ export default class WelcomeMessageModal extends BaseModal {
             const f = await interaction.createFollowup({
                 ...WelcomeMessageHandler.format(gConfig, interaction.member, "join", joinMessage),
                 flags: MessageFlags.EPHEMERAL
-            });
+            }).then(fu => fu.getMessage());
             await db.redis.setex(`welcome-edit:${interaction.guildID}:${uuid}:join`, 60 * 15, EncryptionHandler.encrypt(`${interaction.token}:${f.id}`));
         }
 
@@ -93,7 +87,7 @@ export default class WelcomeMessageModal extends BaseModal {
             const f = await interaction.createFollowup({
                 ...WelcomeMessageHandler.format(gConfig, interaction.member, "leave", leaveMessage),
                 flags: MessageFlags.EPHEMERAL
-            });
+            }).then(fu => fu.getMessage());
             await db.redis.setex(`welcome-edit:${interaction.guildID}:${uuid}:leave`, 60 * 15, EncryptionHandler.encrypt(`${interaction.token}:${f.id}`));
         }
     }

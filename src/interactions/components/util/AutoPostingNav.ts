@@ -13,6 +13,6 @@ export default class AutoPostingNavComponent extends BaseComponent {
         } else {
             page++;
         }
-        return autoPostingNav(interaction, page, channel);
+        await autoPostingNav(interaction, page, channel);
     }
 }

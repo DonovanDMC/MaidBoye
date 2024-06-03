@@ -1,4 +1,4 @@
-import type { EmptyService } from "./Service";
+import type { EmptyService } from "./Service.js";
 import type { ModuleImport } from "@uwu-codes/types";
 import { workerData } from "node:worker_threads";
 if (import.meta.url.endsWith(".ts")) {

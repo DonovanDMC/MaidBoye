@@ -17,7 +17,7 @@ export default class E621Thumbnail {
         }
     }
 
-    static async create(url: string, md5: string, type: Exclude<E621ThumbnailType, "none">) {
+    static async create(_url: string, md5: string, type: Exclude<E621ThumbnailType, "none">) {
         return Yiffy.thumbs.create(md5, type === "image" ? "png" : "gif");
     }
 

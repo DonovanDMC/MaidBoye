@@ -21,12 +21,13 @@ export default new Command(import.meta.url, "shorten")
             code: interaction.data.options.getString("code")
         };
     })
-    .setAck((interaction, { url }, ephemeralUser) => {
+    .setAck(async(interaction, { url }, ephemeralUser) => {
         if ((!url || !url.startsWith("http"))) {
-            return interaction.createMessage({
+            await interaction.createMessage({
                 flags:   MessageFlags.EPHEMERAL,
                 content: "H-hey! That wasn't a valid url.."
             });
+            return;
         }
         return ephemeralUser ? interaction.defer(MessageFlags.EPHEMERAL) : interaction.defer();
     })

@@ -96,8 +96,9 @@ export class Configuration extends PrivateConfiguration {
                 maxShards: "auto",
                 presence:  {
                     activities: [{
-                        type: ActivityTypes.CUSTOM,
-                        name: "Starting.."
+                        type:  ActivityTypes.CUSTOM,
+                        name:  "Starting..",
+                        state: "Starting.."
                     }],
                     status: "dnd"
                 }
@@ -358,7 +359,7 @@ export class Configuration extends PrivateConfiguration {
                     }],
                     status: "online"
                 },
-                filter: (hour: number, minute: number, second: number) => (minute % 2) === 0 && second === 0
+                filter: (_hour: number, minute: number, second: number) => (minute % 2) === 0 && second === 0
             },
             {
                 presence: {
@@ -368,27 +369,29 @@ export class Configuration extends PrivateConfiguration {
                     }],
                     status: "online"
                 },
-                filter: (hour: number, minute: number, second: number) => (minute % 2) === 0 && second === 20
+                filter: (_hour: number, minute: number, second: number) => (minute % 2) === 0 && second === 20
             },
             {
                 presence: {
                     activities: [{
-                        type: ActivityTypes.GAME,
-                        name: "lifting my tail >w>"
+                        type:  ActivityTypes.CUSTOM,
+                        name:  "Lifting my tail >w>",
+                        state: "Lifting my tail >w>"
                     }],
                     status: "online"
                 },
-                filter: (hour: number, minute: number, second: number) => (minute % 2) === 0 && second === 40
+                filter: (_hour: number, minute: number, second: number) => (minute % 2) === 0 && second === 40
             },
             {
                 presence: {
                     activities: [{
-                        type: ActivityTypes.GAME,
-                        name: ">w<"
+                        type:  ActivityTypes.CUSTOM,
+                        name:  ">w<",
+                        state: ">w<"
                     }],
                     status: "online"
                 },
-                filter: (hour: number, minute: number, second: number) => (minute % 2) === 1 && second === 0
+                filter: (_hour: number, minute: number, second: number) => (minute % 2) === 1 && second === 0
             },
             {
                 presence: {
@@ -398,7 +401,7 @@ export class Configuration extends PrivateConfiguration {
                     }],
                     status: "online"
                 },
-                filter: (hour: number, minute: number, second: number) => (minute % 2) === 1 && second === 20
+                filter: (_hour: number, minute: number, second: number) => (minute % 2) === 1 && second === 20
             },
             {
                 presence: {
@@ -408,7 +411,7 @@ export class Configuration extends PrivateConfiguration {
                     }],
                     status: "online"
                 },
-                filter: (hour: number, minute: number, second: number) => (minute % 2) === 1 && second === 40
+                filter: (_hour: number, minute: number, second: number) => (minute % 2) === 1 && second === 40
             }
         ];
 

@@ -14,16 +14,18 @@ export default class DivorceYesComponent extends BaseComponent {
             if (dUser.marriagePartners.includes(interaction.user.id)) {
                 await dUser.edit({ marriage_partners: dUser.marriagePartners.filter(p => p !== interaction.user.id) });
             }
-            return interaction.reply({ content: "Something's not right here.. Maybe they already divorced you, or you already divorced them?" });
+            await interaction.reply({ content: "Something's not right here.. Maybe they already divorced you, or you already divorced them?" });
+            return;
         }
         if (!dUser.marriagePartners.includes(interaction.user.id)) {
             if (user.marriagePartners.includes(data.dUser)) {
                 await user.edit({ marriage_partners: user.marriagePartners.filter(p => p !== data.dUser) });
             }
-            return interaction.reply({ content: "Something's not right here.. Maybe they already divorced you, or you already divorced them?" });
+            await interaction.reply({ content: "Something's not right here.. Maybe they already divorced you, or you already divorced them?" });
+            return;
         }
         await user.edit({ marriage_partners: user.marriagePartners.filter(p => p !== data.dUser) });
         await dUser.edit({ marriage_partners: dUser.marriagePartners.filter(p => p !== interaction.user.id) });
-        return interaction.reply({ content: `You've successfully divorced <@!${data.dUser}>.` });
+        await interaction.reply({ content: `You've successfully divorced <@!${data.dUser}>.` });
     }
 }

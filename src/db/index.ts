@@ -4,7 +4,7 @@ import StatsHandler from "../util/StatsHandler.js";
 import Logger from "@uwu-codes/logger";
 import type { QueryConfig, QueryResultRow } from "pg";
 import pg from "pg";
-import Redis from "ioredis";
+import { Redis } from "ioredis";
 import { Timer } from "@uwu-codes/utils";
 
 export interface OkPacket<T extends bigint | number = bigint> {
@@ -24,7 +24,7 @@ export default class db {
     static async delete(table: string, id: number | string) {
         await this.initIfNotReady();
         const res = await this.query(`DELETE FROM ${table} WHERE id = $1`, [id]);
-        return res.rowCount >= 1;
+        return res.rowCount && res.rowCount >= 1;
     }
 
     // because of some weird circular import nonsense this has to be done this way
@@ -73,7 +73,7 @@ export default class db {
         await this.initIfNotReady();
         const keys = Object.keys(data);
         const values = Object.values(data);
-        const { rows: [res] } = await this.query<{ id: T; }>(`INSERT INTO ${table} (${keys.join(", ")}) VALUES (${values.map((val, index) => `$${index + 1}`).join(", ")}) ${ignoreDuplicate ? "ON CONFLICT DO NOTHING " : ""}RETURNING id`, values);
+        const { rows: [res] } = await this.query<{ id: T; }>(`INSERT INTO ${table} (${keys.join(", ")}) VALUES (${values.map((_val, index) => `$${index + 1}`).join(", ")}) ${ignoreDuplicate ? "ON CONFLICT DO NOTHING " : ""}RETURNING id`, values);
         return ignoreDuplicate ? null : res.id;
     }
 
@@ -81,7 +81,7 @@ export default class db {
         await this.initIfNotReady();
         Debug("db:postgres:query", queryTextOrConfig);
         Debug("db:postgres:queryData", values);
-        return this.dbClient.query<R, I>(queryTextOrConfig, values);
+        return this.dbClient.query<R, I>(queryTextOrConfig, values as never);
     }
 }
 

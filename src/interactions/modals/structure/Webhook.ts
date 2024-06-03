@@ -38,7 +38,7 @@ export default abstract class WebhookModal extends BaseModal {
             reason: this.getReason(interaction, state)
         })
             .catch(err => {
-                if (err instanceof DiscordRESTError && err.code === JSONErrorCodes.MAXIMUM_NUMBER_OF_WEBHOOKS) {
+                if (err instanceof DiscordRESTError && (err.code === JSONErrorCodes.TOO_MANY_WEBHOOKS || err.code === JSONErrorCodes.TOO_MANY_GUILD_WEBHOOKS)) {
                     return null;
                 } else {
                     throw err;

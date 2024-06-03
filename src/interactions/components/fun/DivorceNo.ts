@@ -6,6 +6,6 @@ export default class DivorceNoComponent extends BaseComponent {
     command = "divorce";
 
     protected override async handle(interaction: ComponentInteraction) {
-        return interaction.reply({ content: "Cancelled." });
+        await interaction.reply({ content: "Cancelled." });
     }
 }

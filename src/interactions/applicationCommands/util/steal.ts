@@ -154,13 +154,13 @@ export default new Command(import.meta.url, "steal")
                 } catch (err) {
                     assert(Util.is<Error>(err));
                     if (err instanceof DiscordRESTError) {
-                        if (err.code === JSONErrorCodes.INVALID_FORM_BODY || err.code === JSONErrorCodes.FILE_UPLOADED_EXCEEDS_MAXIMUM_SIZE) {
+                        if (err.code === JSONErrorCodes.INVALID_FORM_BODY || err.code === JSONErrorCodes.INVALID_FILE_ASSET_SIZE) {
                             return interaction.reply({ content: "H-hey! The file was too large, please try again with a smaller file..\n(try 256kb or less)" });
                         }
-                        if (err.code === JSONErrorCodes.MAXIMUM_NUMBER_OF_EMOJIS) {
+                        if (err.code === JSONErrorCodes.TOO_MANY_EMOJI) {
                             return interaction.reply({ content: "H-hey! This server already has the maximum amount of emojis.." });
                         }
-                        if (err.code === JSONErrorCodes.MAXIMUM_NUMBER_OF_ANIMATED_EMOJIS) {
+                        if (err.code === JSONErrorCodes.TOO_MANY_ANIMATED_EMOJI) {
                             return interaction.reply({ content: "H-hey! This server already has the maximum amount of animated emojis.." });
                         }
                     }
@@ -186,10 +186,10 @@ export default new Command(import.meta.url, "steal")
                 } catch (err) {
                     assert(Util.is<Error>(err));
                     if (err instanceof DiscordRESTError) {
-                        if (err.code === JSONErrorCodes.INVALID_FORM_BODY || err.code === JSONErrorCodes.FILE_UPLOADED_EXCEEDS_MAXIMUM_SIZE) {
+                        if (err.code === JSONErrorCodes.INVALID_FORM_BODY || err.code === JSONErrorCodes.INVALID_FILE_ASSET_SIZE) {
                             return interaction.reply({ content: "H-hey! The file was too large, please try again with a smaller file..\n(try 512kb or less)" });
                         }
-                        if (err.code === JSONErrorCodes.MAXIMUM_NUMBER_OF_STICKERS) {
+                        if (err.code === JSONErrorCodes.TOO_MANY_STICKERS) {
                             return interaction.reply({ content: "H-hey! This server already has the maximum amount of stickers.." });
                         }
                     }

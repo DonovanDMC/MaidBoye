@@ -81,6 +81,7 @@ export default class Util {
 
     /**
      * add the specified bits if not already present
+     *
      * @param {T} current - the current bits
      * @param {...T} toAdd - the bits to add
      * @template {(bigint | number)} T
@@ -485,36 +486,31 @@ export default class Util {
 
     static async getYiff(type: YiffTypes) {
         switch (type) {
-            case "straight": { return Yiffy.images.furry.yiff.straight();
-            }
-            case "lesbian": { return Yiffy.images.furry.yiff.lesbian();
-            }
-            case "gynomorph": { return Yiffy.images.furry.yiff.gynomorph();
-            }
-            case "andromorph": { return Yiffy.images.furry.yiff.andromorph();
-            }
-            default: { return Yiffy.images.furry.yiff.gay();
-            }
+            case "straight": return Yiffy.images.furry.yiff.straight();
+            case "lesbian": return Yiffy.images.furry.yiff.lesbian();
+            case "gynomorph": return Yiffy.images.furry.yiff.gynomorph();
+            case "andromorph": return Yiffy.images.furry.yiff.andromorph();
+            default: return Yiffy.images.furry.yiff.gay();
         }
     }
 
     static async handleGenericImage(interaction: CommandInteraction | ComponentInteraction, cmd: string) {
         const map = {
             "birb":            { d: true as const, f: Yiffy.images.animals.birb, t: "Birb!" },
-            "bunny":           { d: false as const, f: CheweyAPI.rabbit.bind(CheweyAPI), t: "Bun-Bun!" },
-            "cat":             { d: false as const, f: CheweyAPI.cat.bind(CheweyAPI), t: "kitty!" },
+            "bunny":           { d: false as const, f: CheweyAPI.images.rabbit, t: "Bun-Bun!" },
+            "cat":             { d: false as const, f: CheweyAPI.images.cat, t: "kitty!" },
             "dikdik":          { d: true as const, f: Yiffy.images.animals.dikdik, t: "Dik-Dik!" },
-            "dog":             { d: false as const, f: CheweyAPI.dog.bind(CheweyAPI), t: "Wool Woof!" },
-            "duck":            { d: false as const, f: CheweyAPI.duck.bind(CheweyAPI), t: "Quack!" },
-            "fox":             { d: false as const, f: CheweyAPI.fox.bind(CheweyAPI), t: "Screeeeee!" },
-            "koala":           { d: false as const, f: CheweyAPI.koala.bind(CheweyAPI), t: "Koala!" },
-            "otter":           { d: false as const, f: CheweyAPI.otter.bind(CheweyAPI), t: "Cuuuuute!" },
-            "owl":             { d: false as const, f: CheweyAPI.owl.bind(CheweyAPI), t: "Hoot Hoot!" },
-            "panda":           { d: false as const, f: CheweyAPI.panda.bind(CheweyAPI), t: "Panda!" },
-            "snek":            { d: false as const, f: CheweyAPI.snake.bind(CheweyAPI), t: "Snek!" },
-            "turtle":          { d: false as const, f: CheweyAPI.turtle.bind(CheweyAPI), t: "Tortle!" },
-            "wah":             { d: false as const, f: CheweyAPI["red-panda"].bind(CheweyAPI), t: "Wah!" },
-            "wolf":            { d: false as const, f: CheweyAPI.wolf.bind(CheweyAPI), t: "Wolf!" },
+            "dog":             { d: false as const, f: CheweyAPI.images.dog, t: "Wool Woof!" },
+            "duck":            { d: false as const, f: CheweyAPI.images.duck, t: "Quack!" },
+            "fox":             { d: false as const, f: CheweyAPI.images.fox, t: "Screeeeee!" },
+            "koala":           { d: false as const, f: CheweyAPI.images.koala, t: "Koala!" },
+            "otter":           { d: false as const, f: CheweyAPI.images.otter, t: "Cuuuuute!" },
+            "owl":             { d: false as const, f: CheweyAPI.images.owl, t: "Hoot Hoot!" },
+            "panda":           { d: false as const, f: CheweyAPI.images.panda, t: "Panda!" },
+            "snek":            { d: false as const, f: CheweyAPI.images.snake, t: "Snek!" },
+            "turtle":          { d: false as const, f: CheweyAPI.images.turtle, t: "Tortle!" },
+            "wah":             { d: false as const, f: CheweyAPI.images["red-panda"], t: "Wah!" },
+            "wolf":            { d: false as const, f: CheweyAPI.images.wolf, t: "Wolf!" },
             "fursuit":         { d: true as const, f: Yiffy.images.furry.fursuit, t: "Fursuit!" },
             "fursuitbutt":     { d: true as const, f: Yiffy.images.furry.butts, t: "Fursuit Butt!" },
             "bulge":           { d: true as const, f: Yiffy.images.furry.bulge, t: "Bulge!" },
@@ -577,6 +573,7 @@ export default class Util {
 
     /**
      * check if the specified bits are present
+     *
      * @param {T} current - the current bits
      * @param {...T} bits - the bits to add
      * @template {(bigint | number)} T
@@ -629,6 +626,7 @@ export default class Util {
 
     /**
      * remove the specified bits if present
+     *
      * @param {T} current - the current bits
      * @param {...T} toRemove - the bits to add
      * @template {(bigint | number)} T
@@ -649,6 +647,7 @@ export default class Util {
 
     /**
      * Replaces all normally provided things with empty versions
+     *
      * @param {CreateMessageOptions} newContent - the new content
      * @returns {CreateMessageOptions}
      */

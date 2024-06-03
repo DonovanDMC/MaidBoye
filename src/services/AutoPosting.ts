@@ -130,13 +130,13 @@ export default class AutoPostingService extends Service {
             }
 
             case AutoPostingTypes.BUNNY: {
-                image = await CheweyAPI.rabbit();
+                image = await CheweyAPI.images.rabbit();
                 api = "CheweyAPI";
                 break;
             }
 
             case AutoPostingTypes.CAT: {
-                image = await CheweyAPI.cat();
+                image = await CheweyAPI.images.cat();
                 api = "CheweyAPI";
                 break;
             }
@@ -151,67 +151,67 @@ export default class AutoPostingService extends Service {
             }
 
             case AutoPostingTypes.DOG: {
-                image = await CheweyAPI.dog();
+                image = await CheweyAPI.images.dog();
                 api = "CheweyAPI";
                 break;
             }
 
             case AutoPostingTypes.DUCK: {
-                image = await CheweyAPI.duck();
+                image = await CheweyAPI.images.duck();
                 api = "CheweyAPI";
                 break;
             }
 
             case AutoPostingTypes.FOX: {
-                image = await CheweyAPI.fox();
+                image = await CheweyAPI.images.fox();
                 api = "CheweyAPI";
                 break;
             }
 
             case AutoPostingTypes.KOALA: {
-                image = await CheweyAPI.koala();
+                image = await CheweyAPI.images.koala();
                 api = "CheweyAPI";
                 break;
             }
 
             case AutoPostingTypes.OTTER: {
-                image = await CheweyAPI.otter();
+                image = await CheweyAPI.images.otter();
                 api = "CheweyAPI";
                 break;
             }
 
             case AutoPostingTypes.OWL: {
-                image = await CheweyAPI.owl();
+                image = await CheweyAPI.images.owl();
                 api = "CheweyAPI";
                 break;
             }
 
             case AutoPostingTypes.PANDA: {
-                image = await CheweyAPI.panda();
+                image = await CheweyAPI.images.panda();
                 api = "CheweyAPI";
                 break;
             }
 
             case AutoPostingTypes.SNEK: {
-                image = await CheweyAPI.snake();
+                image = await CheweyAPI.images.snake();
                 api = "CheweyAPI";
                 break;
             }
 
             case AutoPostingTypes.TURTLE: {
-                image = await CheweyAPI.turtle();
+                image = await CheweyAPI.images.turtle();
                 api = "CheweyAPI";
                 break;
             }
 
             case AutoPostingTypes.RED_PANDA: {
-                image = await CheweyAPI.redPanda();
+                image = await CheweyAPI.images["red-panda"]();
                 api = "CheweyAPI";
                 break;
             }
 
             case AutoPostingTypes.WOLF: {
-                image = await CheweyAPI.wolf();
+                image = await CheweyAPI.images.wolf();
                 api = "CheweyAPI";
                 break;
             }

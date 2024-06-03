@@ -1,7 +1,7 @@
 import Util from "./Util.js";
 import LogEvent, { LogEvents } from "../db/Models/LogEvent.js";
 import db from "../db/index.js";
-import type MaidBoye from "../main";
+import type MaidBoye from "../main.js";
 import type { Invite, Member } from "oceanic.js";
 
 export default class InviteTracker {
