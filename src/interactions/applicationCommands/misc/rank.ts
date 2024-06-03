@@ -26,6 +26,7 @@ export default new Command(import.meta.url, "rank")
         }
         const img = await profileImage(user.id, {
             badgesFrame: true,
+            customBadges,
             rankData:    {
                 currentXp:     leftover,
                 requiredXp:    leftover + needed,
