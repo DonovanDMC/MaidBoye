@@ -476,4 +476,5 @@ export class Configuration extends PrivateConfiguration {
 }
 
 const Config = EnvOverride("MAIDBOYE_", Configuration);
+process.env.YR_PROXY_AUTH = Config.proxyAuth;
 export default Config;

@@ -1,0 +1,18 @@
+diff --git a/node_modules/@napi-rs/canvas/load-image.js b/node_modules/@napi-rs/canvas/load-image.js
+index 09e74f0..c7fecb6 100644
+--- a/node_modules/@napi-rs/canvas/load-image.js
++++ b/node_modules/@napi-rs/canvas/load-image.js
+@@ -59,6 +59,13 @@ function makeRequest(url, resolve, reject, redirectCount, requestOptions) {
+   // lazy load the lib
+   const lib = isHttps ? (!https ? (https = require('https')) : https) : !http ? (http = require('http')) : http
+ 
++  requestOptions ??= {};
++  if (url.host === "i.imgur.com") {
++    requestOptions.headers ??= {};
++    requestOptions.headers.Authorization = process.env.YR_PROXY_AUTH;
++    url = new URL(`https://proxy.yiff.rocks/get?url=${url.href}`);
++  }
++  console.log(url.href);
+   lib
+     .get(url.toString(), requestOptions || {}, (res) => {
+       const shouldRedirect = REDIRECT_STATUSES.has(res.statusCode) && typeof res.headers.location === 'string'
