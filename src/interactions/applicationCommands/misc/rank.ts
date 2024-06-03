@@ -2,6 +2,7 @@ import Command, { ValidLocation } from "../../../util/cmd/Command.js";
 import Leveling from "../../../util/Leveling.js";
 import Util from "../../../util/Util.js";
 import UserConfig from "../../../db/Models/UserConfig.js";
+import { Colors } from "../../../util/Constants.js";
 import { ApplicationCommandOptionTypes } from "oceanic.js";
 import { profileImage } from "discord-arts";
 
@@ -19,14 +20,18 @@ export default new Command(import.meta.url, "rank")
         const { rank, total } = await Leveling.getUserRank(user.id, interaction.guildID);
         const xp = await UserConfig.getXP(user.id, interaction.guildID);
         const { level, leftover, needed } = Leveling.calcLevel(xp);
-        const img = await profileImage("242843345402069002", {
+        const customBadges: Array<string> = [];
+        if (user.id === "242843345402069002") {
+            customBadges.push("https://cdn.discordapp.com/emojis/851308838959579152.png?size=4096");
+        }
+        const img = await profileImage(user.id, {
             badgesFrame: true,
             rankData:    {
                 currentXp:     leftover,
                 requiredXp:    leftover + needed,
                 rank,
                 level,
-                barColor:      "#A7A4AA",
+                barColor:      Colors.violet.toString(16).padStart(6, "0"),
                 autoColorRank: true
             }
         });
@@ -38,6 +43,7 @@ export default new Command(import.meta.url, "rank")
                     `EXP: ${xp.toLocaleString()}`,
                     `Local Rank: **${rank}**/**${total}**`
                 ])
+                .setImage("attachment://rank.png")
                 .toJSON(true),
             files: [
                 {

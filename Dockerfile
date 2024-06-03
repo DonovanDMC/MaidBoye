@@ -8,6 +8,5 @@ COPY package.json package-lock.json ./
 RUN npm install
 COPY . .
 RUN npm run build
-RUN npx patch-package
 RUN npm prune --prod
 CMD ["node", "--no-warnings", "--no-deprecation", "--experimental-specifier-resolution=node", "dist/src/index.js"]
