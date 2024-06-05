@@ -1,0 +1,27 @@
+diff --git a/node_modules/discord-arts/src/cards/profile-image.js b/node_modules/discord-arts/src/cards/profile-image.js
+index 6db3d23..386c8af 100644
+--- a/node_modules/discord-arts/src/cards/profile-image.js
++++ b/node_modules/discord-arts/src/cards/profile-image.js
+@@ -17,7 +17,7 @@ async function profileImage(userId, options) {
+     return buffer;
+   } catch (error) {
+     if (error.message.includes('source rejected')) {
+-      throw new DiscordArtsError(`Error loading user assets, try again later`, { userId })
++      throw new DiscordArtsError(`Error loading user assets, try again later`, { userId, cause: error })
+     }
+     throw new DiscordArtsError(error?.message, { userId })
+   }
+diff --git a/node_modules/discord-arts/src/utils/error.utils.js b/node_modules/discord-arts/src/utils/error.utils.js
+index 1779fdf..b075070 100644
+--- a/node_modules/discord-arts/src/utils/error.utils.js
++++ b/node_modules/discord-arts/src/utils/error.utils.js
+@@ -1,7 +1,7 @@
+ class DiscordArtsError extends Error {
+   constructor(message, info) {
+-    const { userId, packageVersion } = info;
+-    super(message);
++    const { userId, packageVersion, cause } = info;
++    super(message, { cause });
+     this.userId = userId;
+   }
+ }
