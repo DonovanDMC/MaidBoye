@@ -91,3 +91,5 @@ networks:
       driver: default
       config:
         - subnet: 172.19.3.0/29
+    driver_opts:
+      com.docker.network.bridge.name: br-maidboye
