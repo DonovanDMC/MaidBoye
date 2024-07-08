@@ -7,9 +7,9 @@ import type { Post } from "e621";
 import type { JSONResponse } from "yiffy";
 import { Strings } from "@uwu-codes/utils";
 import { fetch } from "undici";
+import { fileTypeFromBuffer } from "file-type";
 import { STATUS_CODES } from "node:http";
 import { Blob } from "node:buffer";
-import { fileTypeFromBuffer } from "file-type";
 
 export class PreCheckError extends Error {
     override name = "PreCheckError";
@@ -107,23 +107,29 @@ export default async function Sauce(input: string, simularity = 80, skipCheck = 
 
         iqdb: if (!method) {
             const img = await RequestProxy.get(input);
-            if (!img.ok) break iqdb;
-        
-            const content = Buffer.from(await img.response.arrayBuffer())
-            const type = (await fileTypeFromBuffer(content))!;
-            const result = await fetch(`https://e621.net/iqdb_queries.json?search[score_cutoff]=${simularity}`, {
-                method: "POST",
-                body: new Blob([content], { type: type.mime })
-            });
+            if (!img.ok) {
+                break iqdb;
+            }
 
-            if (result.status !== 200) break iqdb;
+            const content = Buffer.from(await img.response.arrayBuffer());
+            const type = await fileTypeFromBuffer(content);
+            if (type && ["image/png", "image/jpeg"].includes(type.mime)) {
+                const result = await fetch(`https://e621.net/iqdb_queries.json?search[score_cutoff]=${simularity}`, {
+                    method: "POST",
+                    body:   new Blob([content], { type: type.mime })
+                });
 
-            const res = (await result.json()) as Array<{ post_id: number; score: number; }>;
+                if (result.status !== 200) {
+                    break iqdb;
+                }
 
-            if(res.length > 0) {
-                method = "iqdb";
-                post = await E621.posts.get(res[0].post_id);
-                saucePercent = res[0].score;
+                const res = (await result.json()) as Array<{ post_id: number; score: number; }>;
+
+                if (res.length !== 0) {
+                    method = "iqdb";
+                    post = await E621.posts.get(res[0].post_id);
+                    saucePercent = res[0].score;
+                }
             }
         }
 
