@@ -84,11 +84,11 @@ export default new ClientEvent("messageCreate", async function messageCreateEven
                         // eslint-disable-next-line guard-for-in, @typescript-eslint/no-implied-eval, no-new-func -- typescript messes with variable names so we have to remake them
                         new Function("value", `${k} = value`)(evalVariables[k]);
                     }
-                    let res: unknown
+                    let res: unknown;
                     let arg = args.join(" ");
                     function flag(text: string) {
-                        const r = new RegExp(`(?<!\S)-${text}(?!\S)`, "g")
-                        if (r.exec(arg)) {
+                        const r = new RegExp(`(?<!\\S)-${text}(?!\\S)`, "g");
+                        if (r.test(arg)) {
                             arg = arg.replace(r, "");
                             return true;
                         }
@@ -214,22 +214,24 @@ export default new ClientEvent("messageCreate", async function messageCreateEven
                             if (sauce.post !== null && !sources.some(s => s.startsWith("https://e621.net/posts/"))) {
                                 sources.unshift(`https://e621.net/posts/${sauce.post.id}`);
                             }
-                            await this.rest.channels.createMessage(msg.channelID, {
-                                content:          sources.join("\n"),
-                                messageReference: {
-                                    channelID:       msg.channelID,
-                                    guildID:         msg.guildID,
-                                    messageID:       msg.id,
-                                    failIfNotExists: false
-                                },
-                                allowedMentions: {
-                                    users:       false,
-                                    roles:       false,
-                                    everyone:    false,
-                                    repliedUser: false
-                                },
-                                flags: Oceanic.MessageFlags.SUPPRESS_EMBEDS
-                            });
+                            if (sources.length !== 0) {
+                                await this.rest.channels.createMessage(msg.channelID, {
+                                    content:          sources.join("\n"),
+                                    messageReference: {
+                                        channelID:       msg.channelID,
+                                        guildID:         msg.guildID,
+                                        messageID:       msg.id,
+                                        failIfNotExists: false
+                                    },
+                                    allowedMentions: {
+                                        users:       false,
+                                        roles:       false,
+                                        everyone:    false,
+                                        repliedUser: false
+                                    },
+                                    flags: Oceanic.MessageFlags.SUPPRESS_EMBEDS
+                                });
+                            }
                             continue;
                         }
                     }
@@ -256,22 +258,24 @@ export default new ClientEvent("messageCreate", async function messageCreateEven
                         if (att.post !== null && !sources.some(s => s.startsWith("https://e621.net/posts/"))) {
                             sources.unshift(`https://e621.net/posts/${att.post.id}`);
                         }
-                        await this.rest.channels.createMessage(msg.channelID, {
-                            content:          sources.join("\n"),
-                            messageReference: {
-                                channelID:       msg.channelID,
-                                guildID:         msg.guildID,
-                                messageID:       msg.id,
-                                failIfNotExists: false
-                            },
-                            allowedMentions: {
-                                users:       false,
-                                roles:       false,
-                                everyone:    false,
-                                repliedUser: false
-                            },
-                            flags: Oceanic.MessageFlags.SUPPRESS_EMBEDS
-                        });
+                        if (sources.length !== 0) {
+                            await this.rest.channels.createMessage(msg.channelID, {
+                                content:          sources.join("\n"),
+                                messageReference: {
+                                    channelID:       msg.channelID,
+                                    guildID:         msg.guildID,
+                                    messageID:       msg.id,
+                                    failIfNotExists: false
+                                },
+                                allowedMentions: {
+                                    users:       false,
+                                    roles:       false,
+                                    everyone:    false,
+                                    repliedUser: false
+                                },
+                                flags: Oceanic.MessageFlags.SUPPRESS_EMBEDS
+                            });
+                        }
                     }
                 }
             }
