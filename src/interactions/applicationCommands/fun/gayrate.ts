@@ -3,6 +3,12 @@ import Command from "../../../util/cmd/Command.js";
 import Util from "../../../util/Util.js";
 import { ApplicationCommandOptionTypes } from "oceanic.js";
 
+(global as unknown as { customGayrate: Record<string, number | undefined>; }).customGayrate = {
+    [Config.clientID]:    100,
+    "242843345402069002": 69,
+    "339050872736579589": 69
+};
+
 export default new Command(import.meta.url, "gayrate")
     .setDescription("Rate someone's gayness")
     .setCooldown(3e3)
@@ -16,9 +22,10 @@ export default new Command(import.meta.url, "gayrate")
     .setAck("ephemeral-user")
     .setExecutor(async function(interaction, { user }) {
         let percent: number;
+        const val = (global as unknown as { customGayrate: Record<string, number | undefined>; }).customGayrate[user.id];
         // eslint-disable-next-line unicorn/prefer-ternary
-        if (["242843345402069002", Config.clientID].includes(user.id)) {
-            percent = 100;
+        if (val) {
+            percent = val;
         } else {
             percent = Number(BigInt(user.id) % 100n);
         }
