@@ -33,7 +33,7 @@ export default new Command(import.meta.url, "gayrate")
             embeds: Util.makeEmbed(true, interaction.user)
                 .setTitle(`${user.tag}'s Gayness`)
                 .setDescription(`**${user.tag}** is ${percent}% gay!`)
-                .setThumbnail("https://assets.maidboye.cafe/Gay.png")
+                .setThumbnail("https://assets.maid.gay/Gay.png")
                 .toJSON(true)
         });
     });

@@ -201,25 +201,25 @@ export class Configuration extends PrivateConfiguration {
     static get ["8ballAnswers"]() {
         return [
             // Neutral
-            "https://assets.maidboye.cafe/8Ball/Neutral1.png",
-            "https://assets.maidboye.cafe/8Ball/Neutral2.png",
-            "https://assets.maidboye.cafe/8Ball/Neutral3.png",
+            "https://assets.maid.gay/8Ball/Neutral1.png",
+            "https://assets.maid.gay/8Ball/Neutral2.png",
+            "https://assets.maid.gay/8Ball/Neutral3.png",
 
             // Positive
-            "https://assets.maidboye.cafe/8Ball/Positive1.png",
-            "https://assets.maidboye.cafe/8Ball/Positive2.png",
-            "https://assets.maidboye.cafe/8Ball/Positive3.png",
+            "https://assets.maid.gay/8Ball/Positive1.png",
+            "https://assets.maid.gay/8Ball/Positive2.png",
+            "https://assets.maid.gay/8Ball/Positive3.png",
 
             // Negative
-            "https://assets.maidboye.cafe/8Ball/Negative1.png",
-            "https://assets.maidboye.cafe/8Ball/Negative2.png",
-            "https://assets.maidboye.cafe/8Ball/Negative3.png"
+            "https://assets.maid.gay/8Ball/Negative1.png",
+            "https://assets.maid.gay/8Ball/Negative2.png",
+            "https://assets.maid.gay/8Ball/Negative3.png"
         ];
     }
 
     /* icons */
     static get botIcon() {
-        return "https://i.maidboye.cafe/icon.png";
+        return "https://i.maid.gay/icon.png";
     }
     static get botSauce() {
         return "https://e621.net/posts/2907560";
@@ -231,13 +231,13 @@ export class Configuration extends PrivateConfiguration {
         return "https://furry.cool/sauce";
     }
     static get noIcon() {
-        return "https://assets.maidboye.cafe/noicon.png";
+        return "https://assets.maid.gay/noicon.png";
     }
     static get bapGif() {
-        return "https://assets.maidboye.cafe/bap.gif";
+        return "https://assets.maid.gay/bap.gif";
     }
     static get bellyrubGif() {
-        return "https://assets.maidboye.cafe/bellyrub.gif";
+        return "https://assets.maid.gay/bellyrub.gif";
     }
 
     /* directories */
@@ -294,16 +294,16 @@ export class Configuration extends PrivateConfiguration {
         return "https://discord.gg/8p5A5DVgXK";
     }
     static get webLink() {
-        return "https://maidboye.cafe";
+        return "https://maid.gay";
     }
     static get privacyPolicyLink() {
-        return "https://maidboye.cafe/privacy";
+        return "https://maid.gay/privacy";
     }
     static get inviteLink() {
-        return "https://api.maidboye.cafe/links/invite";
+        return "https://api.maid.gay/links/invite";
     }
     static get inviteRedirectURI() {
-        return "https://api.maidboye.cafe/links/invite/done";
+        return "https://api.maid.gay/links/invite/done";
     }
     static get devLink() {
         return "https://furry.cool";
@@ -432,7 +432,7 @@ export class Configuration extends PrivateConfiguration {
         return !this.isDevelopment;
     }
     static get apiHost() {
-        return this.isDevelopment ? this.apiListener : "api.maidboye.cafe";
+        return this.isDevelopment ? this.apiListener : "api.maid.gay";
     }
     static get apiURL() {
         return `http${this.apiSecure ? "s" : ""}://${this.apiHost}${[80, 443].includes(this.apiPort) || !this.isDevelopment ? "" : `:${this.apiPort}`}`;

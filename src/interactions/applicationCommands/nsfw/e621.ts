@@ -76,7 +76,7 @@ export async function makeMessage(interaction: CommandInteraction | ComponentInt
     if (post.file.ext === "webm") {
         embed.setDescription(`This post is a video. To fully view it, you must go to it on [e621](https://e621.net/posts/${post.id})`);
         if (thumbType !== "none") {
-            embed.setImage("https://assets.maidboye.cafe/loading.gif");
+            embed.setImage("https://assets.maid.gay/loading.gif");
             if (thumbType === "image") {
                 embed.setDescription(`${embed.getDescription()!}\n\n(note: generating image thumbnails can take 10+ seconds)`);
             }

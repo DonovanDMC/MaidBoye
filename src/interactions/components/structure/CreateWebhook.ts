@@ -9,7 +9,7 @@ export default abstract class CreateWebhookComponent extends BaseComponent {
     action = "create-webhook";
 
     protected getAvatar(interaction: ComponentInteraction<ValidLocation.GUILD>) {
-        return "https://i.maidboye.cafe/icon.png";
+        return "https://i.maid.gay/icon.png";
     }
 
     protected getName(interaction: ComponentInteraction<ValidLocation.GUILD>) {

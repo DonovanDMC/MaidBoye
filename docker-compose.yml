@@ -26,7 +26,7 @@ services:
     labels:
       - "hostname=maidboye.containers.local"
       - "traefik.enable=true"
-      - "traefik.http.routers.maidboye.rule=HostRegexp(`api.maidboye.cafe`)"
+      - "traefik.http.routers.maidboye.rule=HostRegexp(`api.maid.gay`)"
       - "traefik.http.routers.maidboye.entrypoints=https"
       - "traefik.http.routers.maidboye.tls=true"
       - "traefik.http.services.maidboye.loadbalancer.server.port=8080"
