@@ -147,7 +147,7 @@ export default class ModLogHandler {
                 text = [
                     `Target: <@!${target.id}> (\`${target.tag}\`)`,
                     `Reason: ${reason}`,
-                    `Time: ${timed ? `${Time.ms(time, { words: true, seconds: true })} (expiry: ${Util.formatDiscordTime(timed.expiresAt.getTime(), "long-datetime")})` : "Permanent"}`
+                    `Time: ${timed ? `${Time.ms(time, { words: true, seconds: true })} (expiry: ${Util.formatDiscordTime(Math.floor(timed.expiresAt.getTime() / 1000), "long-datetime")})` : "Permanent"}`
                 ].join("\n");
                 strike = await Strike.create({
                     id:       randomUUID(),

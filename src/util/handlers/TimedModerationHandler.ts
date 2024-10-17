@@ -25,7 +25,7 @@ export default class TimedModerationHandler {
             guild_id,
             user_id,
             time,
-            expires_at: new Date(Date.now() + time)
+            expires_at: new Date(Date.now() + (time * 1000))
         });
     }
 
