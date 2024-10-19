@@ -3,7 +3,10 @@ import { fetch } from "undici";
 
 export default class RequestProxy {
     static DIRECT_WHITELIST = [
-        /^https?:\/\/static\d+\.e(621|926)\.net\//,
+        /^https?:\/\/static\d+\.e(621|926)\.net/,
+        /^https?:\/\/static\.femboy\.fan/,
+        /^https?:\/\/v2\.yiff\.media/,
+        /^https?:\/\/yiff\.media\/V2/,
         /^https:\/\/media\.discordapp\.net/,
         /^https:\/\/cdn\.discordapp\.com/
     ];

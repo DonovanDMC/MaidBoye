@@ -187,6 +187,9 @@ export default new ClientEvent("messageCreate", async function messageCreateEven
                     if (sauce.post !== null && !sources.some(s => s.startsWith("https://e621.net/posts/"))) {
                         sources.unshift(`https://e621.net/posts/${sauce.post.id}`);
                     }
+                    if (sauce.ffpost !== null && !sources.some(s => s.startsWith("https://femboy.fan/posts/"))) {
+                        sources.unshift(`https://femboy.fan/posts/${sauce.ffpost.id}`);
+                    }
                     await this.rest.channels.createMessage(msg.channelID, {
                         content:          sources.join("\n"),
                         messageReference: {
@@ -213,6 +216,9 @@ export default new ClientEvent("messageCreate", async function messageCreateEven
                             const sources = Array.isArray(sauce.sourceOverride) ? sauce.sourceOverride : (sauce.sourceOverride === undefined ? [] : [sauce.sourceOverride]);
                             if (sauce.post !== null && !sources.some(s => s.startsWith("https://e621.net/posts/"))) {
                                 sources.unshift(`https://e621.net/posts/${sauce.post.id}`);
+                            }
+                            if (sauce.ffpost !== null && !sources.some(s => s.startsWith("https://femboy.fan/posts/"))) {
+                                sources.unshift(`https://femboy.fan/posts/${sauce.ffpost.id}`);
                             }
                             if (sources.length !== 0) {
                                 await this.rest.channels.createMessage(msg.channelID, {
@@ -252,11 +258,14 @@ export default new ClientEvent("messageCreate", async function messageCreateEven
                         }
                     });
                     const md5 = createHash("md5").update(Buffer.from(await file.arrayBuffer())).digest("hex");
-                    const att = await directMD5(md5);
-                    if (att !== null) {
-                        const sources = Array.isArray(att.sourceOverride) ? att.sourceOverride : (att.sourceOverride === undefined ? [] : [att.sourceOverride]);
-                        if (att.post !== null && !sources.some(s => s.startsWith("https://e621.net/posts/"))) {
-                            sources.unshift(`https://e621.net/posts/${att.post.id}`);
+                    const sauce = await directMD5(md5);
+                    if (sauce !== null) {
+                        const sources = Array.isArray(sauce.sourceOverride) ? sauce.sourceOverride : (sauce.sourceOverride === undefined ? [] : [sauce.sourceOverride]);
+                        if (sauce.post !== null && !sources.some(s => s.startsWith("https://e621.net/posts/"))) {
+                            sources.unshift(`https://e621.net/posts/${sauce.post.id}`);
+                        }
+                        if (sauce.ffpost !== null && !sources.some(s => s.startsWith("https://femboy.fan/posts/"))) {
+                            sources.unshift(`https://femboy.fan/posts/${sauce.ffpost.id}`);
                         }
                         if (sources.length !== 0) {
                             await this.rest.channels.createMessage(msg.channelID, {

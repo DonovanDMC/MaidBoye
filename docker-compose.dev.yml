@@ -1,0 +1,4 @@
+services:
+  maidboye:
+    image: maidboye
+    build: .

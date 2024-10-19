@@ -137,6 +137,12 @@ export class Configuration extends PrivateConfiguration {
     static override get tempAuth() {
         return super.tempAuth;
     }
+    static override get femboyFansUser() {
+        return super.femboyFansUser;
+    }
+    static override get femboyFansKey() {
+        return super.femboyFansKey;
+    }
 
     /* db */
     static get dbHost() {
