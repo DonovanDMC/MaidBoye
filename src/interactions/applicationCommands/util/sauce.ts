@@ -1,5 +1,5 @@
 import Command, { ValidLocation } from "../../../util/cmd/Command.js";
-import Sauce from "../../../util/Sauce.js";
+import Sauce, { PreCheckError } from "../../../util/Sauce.js";
 import StatsHandler from "../../../util/StatsHandler.js";
 import { ApplicationCommandOptionTypes } from "oceanic.js";
 import assert from "node:assert";
@@ -46,7 +46,15 @@ export default new Command(import.meta.url, "sauce")
         let sauce: Awaited<ReturnType<typeof Sauce>> = null;
         if (type === "url") {
             assert(inputURL);
-            sauce = await Sauce(inputURL, simularity);
+            try {
+                sauce = await Sauce(inputURL, simularity);
+            } catch (err) {
+                if (err instanceof PreCheckError) {
+                    return interaction.reply({ content: err.message });
+                } else {
+                    throw err;
+                }
+            }
         } else if (type === "file") {
             assert(file);
             sauce = await Sauce(file.url, simularity);

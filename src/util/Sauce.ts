@@ -111,6 +111,65 @@ export default async function Sauce(input: string, similarity = 80, skipCheck = 
             break outer;
         }
 
+        iqdb: {
+            const img = await RequestProxy.get(input);
+            if (!img.ok) {
+                break iqdb;
+            }
+
+            const content = Buffer.from(await img.response.arrayBuffer());
+            const type = await fileTypeFromBuffer(content);
+            if (!type || !["image/png", "image/jpeg", "image/webp"].includes(type.mime)) {
+                break iqdb;
+            }
+
+            ffiqdb: {
+                tried.push("ffiqdb");
+                const result = await FemboyFans.queryIQDB(content, similarity);
+                if (result === null) {
+                    break ffiqdb;
+                }
+
+                method = "ffiqdb";
+                ffpost = await FemboyFans.getPost(result.post_id);
+                saucePercent = result.score;
+                break outer;
+            }
+
+            e6iqdb: {
+                if (type.mime === "image/webp") {
+                    break e6iqdb; // e621 does not support webp
+                }
+                tried.push("iqdb");
+                const body = new FormData();
+                body.append("file", new Blob([content], { type: type.mime }));
+                const result = await fetch(`https://e621.net/iqdb_queries.json?search[score_cutoff]=${similarity}`, {
+                    method:  "POST",
+                    body,
+                    headers: {
+                        "Authorization": `Basic ${Buffer.from(`${Config.e621User}:${Config.e621APIKey}`).toString("base64")}`,
+                        "User-Agent":    Config.userAgent
+                    }
+                });
+
+                if (result.status !== 200) {
+                    break e6iqdb;
+                }
+
+                const results = ((await result.json()) as { posts: Array<{ post_id: number; score: number; }>; }).posts;
+                const res = results.sort((a, b) => b.score - a.score).at(0) ?? null;
+
+                if (res === null) {
+                    break e6iqdb;
+                }
+
+                method = "iqdb";
+                post = await E621.posts.get(res.post_id);
+                saucePercent = res.score;
+                break outer;
+            }
+        }
+
         saucenao: {
             // saucenao is fucky and their api sucks
             if (skipSauceNao) {
@@ -133,62 +192,6 @@ export default async function Sauce(input: string, similarity = 80, skipCheck = 
                 snRateLimited = true;
             }
         }
-
-        iqdb: {
-            const img = await RequestProxy.get(input);
-            if (!img.ok) {
-                break iqdb;
-            }
-
-            const content = Buffer.from(await img.response.arrayBuffer());
-            const type = await fileTypeFromBuffer(content);
-            if (!type || !["image/png", "image/jpeg"].includes(type.mime)) {
-                break iqdb;
-            }
-
-            ffiqdb: {
-                tried.push("ffiqdb");
-                const result = await FemboyFans.queryIQDB(content, similarity);
-                if (result === null) {
-                    break ffiqdb;
-                }
-
-                method = "ffiqdb";
-                ffpost = await FemboyFans.getPost(result.post_id);
-                saucePercent = result.score;
-                break outer;
-            }
-
-            e6iqdb: {
-                tried.push("iqdb");
-                const body = new FormData();
-                body.append("file", new Blob([content], { type: type.mime }));
-                const result = await fetch(`https://e621.net/iqdb_queries.json?search[score_cutoff]=${similarity}`, {
-                    method:  "POST",
-                    body,
-                    headers: {
-                        "Authorization": `Basic ${Buffer.from(`${Config.e621User}:${Config.e621APIKey}`).toString("base64")}`,
-                        "User-Agent":    Config.userAgent
-                    }
-                });
-
-                if (result.status !== 200) {
-                    break e6iqdb;
-                }
-
-                const results = (await result.json()) as Array<{ post_id: number; score: number; }>;
-                const res = results.sort((a, b) => b.score - a.score).at(0) ?? null;
-
-                if (res === null) {
-                    break e6iqdb;
-                }
-
-                method = "iqdb";
-                post = await E621.posts.get(res.post_id);
-                saucePercent = res.score;
-                break outer;
-            }
-        }
     }
 
     if (post && post.flags.deleted && post.relationships.parent_id !== null) {
@@ -203,10 +206,6 @@ export default async function Sauce(input: string, similarity = 80, skipCheck = 
         if (parent !== null) {
             ffpost = parent;
         }
-    }
-
-    if (method === null) {
-        return null;
     }
 
     return {

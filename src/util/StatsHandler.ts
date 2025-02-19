@@ -113,7 +113,8 @@ export default class StatsHandler {
         }
         let tags: Array<string> = [];
         if (Array.isArray(args.at(-1))) {
-            tags = args.at(-1) as Array<string>;
+            // deep clone array so we don't modify the external value
+            tags = structuredClone(args.at(-1) as Array<string>);
         }
         tags.push(`env:${Config.isDevelopment ? "development" : "production"}`, `env:${Config.isDocker ? "docker" : "other"}`, `host:${hostname()}`);
         props.type = StatType[type];
