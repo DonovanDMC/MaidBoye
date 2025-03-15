@@ -71,7 +71,7 @@ export default async function Sauce(input: string, similarity = 80, skipCheck = 
 
         e621: if ((match = e621Regex.exec(input))) {
             tried.push("e621");
-            post = await E621.posts.get(match[1]);
+            post = await E621.posts.getByMD5(match[1]);
             if (post === null) {
                 break e621;
             }
