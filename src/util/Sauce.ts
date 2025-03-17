@@ -3,6 +3,7 @@ import SauceNAO from "./req/SauceNAO.js";
 import RequestProxy from "./RequestProxy.js";
 import Yiffy from "./req/Yiffy.js";
 import FemboyFans from "./req/FemboyFans.js";
+import Util from "./Util.js";
 import Config from "../config/index.js";
 import type { Post } from "e621";
 import type { JSONResponse } from "yiffy";
@@ -142,7 +143,8 @@ export default async function Sauce(input: string, similarity = 80, skipCheck = 
                 }
                 tried.push("iqdb");
                 const body = new FormData();
-                body.append("file", new Blob([content], { type: type.mime }));
+                const image = await Util.convertImageIQDB(content);
+                body.append("file", new Blob([image], { type: type.mime }));
                 const result = await fetch(`https://e621.net/iqdb_queries.json?search[score_cutoff]=${similarity}`, {
                     method:  "POST",
                     body,

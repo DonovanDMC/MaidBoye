@@ -14,6 +14,7 @@ import Config from "../config/index.js";
 import db, { DBLiteral, DBLiteralReverse } from "../db/index.js";
 import type { YiffTypes } from "../db/Models/UserConfig.js";
 import UserConfig from "../db/Models/UserConfig.js";
+import sharp from "sharp";
 import Logger from "@uwu-codes/logger";
 import type { Post } from "e621";
 import {
@@ -210,6 +211,10 @@ export default class Util {
         } else {
             return "unknown";
         }
+    }
+
+    static convertImageIQDB(buffer: Buffer) {
+        return sharp(buffer).withIccProfile("srgb").keepIccProfile().flatten({ background: "#000000" }).resize(150, 150, { fit: "inside" }).jpeg({ quality: 87 }).toBuffer();
     }
 
     static ensurePresent<T extends ErrorConstructor>(condition?: unknown, message?: string, errorConstructor?: T): asserts condition {

@@ -1,5 +1,6 @@
 /// <reference path="../@types/femboyfans.d.ts" />
 import Config from "../../config/index.js";
+import Util from "../Util.js";
 import Logger from "@uwu-codes/logger";
 import { fileTypeFromBuffer } from "file-type";
 
@@ -30,14 +31,17 @@ export default class FemboyFans {
             }
         });
         if (result.status !== 200) {
-            Logger.getLogger("FemboyFans#getPostByMD5").error(`Unexpected ${result.status} ${result.statusText}:`);
-            Logger.getLogger("FemboyFans#getPostByMD5").error(await result.text());
+            if (result.status !== 404) {
+                Logger.getLogger("FemboyFans#getPostByMD5").error(`Unexpected ${result.status} ${result.statusText}:`);
+                Logger.getLogger("FemboyFans#getPostByMD5").error(await result.text());
+            }
             return null;
         }
         return (result.json() as Promise<Array<FemboyFans.Post>>).then(([post]) => post);
     }
 
     static async queryIQDB(img: Buffer, similarity = 60): Promise<{ post_id: number; score: number; } | null> {
+        img = await Util.convertImageIQDB(img);
         const type = await fileTypeFromBuffer(img);
         if (type === undefined) {
             return null;
