@@ -2,7 +2,7 @@
   "name": "maidboye",
   "version": "2.0.0",
   "description": "A cute little maid bot for keeping your server nice and tidy.",
-  "buildDate": 1742053393302,
+  "buildDate": 1759461376775,
   "main": "dist/src/index.js",
   "scripts": {
     "start": "node --no-warnings --no-deprecation --experimental-specifier-resolution=node dist/src/index.js",

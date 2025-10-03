@@ -65,7 +65,12 @@ async function handle(this: MaidBoye, interaction: CommandInteraction<ValidLocat
                     `${Config.emojis.default.dot} Join Date: ${member.joinedAt === null ? "Unknown" : Util.formatDiscordTime(member.joinedAt, "long-datetime", true)}`,
                     `${Config.emojis.default.dot} Roles: ${member.roles.length === 0 ? "**None**" : (member.roles.reduce((a,b) => a + b.length + 4 /* <@&> */, 0) > 1500 ? "**Unable To Display Roles.**" : member.roles.map(r => `<@&${r}>`).join(" "))}`,
                     `${Config.emojis.default.dot} Join Info:`,
-                    ...around.map(a => `${a === target.id ? `- **[#${m.indexOf(a) + 1}]**` : `- [#${m.indexOf(a) + 1}]`} <@!${a}> (${Util.formatDiscordTime(interaction.guild.members.get(a)!.joinedAt, "short-datetime", true)})`)
+                    ...await Promise.all(
+                        around.map(async a => {
+                            const gm = await this.getMember(interaction.guildID, a);
+                            return `${a === target.id ? `- **[#${m.indexOf(a) + 1}]**` : `- [#${m.indexOf(a) + 1}]`} <@!${a}> (${gm === null ? "Unknown" : Util.formatDiscordTime(gm.joinedAt ?? new Date(), "short-datetime", true)})`;
+                        })
+                    )
                 ],
                 "",
                 "**Badges**:",
