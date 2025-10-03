@@ -141,13 +141,21 @@ export default new ClientEvent("messageCreate", async function messageCreateEven
                             ],
                             components: new ComponentBuilder<MessageActionRow>()
                                 .addInteractionButton({
+                                    // response
                                     customID: State.new(msg.author.id, "eval", "trash").encode(),
                                     emoji:    ComponentBuilder.emojiToPartial(Config.emojis.default.trash, "default"),
                                     style:    ButtonColors.RED
                                 })
                                 .addInteractionButton({
-                                    customID: State.new(msg.author.id, "eval", "delete").encode(),
+                                    // invocation
+                                    customID: State.new(msg.author.id, "eval", "delete").with("message", msg.id).encode(),
                                     emoji:    ComponentBuilder.emojiToPartial(Config.emojis.default.x, "default"),
+                                    style:    ButtonColors.GREEN
+                                })
+                                .addInteractionButton({
+                                    // both
+                                    customID: State.new(msg.author.id, "eval", "both").with("message", msg.id).encode(),
+                                    emoji:    ComponentBuilder.emojiToPartial(Config.emojis.default.stop, "default"),
                                     style:    ButtonColors.GREEN
                                 })
                                 .toJSON(),
