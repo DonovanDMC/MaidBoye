@@ -265,7 +265,7 @@ export default class Util {
     static formatBadges(user: User | Member) {
         const flags = Util.getFlagsArray(UserFlags, user.publicFlags);
         const names = flags.map(f => `${Config.emojis.default.dot} ${UserFlagNames[UserFlags[f]]}`);
-        if (user.id === "242843345402069002") {
+        if (Config.developers.includes(user.id)) {
             names.push(`${Config.emojis.default.dot} ${Config.emojis.custom.don} MaidBoye Developer`);
         }
 

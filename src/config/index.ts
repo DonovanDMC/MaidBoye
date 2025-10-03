@@ -76,6 +76,7 @@ export class Configuration extends PrivateConfiguration {
             defaultImageSize:          4096,
             gateway:                   {
                 autoReconnect: true,
+                getAllUsers:   true,
                 concurrency:   "auto",
                 intents:       [
                     "GUILDS",
@@ -102,9 +103,6 @@ export class Configuration extends PrivateConfiguration {
                     }],
                     status: "dnd"
                 }
-            },
-            rest: {
-                superProperties: "eyJjbGllbnRfYnVpbGRfbnVtYmVyIjoxNjI5OTJ9"
             }
         };
     }
